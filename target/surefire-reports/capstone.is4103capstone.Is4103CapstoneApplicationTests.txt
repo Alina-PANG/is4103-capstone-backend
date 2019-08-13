@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: capstone.is4103capstone.Is4103CapstoneApplicationTests
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.385 s - in capstone.is4103capstone.Is4103CapstoneApplicationTests

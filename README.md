@@ -17,7 +17,7 @@ Find the main application: Is4103CapstoneApplication.java
 
 Right click anywhere in the file and select ![image](./gitignore_screenshot/04.png)
 
-A sample controller & index page has been created. Open the browser, go to http://localhost:8080/ to view the webpage as following:
+A sample controller & index page has been created. Open the browser, go to http://localhost:8080/ to view the webpage
 ![image](./gitignore_screenshot/05.png)
 
 ## Installing Dependencies
