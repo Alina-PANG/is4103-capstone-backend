@@ -1,9 +1,9 @@
-package capstone.is4103capstone.module01.service;
+package capstone.is4103capstone.demoModule.service;
 
-import capstone.is4103capstone.module01.model.DemoRole;
-import capstone.is4103capstone.module01.model.DemoUser;
-import capstone.is4103capstone.module01.repository.RoleRepository;
-import capstone.is4103capstone.module01.repository.UserRepository;
+import capstone.is4103capstone.demoModule.model.DemoRole;
+import capstone.is4103capstone.demoModule.model.DemoUser;
+import capstone.is4103capstone.demoModule.repository.RoleRepository;
+import capstone.is4103capstone.demoModule.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

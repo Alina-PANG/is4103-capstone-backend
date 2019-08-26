@@ -1,9 +1,7 @@
-package capstone.is4103capstone.module01.controller;
+package capstone.is4103capstone.demoModule.controller;
 
-import capstone.is4103capstone.module01.service.DemoService;
+import capstone.is4103capstone.demoModule.service.DemoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

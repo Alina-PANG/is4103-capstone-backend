@@ -1,6 +1,6 @@
-package capstone.is4103capstone.module01.repository;
+package capstone.is4103capstone.demoModule.repository;
 
-import capstone.is4103capstone.module01.model.DemoRole;
+import capstone.is4103capstone.demoModule.model.DemoRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
