@@ -7,9 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 public class Is4103CapstoneApplication {
-
     public static void main(String[] args) {
     	SpringApplication.run(Is4103CapstoneApplication.class, args);
     }
-
 }

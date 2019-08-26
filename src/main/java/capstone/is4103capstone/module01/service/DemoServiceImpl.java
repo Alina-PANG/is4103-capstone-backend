@@ -1,6 +1,6 @@
 package capstone.is4103capstone.module01.service;
 
-import capstone.is4103capstone.module01.domain.DemoObject;
+import capstone.is4103capstone.module01.model.DemoObject;
 import org.springframework.stereotype.Service;
 
 //Actual Implementation of the service functions
@@ -15,7 +15,6 @@ public class DemoServiceImpl implements DemoService {
 
     @Override
     public void insertObject(DemoObject demoObject) {
-
     }
 
     @Override

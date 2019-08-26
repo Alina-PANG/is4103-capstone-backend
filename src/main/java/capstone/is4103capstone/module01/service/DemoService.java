@@ -1,6 +1,6 @@
 package capstone.is4103capstone.module01.service;
 
-import capstone.is4103capstone.module01.domain.DemoObject;
+import capstone.is4103capstone.module01.model.DemoObject;
 
 //Some CRUD functions
 public interface DemoService {

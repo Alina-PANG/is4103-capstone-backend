@@ -13,13 +13,16 @@ public class DemoController {
     DemoService demoService;
 
     @GetMapping
-    public String defaultDemoPage(){
+    public String defaultDemoPage() {
         return "This is default page for DemoService";
     }
 
     @GetMapping("/{id}")
-    public String getDemoObjectById(@PathVariable("id") long id){
+    public String getDemoObjectById(@PathVariable("id") long id) {
         return demoService.getTestString(id);
     }
+
+
+
 
 }
