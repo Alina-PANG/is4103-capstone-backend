@@ -39,6 +39,10 @@ Make sure to branch out when commiting later changes! :D
 3. Junit
 4. Spring Web Starter (for Restful services)
 
+## Database Connection
+The url and auth info are in `application.properties`
+Demo schema is under `demo.sql`
+
 ## Error Handling
 Whenever there is any 'pom' or 'maven' error, or when any dependencies have been added to pom.xml, do:
 - Terminal: `mvn clean install`, or
