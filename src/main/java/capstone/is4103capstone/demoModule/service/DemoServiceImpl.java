@@ -1,6 +1,6 @@
 package capstone.is4103capstone.demoModule.service;
 
-import capstone.is4103capstone.demoModule.model.DemoObject;
+import capstone.is4103capstone.demoModule.entity.DemoObject;
 import org.springframework.stereotype.Service;
 
 //Actual Implementation of the service functions
