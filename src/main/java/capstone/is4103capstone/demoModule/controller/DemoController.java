@@ -17,28 +17,7 @@ public class DemoController {
     @Autowired
     DemoService demoService;
 
-    @Autowired
-    ExportToFileService exportToFileService;
 
-    @GetMapping
-    public String defaultDemoPage() {
-        return "This is default page for DemoService";
-    }
-
-
-    @GetMapping(value = "/api/download/customers.xlsx")
-    public ResponseEntity<InputStreamResource> excelCustomersReport() {
-        ByteArrayInputStream in = exportToFileService.exportToExcel("customers");
-        // return IOUtils.toByteArray(in);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=customers.xlsx");
-
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .body(new InputStreamResource(in));
-    }
 
     @GetMapping("/{id}")
     public String getDemoObjectById(@PathVariable("id") long id) {

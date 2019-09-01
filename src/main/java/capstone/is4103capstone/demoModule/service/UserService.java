@@ -1,7 +1,7 @@
 package capstone.is4103capstone.demoModule.service;
 
-import capstone.is4103capstone.demoModule.model.DemoRole;
-import capstone.is4103capstone.demoModule.model.DemoUser;
+import capstone.is4103capstone.demoModule.entity.DemoRole;
+import capstone.is4103capstone.demoModule.entity.DemoUser;
 
 import java.util.List;
 

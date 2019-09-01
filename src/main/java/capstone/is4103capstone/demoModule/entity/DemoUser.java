@@ -1,4 +1,4 @@
-package capstone.is4103capstone.demoModule.model;
+package capstone.is4103capstone.demoModule.entity;
 
 import javax.persistence.*;
 import java.util.Set;
