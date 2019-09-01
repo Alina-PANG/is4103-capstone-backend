@@ -10,6 +10,7 @@
 	- check 'import Maven projects automatically'
 	- JDK for importer: select java version 1.8
 6. Next until the project is generated
+7. In the application.properties file, search for "file.upload-dir" and change to your corresponding path
 
 ## Running the Project
 Find the main application: Is4103CapstoneApplication.java
