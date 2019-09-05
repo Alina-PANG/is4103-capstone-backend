@@ -1,8 +1,8 @@
-package capstone.is4103capstone.demoModule.controller;
+package capstone.is4103capstone._demoModule.controller;
 
-import capstone.is4103capstone.demoModule.entity.DemoRole;
-import capstone.is4103capstone.demoModule.entity.DemoUser;
-import capstone.is4103capstone.demoModule.service.UserService;
+import capstone.is4103capstone._demoModule.entity.DemoRole;
+import capstone.is4103capstone._demoModule.entity.DemoUser;
+import capstone.is4103capstone._demoModule.service.UserService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
