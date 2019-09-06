@@ -1,4 +1,4 @@
-package capstone.is4103capstone.demoModule.entity;
+package capstone.is4103capstone._demoModule.entity;
 
 import org.springframework.data.annotation.Id;
 
