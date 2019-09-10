@@ -4,9 +4,17 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 //add the two annotations
-//@Entity
-//@Table
+@Entity
+@Table
 public class DemoEntity extends DBEntityTemplate {
-    //other properties of the entity
-    //+getter/setter
+
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

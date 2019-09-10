@@ -1,22 +1,32 @@
 package capstone.is4103capstone.configuration;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.UUID;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class DBEntityTemplate {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID id;
 
-    @Column(columnDefinition = "boolean default false")
-    private Boolean isDeleted;
+    private String objectName;
+
+    @Column(unique = true)
+    private String runningId;
+
+    private String hierachyPath;
+
+    private Boolean isDeleted = false;
 
     private String createdBy;
     @Temporal(TemporalType.TIMESTAMP)
@@ -32,11 +42,11 @@ public class DBEntityTemplate {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date lastModifiedDateTime;
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
     public Boolean getDeleted() {
@@ -93,5 +103,29 @@ public class DBEntityTemplate {
 
     public void setLastModifiedDateTime(Date lastModifiedDateTime) {
         this.lastModifiedDateTime = lastModifiedDateTime;
+    }
+
+    public String getRunningId() {
+        return runningId;
+    }
+
+    public void setRunningId(String runningId) {
+        this.runningId = runningId;
+    }
+
+    public String getHierachyPath() {
+        return hierachyPath;
+    }
+
+    public void setHierachyPath(String hierachyPath) {
+        this.hierachyPath = hierachyPath;
+    }
+
+    public String getObjectName() {
+        return objectName;
+    }
+
+    public void setObjectName(String objectName) {
+        this.objectName = objectName;
     }
 }
