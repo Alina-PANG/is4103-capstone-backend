@@ -1,0 +1,20 @@
+package capstone.is4103capstone.entities;
+
+import capstone.is4103capstone.configuration.DBEntityTemplate;
+
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.util.List;
+
+@Entity
+@Table
+public class CostCenter extends DBEntityTemplate {
+
+    @OneToMany
+    private List<Employee> employees;
+
+    @ManyToOne
+    private Employee costCenterManager;
+}

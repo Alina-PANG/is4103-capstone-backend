@@ -22,7 +22,7 @@ public class DBEntityTemplate {
     private String objectName;
 
     @Column(unique = true)
-    private String runningId;
+    private String code;
 
     private String hierachyPath;
 
@@ -105,12 +105,12 @@ public class DBEntityTemplate {
         this.lastModifiedDateTime = lastModifiedDateTime;
     }
 
-    public String getRunningId() {
-        return runningId;
+    public String getCode() {
+        return code;
     }
 
-    public void setRunningId(String runningId) {
-        this.runningId = runningId;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getHierachyPath() {
