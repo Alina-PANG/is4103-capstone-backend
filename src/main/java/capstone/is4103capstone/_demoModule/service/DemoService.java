@@ -1,12 +1,18 @@
 package capstone.is4103capstone._demoModule.service;
 
-import capstone.is4103capstone._demoModule.entity.DemoObject;
+import capstone.is4103capstone._demoModule.repository.DemoEntityRepository;
+import capstone.is4103capstone.configuration.DemoEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 //Some CRUD functions
-public interface DemoService {
-    DemoObject getObjectById(Long id);
+public class DemoService {
 
-    void insertObject(DemoObject demoObject);
+    @Autowired
+    DemoEntityRepository demoEntityRepository;
 
-    String getTestString(long id);
+    public List<DemoEntity> findAllDemoEntities(){
+        return demoEntityRepository.findAll();
+    }
 }
