@@ -14,10 +14,13 @@ import java.util.UUID;
 public class DBEntityTemplate {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID id;
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(updatable = false, nullable = false)
+    private String id;
 
     private String objectName;
 
@@ -42,11 +45,11 @@ public class DBEntityTemplate {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date lastModifiedDateTime;
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
     public Boolean getDeleted() {

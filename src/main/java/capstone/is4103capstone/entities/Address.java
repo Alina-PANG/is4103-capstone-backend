@@ -1,6 +1,12 @@
-package capstone.is4103capstone.entities.nonentity;
+package capstone.is4103capstone.entities;
 
-public class Address {
+
+import capstone.is4103capstone.configuration.DBEntityTemplate;
+
+import javax.persistence.Entity;
+
+@Entity
+public class Address extends DBEntityTemplate {
 
     private String addressLine1;
 

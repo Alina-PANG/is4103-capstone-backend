@@ -1,7 +1,6 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.nonentity.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -10,6 +9,8 @@ import java.util.List;
 @Entity
 @Table
 public class Office extends DBEntityTemplate {
+    @OneToOne
+    @JoinColumn(name = "office-address")
     private Address address;
 
     private Integer numOfFloors;

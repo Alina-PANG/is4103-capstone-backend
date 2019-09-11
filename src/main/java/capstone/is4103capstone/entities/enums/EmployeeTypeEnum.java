@@ -1,6 +1,6 @@
 package capstone.is4103capstone.entities.enums;
 
-public enum EmployeeType {
+public enum EmployeeTypeEnum {
     PERMANENT,
     TEMPORARY,
     WORKINGFROMHOME
