@@ -24,6 +24,23 @@ public class DBEntityTemplate {
     @Length(min=36, max=36)
     private String id;
 
+    public DBEntityTemplate() {
+    }
+
+    public DBEntityTemplate(String objectName, String code, String hierachyPath) {
+        this.objectName = objectName;
+        this.code = code;
+        this.hierachyPath = hierachyPath;
+    }
+
+    public DBEntityTemplate(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy) {
+        this.objectName = objectName;
+        this.code = code;
+        this.hierachyPath = hierachyPath;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
     private String objectName;
 
     @Column(unique = true)

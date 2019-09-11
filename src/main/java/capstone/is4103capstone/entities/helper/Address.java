@@ -21,6 +21,9 @@ public class Address{
 
     private String regionCode;
 
+    public Address() {
+    }
+
     public Address(String addressLine1, String adddressLine2, String postalCode, String city, String countryCode, String regionCode) {
         this.addressLine1 = addressLine1;
         this.adddressLine2 = adddressLine2;

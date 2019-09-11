@@ -4,18 +4,19 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "costcenter")
 public class CostCenter extends DBEntityTemplate {
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany
     @JoinColumn(name = "costcenter_employees")//uni-directional
-    private List<Employee> employees;
+    private List<Employee> employees = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "costcenter_manager")
+    @JoinColumn(name = "ccmanager")
     @JsonIgnore
     private Employee costCenterManager;
 
