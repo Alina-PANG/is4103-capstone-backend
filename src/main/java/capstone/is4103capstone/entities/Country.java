@@ -24,4 +24,28 @@ public class Country extends DBEntityTemplate {
 
     @OneToMany(mappedBy = "country")
     private List<Office> offices;
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public List<CompanyFunction> getFunctions() {
+        return functions;
+    }
+
+    public void setFunctions(List<CompanyFunction> functions) {
+        this.functions = functions;
+    }
+
+    public List<Office> getOffices() {
+        return offices;
+    }
+
+    public void setOffices(List<Office> offices) {
+        this.offices = offices;
+    }
 }

@@ -18,4 +18,28 @@ public class CompanyFunction extends DBEntityTemplate {
 
     @Convert(converter = StringListConverter.class)
     private List<String> officesCodeOfFunction;
+
+    public List<Country> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<Country> countries) {
+        this.countries = countries;
+    }
+
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
+    }
+
+    public List<String> getOfficesCodeOfFunction() {
+        return officesCodeOfFunction;
+    }
+
+    public void setOfficesCodeOfFunction(List<String> officesCodeOfFunction) {
+        this.officesCodeOfFunction = officesCodeOfFunction;
+    }
 }

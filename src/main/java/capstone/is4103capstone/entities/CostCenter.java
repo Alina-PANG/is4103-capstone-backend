@@ -18,4 +18,20 @@ public class CostCenter extends DBEntityTemplate {
     @JoinColumn(name = "costcenter_manager")
     @JsonIgnore
     private Employee costCenterManager;
+
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
+
+    public Employee getCostCenterManager() {
+        return costCenterManager;
+    }
+
+    public void setCostCenterManager(Employee costCenterManager) {
+        this.costCenterManager = costCenterManager;
+    }
 }

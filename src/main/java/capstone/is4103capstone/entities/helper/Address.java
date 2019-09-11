@@ -1,4 +1,4 @@
-package capstone.is4103capstone.entities;
+package capstone.is4103capstone.entities.helper;
 
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
@@ -20,6 +20,15 @@ public class Address{
     private String countryCode;
 
     private String regionCode;
+
+    public Address(String addressLine1, String adddressLine2, String postalCode, String city, String countryCode, String regionCode) {
+        this.addressLine1 = addressLine1;
+        this.adddressLine2 = adddressLine2;
+        this.postalCode = postalCode;
+        this.city = city;
+        this.countryCode = countryCode;
+        this.regionCode = regionCode;
+    }
 
     public String getAddressLine1() {
         return addressLine1;

@@ -21,4 +21,20 @@ public class Team extends DBEntityTemplate {
             inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private List<Employee> members;
+
+    public CompanyFunction getFunction() {
+        return function;
+    }
+
+    public void setFunction(CompanyFunction function) {
+        this.function = function;
+    }
+
+    public List<Employee> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<Employee> members) {
+        this.members = members;
+    }
 }
