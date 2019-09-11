@@ -20,6 +20,7 @@ public class Office extends DBEntityTemplate {
     @JsonIgnore
     private Country country;
 
+
 //    @ManyToMany//do we need this?
 //    private List<CompanyFunction> companyFunctions;
 
