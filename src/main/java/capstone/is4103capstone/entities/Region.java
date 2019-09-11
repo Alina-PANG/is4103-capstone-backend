@@ -11,6 +11,6 @@ import java.util.List;
 @Table
 public class Region extends DBEntityTemplate {
 
-    @OneToMany
+    @OneToMany(mappedBy = "region")
     private List<Country> countries;
 }

@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,11 +19,18 @@ public class Employee extends DBEntityTemplate {
     private String password;
     private List<String> groupsBelongTo;
 
-    @ManyToMany
+    //A uni-directional with CostCenter
+    private String costCenterCode;
+
+    @ManyToMany(mappedBy = "members")
     private List<Team> memberOfTeams;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee-manager")
+    @JsonIgnore
     private Employee manager;
-    @OneToMany
+
+    @OneToMany(mappedBy = "manager")
     private List<Employee> subordinates;
 
     public String getFirstName() {
@@ -35,6 +43,14 @@ public class Employee extends DBEntityTemplate {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getCostCenterCode() {
+        return costCenterCode;
+    }
+
+    public void setCostCenterCode(String costCenterCode) {
+        this.costCenterCode = costCenterCode;
     }
 
     public void setLastName(String lastName) {

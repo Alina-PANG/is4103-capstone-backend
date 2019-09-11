@@ -9,8 +9,9 @@ import java.util.List;
 @Table
 public class Function extends DBEntityTemplate {
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "functions")
     private List<Country> countries;
-    @OneToMany
+
+    @OneToMany(mappedBy = "function")
     private List<Team> teams;
 }
