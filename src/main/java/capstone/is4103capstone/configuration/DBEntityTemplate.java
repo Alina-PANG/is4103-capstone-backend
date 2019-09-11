@@ -1,6 +1,7 @@
 package capstone.is4103capstone.configuration;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,10 +15,14 @@ import java.util.UUID;
 public class DBEntityTemplate {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID id;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(
+            name = "uuid",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(unique = true, updatable = false, nullable = false,length = 36)
+    @Length(min=36, max=36)
+    private String id;
 
     private String objectName;
 
@@ -42,11 +47,11 @@ public class DBEntityTemplate {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date lastModifiedDateTime;
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
     public Boolean getDeleted() {
