@@ -37,11 +37,78 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "manager")
     private List<Employee> subordinates;
 
+    @OneToMany(mappedBy = "assignee")
+    private List<Action> actionsAssigned;
+
+    @OneToMany(mappedBy = "creator")
+    private List<Action> actionsCreated;
+
+    @OneToMany(mappedBy = "handler")
+    private List<Dispute> disputesHandling;
+
+    @OneToMany(mappedBy = "creator")
+    private List<Dispute> disputesCreated;
+
+    @OneToMany(mappedBy = "employeeInCharge")
+    private List<Outsourcing> outsourcingInCharged;
+
+    @OneToMany(mappedBy = "employeeAssess")
+    private List<OutsourcingAssessment> outsourcingAssessmentList;
+
+
     public Employee(String firstName, String lastName, String middleName, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
         this.password = password;
+    }
+
+    public List<Outsourcing> getOutsourcingInCharged() {
+        return outsourcingInCharged;
+    }
+
+    public List<OutsourcingAssessment> getOutsourcingAssessmentList() {
+        return outsourcingAssessmentList;
+    }
+
+    public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
+        this.outsourcingAssessmentList = outsourcingAssessmentList;
+    }
+
+    public void setOutsourcingInCharged(List<Outsourcing> outsourcingInCharged) {
+        this.outsourcingInCharged = outsourcingInCharged;
+    }
+
+    public List<Dispute> getDisputesHandling() {
+        return disputesHandling;
+    }
+
+    public void setDisputesHandling(List<Dispute> disputesHandling) {
+        this.disputesHandling = disputesHandling;
+    }
+
+    public List<Dispute> getDisputesCreated() {
+        return disputesCreated;
+    }
+
+    public void setDisputesCreated(List<Dispute> disputesCreated) {
+        this.disputesCreated = disputesCreated;
+    }
+
+    public List<Action> getActionsAssigned() {
+        return actionsAssigned;
+    }
+
+    public void setActionsAssigned(List<Action> actionsAssigned) {
+        this.actionsAssigned = actionsAssigned;
+    }
+
+    public List<Action> getActionsCreated() {
+        return actionsCreated;
+    }
+
+    public void setActionsCreated(List<Action> actionsCreated) {
+        this.actionsCreated = actionsCreated;
     }
 
     public String getFirstName() {
