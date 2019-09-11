@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,13 +17,27 @@ public class Office extends DBEntityTemplate {
 
     private Integer numOfFloors;
 
-    @ManyToOne
-    @JoinColumn(name = "country_office")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
     @JsonIgnore
     private Country country;
 
+
     @Convert(converter = StringListConverter.class)
-    private List<String> functionsCodeInOffice;
+    private List<String> functionsCodeInOffice = new ArrayList<>();
+
+    public Office() {
+    }
+
+    public Office(String officeName, String officeCode, String hierachyPath) {
+        super(officeName, officeCode, hierachyPath);
+    }
+
+    public Office(String officeName, String officeCode, String hierachyPath, Address address, Integer numOfFloors) {
+        super(officeName, officeCode, hierachyPath);
+        this.address = address;
+        this.numOfFloors = numOfFloors;
+    }
 
     public Address getAddress() {
         return address;

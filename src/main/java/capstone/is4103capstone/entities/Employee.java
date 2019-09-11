@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -14,34 +15,50 @@ Haven't added in accessRequest
 @Entity
 @Table
 public class Employee extends DBEntityTemplate {
-
+    @Column(unique = true)
+    private String userName;
     private String firstName;
     private String lastName;
     private String middleName;
     private String password;
     @Convert(converter = StringListConverter.class)
-    private List<String> groupsBelongTo;
+    private List<String> groupsBelongTo = new ArrayList<>();
 
     private EmployeeTypeEnum employeeType;
     //A uni-directional with CostCenter
     private String costCenterCode;
 
-    @ManyToMany(mappedBy = "members")
-    private List<Team> memberOfTeams;
+    @ManyToMany(mappedBy = "members",fetch = FetchType.EAGER)
+    private List<Team> memberOfTeams = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_manager")
+    @JoinColumn(name = "manager_id")
     @JsonIgnore
     private Employee manager;
 
     @OneToMany(mappedBy = "manager")
-    private List<Employee> subordinates;
+    private List<Employee> subordinates = new ArrayList<>();
 
-    public Employee(String firstName, String lastName, String middleName, String password) {
+    public Employee() {
+    }
+
+    public Employee(String userName, String firstName, String lastName, String middleName, String password) {
+        this.userName = userName;
+        this.setObjectName(userName);
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
         this.password = password;
+    }
+
+
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getFirstName() {

@@ -4,26 +4,34 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table
 public class Country extends DBEntityTemplate {
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "region_country",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
     @JsonIgnore
     private Region region;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "country_function",
             joinColumns = @JoinColumn(name = "country_id"),
             inverseJoinColumns = @JoinColumn(name = "function_id")
     )
-    private List<CompanyFunction> functions;
+    private List<CompanyFunction> functions = new ArrayList<>();
 
     @OneToMany(mappedBy = "country")
-    private List<Office> offices;
+    private List<Office> offices = new ArrayList<>();
+
+    public Country() {
+    }
+
+    public Country(String countryName, String countryCode, String hierachyPath) {
+        super(countryName, countryCode, hierachyPath);
+    }
 
     public Region getRegion() {
         return region;
