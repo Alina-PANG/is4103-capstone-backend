@@ -26,7 +26,7 @@ public class Vendor extends DBEntityTemplate {
     @OneToMany(mappedBy = "outsourcedVendor")
     private List<Outsourcing> outsourcingList;
 
-    public Vendor(String businessUnit, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail, Contract contract) {
+    public Vendor(String businessUnit, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
         this.businessUnit = businessUnit;
         this.serviceDescription = serviceDescription;
         this.relationshipManagerName = relationshipManagerName;
@@ -35,7 +35,6 @@ public class Vendor extends DBEntityTemplate {
         this.billingContactEmail = billingContactEmail;
         this.escalationContactName = escalationContactName;
         this.escalationContactEmail = escalationContactEmail;
-        this.contract = contract;
     }
 
     public Vendor() {
