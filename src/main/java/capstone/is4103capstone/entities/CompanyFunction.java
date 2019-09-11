@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table
-public class Function extends DBEntityTemplate {
+public class CompanyFunction extends DBEntityTemplate {
 
     @ManyToMany(mappedBy = "functions")
     private List<Country> countries;

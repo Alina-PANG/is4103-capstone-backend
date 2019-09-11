@@ -30,7 +30,7 @@ public class Employee extends DBEntityTemplate {
     private List<Team> memberOfTeams;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee-manager")
+    @JoinColumn(name = "employee_manager")
     @JsonIgnore
     private Employee manager;
 

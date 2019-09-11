@@ -10,17 +10,17 @@ import java.util.List;
 @Table
 public class Office extends DBEntityTemplate {
     @OneToOne
-    @JoinColumn(name = "office-address")
+    @JoinColumn(name = "office_address")
     private Address address;
 
     private Integer numOfFloors;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "country-office",nullable = false)
+    @JoinColumn(name = "country_office",nullable = false)
     @JsonIgnore
     private Country country;
 
-    @ManyToMany//do we need this?
-    private List<Function> functions;
+//    @ManyToMany//do we need this?
+//    private List<CompanyFunction> companyFunctions;
 
 }

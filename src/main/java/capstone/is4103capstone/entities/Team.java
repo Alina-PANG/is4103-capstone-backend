@@ -11,13 +11,13 @@ import java.util.List;
 public class Team extends DBEntityTemplate {
 
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "function-team",nullable = false)
+    @JoinColumn(name = "function_team",nullable = false)
     @JsonIgnore
-    private Function function;
+    private CompanyFunction function;
 
     @ManyToMany
-    @JoinTable(name = "team-employee",
-    joinColumns =@JoinColumn(name = "team_id"),
+    @JoinTable(name = "team_employee",
+    joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private List<Employee> members;

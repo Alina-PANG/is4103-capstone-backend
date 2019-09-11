@@ -11,14 +11,14 @@ import java.util.List;
 public class Country extends DBEntityTemplate {
 
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "region-country",nullable = false)
+    @JoinColumn(name = "region_country",nullable = false)
     @JsonIgnore
     private Region region;
 
     @ManyToMany
-    @JoinTable(name = "country-function",
+    @JoinTable(name = "country_function",
             joinColumns = @JoinColumn(name = "country_id"),
             inverseJoinColumns = @JoinColumn(name = "function_id")
     )
-    private List<Function> functions;
+    private List<CompanyFunction> functions;
 }

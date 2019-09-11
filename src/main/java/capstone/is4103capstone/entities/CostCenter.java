@@ -7,15 +7,15 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table
+@Table(name = "costcenter")
 public class CostCenter extends DBEntityTemplate {
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "costcenter-employees")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "costcenter_employees")//uni-directional
     private List<Employee> employees;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "costcenter-manager")
+    @JoinColumn(name = "costcenter_manager")
     @JsonIgnore
     private Employee costCenterManager;
 }
