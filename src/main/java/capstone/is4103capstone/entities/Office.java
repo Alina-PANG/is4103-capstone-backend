@@ -1,7 +1,9 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.poi.ss.formula.functions.Count;
 
 import javax.persistence.*;
 import java.util.List;
@@ -9,19 +11,17 @@ import java.util.List;
 @Entity
 @Table
 public class Office extends DBEntityTemplate {
-    @OneToOne
-    @JoinColumn(name = "office_address")
+    @Embedded
     private Address address;
 
     private Integer numOfFloors;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "country_office",nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "country_office")
     @JsonIgnore
     private Country country;
 
-
-//    @ManyToMany//do we need this?
-//    private List<CompanyFunction> companyFunctions;
+    @Convert(converter = StringListConverter.class)
+    private List<String> functionsCodeInOffice;
 
 }

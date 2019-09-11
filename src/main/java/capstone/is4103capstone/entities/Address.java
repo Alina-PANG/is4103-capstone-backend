@@ -3,10 +3,11 @@ package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 
-@Entity
-public class Address extends DBEntityTemplate {
+@Embeddable
+public class Address{
 
     private String addressLine1;
 
@@ -19,7 +20,6 @@ public class Address extends DBEntityTemplate {
     private String countryCode;
 
     private String regionCode;
-
 
     public String getAddressLine1() {
         return addressLine1;

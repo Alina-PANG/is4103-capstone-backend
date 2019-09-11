@@ -21,4 +21,7 @@ public class Country extends DBEntityTemplate {
             inverseJoinColumns = @JoinColumn(name = "function_id")
     )
     private List<CompanyFunction> functions;
+
+    @OneToMany(mappedBy = "country")
+    private List<Office> offices;
 }
