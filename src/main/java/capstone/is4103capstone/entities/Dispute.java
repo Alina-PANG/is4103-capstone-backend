@@ -33,6 +33,9 @@ public class Dispute extends DBEntityTemplate {
         return disputeDescription;
     }
 
+    public Dispute() {
+    }
+
     public void setDisputeDescription(String disputeDescription) {
         this.disputeDescription = disputeDescription;
     }

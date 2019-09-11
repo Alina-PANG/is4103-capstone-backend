@@ -31,6 +31,9 @@ public class Outsourcing extends DBEntityTemplate {
         this.outsourcingAssessment = outsourcingAssessment;
     }
 
+    public Outsourcing() {
+    }
+
     public String getOutsourcingDescription() {
         return outsourcingDescription;
     }

@@ -25,6 +25,9 @@ public class OutsourcingAssessment extends DBEntityTemplate {
 
     private OutsourcingAssessmentStatusEnum outsourcingAssessmentStatus;
 
+    public OutsourcingAssessment() {
+    }
+
     public OutsourcingAssessment(List<OutsourcingAssessmentSection> sectionList, Employee employeeAssess, OutsourcingAssessmentStatusEnum outsourcingAssessmentStatus) {
         this.sectionList = sectionList;
         this.employeeAssess = employeeAssess;

@@ -29,6 +29,9 @@ public class OutsourcingAssessmentLine extends DBEntityTemplate {
         this.outsourcingAssessmentSection = outsourcingAssessmentSection;
     }
 
+    public OutsourcingAssessmentLine() {
+    }
+
     public String getQuestion() {
         return question;
     }

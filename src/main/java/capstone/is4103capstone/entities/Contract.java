@@ -12,15 +12,25 @@ import java.util.Date;
 @Table
 public class Contract extends DBEntityTemplate {
     private PurchaseTypeEnum purchaseType;
+
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
+
+    @Temporal(TemporalType.TIMESTAMP)
     private Date renewalStartDate;
+
     private String contractTerm; //no of months, evergreen, perpetual
     private ContractTypeEnum contractType;
     //to-do: hierarchy
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
+
+    @Temporal(TemporalType.TIMESTAMP)
     private Date cpgReviewAlertDate;
+
     private String spendType; //not very sure
 
     @OneToOne(mappedBy = "contract")
@@ -36,6 +46,9 @@ public class Contract extends DBEntityTemplate {
         this.noticeDaysToExit = noticeDaysToExit;
         this.spendType = spendType;
         this.vendor = vendor;
+    }
+
+    public Contract() {
     }
 
     public PurchaseTypeEnum getPurchaseType() {

@@ -30,6 +30,9 @@ public class Action extends DBEntityTemplate {
         this.creator = creator;
     }
 
+    public Action() {
+    }
+
     public String getActionDescription() {
         return actionDescription;
     }

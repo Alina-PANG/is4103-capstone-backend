@@ -18,6 +18,9 @@ public class OutsourcingAssessmentSection extends DBEntityTemplate {
     @OneToMany(mappedBy = "outsourcingAssessmentSection")
     private List<OutsourcingAssessmentLine> outsourcingAssessmentLines;
 
+    public OutsourcingAssessmentSection() {
+    }
+
     public OutsourcingAssessmentSection(List<OutsourcingAssessmentLine> outsourcingAssessmentLines) {
         this.outsourcingAssessmentLines = outsourcingAssessmentLines;
     }

@@ -38,6 +38,9 @@ public class Vendor extends DBEntityTemplate {
         this.contract = contract;
     }
 
+    public Vendor() {
+    }
+
     public List<Outsourcing> getOutsourcingList() {
         return outsourcingList;
     }
