@@ -1,4 +1,6 @@
-package capstone.is4103capstone.configuration;
+package capstone.is4103capstone.entities;
+
+import capstone.is4103capstone.configuration.DBEntityTemplate;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
