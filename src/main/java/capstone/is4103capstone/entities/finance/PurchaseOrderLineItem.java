@@ -1,7 +1,6 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.supplyChain.Contract;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
