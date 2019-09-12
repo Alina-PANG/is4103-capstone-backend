@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.finance.ApprovalForRequest;
 import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.entities.supplyChain.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -51,15 +52,29 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "employee")
     private List<ApprovalForRequest> approvalForRequests= new ArrayList<>();
 
+    @OneToMany(mappedBy = "assignee")
+    private List<Action> actionsAssigned;
+
+    @OneToMany(mappedBy = "creator")
+    private List<Action> actionsCreated;
+
+    @OneToMany(mappedBy = "handler")
+    private List<Dispute> disputesHandling;
+
+    @OneToMany(mappedBy = "creator")
+    private List<Dispute> disputesCreated;
+
+    @OneToMany(mappedBy = "employeeInChargeOutsourcing")
+    private List<Outsourcing> outsourcingInCharged;
+
+    @OneToMany(mappedBy = "employeeInChargeContract")
+    private List<Contract> contractInCharged;
+
+    @OneToMany(mappedBy = "employeeAssess")
+    private List<OutsourcingAssessment> outsourcingAssessmentList;
+
+
     public Employee() {
-    }
-
-    public List<ApprovalForRequest> getApprovalForRequests() {
-        return approvalForRequests;
-    }
-
-    public void setApprovalForRequests(List<ApprovalForRequest> approvalForRequests) {
-        this.approvalForRequests = approvalForRequests;
     }
 
     public Employee(String userName, String firstName, String lastName, String middleName, String password) {
@@ -69,22 +84,6 @@ public class Employee extends DBEntityTemplate {
         this.lastName = lastName;
         this.middleName = middleName;
         this.password = password;
-    }
-
-    public List<PurchaseOrder> getPurchaseOrders() {
-        return purchaseOrders;
-    }
-
-    public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
-        this.purchaseOrders = purchaseOrders;
-    }
-
-    public List<BJF> getBjfs() {
-        return bjfs;
-    }
-
-    public void setBjfs(List<BJF> bjfs) {
-        this.bjfs = bjfs;
     }
 
     public String getUserName() {
@@ -173,5 +172,85 @@ public class Employee extends DBEntityTemplate {
 
     public void setSubordinates(List<Employee> subordinates) {
         this.subordinates = subordinates;
+    }
+
+    public List<PurchaseOrder> getPurchaseOrders() {
+        return purchaseOrders;
+    }
+
+    public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
+        this.purchaseOrders = purchaseOrders;
+    }
+
+    public List<BJF> getBjfs() {
+        return bjfs;
+    }
+
+    public void setBjfs(List<BJF> bjfs) {
+        this.bjfs = bjfs;
+    }
+
+    public List<ApprovalForRequest> getApprovalForRequests() {
+        return approvalForRequests;
+    }
+
+    public void setApprovalForRequests(List<ApprovalForRequest> approvalForRequests) {
+        this.approvalForRequests = approvalForRequests;
+    }
+
+    public List<Action> getActionsAssigned() {
+        return actionsAssigned;
+    }
+
+    public void setActionsAssigned(List<Action> actionsAssigned) {
+        this.actionsAssigned = actionsAssigned;
+    }
+
+    public List<Action> getActionsCreated() {
+        return actionsCreated;
+    }
+
+    public void setActionsCreated(List<Action> actionsCreated) {
+        this.actionsCreated = actionsCreated;
+    }
+
+    public List<Dispute> getDisputesHandling() {
+        return disputesHandling;
+    }
+
+    public void setDisputesHandling(List<Dispute> disputesHandling) {
+        this.disputesHandling = disputesHandling;
+    }
+
+    public List<Dispute> getDisputesCreated() {
+        return disputesCreated;
+    }
+
+    public void setDisputesCreated(List<Dispute> disputesCreated) {
+        this.disputesCreated = disputesCreated;
+    }
+
+    public List<Outsourcing> getOutsourcingInCharged() {
+        return outsourcingInCharged;
+    }
+
+    public void setOutsourcingInCharged(List<Outsourcing> outsourcingInCharged) {
+        this.outsourcingInCharged = outsourcingInCharged;
+    }
+
+    public List<Contract> getContractInCharged() {
+        return contractInCharged;
+    }
+
+    public void setContractInCharged(List<Contract> contractInCharged) {
+        this.contractInCharged = contractInCharged;
+    }
+
+    public List<OutsourcingAssessment> getOutsourcingAssessmentList() {
+        return outsourcingAssessmentList;
+    }
+
+    public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
+        this.outsourcingAssessmentList = outsourcingAssessmentList;
     }
 }
