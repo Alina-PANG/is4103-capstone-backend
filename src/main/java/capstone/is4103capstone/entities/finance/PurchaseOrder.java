@@ -39,7 +39,7 @@ public class PurchaseOrder extends DBEntityTemplate {
         super(poName, poCode, hierachyPath);
     }
 
-    public PurchaseOrder(Employee employee, BJF bjf, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
+    public PurchaseOrder(Employee employee, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
         this.employee = employee;
         this.purchaseOrderLineItems = purchaseOrderLineItems;
         this.invoices = invoices;
@@ -93,5 +93,14 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.statementOfAccounts = statementOfAccounts;
     }
 
-
+    public Double calculateTotalPrice(){
+        if (this.purchaseOrderLineItems.size() == 0){
+            return Double.valueOf(0.0);
+        }
+        Double total = 0d;
+        for (PurchaseOrderLineItem lineItem: purchaseOrderLineItems){
+            total += lineItem.getPrice() * lineItem.getQuantity();
+        }
+        return total;
+    }
 }
