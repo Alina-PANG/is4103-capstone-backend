@@ -2,13 +2,15 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.enums.ContractStatusEnum;
-import capstone.is4103capstone.entities.enums.ContractTypeEnum;
-import capstone.is4103capstone.entities.enums.PurchaseTypeEnum;
+import capstone.is4103capstone.util.enums.ContractStatusEnum;
+import capstone.is4103capstone.util.enums.ContractTypeEnum;
+import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table
@@ -42,6 +44,9 @@ public class Contract extends DBEntityTemplate {
     @JoinColumn(name = "employee_inCharge_contract")
     @JsonIgnore
     private Employee employeeInChargeContract;
+
+    @OneToMany(mappedBy = "contract")
+    private List<Contract> contracts = new ArrayList<>();
 
 
     public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract) {

@@ -23,13 +23,13 @@ public class Outsourcing extends DBEntityTemplate {
     private Employee employeeInChargeOutsourcing;
 
     @OneToMany(mappedBy = "outsourcing")
-    private List<OutsourcingAssessment> outsourcingAssessment;
+    private List<OutsourcingAssessment> outsourcingAssessmentList;
 
-    public Outsourcing(String outsourcingDescription, Vendor outsourcedVendor, Employee employeeInChargeOutsourcing, List<OutsourcingAssessment> outsourcingAssessment) {
+    public Outsourcing(String outsourcingDescription, Vendor outsourcedVendor, Employee employeeInChargeOutsourcing, List<OutsourcingAssessment> outsourcingAssessmentList) {
         this.outsourcingDescription = outsourcingDescription;
         this.outsourcedVendor = outsourcedVendor;
         this.employeeInChargeOutsourcing = employeeInChargeOutsourcing;
-        this.outsourcingAssessment = outsourcingAssessment;
+        this.outsourcingAssessmentList = outsourcingAssessmentList;
     }
 
     public Outsourcing() {
@@ -59,11 +59,11 @@ public class Outsourcing extends DBEntityTemplate {
         this.employeeInChargeOutsourcing = employeeInChargeOutsourcing;
     }
 
-    public List<OutsourcingAssessment> getOutsourcingAssessment() {
-        return outsourcingAssessment;
+    public List<OutsourcingAssessment> getOutsourcingAssessmentList() {
+        return outsourcingAssessmentList;
     }
 
-    public void setOutsourcingAssessment(List<OutsourcingAssessment> outsourcingAssessment) {
-        this.outsourcingAssessment = outsourcingAssessment;
+    public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
+        this.outsourcingAssessmentList = outsourcingAssessmentList;
     }
 }

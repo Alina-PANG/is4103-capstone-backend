@@ -18,7 +18,7 @@ public class Team extends DBEntityTemplate {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "team_employee",
-    joinColumns = @JoinColumn(name = "team_id"),
+            joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private List<Employee> members = new ArrayList<>();

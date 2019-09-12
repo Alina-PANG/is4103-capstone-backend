@@ -2,7 +2,7 @@ package capstone.is4103capstone.admin;
 
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
-import capstone.is4103capstone.entities.enums.EmployeeTypeEnum;
+import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.entities.helper.Address;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
