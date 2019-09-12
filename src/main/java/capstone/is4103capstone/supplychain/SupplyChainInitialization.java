@@ -3,10 +3,7 @@ package capstone.is4103capstone.supplychain;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.Merchandise;
-import capstone.is4103capstone.entities.supplyChain.Action;
-import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.Dispute;
-import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.entities.supplyChain.*;
 import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
 import capstone.is4103capstone.supplychain.Repository.*;
 import capstone.is4103capstone.util.enums.*;
@@ -140,18 +137,56 @@ public class SupplyChainInitialization {
     }
 
     public void createOutsourcingAssessmentLine(){
-
+        OutsourcingAssessmentLine outsourcingAssessmentLine = new OutsourcingAssessmentLine("Question1: Can we do it by ourselves?");
+        outsourcingAssessmentLine.setCode("Outsourcing_Assessment_Line1");
+        outsourcingAssessmentLineRepository.save(outsourcingAssessmentLine);
     }
 
     public void createOutsourcingAssessmentSection(){
+        OutsourcingAssessmentLine outsourcingAssessmentLine = outsourcingAssessmentLineRepository.findOutsourcingAssessmentLineByCode("Outsourcing_Assessment_Line1").get(0);
 
+        OutsourcingAssessmentSection outsourcingAssessmentSection = new OutsourcingAssessmentSection();
+        outsourcingAssessmentSection.setCode("Outsourcing_Assessment_Section1");
+        outsourcingAssessmentSection.getOutsourcingAssessmentLines().add(outsourcingAssessmentLine);
+        outsourcingAssessmentSectionRepository.save(outsourcingAssessmentSection);
+
+        outsourcingAssessmentLine.setOutsourcingAssessmentSection(outsourcingAssessmentSection);
+        outsourcingAssessmentLineRepository.saveAndFlush(outsourcingAssessmentLine);
     }
 
     public void createOutsourcingAssessment(){
+        OutsourcingAssessmentSection outsourcingAssessmentSection = outsourcingAssessmentSectionRepository.findOutsourcingAssessmentSectionByCode("Outsourcing_Assessment_Section1").get(0);
+        Employee employeeAssess = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
 
+        OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
+        outsourcingAssessment.setCode("Outsourcing_Assessment1");
+        outsourcingAssessment.setEmployeeAssess(employeeAssess);
+        outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.CREATED);
+        outsourcingAssessmentRepository.save(outsourcingAssessment);
+
+        employeeAssess.getOutsourcingAssessmentList().add(outsourcingAssessment);
+        outsourcingAssessmentSection.setOutsourcingAssessment(outsourcingAssessment);
+        employeeRepository.saveAndFlush(employeeAssess);
+        outsourcingAssessmentSectionRepository.saveAndFlush(outsourcingAssessmentSection);
     }
 
     public void createOutsourcing(){
+        OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findOutsourcingAssessmentByCode("Outsourcing_Assessment1").get(0);
+        Employee employeeInCharge = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
+        Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo").get(0);
 
+        Outsourcing outsourcing = new Outsourcing();
+        outsourcing.setOutsourcingDescription("This is a ... outsourcing.");
+        outsourcing.setEmployeeInChargeOutsourcing(employeeInCharge);
+        outsourcing.setOutsourcedVendor(vendor);
+        outsourcing.getOutsourcingAssessmentList().add(outsourcingAssessment);
+        outsourcingRepository.save(outsourcing);
+
+        vendor.getOutsourcingList().add(outsourcing);
+        employeeInCharge.getOutsourcingInCharged().add(outsourcing);
+        outsourcingAssessment.setOutsourcing(outsourcing);
+        vendorRepository.saveAndFlush(vendor);
+        employeeRepository.saveAndFlush(employeeInCharge);
+        outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
     }
 }
