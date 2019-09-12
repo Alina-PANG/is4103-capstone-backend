@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -14,10 +15,8 @@ public class PurchaseOrder extends DBEntityTemplate {
     @JsonIgnore
     private Employee employee;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bjf_id")
-    @JsonIgnore
-    private BJF bjf;
+    @Convert(converter = StringListConverter.class)
+    private List<String> relatedBJF;
 
     @OneToMany(mappedBy = "purchaseOrder")
     private List<PurchaseOrderLineItem> purchaseOrderLineItems = new ArrayList<>();
@@ -40,7 +39,6 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public PurchaseOrder(Employee employee, BJF bjf, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
         this.employee = employee;
-        this.bjf = bjf;
         this.purchaseOrderLineItems = purchaseOrderLineItems;
         this.invoices = invoices;
         this.merchandises = merchandises;
@@ -55,12 +53,12 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.merchandises = merchandises;
     }
 
-    public BJF getBjf() {
-        return bjf;
+    public List<String> getRelatedBJF() {
+        return relatedBJF;
     }
 
-    public void setBjf(BJF bjf) {
-        this.bjf = bjf;
+    public void setRelatedBJF(List<String> relatedBJF) {
+        this.relatedBJF = relatedBJF;
     }
 
     public Employee getEmployee() {

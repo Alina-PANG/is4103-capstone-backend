@@ -27,6 +27,15 @@ public class DBEntityTemplate {
     public DBEntityTemplate() {
     }
 
+    public DBEntityTemplate(String objectName, String code) {
+        this.objectName = objectName;
+        this.code = code;
+    }
+
+    public DBEntityTemplate(String code) {
+        this.code = code;
+    }
+
     public DBEntityTemplate(String objectName, String code, String hierachyPath) {
         this.objectName = objectName;
         this.code = code;

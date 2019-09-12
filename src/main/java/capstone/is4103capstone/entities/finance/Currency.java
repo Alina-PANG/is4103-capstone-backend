@@ -6,16 +6,18 @@ import capstone.is4103capstone.entities.Country;
 import javax.persistence.ManyToMany;
 
 public class Currency extends DBEntityTemplate {
-    Character symbol;
-    String abbr;
+    private Character symbol;
+    private String countryCode;
 
     public Currency() {
     }
 
-    public Currency(Character symbol, String abbr) {
+    public Currency(String currencyName, String currencyCode,Character symbol,String countryCode) {
+        super(currencyName, currencyCode);
         this.symbol = symbol;
-        this.abbr = abbr;
+        this.countryCode = countryCode;
     }
+
 
     public Character getSymbol() {
         return symbol;
@@ -25,11 +27,4 @@ public class Currency extends DBEntityTemplate {
         this.symbol = symbol;
     }
 
-    public String getAbbr() {
-        return abbr;
-    }
-
-    public void setAbbr(String abbr) {
-        this.abbr = abbr;
-    }
 }
