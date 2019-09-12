@@ -1,4 +1,4 @@
-package capstone.is4103capstone.entities.enums;
+package capstone.is4103capstone.util.enums;
 
 public enum OutsourcingAssessmentStatusEnum {
     CREATED,

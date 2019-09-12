@@ -2,10 +2,9 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.enums.ContractStatusEnum;
-import capstone.is4103capstone.entities.enums.ContractTypeEnum;
-import capstone.is4103capstone.entities.enums.PurchaseTypeEnum;
-import capstone.is4103capstone.entities.finance.BudgetSub2;
+import capstone.is4103capstone.util.enums.ContractStatusEnum;
+import capstone.is4103capstone.util.enums.ContractTypeEnum;
+import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
