@@ -22,6 +22,8 @@ public class Merchandise extends DBEntityTemplate {
     @JsonIgnore
     private Vendor vendor;
 
+    private String currentContractCode;
+
 //    @OneToMany(mappedBy = "merchandise")
 //    private BJF bjf;
 
@@ -31,13 +33,6 @@ public class Merchandise extends DBEntityTemplate {
 //            inverseJoinColumns = @JoinColumn(name = "po_id")
 //    )
 //    private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "contract_merchandise",
-            joinColumns = @JoinColumn(name = "merchandise_id"),
-            inverseJoinColumns = @JoinColumn(name = "contract_id")
-    )
-    private List<Contract> contractList = new ArrayList<>();
 
     private Double price;
 
@@ -60,12 +55,13 @@ public class Merchandise extends DBEntityTemplate {
 //        this.bjf = bjf;
 //    }
 
-    public List<Contract> getContractList() {
-        return contractList;
+
+    public String getCurrentContractCode() {
+        return currentContractCode;
     }
 
-    public void setContractList(List<Contract> contractList) {
-        this.contractList = contractList;
+    public void setCurrentContractCode(String currentContractCode) {
+        this.currentContractCode = currentContractCode;
     }
 
     public BudgetSub2 getBudgetSub2() {
