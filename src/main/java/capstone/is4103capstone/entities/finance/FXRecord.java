@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "fx_record")
+@Table
 public class FXRecord extends DBEntityTemplate {
 
     String baseCurrencyAbbr;

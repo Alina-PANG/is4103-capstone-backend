@@ -29,7 +29,7 @@ public class Employee extends DBEntityTemplate {
     private List<String> groupsBelongTo = new ArrayList<>();
 
     private EmployeeTypeEnum employeeType;
-    //A uni-directional with CostCenter
+    //A uni-directional with CostCcenter
     private String costCenterCode;
 
     @ManyToMany(mappedBy = "members",fetch = FetchType.EAGER)

@@ -1,7 +1,7 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.finance.BudgetPlan;
+import capstone.is4103capstone.entities.finance.Plan;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -17,7 +17,7 @@ public class CostCenter extends DBEntityTemplate {
     private List<Employee> employees = new ArrayList<>();
 
     @OneToMany(mappedBy = "costCenter")
-    private List<BudgetPlan> budgetPlans = new ArrayList<>();
+    private List<Plan> plans = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ccmanager")

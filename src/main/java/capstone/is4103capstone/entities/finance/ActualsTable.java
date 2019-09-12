@@ -3,13 +3,12 @@ package capstone.is4103capstone.entities.finance;
 import capstone.is4103capstone.entities.CostCenter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table
 public class ActualsTable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "costCenter_id")

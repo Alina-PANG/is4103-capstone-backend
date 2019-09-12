@@ -26,25 +26,26 @@ public class Country extends DBEntityTemplate {
     @OneToMany(mappedBy = "country")
     private List<Office> offices = new ArrayList<>();
 
-    private String currencyAbbr;
+    private String currencyCode;
+
 
     public Country() {
     }
 
-    public Country(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Region region, List<CompanyFunction> functions, List<Office> offices, String currencyAbbr) {
+    public Country(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Region region, List<CompanyFunction> functions, List<Office> offices, String currencyCode) {
         super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
         this.region = region;
         this.functions = functions;
         this.offices = offices;
-        this.currencyAbbr = currencyAbbr;
+        this.currencyCode = currencyCode;
     }
 
-    public String getCurrencyAbbr() {
-        return currencyAbbr;
+    public String getCurrencyCode() {
+        return currencyCode;
     }
 
-    public void setCurrencyAbbr(String currencyAbbr) {
-        this.currencyAbbr = currencyAbbr;
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public Country(String countryName, String countryCode, String hierachyPath) {

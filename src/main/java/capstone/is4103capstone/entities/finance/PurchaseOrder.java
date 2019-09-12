@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities.finance;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -18,6 +19,10 @@ public class PurchaseOrder extends DBEntityTemplate {
     @Convert(converter = StringListConverter.class)
     private List<String> relatedBJF;
 
+    @ManyToOne
+    @JoinColumn(name = "vendor_id")
+    private Vendor vendor;
+
     @OneToMany(mappedBy = "purchaseOrder")
     private List<PurchaseOrderLineItem> purchaseOrderLineItems = new ArrayList<>();
 
@@ -26,9 +31,6 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     @OneToMany(mappedBy = "purchaseOrder")
     private List<StatementOfAcctLineItem> statementOfAccounts= new ArrayList<>();
-
-    @ManyToMany(fetch = FetchType.EAGER,mappedBy = "purchaseOrders")
-    private List<Merchandise> merchandises = new ArrayList<>();
 
     public PurchaseOrder() {
     }
@@ -41,16 +43,14 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.employee = employee;
         this.purchaseOrderLineItems = purchaseOrderLineItems;
         this.invoices = invoices;
-        this.merchandises = merchandises;
     }
 
-
-    public List<Merchandise> getMerchandises() {
-        return merchandises;
+    public Vendor getVendor() {
+        return vendor;
     }
 
-    public void setMerchandises(List<Merchandise> merchandises) {
-        this.merchandises = merchandises;
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 
     public List<String> getRelatedBJF() {

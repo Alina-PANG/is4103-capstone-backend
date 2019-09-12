@@ -1,21 +1,24 @@
 package capstone.is4103capstone.entities.finance;
 
+import capstone.is4103capstone.entities.supplyChain.Contract;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
+@Entity
+@Table
 public class PurchaseOrderLineItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchaseOrder_id")
     @JsonIgnore
     private PurchaseOrder purchaseOrder;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "actualsTable_id")
-    @JsonIgnore
-    private ActualsTable actualsTable;
+    private Merchandise merchandise;
+    private Integer quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "contract_id")
+    private Contract contractReferredTo;
 
     public PurchaseOrderLineItem() {
     }
@@ -28,11 +31,30 @@ public class PurchaseOrderLineItem {
         this.purchaseOrder = purchaseOrder;
     }
 
-    public ActualsTable getActualsTable() {
-        return actualsTable;
+
+    public Merchandise getMerchandise() {
+        return merchandise;
     }
 
-    public void setActualsTable(ActualsTable actualsTable) {
-        this.actualsTable = actualsTable;
+    public void setMerchandise(Merchandise merchandise) {
+        this.merchandise = merchandise;
     }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public Contract getContractReferredTo() {
+        return contractReferredTo;
+    }
+
+    public void setContractReferredTo(Contract contractReferredTo) {
+        this.contractReferredTo = contractReferredTo;
+    }
+
+
 }
