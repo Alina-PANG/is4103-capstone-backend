@@ -17,15 +17,6 @@ public class BudgetItem extends DBEntityTemplate {
     private BudgetSub2 budgetSub2;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vendor_id")
-    @JsonIgnore
-    private Vendor vendor;
-
-    Double price;
-
-    String currencyAbbr;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract_id")
     @JsonIgnore
     Contract contract;
@@ -36,17 +27,20 @@ public class BudgetItem extends DBEntityTemplate {
     BudgetPlan budgetPlan;
 
     @OneToMany(mappedBy = "budgetItem")
+    private List<Item> items= new ArrayList<>();
+
+    @OneToMany(mappedBy = "budgetItem")
     private List<BudgetLineItem> budgetLineItems = new ArrayList<>();
 
     public BudgetItem() {
     }
 
-    public BudgetItem(BudgetSub2 budgetSub2, Vendor vendor, Double price, String currencyAbbr, Contract contract) {
+    public BudgetItem(BudgetSub2 budgetSub2, Contract contract, BudgetPlan budgetPlan, List<Item> items, List<BudgetLineItem> budgetLineItems) {
         this.budgetSub2 = budgetSub2;
-        this.vendor = vendor;
-        this.price = price;
-        this.currencyAbbr = currencyAbbr;
         this.contract = contract;
+        this.budgetPlan = budgetPlan;
+        this.items = items;
+        this.budgetLineItems = budgetLineItems;
     }
 
     public BudgetSub2 getBudgetSub2() {
@@ -57,35 +51,35 @@ public class BudgetItem extends DBEntityTemplate {
         this.budgetSub2 = budgetSub2;
     }
 
-    public Vendor getVendor() {
-        return vendor;
-    }
-
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public String getCurrencyAbbr() {
-        return currencyAbbr;
-    }
-
-    public void setCurrencyAbbr(String currencyAbbr) {
-        this.currencyAbbr = currencyAbbr;
-    }
-
     public Contract getContract() {
         return contract;
     }
 
     public void setContract(Contract contract) {
         this.contract = contract;
+    }
+
+    public BudgetPlan getBudgetPlan() {
+        return budgetPlan;
+    }
+
+    public void setBudgetPlan(BudgetPlan budgetPlan) {
+        this.budgetPlan = budgetPlan;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
+    public List<BudgetLineItem> getBudgetLineItems() {
+        return budgetLineItems;
+    }
+
+    public void setBudgetLineItems(List<BudgetLineItem> budgetLineItems) {
+        this.budgetLineItems = budgetLineItems;
     }
 }

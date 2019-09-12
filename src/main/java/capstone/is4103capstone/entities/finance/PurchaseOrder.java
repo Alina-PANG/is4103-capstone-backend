@@ -36,6 +36,9 @@ public class PurchaseOrder extends DBEntityTemplate {
     @OneToMany(mappedBy = "purchaseOrder")
     private List<StatementOfAccount> statementOfAccounts= new ArrayList<>();
 
+    @OneToMany(mappedBy = "purchaseOrder")
+    private List<Item> items= new ArrayList<>();
+
     public PurchaseOrder() {
     }
 
