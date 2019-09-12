@@ -35,8 +35,8 @@ public class PurchaseOrder extends DBEntityTemplate {
     public PurchaseOrder() {
     }
 
-    public PurchaseOrder(String poName, String poCode, String hierachyPath) {
-        super(poName, poCode, hierachyPath);
+    public PurchaseOrder(String poCode, String hierachyPath) {
+        super(poCode, hierachyPath);
     }
 
     public PurchaseOrder(Employee employee, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
