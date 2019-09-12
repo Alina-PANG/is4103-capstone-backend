@@ -3,10 +3,7 @@ package capstone.is4103capstone.entities.supplyChain;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table
@@ -14,7 +11,7 @@ public class ContractLine extends DBEntityTemplate{
     private String merchandiseCode;
     private Double price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract")
     @JsonIgnore
     private Contract contract;

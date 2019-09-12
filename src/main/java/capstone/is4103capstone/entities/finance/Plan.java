@@ -13,8 +13,8 @@ import java.util.List;
 @Entity
 @Table
 public class Plan extends DBEntityTemplate {
-    @OneToMany(mappedBy = "planBelongsTo")
-    private List<PlanLineItem> budgetLineItems = new ArrayList<>();
+    @OneToMany(mappedBy = "planBelongsTo",fetch = FetchType.EAGER)
+    private List<PlanLineItem> lineItems = new ArrayList<>();
 
     private Integer forYear;
 
@@ -41,18 +41,18 @@ public class Plan extends DBEntityTemplate {
     }
 
     public Plan(List<PlanLineItem> budgetItems, CostCenter costCenter, BudgetPlanStatusEnum budgetPlanStatusEnum, Integer version) {
-        this.budgetLineItems = budgetItems;
+        this.lineItems = budgetItems;
         this.costCenter = costCenter;
         this.budgetPlanStatusEnum = budgetPlanStatusEnum;
         this.version = version;
     }
 
-    public List<PlanLineItem> getBudgetLineItems() {
-        return budgetLineItems;
+    public List<PlanLineItem> getLineItems() {
+        return lineItems;
     }
 
-    public void setBudgetLineItems(List<PlanLineItem> budgetLineItems) {
-        this.budgetLineItems = budgetLineItems;
+    public void setLineItems(List<PlanLineItem> lineItems) {
+        this.lineItems = lineItems;
     }
 
     public CostCenter getCostCenter() {

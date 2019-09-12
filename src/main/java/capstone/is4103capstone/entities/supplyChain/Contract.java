@@ -18,13 +18,13 @@ import java.util.List;
 public class Contract extends DBEntityTemplate {
     private PurchaseTypeEnum purchaseType;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date startDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date renewalStartDate;
 
     private String contractTerm; //no of months, evergreen, perpetual
@@ -33,7 +33,7 @@ public class Contract extends DBEntityTemplate {
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
     private String spendType; //not very sure
@@ -41,11 +41,11 @@ public class Contract extends DBEntityTemplate {
     @OneToOne(mappedBy = "contract")
     private Vendor vendor;
 
-    @OneToMany(mappedBy = "contract")
+    @OneToMany(mappedBy = "contract",fetch = FetchType.EAGER)
     private List<ContractLine> contractLines = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_inCharge_contract")
+    @JoinColumn(name = "employee_incharge")
     @JsonIgnore
     private Employee employeeInChargeContract;
 

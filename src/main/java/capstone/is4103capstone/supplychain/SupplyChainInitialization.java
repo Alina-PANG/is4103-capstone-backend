@@ -118,7 +118,8 @@ public class SupplyChainInitialization {
         contractLine1.setContract(contract1);
         contractLine2.setContract(contract1);
         vendor.setContract(contract1);
-        merchandise.setCurrentContractCode("Contract1");
+        merchandise.setActiveContractCode("Contract1");
+
         newEmployee.getContractInCharged().add(contract1);
 
         vendorRepository.saveAndFlush(vendor);

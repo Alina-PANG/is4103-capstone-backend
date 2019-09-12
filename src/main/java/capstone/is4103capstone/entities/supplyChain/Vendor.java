@@ -22,11 +22,11 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactName;
     private String escalationContactEmail;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+    //@LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "vendor")
     private List<Merchandise> merchandises = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+    //@LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "vendor")
     private List<Invoice> invoices = new ArrayList<>();
 
@@ -34,7 +34,7 @@ public class Vendor extends DBEntityTemplate {
     @JoinColumn(name = "contract_id", referencedColumnName = "id")
     private Contract contract;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+    //@LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "outsourcedVendor")
     private List<Outsourcing> outsourcingList = new ArrayList<>();
 

@@ -16,7 +16,7 @@ public class Project extends DBEntityTemplate {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectOwner_Id")
     private Employee projectOwner;
 

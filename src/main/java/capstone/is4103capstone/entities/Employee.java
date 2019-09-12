@@ -31,10 +31,12 @@ public class Employee extends DBEntityTemplate {
     private List<String> groupsBelongTo = new ArrayList<>();
 
     private EmployeeTypeEnum employeeType;
-    //A uni-directional with CostCenter
-    private String costCenterCode;
 
-    @ManyToMany(mappedBy = "members",fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "costcenter_id")
+    private CostCenter defaultCostCenter;
+
+    @ManyToMany(mappedBy = "members")
     private List<Team> memberOfTeams = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,39 +48,38 @@ public class Employee extends DBEntityTemplate {
     private List<Employee> subordinates = new ArrayList<>();
 
     @OneToMany(mappedBy = "employee")
-    private List<PurchaseOrder> purchaseOrders= new ArrayList<>();
-
-    @OneToMany(mappedBy = "employee")
     private List<BJF> bjfs= new ArrayList<>();
 
-    @OneToMany(mappedBy = "employee")
-    private List<ApprovalForRequest> approvalForRequests= new ArrayList<>();
+    @Convert(converter = StringListConverter.class)
+    private List<String> myRequestTickets= new ArrayList<>();
+    @Convert(converter = StringListConverter.class)
+    private List<String> myApprovals = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "assignee")
     private List<Action> actionsAssigned = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "creator")
     private List<Action> actionsCreated = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "handler")
     private List<Dispute> disputesHandling = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "creator")
     private List<Dispute> disputesCreated = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeInChargeOutsourcing")
     private List<Outsourcing> outsourcingInCharged = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeInChargeContract")
     private List<Contract> contractInCharged = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
@@ -150,12 +151,12 @@ public class Employee extends DBEntityTemplate {
         this.employeeType = employeeType;
     }
 
-    public String getCostCenterCode() {
-        return costCenterCode;
+    public CostCenter getDefaultCostCenter() {
+        return defaultCostCenter;
     }
 
-    public void setCostCenterCode(String costCenterCode) {
-        this.costCenterCode = costCenterCode;
+    public void setDefaultCostCenter(CostCenter defaultCostCenter) {
+        this.defaultCostCenter = defaultCostCenter;
     }
 
     public List<Team> getMemberOfTeams() {
@@ -182,12 +183,20 @@ public class Employee extends DBEntityTemplate {
         this.subordinates = subordinates;
     }
 
-    public List<PurchaseOrder> getPurchaseOrders() {
-        return purchaseOrders;
+    public List<String> getMyRequestTickets() {
+        return myRequestTickets;
     }
 
-    public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
-        this.purchaseOrders = purchaseOrders;
+    public void setMyRequestTickets(List<String> myRequestTickets) {
+        this.myRequestTickets = myRequestTickets;
+    }
+
+    public List<String> getMyApprovals() {
+        return myApprovals;
+    }
+
+    public void setMyApprovals(List<String> myApprovals) {
+        this.myApprovals = myApprovals;
     }
 
     public List<BJF> getBjfs() {
@@ -196,14 +205,6 @@ public class Employee extends DBEntityTemplate {
 
     public void setBjfs(List<BJF> bjfs) {
         this.bjfs = bjfs;
-    }
-
-    public List<ApprovalForRequest> getApprovalForRequests() {
-        return approvalForRequests;
-    }
-
-    public void setApprovalForRequests(List<ApprovalForRequest> approvalForRequests) {
-        this.approvalForRequests = approvalForRequests;
     }
 
     public List<Action> getActionsAssigned() {

@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -38,6 +39,11 @@ public class Merchandise extends DBEntityTemplate {
     public Merchandise() {
     }
 
+    public Merchandise(String objectName, String code, String hierachyPath, Double currentPrice, String currencyCode) {
+        super(objectName, code, hierachyPath);
+        this.currentPrice = currentPrice;
+        this.currencyCode = currencyCode;
+    }
 
     public Merchandise(String merchandiseName, String merchandiseCode, String hierachyPath) {
         super(merchandiseName, merchandiseCode, hierachyPath);

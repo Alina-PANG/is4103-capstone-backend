@@ -14,7 +14,7 @@ public class ApprovalForRequest extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "approver_id")
     @JsonIgnore
-    private Employee approver;
+    private Employee approver;//uni-directional
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id")

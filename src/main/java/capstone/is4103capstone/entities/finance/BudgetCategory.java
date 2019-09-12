@@ -16,7 +16,7 @@ public class BudgetCategory extends DBEntityTemplate {
     @JsonIgnore
     private Country country;
 
-    @OneToMany(mappedBy = "budgetCategory")
+    @OneToMany(mappedBy = "budgetCategory",fetch = FetchType.EAGER)
     private List<BudgetSub1> budgetSub1s = new ArrayList<>();
 
     public BudgetCategory() {

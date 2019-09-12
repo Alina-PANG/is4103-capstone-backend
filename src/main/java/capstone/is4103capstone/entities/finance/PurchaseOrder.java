@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities.finance;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -12,19 +13,14 @@ import java.util.List;
 @Entity
 @Table
 public class PurchaseOrder extends DBEntityTemplate {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id")
-    @JsonIgnore
-    private Employee employee;
-
     @Convert(converter = StringListConverter.class)
     private List<String> relatedBJF;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vendor_id")
     private Vendor vendor;
 
-    @OneToMany(mappedBy = "purchaseOrder")
+    @OneToMany(mappedBy = "purchaseOrder",fetch = FetchType.EAGER)
     private List<PurchaseOrderLineItem> purchaseOrderLineItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "purchaseOrder")
@@ -41,7 +37,6 @@ public class PurchaseOrder extends DBEntityTemplate {
     }
 
     public PurchaseOrder(Employee employee, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
-        this.employee = employee;
         this.purchaseOrderLineItems = purchaseOrderLineItems;
         this.invoices = invoices;
     }
@@ -60,14 +55,6 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public void setRelatedBJF(List<String> relatedBJF) {
         this.relatedBJF = relatedBJF;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
     }
 
     public List<PurchaseOrderLineItem> getPurchaseOrderLineItems() {

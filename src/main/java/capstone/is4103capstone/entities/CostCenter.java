@@ -13,8 +13,7 @@ import java.util.List;
 @Table(name = "costcenter")
 public class CostCenter extends DBEntityTemplate {
 
-    @OneToMany
-    @JoinColumn(name = "costcenter_employees")//uni-directional
+    @OneToMany(mappedBy = "defaultCostCenter")
     private List<Employee> employees = new ArrayList<>();
 
     @OneToMany(mappedBy = "costCenter")
@@ -25,7 +24,7 @@ public class CostCenter extends DBEntityTemplate {
     @JsonIgnore
     private Employee costCenterManager;
 
-    @OneToMany(mappedBy = "costCenter")
+    @OneToMany(mappedBy = "costCenter",fetch = FetchType.EAGER)
     private List<ActualsTable> actuals = new ArrayList<>();
 
     public CostCenter() {

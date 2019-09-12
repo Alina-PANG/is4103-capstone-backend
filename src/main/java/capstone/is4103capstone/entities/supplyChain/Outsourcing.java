@@ -23,7 +23,7 @@ public class Outsourcing extends DBEntityTemplate {
     @JsonIgnore
     private Employee employeeInChargeOutsourcing;
 
-    @OneToMany(mappedBy = "outsourcing")
+    @OneToMany(mappedBy = "outsourcing",fetch = FetchType.EAGER)
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
     public Outsourcing(String outsourcingDescription, Vendor outsourcedVendor, Employee employeeInChargeOutsourcing, List<OutsourcingAssessment> outsourcingAssessmentList) {
