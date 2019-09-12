@@ -1,7 +1,7 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.enums.EmployeeTypeEnum;
+import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.entities.finance.ApprovalForRequest;
 import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;

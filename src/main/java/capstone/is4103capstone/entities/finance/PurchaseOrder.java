@@ -18,11 +18,6 @@ public class PurchaseOrder extends DBEntityTemplate {
     private Employee employee;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vendor_id")
-    @JsonIgnore
-    private Vendor vendor;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bjf_id")
     @JsonIgnore
     private BJF bjf;
@@ -42,13 +37,21 @@ public class PurchaseOrder extends DBEntityTemplate {
     public PurchaseOrder() {
     }
 
-    public PurchaseOrder(Employee employee, Vendor vendor, BJF bjf, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAccount> statementOfAccounts) {
+    public PurchaseOrder(Employee employee, BJF bjf, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAccount> statementOfAccounts, List<Item> items) {
         this.employee = employee;
-        this.vendor = vendor;
         this.bjf = bjf;
         this.purchaseOrderLineItems = purchaseOrderLineItems;
         this.invoices = invoices;
         this.statementOfAccounts = statementOfAccounts;
+        this.items = items;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 
     public BJF getBjf() {
@@ -65,14 +68,6 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
-    }
-
-    public Vendor getVendor() {
-        return vendor;
-    }
-
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
     }
 
     public List<PurchaseOrderLineItem> getPurchaseOrderLineItems() {
