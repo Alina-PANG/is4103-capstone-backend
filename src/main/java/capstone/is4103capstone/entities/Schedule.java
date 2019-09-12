@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.util.enums.ScheduleRecurringBasisEnum;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
