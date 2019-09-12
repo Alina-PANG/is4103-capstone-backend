@@ -1,6 +1,7 @@
-package capstone.is4103capstone.entities;
+package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.Employee;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -17,17 +18,17 @@ public class Outsourcing extends DBEntityTemplate {
     private Vendor outsourcedVendor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_inCharge")
+    @JoinColumn(name = "employee_inCharge_outsourcing")
     @JsonIgnore
-    private Employee employeeInCharge;
+    private Employee employeeInChargeOutsourcing;
 
     @OneToMany(mappedBy = "outsourcing")
     private List<OutsourcingAssessment> outsourcingAssessment;
 
-    public Outsourcing(String outsourcingDescription, Vendor outsourcedVendor, Employee employeeInCharge, List<OutsourcingAssessment> outsourcingAssessment) {
+    public Outsourcing(String outsourcingDescription, Vendor outsourcedVendor, Employee employeeInChargeOutsourcing, List<OutsourcingAssessment> outsourcingAssessment) {
         this.outsourcingDescription = outsourcingDescription;
         this.outsourcedVendor = outsourcedVendor;
-        this.employeeInCharge = employeeInCharge;
+        this.employeeInChargeOutsourcing = employeeInChargeOutsourcing;
         this.outsourcingAssessment = outsourcingAssessment;
     }
 
@@ -50,12 +51,12 @@ public class Outsourcing extends DBEntityTemplate {
         this.outsourcedVendor = outsourcedVendor;
     }
 
-    public Employee getEmployeeInCharge() {
-        return employeeInCharge;
+    public Employee getEmployeeInChargeOutsourcing() {
+        return employeeInChargeOutsourcing;
     }
 
-    public void setEmployeeInCharge(Employee employeeInCharge) {
-        this.employeeInCharge = employeeInCharge;
+    public void setEmployeeInChargeOutsourcing(Employee employeeInChargeOutsourcing) {
+        this.employeeInChargeOutsourcing = employeeInChargeOutsourcing;
     }
 
     public List<OutsourcingAssessment> getOutsourcingAssessment() {

@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.entities.supplyChain.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -54,8 +55,11 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "creator")
     private List<Dispute> disputesCreated;
 
-    @OneToMany(mappedBy = "employeeInCharge")
+    @OneToMany(mappedBy = "employeeInChargeOutsourcing")
     private List<Outsourcing> outsourcingInCharged;
+
+    @OneToMany(mappedBy = "employeeInChargeContract")
+    private List<Contract> contractInCharged;
 
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList;

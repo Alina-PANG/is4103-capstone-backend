@@ -1,7 +1,8 @@
-package capstone.is4103capstone.entities;
+package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import capstone.is4103capstone.entities.supplyChain.Contract;
+import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 
 import javax.persistence.*;
 import java.util.List;

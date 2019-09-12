@@ -1,9 +1,11 @@
-package capstone.is4103capstone.entities;
+package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.enums.ContractStatusEnum;
 import capstone.is4103capstone.entities.enums.ContractTypeEnum;
 import capstone.is4103capstone.entities.enums.PurchaseTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -36,7 +38,13 @@ public class Contract extends DBEntityTemplate {
     @OneToOne(mappedBy = "contract")
     private Vendor vendor;
 
-    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_inCharge_contract")
+    @JsonIgnore
+    private Employee employeeInChargeContract;
+
+
+    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract) {
         this.purchaseType = purchaseType;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -46,9 +54,18 @@ public class Contract extends DBEntityTemplate {
         this.noticeDaysToExit = noticeDaysToExit;
         this.spendType = spendType;
         this.vendor = vendor;
+        this.employeeInChargeContract = employeeInChargeContract;
     }
 
     public Contract() {
+    }
+
+    public Employee getEmployeeInChargeContract() {
+        return employeeInChargeContract;
+    }
+
+    public void setEmployeeInChargeContract(Employee employeeInChargeContract) {
+        this.employeeInChargeContract = employeeInChargeContract;
     }
 
     public PurchaseTypeEnum getPurchaseType() {

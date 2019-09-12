@@ -1,4 +1,4 @@
-package capstone.is4103capstone.entities;
+package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;

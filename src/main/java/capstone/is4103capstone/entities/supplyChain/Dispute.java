@@ -1,6 +1,7 @@
-package capstone.is4103capstone.entities;
+package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.enums.DisputeStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
