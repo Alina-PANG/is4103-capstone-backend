@@ -90,8 +90,8 @@ public class SupplyChainInitialization {
     public void createContract(){
         ContractLine contractLine1 = new ContractLine("SG_Banana",2.0);
         ContractLine contractLine2 = new ContractLine("SG_Mango",5.0);
-        contractLineRepository.save(contractLine1);
-        contractLineRepository.save(contractLine2);
+        contractLine1 = contractLineRepository.save(contractLine1);
+        contractLine2 = contractLineRepository.save(contractLine2);
 
         Contract contract1 = new Contract();
         contract1.setPurchaseType(PurchaseTypeEnum.TERMLICENSE);
@@ -104,6 +104,7 @@ public class SupplyChainInitialization {
         long time = startDate.getTime();
         Timestamp startTs = new Timestamp(time);
         contract1.setStartDate(startTs);
+
         contract1.getContractLines().add(contractLine1);
         contract1.getContractLines().add(contractLine2);
 
@@ -113,13 +114,15 @@ public class SupplyChainInitialization {
 
         contract1.setVendor(vendor);
         contract1.setEmployeeInChargeContract(newEmployee);
-        contractRepository.save(contract1);
+
+        contract1 = contractRepository.save(contract1);
 
         contractLine1.setContract(contract1);
         contractLine2.setContract(contract1);
         vendor.setContract(contract1);
         merchandise.setActiveContractCode("Contract1");
 
+        newEmployee.getContractInCharged().size();
         newEmployee.getContractInCharged().add(contract1);
 
         vendorRepository.saveAndFlush(vendor);

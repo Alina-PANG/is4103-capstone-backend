@@ -55,31 +55,31 @@ public class Employee extends DBEntityTemplate {
     @Convert(converter = StringListConverter.class)
     private List<String> myApprovals = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "assignee")
     private List<Action> actionsAssigned = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "creator")
     private List<Action> actionsCreated = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "handler")
     private List<Dispute> disputesHandling = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "creator")
     private List<Dispute> disputesCreated = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeInChargeOutsourcing")
     private List<Outsourcing> outsourcingInCharged = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeInChargeContract")
     private List<Contract> contractInCharged = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
