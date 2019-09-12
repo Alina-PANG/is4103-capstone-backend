@@ -1,19 +1,18 @@
 package capstone.is4103capstone.entities.seat;
 
-import capstone.is4103capstone.entities.Office;
-import capstone.is4103capstone.entities.OfficeFacility;
+import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.enums.SeatTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table
-public class Seat extends OfficeFacility {
+public class Seat extends DBEntityTemplate {
     @Enumerated(EnumType.STRING)
     private SeatTypeEnum type = SeatTypeEnum.FIXED;
     private Point2D.Double coordinate;
@@ -26,19 +25,21 @@ public class Seat extends OfficeFacility {
     @NotNull
     private SeatMap seatMap;
     @OneToMany(mappedBy = "seat")
-    private List<SeatAllocation> seatAllocations;
+    private List<SeatAllocation> seatAllocations = new ArrayList<>();
 
     public Seat() {
     }
 
-    public Seat(String objectName, String code, String hierachyPath, Point2D.Double coordinate) {
+    public Seat(String objectName, String code, String hierachyPath, Point2D.Double coordinate, @NotNull SeatMap seatMap) {
         super(objectName, code, hierachyPath);
         this.coordinate = coordinate;
+        this.seatMap = seatMap;
     }
 
-    public Seat(String objectName, String code, String hierachyPath, Office office, @Min(1) Integer floor, Point2D.Double coordinate) {
-        super(objectName, code, hierachyPath, office, floor);
+    public Seat(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Point2D.Double coordinate, @NotNull SeatMap seatMap) {
+        super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
         this.coordinate = coordinate;
+        this.seatMap = seatMap;
     }
 
     public SeatTypeEnum getType() {
