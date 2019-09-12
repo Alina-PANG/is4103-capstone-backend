@@ -41,15 +41,15 @@ public class Contract extends DBEntityTemplate {
     @OneToOne(mappedBy = "contract")
     private Vendor vendor;
 
+    @OneToMany(mappedBy = "contract")
+    private List<ContractLine> contractLines = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_inCharge_contract")
     @JsonIgnore
     private Employee employeeInChargeContract;
 
-    @ManyToMany(mappedBy = "contractList", fetch = FetchType.EAGER)
-    private List<Merchandise> merchandises = new ArrayList<>();
-
-    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract, List<Merchandise> merchandises) {
+    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract) {
         this.purchaseType = purchaseType;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -60,18 +60,17 @@ public class Contract extends DBEntityTemplate {
         this.spendType = spendType;
         this.vendor = vendor;
         this.employeeInChargeContract = employeeInChargeContract;
-        this.merchandises = merchandises;
     }
 
     public Contract() {
     }
 
-    public List<Merchandise> getMerchandises() {
-        return merchandises;
+    public List<ContractLine> getContractLines() {
+        return contractLines;
     }
 
-    public void setMerchandises(List<Merchandise> merchandises) {
-        this.merchandises = merchandises;
+    public void setContractLines(List<ContractLine> contractLines) {
+        this.contractLines = contractLines;
     }
 
     public Employee getEmployeeInChargeContract() {

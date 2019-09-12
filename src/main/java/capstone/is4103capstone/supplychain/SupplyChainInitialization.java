@@ -36,6 +36,8 @@ public class SupplyChainInitialization {
     OutsourcingRepository outsourcingRepository;
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    ContractLineRepository contractLineRepository;
 
     @PostConstruct
     public void init(){
@@ -52,9 +54,14 @@ public class SupplyChainInitialization {
 
     public void createMechandise(){
         Merchandise merchandise1 = new Merchandise("Banana", "SG_Banana", "dummy_hierachy", 2.0, "SGD");
-       merchandise1.setCreatedBy("Admin");
+        merchandise1.setCreatedBy("Admin");
         merchandise1.setLastModifiedBy("admin");
+
+        Merchandise merchandise2 = new Merchandise("Mango", "SG_Mango", "dummy_hierachy", 5.0, "SGD");
+        merchandise2.setCreatedBy("Admin");
+        merchandise2.setLastModifiedBy("admin");
         merchandiseRepository.save(merchandise1);
+        merchandiseRepository.save(merchandise2);
     }
 
     public void createVendors(){
@@ -81,9 +88,15 @@ public class SupplyChainInitialization {
 
 
     public void createContract(){
+        ContractLine contractLine1 = new ContractLine("SG_Banana",2.0);
+        ContractLine contractLine2 = new ContractLine("SG_Mango",5.0);
+        contractLineRepository.save(contractLine1);
+        contractLineRepository.save(contractLine2);
+
         Contract contract1 = new Contract();
         contract1.setPurchaseType(PurchaseTypeEnum.TERMLICENSE);
         contract1.setSpendType("DummyType");
+        contract1.setCode("Contract1");
         contract1.setContractStatus(ContractStatusEnum.ACTIVE);
         contract1.setContractType(ContractTypeEnum.SCHEDULE);
         contract1.setContractTerm("9 months");
@@ -91,23 +104,28 @@ public class SupplyChainInitialization {
         long time = startDate.getTime();
         Timestamp startTs = new Timestamp(time);
         contract1.setStartDate(startTs);
+        contract1.getContractLines().add(contractLine1);
+        contract1.getContractLines().add(contractLine2);
 
         Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana").get(0);
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo").get(0);
         Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
 
         contract1.setVendor(vendor);
-        contract1.getMerchandises().add(merchandise);
         contract1.setEmployeeInChargeContract(newEmployee);
         contractRepository.save(contract1);
 
+        contractLine1.setContract(contract1);
+        contractLine2.setContract(contract1);
         vendor.setContract(contract1);
-        merchandise.getContractList().add(contract1);
+        merchandise.setCurrentContractCode("Contract1");
         newEmployee.getContractInCharged().add(contract1);
 
         vendorRepository.saveAndFlush(vendor);
         merchandiseRepository.saveAndFlush(merchandise);
         employeeRepository.saveAndFlush(newEmployee);
+        contractLineRepository.saveAndFlush(contractLine1);
+        contractLineRepository.saveAndFlush(contractLine2);
     }
 
     public void createDispute(){
