@@ -1,11 +1,8 @@
 package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.finance.BudgetSub2;
 import capstone.is4103capstone.entities.finance.Invoice;
-import capstone.is4103capstone.entities.finance.Item;
-import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.Outsourcing;
+import capstone.is4103capstone.entities.finance.Merchandise;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -24,7 +21,7 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactEmail;
 
     @OneToMany(mappedBy = "vendor")
-    private List<Item> items = new ArrayList<>();
+    private List<Merchandise> items = new ArrayList<>();
 
     @OneToMany(mappedBy = "vendor")
     private List<Invoice> invoices = new ArrayList<>();
