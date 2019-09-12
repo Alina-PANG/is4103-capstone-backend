@@ -13,14 +13,18 @@ public class PurchaseOrderLineItem {
     @JsonIgnore
     private PurchaseOrder purchaseOrder;
 
-    private Merchandise merchandise;
+    private String merchandiseCode;
     private Integer quantity;
-
-    @ManyToOne
-    @JoinColumn(name = "contract_id")
-    private Contract contractReferredTo;
+    private Double price;
 
     public PurchaseOrderLineItem() {
+    }
+
+    public PurchaseOrderLineItem(PurchaseOrder purchaseOrder, String merchandiseCode, Integer quantity, Double price) {
+        this.purchaseOrder = purchaseOrder;
+        this.merchandiseCode = merchandiseCode;
+        this.quantity = quantity;
+        this.price = price;
     }
 
     public PurchaseOrder getPurchaseOrder() {
@@ -31,15 +35,6 @@ public class PurchaseOrderLineItem {
         this.purchaseOrder = purchaseOrder;
     }
 
-
-    public Merchandise getMerchandise() {
-        return merchandise;
-    }
-
-    public void setMerchandise(Merchandise merchandise) {
-        this.merchandise = merchandise;
-    }
-
     public Integer getQuantity() {
         return quantity;
     }
@@ -48,13 +43,20 @@ public class PurchaseOrderLineItem {
         this.quantity = quantity;
     }
 
-    public Contract getContractReferredTo() {
-        return contractReferredTo;
+    public String getMerchandiseCode() {
+        return merchandiseCode;
     }
 
-    public void setContractReferredTo(Contract contractReferredTo) {
-        this.contractReferredTo = contractReferredTo;
+    public void setMerchandiseCode(String merchandiseCode) {
+        this.merchandiseCode = merchandiseCode;
     }
 
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 
 }

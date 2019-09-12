@@ -92,4 +92,6 @@ public class PurchaseOrder extends DBEntityTemplate {
     public void setStatementOfAccounts(List<StatementOfAcctLineItem> statementOfAccounts) {
         this.statementOfAccounts = statementOfAccounts;
     }
+
+
 }
