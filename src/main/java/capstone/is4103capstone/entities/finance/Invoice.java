@@ -9,8 +9,9 @@ import javax.persistence.*;
 @Entity
 @Table
 public class Invoice extends DBEntityTemplate {
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchaseOrder_id")
+    @JoinColumn(name = "po_id")
     @JsonIgnore
     private PurchaseOrder purchaseOrder;
 
@@ -26,6 +27,11 @@ public class Invoice extends DBEntityTemplate {
     public Invoice() {
     }
 
+    public Invoice(String objectName, String code, String description, Double paymentAmount) {
+        super(objectName, code);
+        this.description = description;
+        this.paymentAmount = paymentAmount;
+    }
 
     public Invoice(PurchaseOrder purchaseOrder, String description, Double paymentAmount, Vendor vendor) {
         this.purchaseOrder = purchaseOrder;
@@ -42,11 +48,8 @@ public class Invoice extends DBEntityTemplate {
         this.paymentAmount = paymentAmount;
     }
 
-    public Invoice(PurchaseOrder purchaseOrder, String description, Vendor vendor) {
-        this.purchaseOrder = purchaseOrder;
-        this.description = description;
-        this.vendor = vendor;
-    }
+
+
 
     public PurchaseOrder getPurchaseOrder() {
         return purchaseOrder;

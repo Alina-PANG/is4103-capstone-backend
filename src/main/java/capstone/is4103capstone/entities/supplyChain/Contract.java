@@ -45,10 +45,6 @@ public class Contract extends DBEntityTemplate {
     @JsonIgnore
     private Employee employeeInChargeContract;
 
-    @OneToMany(mappedBy = "contract")
-    private List<Contract> contracts = new ArrayList<>();
-
-
     public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract) {
         this.purchaseType = purchaseType;
         this.startDate = startDate;
