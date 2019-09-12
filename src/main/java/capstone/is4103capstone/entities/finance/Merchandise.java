@@ -32,7 +32,7 @@ public class Merchandise extends DBEntityTemplate {
 //    )
 //    private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "contract_merchandise",
             joinColumns = @JoinColumn(name = "merchandise_id"),
             inverseJoinColumns = @JoinColumn(name = "contract_id")
