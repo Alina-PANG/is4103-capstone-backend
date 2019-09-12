@@ -2,6 +2,9 @@ package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.enums.EmployeeTypeEnum;
+import capstone.is4103capstone.entities.finance.ApprovalForRequest;
+import capstone.is4103capstone.entities.finance.BJF;
+import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -39,7 +42,24 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "manager")
     private List<Employee> subordinates = new ArrayList<>();
 
+    @OneToMany(mappedBy = "employee")
+    private List<PurchaseOrder> purchaseOrders= new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee")
+    private List<BJF> bjfs= new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee")
+    private List<ApprovalForRequest> approvalForRequests= new ArrayList<>();
+
     public Employee() {
+    }
+
+    public List<ApprovalForRequest> getApprovalForRequests() {
+        return approvalForRequests;
+    }
+
+    public void setApprovalForRequests(List<ApprovalForRequest> approvalForRequests) {
+        this.approvalForRequests = approvalForRequests;
     }
 
     public Employee(String userName, String firstName, String lastName, String middleName, String password) {
@@ -51,7 +71,21 @@ public class Employee extends DBEntityTemplate {
         this.password = password;
     }
 
+    public List<PurchaseOrder> getPurchaseOrders() {
+        return purchaseOrders;
+    }
 
+    public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
+        this.purchaseOrders = purchaseOrders;
+    }
+
+    public List<BJF> getBjfs() {
+        return bjfs;
+    }
+
+    public void setBjfs(List<BJF> bjfs) {
+        this.bjfs = bjfs;
+    }
 
     public String getUserName() {
         return userName;
