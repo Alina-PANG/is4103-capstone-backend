@@ -8,6 +8,8 @@ import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.entities.supplyChain.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class Employee extends DBEntityTemplate {
     private List<String> groupsBelongTo = new ArrayList<>();
 
     private EmployeeTypeEnum employeeType;
-    //A uni-directional with CostCcenter
+    //A uni-directional with CostCenter
     private String costCenterCode;
 
     @ManyToMany(mappedBy = "members",fetch = FetchType.EAGER)
@@ -49,33 +51,36 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "employee")
     private List<BJF> bjfs= new ArrayList<>();
 
+    @OneToMany(mappedBy = "employee")
+    private List<ApprovalForRequest> approvalForRequests= new ArrayList<>();
+
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "assignee")
-    private List<Action> actionsAssigned;
+    private List<Action> actionsAssigned = new ArrayList<>();
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "creator")
-    private List<Action> actionsCreated;
+    private List<Action> actionsCreated = new ArrayList<>();
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "handler")
-    private List<Dispute> disputesHandling;
+    private List<Dispute> disputesHandling = new ArrayList<>();
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "creator")
-    private List<Dispute> disputesCreated;
+    private List<Dispute> disputesCreated = new ArrayList<>();
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeInChargeOutsourcing")
-    private List<Outsourcing> outsourcingInCharged;
+    private List<Outsourcing> outsourcingInCharged = new ArrayList<>();
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeInChargeContract")
-    private List<Contract> contractInCharged;
+    private List<Contract> contractInCharged = new ArrayList<>();
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeAssess")
-    private List<OutsourcingAssessment> outsourcingAssessmentList;
-
-    @Convert(converter = StringListConverter.class)
-    private List<String> myRequestes = new ArrayList<>();
-
-    @Convert(converter = StringListConverter.class)
-    private List<String> myApprovals = new ArrayList<>();
-
+    private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
     public Employee() {
     }
@@ -193,20 +198,12 @@ public class Employee extends DBEntityTemplate {
         this.bjfs = bjfs;
     }
 
-    public List<String> getMyRequestes() {
-        return myRequestes;
+    public List<ApprovalForRequest> getApprovalForRequests() {
+        return approvalForRequests;
     }
 
-    public void setMyRequestes(List<String> myRequestes) {
-        this.myRequestes = myRequestes;
-    }
-
-    public List<String> getMyApprovals() {
-        return myApprovals;
-    }
-
-    public void setMyApprovals(List<String> myApprovals) {
-        this.myApprovals = myApprovals;
+    public void setApprovalForRequests(List<ApprovalForRequest> approvalForRequests) {
+        this.approvalForRequests = approvalForRequests;
     }
 
     public List<Action> getActionsAssigned() {

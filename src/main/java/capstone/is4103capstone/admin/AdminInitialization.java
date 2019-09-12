@@ -44,8 +44,14 @@ public class AdminInitialization {
         admin.setCreatedBy("admin");
         admin.setCode("EMPLOYEE-admin");
         admin.setLastModifiedBy("admin");
+
+        Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
+        newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        newEmployee2.setCode("EMPLOYEE-xuhong");
+
         employeeRepository.save(newEmployee);
         employeeRepository.save(admin);
+        employeeRepository.save(newEmployee2);
 
         Team team = teamRepository.findTeamByCode("DTS").get(0);
 
