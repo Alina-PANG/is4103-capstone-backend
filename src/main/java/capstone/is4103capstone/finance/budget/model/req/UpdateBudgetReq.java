@@ -1,9 +1,9 @@
 package capstone.is4103capstone.finance.budget.model.req;
 
-public class CreateBudgetReq {
+public class UpdateBudgetReq {
     private String username;
 
-    public CreateBudgetReq() {
+    public UpdateBudgetReq() {
     }
 
     public String getUsername() {

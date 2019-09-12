@@ -1,9 +1,10 @@
-package capstone.is4103capstone.finance.budget.model.req;
+package capstone.is4103capstone.scm.actionTracking.model.req;
 
-public class CreateBudgetReq {
+public class CreateActionTrackingReq {
     private String username;
 
-    public CreateBudgetReq() {
+    public CreateActionTrackingReq(String username) {
+        this.username = username;
     }
 
     public String getUsername() {
