@@ -16,20 +16,20 @@ public class BudgetSub2 extends DBEntityTemplate {
     @JsonIgnore
     private BudgetSub1 budgetSub1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bjf_id")
-    @JsonIgnore
-    private BJF bjf;
-
     @OneToMany(mappedBy = "budgetSub2")
-    private List<BudgetItem> budgetItems = new ArrayList<>();
+    private List<Merchandise> merchandises = new ArrayList<>();
 
     public BudgetSub2() {
     }
 
-    public BudgetSub2(BudgetSub1 budgetSub1, List<BudgetItem> budgetItems) {
+
+    public BudgetSub2(String sub2CatName, String sub2CatCode, String hierachyPath) {
+        super(sub2CatName, sub2CatCode, hierachyPath);
+    }
+
+    public BudgetSub2(BudgetSub1 budgetSub1, List<Merchandise> budgetItems) {
         this.budgetSub1 = budgetSub1;
-        this.budgetItems = budgetItems;
+        this.merchandises = budgetItems;
     }
 
     public BudgetSub1 getBudgetSub1() {
@@ -40,19 +40,14 @@ public class BudgetSub2 extends DBEntityTemplate {
         this.budgetSub1 = budgetSub1;
     }
 
-    public List<BudgetItem> getBudgetItems() {
-        return budgetItems;
+    public List<Merchandise> getMerchandises() {
+        return merchandises;
     }
 
-    public void setBudgetItems(List<BudgetItem> budgetItems) {
-        this.budgetItems = budgetItems;
+    public void setMerchandises(List<Merchandise> merchandises) {
+        this.merchandises = merchandises;
     }
 
-    public BJF getBjf() {
-        return bjf;
-    }
 
-    public void setBjf(BJF bjf) {
-        this.bjf = bjf;
-    }
+
 }

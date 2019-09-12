@@ -4,10 +4,7 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,29 +26,33 @@ public class PurchaseOrder extends DBEntityTemplate {
     private List<Invoice> invoices = new ArrayList<>();
 
     @OneToMany(mappedBy = "purchaseOrder")
-    private List<StatementOfAccount> statementOfAccounts= new ArrayList<>();
+    private List<StatementOfAcctLineItem> statementOfAccounts= new ArrayList<>();
 
-    @OneToMany(mappedBy = "purchaseOrder")
-    private List<Item> items= new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER,mappedBy = "purchaseOrders")
+    private List<Merchandise> merchandises = new ArrayList<>();
 
     public PurchaseOrder() {
     }
 
-    public PurchaseOrder(Employee employee, BJF bjf, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAccount> statementOfAccounts, List<Item> items) {
+    public PurchaseOrder(String poName, String poCode, String hierachyPath) {
+        super(poName, poCode, hierachyPath);
+    }
+
+    public PurchaseOrder(Employee employee, BJF bjf, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
         this.employee = employee;
         this.bjf = bjf;
         this.purchaseOrderLineItems = purchaseOrderLineItems;
         this.invoices = invoices;
-        this.statementOfAccounts = statementOfAccounts;
-        this.items = items;
+        this.merchandises = merchandises;
     }
 
-    public List<Item> getItems() {
-        return items;
+
+    public List<Merchandise> getMerchandises() {
+        return merchandises;
     }
 
-    public void setItems(List<Item> items) {
-        this.items = items;
+    public void setMerchandises(List<Merchandise> merchandises) {
+        this.merchandises = merchandises;
     }
 
     public BJF getBjf() {
@@ -86,11 +87,11 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.invoices = invoices;
     }
 
-    public List<StatementOfAccount> getStatementOfAccounts() {
+    public List<StatementOfAcctLineItem> getStatementOfAccounts() {
         return statementOfAccounts;
     }
 
-    public void setStatementOfAccounts(List<StatementOfAccount> statementOfAccounts) {
+    public void setStatementOfAccounts(List<StatementOfAcctLineItem> statementOfAccounts) {
         this.statementOfAccounts = statementOfAccounts;
     }
 }
