@@ -50,6 +50,8 @@ public class BJF extends DBEntityTemplate {
     public BJF() {
     }
 
+
+
     public BJF(BjfTypeEnum bjfType, String justification, String currencyCode, Double ongoingCost, Double totalAmt, String costCenterCode, Double projectCost, String projectCode) {
         this.BjfType = bjfType;
         this.justification = justification;

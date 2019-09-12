@@ -20,10 +20,6 @@ public class Merchandise extends DBEntityTemplate {
     @JsonIgnore
     private Vendor vendor;
 
-
-    @OneToMany(mappedBy = "merchandise")
-    private BJF bjf;
-
     @ManyToMany
     @JoinTable(name = "po_merchandise",
             joinColumns = @JoinColumn(name = "po_id"),
@@ -43,6 +39,8 @@ public class Merchandise extends DBEntityTemplate {
         this.price = price;
         this.currencyCode = currencyCode;
     }
+
+
 
     public BudgetSub2 getBudgetSub2() {
         return budgetSub2;

@@ -30,6 +30,7 @@ public class StatementOfAcctLineItem extends DBEntityTemplate {
         this.accruals = accruals;
     }
 
+
     public Date getScheduleDate() {
         return scheduleDate;
     }

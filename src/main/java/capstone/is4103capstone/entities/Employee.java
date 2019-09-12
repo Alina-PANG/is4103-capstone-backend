@@ -49,9 +49,6 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "employee")
     private List<BJF> bjfs= new ArrayList<>();
 
-    @OneToMany(mappedBy = "employee")
-    private List<ApprovalForRequest> approvalForRequests= new ArrayList<>();
-
     @OneToMany(mappedBy = "assignee")
     private List<Action> actionsAssigned;
 
@@ -72,6 +69,12 @@ public class Employee extends DBEntityTemplate {
 
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList;
+
+    @Convert(converter = StringListConverter.class)
+    private List<String> myRequestes = new ArrayList<>();
+
+    @Convert(converter = StringListConverter.class)
+    private List<String> myApprovals = new ArrayList<>();
 
 
     public Employee() {
@@ -190,12 +193,20 @@ public class Employee extends DBEntityTemplate {
         this.bjfs = bjfs;
     }
 
-    public List<ApprovalForRequest> getApprovalForRequests() {
-        return approvalForRequests;
+    public List<String> getMyRequestes() {
+        return myRequestes;
     }
 
-    public void setApprovalForRequests(List<ApprovalForRequest> approvalForRequests) {
-        this.approvalForRequests = approvalForRequests;
+    public void setMyRequestes(List<String> myRequestes) {
+        this.myRequestes = myRequestes;
+    }
+
+    public List<String> getMyApprovals() {
+        return myApprovals;
+    }
+
+    public void setMyApprovals(List<String> myApprovals) {
+        this.myApprovals = myApprovals;
     }
 
     public List<Action> getActionsAssigned() {

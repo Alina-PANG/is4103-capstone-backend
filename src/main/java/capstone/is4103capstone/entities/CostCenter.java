@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.finance.ActualsTable;
 import capstone.is4103capstone.entities.finance.Plan;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,6 +24,28 @@ public class CostCenter extends DBEntityTemplate {
     @JoinColumn(name = "ccmanager")
     @JsonIgnore
     private Employee costCenterManager;
+
+    @OneToMany(mappedBy = "costCenter")
+    private List<ActualsTable> actuals = new ArrayList<>();
+
+    public CostCenter() {
+    }
+
+    public List<Plan> getPlans() {
+        return plans;
+    }
+
+    public void setPlans(List<Plan> plans) {
+        this.plans = plans;
+    }
+
+    public List<ActualsTable> getActuals() {
+        return actuals;
+    }
+
+    public void setActuals(List<ActualsTable> actuals) {
+        this.actuals = actuals;
+    }
 
     public List<Employee> getEmployees() {
         return employees;

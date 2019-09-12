@@ -22,6 +22,11 @@ public class BudgetCategory extends DBEntityTemplate {
     public BudgetCategory() {
     }
 
+    public BudgetCategory(String categoryName, String categoryPath, Country country) {
+        super(categoryName, categoryPath);
+        this.country = country;
+    }
+
     public BudgetCategory(Country country, List<BudgetSub1> budgetSub1s) {
         this.country = country;
         this.budgetSub1s = budgetSub1s;

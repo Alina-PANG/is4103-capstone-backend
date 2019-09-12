@@ -16,12 +16,30 @@ public class Invoice extends DBEntityTemplate {
 
     private String description;
 
+    private Double paymentAmount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vendor_id")
     @JsonIgnore
     private Vendor vendor;
 
     public Invoice() {
+    }
+
+
+    public Invoice(PurchaseOrder purchaseOrder, String description, Double paymentAmount, Vendor vendor) {
+        this.purchaseOrder = purchaseOrder;
+        this.description = description;
+        this.paymentAmount = paymentAmount;
+        this.vendor = vendor;
+    }
+
+    public Double getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    public void setPaymentAmount(Double paymentAmount) {
+        this.paymentAmount = paymentAmount;
     }
 
     public Invoice(PurchaseOrder purchaseOrder, String description, Vendor vendor) {

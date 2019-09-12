@@ -16,6 +16,11 @@ public class ApprovalForRequest extends DBEntityTemplate {
     @JsonIgnore
     private Employee approver;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requester_id")
+    @JsonIgnore
+    private Employee requester;
+
     //use approvalType to match entity table, use requestedItemCode to find the actual item;
     private ApprovalTypeEnum approvalType;
 
@@ -27,6 +32,11 @@ public class ApprovalForRequest extends DBEntityTemplate {
 
     private ApprovalStatusEnum approvalStatus = ApprovalStatusEnum.PENDING;
 
+
+    public ApprovalForRequest() {
+    }
+
+
     public ApprovalForRequest(String ticketCode, ApprovalTypeEnum approvalType, String requestedItemCode, String commentByRequester) {
         super(ticketCode);
         this.approvalType = approvalType;
@@ -34,13 +44,19 @@ public class ApprovalForRequest extends DBEntityTemplate {
         this.commentByRequester = commentByRequester;
     }
 
-    public ApprovalForRequest(Employee approver, ApprovalTypeEnum approvalType, String requestedItemCode) {
+    public ApprovalForRequest(Employee requester, Employee approver, ApprovalTypeEnum approvalType, String requestedItemCode) {
+        this.requester = requester;
         this.approver = approver;
         this.approvalType = approvalType;
         this.requestedItemCode = requestedItemCode;
     }
 
-    public ApprovalForRequest() {
+    public Employee getRequester() {
+        return requester;
+    }
+
+    public void setRequester(Employee requester) {
+        this.requester = requester;
     }
 
     public String getCommentByRequester() {

@@ -34,6 +34,7 @@ public class Plan extends DBEntityTemplate {
     public Plan() {
     }
 
+
     public Plan(Integer forYear, Integer version) {
         this.forYear = forYear;
         this.version = version;

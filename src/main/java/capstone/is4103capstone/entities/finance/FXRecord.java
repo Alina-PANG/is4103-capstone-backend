@@ -15,13 +15,25 @@ public class FXRecord extends DBEntityTemplate {
 
     Double exchangeRate;
 
+    @Temporal(TemporalType.DATE)
+    Date effectiveDate;
+
     public FXRecord() {
     }
 
-    public FXRecord(String baseCurrencyAbbr, String priceCurrencyAbbr, Double exchangeRate) {
+    public FXRecord(String baseCurrencyAbbr, String priceCurrencyAbbr, Double exchangeRate, Date effectiveDate) {
         this.baseCurrencyAbbr = baseCurrencyAbbr;
         this.priceCurrencyAbbr = priceCurrencyAbbr;
         this.exchangeRate = exchangeRate;
+        this.effectiveDate = effectiveDate;
+    }
+
+    public Date getEffectiveDate() {
+        return effectiveDate;
+    }
+
+    public void setEffectiveDate(Date effectiveDate) {
+        this.effectiveDate = effectiveDate;
     }
 
     public String getBaseCurrencyAbbr() {
