@@ -46,7 +46,7 @@ public class Contract extends DBEntityTemplate {
     @JsonIgnore
     private Employee employeeInChargeContract;
 
-    @ManyToMany(fetch = FetchType.EAGER,mappedBy = "contractList")
+    @ManyToMany(mappedBy = "contractList", fetch = FetchType.EAGER)
     private List<Merchandise> merchandises = new ArrayList<>();
 
     public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract, List<Merchandise> merchandises) {

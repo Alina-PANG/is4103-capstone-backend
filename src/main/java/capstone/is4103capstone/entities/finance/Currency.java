@@ -3,8 +3,12 @@ package capstone.is4103capstone.entities.finance;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Country;
 
+import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
+@Entity
+@Table
 public class Currency extends DBEntityTemplate {
     Character symbol;
     String abbr;

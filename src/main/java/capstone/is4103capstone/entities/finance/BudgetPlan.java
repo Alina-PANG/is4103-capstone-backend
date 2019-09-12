@@ -5,17 +5,13 @@ import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table
 public class BudgetPlan extends DBEntityTemplate {
-    @OneToMany(mappedBy = "budgetPlan")
-    private List<BudgetItem> budgetItems = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "costCenter_id")
     @JsonIgnore
@@ -28,19 +24,10 @@ public class BudgetPlan extends DBEntityTemplate {
     public BudgetPlan() {
     }
 
-    public BudgetPlan(List<BudgetItem> budgetItems, CostCenter costCenter, BudgetPlanStatusEnum budgetPlanStatusEnum, Double version) {
-        this.budgetItems = budgetItems;
+    public BudgetPlan(CostCenter costCenter, BudgetPlanStatusEnum budgetPlanStatusEnum, Double version) {
         this.costCenter = costCenter;
         this.budgetPlanStatusEnum = budgetPlanStatusEnum;
         this.version = version;
-    }
-
-    public List<BudgetItem> getBudgetItems() {
-        return budgetItems;
-    }
-
-    public void setBudgetItems(List<BudgetItem> budgetItems) {
-        this.budgetItems = budgetItems;
     }
 
     public CostCenter getCostCenter() {

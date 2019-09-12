@@ -53,25 +53,25 @@ public class Employee extends DBEntityTemplate {
     private List<ApprovalForRequest> approvalForRequests= new ArrayList<>();
 
     @OneToMany(mappedBy = "assignee")
-    private List<Action> actionsAssigned;
+    private List<Action> actionsAssigned = new ArrayList<>();
 
     @OneToMany(mappedBy = "creator")
-    private List<Action> actionsCreated;
+    private List<Action> actionsCreated = new ArrayList<>();
 
     @OneToMany(mappedBy = "handler")
-    private List<Dispute> disputesHandling;
+    private List<Dispute> disputesHandling = new ArrayList<>();
 
     @OneToMany(mappedBy = "creator")
-    private List<Dispute> disputesCreated;
+    private List<Dispute> disputesCreated = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeInChargeOutsourcing")
-    private List<Outsourcing> outsourcingInCharged;
+    private List<Outsourcing> outsourcingInCharged = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeInChargeContract")
-    private List<Contract> contractInCharged;
+    private List<Contract> contractInCharged = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeAssess")
-    private List<OutsourcingAssessment> outsourcingAssessmentList;
+    private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
 
     public Employee() {

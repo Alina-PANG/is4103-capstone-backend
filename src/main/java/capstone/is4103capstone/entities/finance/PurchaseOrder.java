@@ -8,6 +8,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table
 public class PurchaseOrder extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
@@ -26,9 +28,9 @@ public class PurchaseOrder extends DBEntityTemplate {
     private List<Invoice> invoices = new ArrayList<>();
 
     @OneToMany(mappedBy = "purchaseOrder")
-    private List<StatementOfAcctLineItem> statementOfAccounts= new ArrayList<>();
+    private List<StatementOfAcctLineItem> statementOfAccounts = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER,mappedBy = "purchaseOrders")
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Merchandise> merchandises = new ArrayList<>();
 
     public PurchaseOrder() {

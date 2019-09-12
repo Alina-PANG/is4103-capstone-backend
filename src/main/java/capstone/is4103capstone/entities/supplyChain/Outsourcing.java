@@ -5,6 +5,7 @@ import capstone.is4103capstone.entities.Employee;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,7 +24,7 @@ public class Outsourcing extends DBEntityTemplate {
     private Employee employeeInChargeOutsourcing;
 
     @OneToMany(mappedBy = "outsourcing")
-    private List<OutsourcingAssessment> outsourcingAssessmentList;
+    private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
     public Outsourcing(String outsourcingDescription, Vendor outsourcedVendor, Employee employeeInChargeOutsourcing, List<OutsourcingAssessment> outsourcingAssessmentList) {
         this.outsourcingDescription = outsourcingDescription;

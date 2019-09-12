@@ -9,7 +9,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@MappedSuperclass
+@Entity
+@Table
 public class BJF extends DBEntityTemplate {
 
     @ManyToOne(fetch = FetchType.LAZY)

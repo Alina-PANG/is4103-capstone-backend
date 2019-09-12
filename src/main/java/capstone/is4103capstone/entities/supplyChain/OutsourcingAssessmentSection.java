@@ -4,6 +4,7 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,7 +16,7 @@ public class OutsourcingAssessmentSection extends DBEntityTemplate {
     private OutsourcingAssessment outsourcingAssessment;
 
     @OneToMany(mappedBy = "outsourcingAssessmentSection")
-    private List<OutsourcingAssessmentLine> outsourcingAssessmentLines;
+    private List<OutsourcingAssessmentLine> outsourcingAssessmentLines = new ArrayList<>();
 
     public OutsourcingAssessmentSection() {
     }

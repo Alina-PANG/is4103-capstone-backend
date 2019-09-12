@@ -6,6 +6,7 @@ import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,7 +18,7 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     private Outsourcing outsourcing;
 
     @OneToMany(mappedBy = "outsourcingAssessment")
-    private List<OutsourcingAssessmentSection> sectionList;
+    private List<OutsourcingAssessmentSection> sectionList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_assess")
