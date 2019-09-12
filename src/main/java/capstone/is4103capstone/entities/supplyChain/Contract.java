@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.finance.Merchandise;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
@@ -45,11 +46,10 @@ public class Contract extends DBEntityTemplate {
     @JsonIgnore
     private Employee employeeInChargeContract;
 
-    @OneToMany(mappedBy = "contract")
-    private List<Contract> contracts = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER,mappedBy = "contractList")
+    private List<Merchandise> merchandises = new ArrayList<>();
 
-
-    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract) {
+    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract, List<Merchandise> merchandises) {
         this.purchaseType = purchaseType;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -60,9 +60,18 @@ public class Contract extends DBEntityTemplate {
         this.spendType = spendType;
         this.vendor = vendor;
         this.employeeInChargeContract = employeeInChargeContract;
+        this.merchandises = merchandises;
     }
 
     public Contract() {
+    }
+
+    public List<Merchandise> getMerchandises() {
+        return merchandises;
+    }
+
+    public void setMerchandises(List<Merchandise> merchandises) {
+        this.merchandises = merchandises;
     }
 
     public Employee getEmployeeInChargeContract() {

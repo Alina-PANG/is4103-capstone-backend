@@ -1,11 +1,8 @@
 package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.finance.BudgetSub2;
 import capstone.is4103capstone.entities.finance.Invoice;
-import capstone.is4103capstone.entities.finance.Item;
-import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.Outsourcing;
+import capstone.is4103capstone.entities.finance.Merchandise;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -24,7 +21,7 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactEmail;
 
     @OneToMany(mappedBy = "vendor")
-    private List<Item> items = new ArrayList<>();
+    private List<Merchandise> merchandises = new ArrayList<>();
 
     @OneToMany(mappedBy = "vendor")
     private List<Invoice> invoices = new ArrayList<>();
@@ -32,7 +29,6 @@ public class Vendor extends DBEntityTemplate {
     @OneToOne
     @JoinColumn(name = "contract_id", referencedColumnName = "id")
     private Contract contract;
-
 
     @OneToMany(mappedBy = "outsourcedVendor")
     private List<Outsourcing> outsourcingList;
@@ -49,6 +45,22 @@ public class Vendor extends DBEntityTemplate {
     }
 
     public Vendor() {
+    }
+
+    public List<Merchandise> getMerchandises() {
+        return merchandises;
+    }
+
+    public void setMerchandises(List<Merchandise> merchandises) {
+        this.merchandises = merchandises;
+    }
+
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
     }
 
     public List<Outsourcing> getOutsourcingList() {
