@@ -30,11 +30,11 @@ public class Dispute extends DBEntityTemplate {
         this.creator = creator;
     }
 
-    public String getDisputeDescription() {
-        return disputeDescription;
+    public Dispute() {
     }
 
-    public Dispute() {
+    public String getDisputeDescription() {
+        return disputeDescription;
     }
 
     public void setDisputeDescription(String disputeDescription) {
