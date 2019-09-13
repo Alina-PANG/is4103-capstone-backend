@@ -120,7 +120,7 @@ public class SupplyChainInitialization {
 
         contractLine1.setContract(contract1);
         contractLine2.setContract(contract1);
-        vendor.setContract(contract1);
+        vendor.getContracts().add(contract1);
         merchandise.setActiveContractCode("Contract1");
 
         newEmployee.getContractInCharged().size();

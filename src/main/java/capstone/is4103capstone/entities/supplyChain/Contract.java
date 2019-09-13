@@ -38,7 +38,9 @@ public class Contract extends DBEntityTemplate {
 
     private String spendType; //not very sure
 
-    @OneToOne(mappedBy = "contract")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vendor_id")
+    @JsonIgnore
     private Vendor vendor;
 
     @OneToMany(mappedBy = "contract",fetch = FetchType.EAGER)
