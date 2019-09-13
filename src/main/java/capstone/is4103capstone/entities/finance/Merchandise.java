@@ -5,6 +5,7 @@ import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table
@@ -28,7 +29,7 @@ public class Merchandise extends DBEntityTemplate {
 //    )
 //    private List<PurchaseOrder> purchaseOrders;
 
-    private Double currentPrice;
+    private BigDecimal currentPrice;
 
     private String activeContractCode;
 
@@ -39,7 +40,7 @@ public class Merchandise extends DBEntityTemplate {
     public Merchandise() {
     }
 
-    public Merchandise(String objectName, String code, String hierachyPath, Double currentPrice, String currencyCode) {
+    public Merchandise(String objectName, String code, String hierachyPath, BigDecimal currentPrice, String currencyCode) {
         super(objectName, code, hierachyPath);
         this.currentPrice = currentPrice;
         this.currencyCode = currencyCode;
@@ -82,11 +83,11 @@ public class Merchandise extends DBEntityTemplate {
     }
 
 
-    public Double getCurrentPrice() {
+    public BigDecimal getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(Double currentPrice) {
+    public void setCurrentPrice(BigDecimal currentPrice) {
         this.currentPrice = currentPrice;
     }
 

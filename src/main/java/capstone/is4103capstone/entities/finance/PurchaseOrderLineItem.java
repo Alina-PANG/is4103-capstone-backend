@@ -4,6 +4,7 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table
@@ -15,12 +16,12 @@ public class PurchaseOrderLineItem extends DBEntityTemplate {
 
     private String merchandiseCode;
     private Integer quantity;
-    private Double price;
+    private BigDecimal price;
 
     public PurchaseOrderLineItem() {
     }
 
-    public PurchaseOrderLineItem(PurchaseOrder purchaseOrder, String merchandiseCode, Integer quantity, Double price) {
+    public PurchaseOrderLineItem(PurchaseOrder purchaseOrder, String merchandiseCode, Integer quantity, BigDecimal price) {
         this.purchaseOrder = purchaseOrder;
         this.merchandiseCode = merchandiseCode;
         this.quantity = quantity;
@@ -51,11 +52,11 @@ public class PurchaseOrderLineItem extends DBEntityTemplate {
         this.merchandiseCode = merchandiseCode;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

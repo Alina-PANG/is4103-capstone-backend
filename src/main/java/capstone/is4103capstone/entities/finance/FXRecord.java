@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities.finance;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -13,7 +14,7 @@ public class FXRecord extends DBEntityTemplate {
 
     String priceCurrencyAbbr;
 
-    Double exchangeRate;
+    BigDecimal exchangeRate;
 
     @Temporal(TemporalType.DATE)
     Date effectiveDate;
@@ -21,7 +22,7 @@ public class FXRecord extends DBEntityTemplate {
     public FXRecord() {
     }
 
-    public FXRecord(String baseCurrencyAbbr, String priceCurrencyAbbr, Double exchangeRate, Date effectiveDate) {
+    public FXRecord(String baseCurrencyAbbr, String priceCurrencyAbbr, BigDecimal exchangeRate, Date effectiveDate) {
         this.baseCurrencyAbbr = baseCurrencyAbbr;
         this.priceCurrencyAbbr = priceCurrencyAbbr;
         this.exchangeRate = exchangeRate;
@@ -52,11 +53,11 @@ public class FXRecord extends DBEntityTemplate {
         this.priceCurrencyAbbr = priceCurrencyAbbr;
     }
 
-    public Double getExchangeRate() {
+    public BigDecimal getExchangeRate() {
         return exchangeRate;
     }
 
-    public void setExchangeRate(Double exchangeRate) {
+    public void setExchangeRate(BigDecimal exchangeRate) {
         this.exchangeRate = exchangeRate;
     }
 }

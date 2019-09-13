@@ -4,6 +4,7 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -16,14 +17,14 @@ public class StatementOfAcctLineItem extends DBEntityTemplate {
     @Temporal(TemporalType.DATE)
     private Date scheduleDate;
 
-    private Double paidAmt;
-    private Double actualPmt;
-    private Double accruals;
+    private BigDecimal paidAmt;
+    private BigDecimal actualPmt;
+    private BigDecimal accruals;
 
     public StatementOfAcctLineItem() {
     }
 
-    public StatementOfAcctLineItem(Date scheduleDate, Double paidAmt, Double actualPmt, Double accruals) {
+    public StatementOfAcctLineItem(Date scheduleDate, BigDecimal paidAmt, BigDecimal actualPmt, BigDecimal accruals) {
         this.scheduleDate = scheduleDate;
         this.paidAmt = paidAmt;
         this.actualPmt = actualPmt;
@@ -38,27 +39,27 @@ public class StatementOfAcctLineItem extends DBEntityTemplate {
         this.scheduleDate = scheduleDate;
     }
 
-    public Double getPaidAmt() {
+    public BigDecimal getPaidAmt() {
         return paidAmt;
     }
 
-    public void setPaidAmt(Double paidAmt) {
+    public void setPaidAmt(BigDecimal paidAmt) {
         this.paidAmt = paidAmt;
     }
 
-    public Double getActualPmt() {
+    public BigDecimal getActualPmt() {
         return actualPmt;
     }
 
-    public void setActualPmt(Double actualPmt) {
+    public void setActualPmt(BigDecimal actualPmt) {
         this.actualPmt = actualPmt;
     }
 
-    public Double getAccruals() {
+    public BigDecimal getAccruals() {
         return accruals;
     }
 
-    public void setAccruals(Double accruals) {
+    public void setAccruals(BigDecimal accruals) {
         this.accruals = accruals;
     }
 

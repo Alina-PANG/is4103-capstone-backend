@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -53,11 +54,11 @@ public class SupplyChainInitialization {
     }
 
     public void createMechandise(){
-        Merchandise merchandise1 = new Merchandise("Banana", "SG_Banana", "dummy_hierachy", 2.0, "SGD");
+        Merchandise merchandise1 = new Merchandise("Banana", "SG_Banana", "dummy_hierachy", BigDecimal.valueOf(2.0), "SGD");
         merchandise1.setCreatedBy("Admin");
         merchandise1.setLastModifiedBy("admin");
 
-        Merchandise merchandise2 = new Merchandise("Mango", "SG_Mango", "dummy_hierachy", 5.0, "SGD");
+        Merchandise merchandise2 = new Merchandise("Mango", "SG_Mango", "dummy_hierachy", BigDecimal.valueOf(5.0), "SGD");
         merchandise2.setCreatedBy("Admin");
         merchandise2.setLastModifiedBy("admin");
         merchandiseRepository.save(merchandise1);
@@ -88,8 +89,8 @@ public class SupplyChainInitialization {
 
 
     public void createContract(){
-        ContractLine contractLine1 = new ContractLine("SG_Banana",2.0);
-        ContractLine contractLine2 = new ContractLine("SG_Mango",5.0);
+        ContractLine contractLine1 = new ContractLine("SG_Banana",BigDecimal.valueOf(2.0));
+        ContractLine contractLine2 = new ContractLine("SG_Mango",BigDecimal.valueOf(5.0));
         contractLine1 = contractLineRepository.save(contractLine1);
         contractLine2 = contractLineRepository.save(contractLine2);
 

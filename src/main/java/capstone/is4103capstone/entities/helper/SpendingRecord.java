@@ -1,18 +1,19 @@
 package capstone.is4103capstone.entities.helper;
 
 import javax.persistence.Embeddable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Embeddable
 public class SpendingRecord {
     private String poCode;
     private Date createdDate;
-    private Double spendingAmt;
+    private BigDecimal spendingAmt;
 
     public SpendingRecord() {
     }
 
-    public SpendingRecord(String poCode, Date createdDate, Double spendingAmt) {
+    public SpendingRecord(String poCode, Date createdDate, BigDecimal spendingAmt) {
         this.poCode = poCode;
         this.createdDate = createdDate;
         this.spendingAmt = spendingAmt;
@@ -34,11 +35,11 @@ public class SpendingRecord {
         this.createdDate = createdDate;
     }
 
-    public Double getSpendingAmt() {
+    public BigDecimal getSpendingAmt() {
         return spendingAmt;
     }
 
-    public void setSpendingAmt(Double spendingAmt) {
+    public void setSpendingAmt(BigDecimal spendingAmt) {
         this.spendingAmt = spendingAmt;
     }
 }

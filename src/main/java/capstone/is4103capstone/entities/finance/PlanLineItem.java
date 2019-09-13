@@ -5,11 +5,12 @@ import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table
 public class PlanLineItem extends DBEntityTemplate {
-    Double budgetAmount;
+    BigDecimal budgetAmount;
     String currencyAbbr;
     String comment;
     String merchandiseCode;
@@ -25,18 +26,18 @@ public class PlanLineItem extends DBEntityTemplate {
     }
 
 
-    public PlanLineItem(Double budgetAmount, String currencyAbbr, String comment, String merchandiseCode) {
+    public PlanLineItem(BigDecimal budgetAmount, String currencyAbbr, String comment, String merchandiseCode) {
         this.budgetAmount = budgetAmount;
         this.currencyAbbr = currencyAbbr;
         this.comment = comment;
         this.merchandiseCode = merchandiseCode;
     }
 
-    public Double getBudgetAmount() {
+    public BigDecimal getBudgetAmount() {
         return budgetAmount;
     }
 
-    public void setBudgetAmount(Double budgetAmount) {
+    public void setBudgetAmount(BigDecimal budgetAmount) {
         this.budgetAmount = budgetAmount;
     }
 

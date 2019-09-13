@@ -6,6 +6,7 @@ import capstone.is4103capstone.util.enums.BjfTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,13 +30,13 @@ public class BJF extends DBEntityTemplate {
 
     private String currencyCode;
 
-    private Double ongoingCost;
+    private BigDecimal ongoingCost;
 
-    private Double totalAmt;
+    private BigDecimal totalAmt;
 
     private String costCenterCode;
 
-    private Double projectCost = null; // if type == project
+    private BigDecimal projectCost = null; // if type == project
 
     private String projectCode = null; // if type == project
 
@@ -52,7 +53,7 @@ public class BJF extends DBEntityTemplate {
 
 
 
-    public BJF(BjfTypeEnum bjfType, String justification, String currencyCode, Double ongoingCost, Double totalAmt, String costCenterCode, Double projectCost, String projectCode) {
+    public BJF(BjfTypeEnum bjfType, String justification, String currencyCode, BigDecimal ongoingCost, BigDecimal totalAmt, String costCenterCode, BigDecimal projectCost, String projectCode) {
         this.BjfType = bjfType;
         this.justification = justification;
         this.currencyCode = currencyCode;
@@ -87,19 +88,19 @@ public class BJF extends DBEntityTemplate {
         this.currencyCode = currencyCode;
     }
 
-    public Double getOngoingCost() {
+    public BigDecimal getOngoingCost() {
         return ongoingCost;
     }
 
-    public void setOngoingCost(Double ongoingCost) {
+    public void setOngoingCost(BigDecimal ongoingCost) {
         this.ongoingCost = ongoingCost;
     }
 
-    public Double getTotalAmt() {
+    public BigDecimal getTotalAmt() {
         return totalAmt;
     }
 
-    public void setTotalAmt(Double totalAmt) {
+    public void setTotalAmt(BigDecimal totalAmt) {
         this.totalAmt = totalAmt;
     }
 
@@ -111,11 +112,11 @@ public class BJF extends DBEntityTemplate {
         this.costCenterCode = costCenterCode;
     }
 
-    public Double getProjectCost() {
+    public BigDecimal getProjectCost() {
         return projectCost;
     }
 
-    public void setProjectCost(Double projectCost) {
+    public void setProjectCost(BigDecimal projectCost) {
         this.projectCost = projectCost;
     }
 

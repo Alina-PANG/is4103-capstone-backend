@@ -7,6 +7,7 @@ import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class PurchaseOrder extends DBEntityTemplate {
         }
         Double total = 0d;
         for (PurchaseOrderLineItem lineItem: purchaseOrderLineItems){
-            total += lineItem.getPrice() * lineItem.getQuantity();
+            total += lineItem.getPrice().doubleValue() * lineItem.getQuantity();
         }
         return total;
     }

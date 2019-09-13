@@ -4,12 +4,12 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
 @Table
 public class Project extends DBEntityTemplate {
-
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -22,14 +22,14 @@ public class Project extends DBEntityTemplate {
 
     private String description;
 
-    private Double budgetAmt;
+    private BigDecimal budgetAmt;
 
     private String costCenterCode;
 
     public Project() {
     }
 
-    public Project(String projectName, String projectCode, Date startDate, Date endDate, String description, Double budgetAmt,String costCenterCode) {
+    public Project(String projectName, String projectCode, Date startDate, Date endDate, String description, BigDecimal budgetAmt,String costCenterCode) {
         super(projectName, projectCode);
         this.startDate = startDate;
         this.endDate = endDate;
@@ -80,11 +80,11 @@ public class Project extends DBEntityTemplate {
         this.description = description;
     }
 
-    public Double getBudgetAmt() {
+    public BigDecimal getBudgetAmt() {
         return budgetAmt;
     }
 
-    public void setBudgetAmt(Double budgetAmt) {
+    public void setBudgetAmt(BigDecimal budgetAmt) {
         this.budgetAmt = budgetAmt;
     }
 }
