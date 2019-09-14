@@ -3,6 +3,8 @@ package capstone.is4103capstone.entities.supplyChain;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.finance.Invoice;
 import capstone.is4103capstone.entities.finance.Merchandise;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,19 +22,21 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactName;
     private String escalationContactEmail;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "vendor")
-    private List<Merchandise> items = new ArrayList<>();
+    private List<Merchandise> merchandises = new ArrayList<>();
 
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "vendor")
     private List<Invoice> invoices = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name = "contract_id", referencedColumnName = "id")
-    private Contract contract;
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "vendor")
+    private List<Contract> contracts = new ArrayList<>();
 
-
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "outsourcedVendor")
-    private List<Outsourcing> outsourcingList;
+    private List<Outsourcing> outsourcingList = new ArrayList<>();
 
     public Vendor(String businessUnit, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
         this.businessUnit = businessUnit;
@@ -46,6 +50,22 @@ public class Vendor extends DBEntityTemplate {
     }
 
     public Vendor() {
+    }
+
+    public List<Merchandise> getMerchandises() {
+        return merchandises;
+    }
+
+    public void setMerchandises(List<Merchandise> merchandises) {
+        this.merchandises = merchandises;
+    }
+
+    public List<Invoice> getInvoices() {
+        return invoices;
+    }
+
+    public void setInvoices(List<Invoice> invoices) {
+        this.invoices = invoices;
     }
 
     public List<Outsourcing> getOutsourcingList() {
@@ -120,11 +140,11 @@ public class Vendor extends DBEntityTemplate {
         this.escalationContactEmail = escalationContactEmail;
     }
 
-    public Contract getContract() {
-        return contract;
+    public List<Contract> getContracts() {
+        return contracts;
     }
 
-    public void setContract(Contract contract) {
-        this.contract = contract;
+    public void setContracts(List<Contract> contracts) {
+        this.contracts = contracts;
     }
 }

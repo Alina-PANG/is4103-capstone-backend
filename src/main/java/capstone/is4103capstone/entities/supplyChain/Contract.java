@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.finance.Merchandise;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
@@ -17,13 +18,13 @@ import java.util.List;
 public class Contract extends DBEntityTemplate {
     private PurchaseTypeEnum purchaseType;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date startDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date renewalStartDate;
 
     private String contractTerm; //no of months, evergreen, perpetual
@@ -32,22 +33,23 @@ public class Contract extends DBEntityTemplate {
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
     private String spendType; //not very sure
 
-    @OneToOne(mappedBy = "contract")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vendor_id")
+    @JsonIgnore
     private Vendor vendor;
 
+    @OneToMany(mappedBy = "contract",fetch = FetchType.EAGER)
+    private List<ContractLine> contractLines = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_inCharge_contract")
+    @JoinColumn(name = "employee_incharge")
     @JsonIgnore
     private Employee employeeInChargeContract;
-
-    @OneToMany(mappedBy = "contract")
-    private List<Contract> contracts = new ArrayList<>();
-
 
     public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract) {
         this.purchaseType = purchaseType;
@@ -63,6 +65,14 @@ public class Contract extends DBEntityTemplate {
     }
 
     public Contract() {
+    }
+
+    public List<ContractLine> getContractLines() {
+        return contractLines;
+    }
+
+    public void setContractLines(List<ContractLine> contractLines) {
+        this.contractLines = contractLines;
     }
 
     public Employee getEmployeeInChargeContract() {

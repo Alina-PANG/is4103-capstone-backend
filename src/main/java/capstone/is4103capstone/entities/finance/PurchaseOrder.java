@@ -2,24 +2,26 @@ package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table
 public class PurchaseOrder extends DBEntityTemplate {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id")
-    @JsonIgnore
-    private Employee employee;
+    @Convert(converter = StringListConverter.class)
+    private List<String> relatedBJF;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bjf_id")
-    @JsonIgnore
-    private BJF bjf;
+    @JoinColumn(name = "vendor_id")
+    private Vendor vendor;
 
-    @OneToMany(mappedBy = "purchaseOrder")
+    @OneToMany(mappedBy = "purchaseOrder",fetch = FetchType.EAGER)
     private List<PurchaseOrderLineItem> purchaseOrderLineItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "purchaseOrder")
@@ -28,47 +30,32 @@ public class PurchaseOrder extends DBEntityTemplate {
     @OneToMany(mappedBy = "purchaseOrder")
     private List<StatementOfAcctLineItem> statementOfAccounts= new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER,mappedBy = "purchaseOrders")
-    private List<Merchandise> merchandises = new ArrayList<>();
-
     public PurchaseOrder() {
     }
 
-    public PurchaseOrder(String poName, String poCode, String hierachyPath) {
-        super(poName, poCode, hierachyPath);
+    public PurchaseOrder(String poCode, String hierachyPath) {
+        super(poCode, hierachyPath);
     }
 
-    public PurchaseOrder(Employee employee, BJF bjf, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
-        this.employee = employee;
-        this.bjf = bjf;
+    public PurchaseOrder(Employee employee, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
         this.purchaseOrderLineItems = purchaseOrderLineItems;
         this.invoices = invoices;
-        this.merchandises = merchandises;
     }
 
-
-    public List<Merchandise> getMerchandises() {
-        return merchandises;
+    public Vendor getVendor() {
+        return vendor;
     }
 
-    public void setMerchandises(List<Merchandise> merchandises) {
-        this.merchandises = merchandises;
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 
-    public BJF getBjf() {
-        return bjf;
+    public List<String> getRelatedBJF() {
+        return relatedBJF;
     }
 
-    public void setBjf(BJF bjf) {
-        this.bjf = bjf;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    public void setRelatedBJF(List<String> relatedBJF) {
+        this.relatedBJF = relatedBJF;
     }
 
     public List<PurchaseOrderLineItem> getPurchaseOrderLineItems() {
@@ -93,5 +80,16 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public void setStatementOfAccounts(List<StatementOfAcctLineItem> statementOfAccounts) {
         this.statementOfAccounts = statementOfAccounts;
+    }
+
+    public Double calculateTotalPrice(){
+        if (this.purchaseOrderLineItems.size() == 0){
+            return Double.valueOf(0.0);
+        }
+        Double total = 0d;
+        for (PurchaseOrderLineItem lineItem: purchaseOrderLineItems){
+            total += lineItem.getPrice().doubleValue() * lineItem.getQuantity();
+        }
+        return total;
     }
 }

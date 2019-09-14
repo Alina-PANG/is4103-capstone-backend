@@ -2,13 +2,12 @@ package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
-import capstone.is4103capstone.entities.finance.ApprovalForRequest;
 import capstone.is4103capstone.entities.finance.BJF;
-import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.entities.supplyChain.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +28,12 @@ public class Employee extends DBEntityTemplate {
     private List<String> groupsBelongTo = new ArrayList<>();
 
     private EmployeeTypeEnum employeeType;
-    //A uni-directional with CostCenter
-    private String costCenterCode;
 
-    @ManyToMany(mappedBy = "members",fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "costcenter_id")
+    private CostCenter defaultCostCenter;
+
+    @ManyToMany(mappedBy = "members")
     private List<Team> memberOfTeams = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,35 +45,34 @@ public class Employee extends DBEntityTemplate {
     private List<Employee> subordinates = new ArrayList<>();
 
     @OneToMany(mappedBy = "employee")
-    private List<PurchaseOrder> purchaseOrders= new ArrayList<>();
-
-    @OneToMany(mappedBy = "employee")
     private List<BJF> bjfs= new ArrayList<>();
 
-    @OneToMany(mappedBy = "employee")
-    private List<ApprovalForRequest> approvalForRequests= new ArrayList<>();
+    @Convert(converter = StringListConverter.class)
+    private List<String> myRequestTickets= new ArrayList<>();
+    @Convert(converter = StringListConverter.class)
+    private List<String> myApprovals = new ArrayList<>();
 
+//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "assignee")
-    private List<Action> actionsAssigned;
+    private List<Action> actionsAssigned = new ArrayList<>();
 
     @OneToMany(mappedBy = "creator")
-    private List<Action> actionsCreated;
+    private List<Action> actionsCreated = new ArrayList<>();
 
     @OneToMany(mappedBy = "handler")
-    private List<Dispute> disputesHandling;
+    private List<Dispute> disputesHandling = new ArrayList<>();
 
     @OneToMany(mappedBy = "creator")
-    private List<Dispute> disputesCreated;
+    private List<Dispute> disputesCreated = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeInChargeOutsourcing")
-    private List<Outsourcing> outsourcingInCharged;
+    private List<Outsourcing> outsourcingInCharged = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeInChargeContract")
-    private List<Contract> contractInCharged;
+    private List<Contract> contractInCharged = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeAssess")
-    private List<OutsourcingAssessment> outsourcingAssessmentList;
-
+    private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
     public Employee() {
     }
@@ -85,6 +85,7 @@ public class Employee extends DBEntityTemplate {
         this.middleName = middleName;
         this.password = password;
     }
+
 
     public String getUserName() {
         return userName;
@@ -142,12 +143,12 @@ public class Employee extends DBEntityTemplate {
         this.employeeType = employeeType;
     }
 
-    public String getCostCenterCode() {
-        return costCenterCode;
+    public CostCenter getDefaultCostCenter() {
+        return defaultCostCenter;
     }
 
-    public void setCostCenterCode(String costCenterCode) {
-        this.costCenterCode = costCenterCode;
+    public void setDefaultCostCenter(CostCenter defaultCostCenter) {
+        this.defaultCostCenter = defaultCostCenter;
     }
 
     public List<Team> getMemberOfTeams() {
@@ -174,12 +175,20 @@ public class Employee extends DBEntityTemplate {
         this.subordinates = subordinates;
     }
 
-    public List<PurchaseOrder> getPurchaseOrders() {
-        return purchaseOrders;
+    public List<String> getMyRequestTickets() {
+        return myRequestTickets;
     }
 
-    public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
-        this.purchaseOrders = purchaseOrders;
+    public void setMyRequestTickets(List<String> myRequestTickets) {
+        this.myRequestTickets = myRequestTickets;
+    }
+
+    public List<String> getMyApprovals() {
+        return myApprovals;
+    }
+
+    public void setMyApprovals(List<String> myApprovals) {
+        this.myApprovals = myApprovals;
     }
 
     public List<BJF> getBjfs() {
@@ -188,14 +197,6 @@ public class Employee extends DBEntityTemplate {
 
     public void setBjfs(List<BJF> bjfs) {
         this.bjfs = bjfs;
-    }
-
-    public List<ApprovalForRequest> getApprovalForRequests() {
-        return approvalForRequests;
-    }
-
-    public void setApprovalForRequests(List<ApprovalForRequest> approvalForRequests) {
-        this.approvalForRequests = approvalForRequests;
     }
 
     public List<Action> getActionsAssigned() {
@@ -246,6 +247,10 @@ public class Employee extends DBEntityTemplate {
         this.contractInCharged = contractInCharged;
     }
 
+    public void addContractIC(Contract newContract){
+        this.getContractInCharged().add(newContract);
+    }
+
     public List<OutsourcingAssessment> getOutsourcingAssessmentList() {
         return outsourcingAssessmentList;
     }
@@ -253,4 +258,6 @@ public class Employee extends DBEntityTemplate {
     public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
         this.outsourcingAssessmentList = outsourcingAssessmentList;
     }
+
+
 }

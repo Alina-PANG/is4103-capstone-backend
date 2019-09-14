@@ -1,30 +1,34 @@
 package capstone.is4103capstone.entities.finance;
 
+import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.CostCenter;
+import capstone.is4103capstone.entities.helper.SpendingRecord;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActualsTable {
+@Entity
+@Table
+public class ActualsTable extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "costCenter_id")
     @JsonIgnore
     private CostCenter costCenter;
 
-    @OneToMany(mappedBy = "purchaseOrderLineItem")
-    private List<PurchaseOrderLineItem> purchaseOrderLineItems= new ArrayList<>();
+    private Integer forYear;
+
+    @Embedded
+    private List<SpendingRecord> spendings = new ArrayList<>();
+
 
     public ActualsTable() {
     }
 
-    public ActualsTable(CostCenter costCenter, List<PurchaseOrderLineItem> purchaseOrderLineItems) {
+    public ActualsTable(CostCenter costCenter, Integer forYear) {
         this.costCenter = costCenter;
-        this.purchaseOrderLineItems = purchaseOrderLineItems;
+        this.forYear = forYear;
     }
 
     public CostCenter getCostCenter() {
@@ -35,11 +39,19 @@ public class ActualsTable {
         this.costCenter = costCenter;
     }
 
-    public List<PurchaseOrderLineItem> getPurchaseOrderLineItems() {
-        return purchaseOrderLineItems;
+    public Integer getForYear() {
+        return forYear;
     }
 
-    public void setPurchaseOrderLineItems(List<PurchaseOrderLineItem> purchaseOrderLineItems) {
-        this.purchaseOrderLineItems = purchaseOrderLineItems;
+    public void setForYear(Integer forYear) {
+        this.forYear = forYear;
+    }
+
+    public List<SpendingRecord> getSpendings() {
+        return spendings;
+    }
+
+    public void setSpendings(List<SpendingRecord> spendings) {
+        this.spendings = spendings;
     }
 }

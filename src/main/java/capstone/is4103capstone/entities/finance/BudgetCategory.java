@@ -4,28 +4,26 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Country;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table
 public class BudgetCategory extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     @JsonIgnore
     private Country country;
 
-    @OneToMany(mappedBy = "budgetCategory")
+    @OneToMany(mappedBy = "budgetCategory",fetch = FetchType.EAGER)
     private List<BudgetSub1> budgetSub1s = new ArrayList<>();
 
     public BudgetCategory() {
     }
 
-    public BudgetCategory(Country country, List<BudgetSub1> budgetSub1s) {
-        this.country = country;
-        this.budgetSub1s = budgetSub1s;
+    public BudgetCategory(String categoryName, String categoryCode, String hierachyPath) {
+        super(categoryName, categoryCode, hierachyPath);
     }
 
     public Country getCountry() {

@@ -1,23 +1,31 @@
 package capstone.is4103capstone.entities.finance;
 
+import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
+import java.math.BigDecimal;
 
-public class PurchaseOrderLineItem {
+@Entity
+@Table
+public class PurchaseOrderLineItem extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchaseOrder_id")
     @JsonIgnore
     private PurchaseOrder purchaseOrder;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "actualsTable_id")
-    @JsonIgnore
-    private ActualsTable actualsTable;
+    private String merchandiseCode;
+    private Integer quantity;
+    private BigDecimal price;
 
     public PurchaseOrderLineItem() {
+    }
+
+    public PurchaseOrderLineItem(PurchaseOrder purchaseOrder, String merchandiseCode, Integer quantity, BigDecimal price) {
+        this.purchaseOrder = purchaseOrder;
+        this.merchandiseCode = merchandiseCode;
+        this.quantity = quantity;
+        this.price = price;
     }
 
     public PurchaseOrder getPurchaseOrder() {
@@ -28,11 +36,28 @@ public class PurchaseOrderLineItem {
         this.purchaseOrder = purchaseOrder;
     }
 
-    public ActualsTable getActualsTable() {
-        return actualsTable;
+    public Integer getQuantity() {
+        return quantity;
     }
 
-    public void setActualsTable(ActualsTable actualsTable) {
-        this.actualsTable = actualsTable;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
+
+    public String getMerchandiseCode() {
+        return merchandiseCode;
+    }
+
+    public void setMerchandiseCode(String merchandiseCode) {
+        this.merchandiseCode = merchandiseCode;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
 }
