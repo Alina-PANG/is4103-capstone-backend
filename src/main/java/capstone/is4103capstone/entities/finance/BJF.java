@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table
@@ -22,7 +20,7 @@ public class BJF extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     @JsonIgnore
-    private Employee employee;
+    private Employee requester;
 
     private BjfTypeEnum BjfType;
 
@@ -152,12 +150,12 @@ public class BJF extends DBEntityTemplate {
         this.budgetApprovalTicketCode = budgetApprovalTicketCode;
     }
 
-    public Employee getEmployee() {
-        return employee;
+    public Employee getRequester() {
+        return requester;
     }
 
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    public void setRequester(Employee requester) {
+        this.requester = requester;
     }
 
     public String getJustification() {
