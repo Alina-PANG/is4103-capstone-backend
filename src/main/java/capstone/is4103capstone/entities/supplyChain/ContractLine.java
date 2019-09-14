@@ -5,15 +5,15 @@ import capstone.is4103capstone.entities.finance.Merchandise;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Entity
 @Table
 public class ContractLine extends DBEntityTemplate{
 
-    @OneToOne
-    @JoinColumn(name = "merchandise_id")
-    private Merchandise merchandise;
+    @NotNull
+    private String merchandiseCode;
 
 
     private BigDecimal price;
@@ -25,14 +25,14 @@ public class ContractLine extends DBEntityTemplate{
     @JsonIgnore
     private Contract contract;
 
-    public ContractLine(BigDecimal price, String currencyCode) {
+    public ContractLine(String merchandiseCode, BigDecimal price, String currencyCode,String createdUser) {
+        this.merchandiseCode = merchandiseCode;
         this.price = price;
         this.currencyCode = currencyCode;
+        this.setCreatedBy(createdUser);
+        this.setLastModifiedBy(createdUser);
     }
 
-    public ContractLine(BigDecimal price) {
-        this.price = price;
-    }
 
     public String getCurrencyCode() {
         return currencyCode;
@@ -42,12 +42,12 @@ public class ContractLine extends DBEntityTemplate{
         this.currencyCode = currencyCode;
     }
 
-    public Merchandise getMerchandise() {
-        return merchandise;
+    public String getMerchandiseCode() {
+        return merchandiseCode;
     }
 
-    public void setMerchandise(Merchandise merchandise) {
-        this.merchandise = merchandise;
+    public void setMerchandiseCode(String merchandiseCode) {
+        this.merchandiseCode = merchandiseCode;
     }
 
     public ContractLine() {

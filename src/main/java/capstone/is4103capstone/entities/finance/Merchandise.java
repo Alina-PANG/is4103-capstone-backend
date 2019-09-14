@@ -36,8 +36,7 @@ public class Merchandise extends DBEntityTemplate {
 
     private BigDecimal currentPrice;
 
-    @OneToOne(mappedBy = "merchandise")
-    private ContractLine currentContract;
+    private String currentContractCode;
 
     private String currencyCode;
 
@@ -45,15 +44,15 @@ public class Merchandise extends DBEntityTemplate {
     public Merchandise() {
     }
 
-    public ContractLine getCurrentContract() {
-        return currentContract;
+    public String getCurrentContractCode() {
+        return currentContractCode;
     }
 
-    public void setCurrentContract(ContractLine currentContract) {
-        this.currentContract = currentContract;
+    public void setCurrentContractCode(String currentContractCode) {
+        this.currentContractCode = currentContractCode;
     }
 
-    public Merchandise(String objectName, String code,String hierachyPath, String measureUnit, String opsUser) {
+    public Merchandise(String objectName, String code, String hierachyPath, String measureUnit, String opsUser) {
         super(objectName, code,hierachyPath);
         this.setCreatedBy(opsUser);
         this.setLastModifiedBy(opsUser);

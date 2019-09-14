@@ -53,7 +53,7 @@ public class AdminInitialization {
         employeeRepository.save(admin);
         employeeRepository.save(newEmployee2);
 
-        Team team = teamRepository.findTeamByCode("DTS").get(0);
+        Team team = teamRepository.findTeamByCode("DTS");
 
         newEmployee.getMemberOfTeams().add(team);
         admin.getMemberOfTeams().add(team);
