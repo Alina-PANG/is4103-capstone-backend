@@ -7,8 +7,10 @@ import capstone.is4103capstone.entities.supplyChain.*;
 import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
 import capstone.is4103capstone.supplychain.Repository.*;
 import capstone.is4103capstone.util.enums.*;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
@@ -16,6 +18,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 @Service
+@Transactional
 public class SupplyChainInitialization {
     @Autowired
     VendorRepository vendorRepository;
@@ -41,6 +44,7 @@ public class SupplyChainInitialization {
     ContractLineRepository contractLineRepository;
 
     @PostConstruct
+    @Transactional
     public void init(){
         createMechandise();
         createVendors();
@@ -87,7 +91,7 @@ public class SupplyChainInitialization {
         merchandiseRepository.saveAndFlush(merchandise);
     }
 
-
+    @Transactional
     public void createContract(){
         ContractLine contractLine1 = new ContractLine("SG_Banana",BigDecimal.valueOf(2.0));
         ContractLine contractLine2 = new ContractLine("SG_Mango",BigDecimal.valueOf(5.0));
@@ -113,24 +117,13 @@ public class SupplyChainInitialization {
 
         Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana").get(0);
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo").get(0);
-        Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
+        Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
 
         contract1.setVendor(vendor);
-//<<<<<<< HEAD
-//        vendor.setContract(contract1);
-//=======
-//        contract1.setEmployeeInChargeContract(newEmployee);
-//
-//        contract1 = contractRepository.save(contract1);
-//
-//        contractLine1.setContract(contract1);
-//        contractLine2.setContract(contract1);
-//        vendor.getContracts().add(contract1);
-//        merchandise.setActiveContractCode("Contract1");
-//>>>>>>> 9d66026255b59edba97e13be400fafd4a6c64f01
-
         contract1.setEmployeeInChargeContract(newEmployee);
-        newEmployee.addContractIC(contract1);
+        Hibernate.initialize(newEmployee.getContractInCharged());
+        newEmployee.getContractInCharged().size();
+        newEmployee.getContractInCharged().add(contract1);
 
         merchandise.setActiveContractCode("Contract1");
 //        newEmployee.getContractInCharged().size();
@@ -142,8 +135,8 @@ public class SupplyChainInitialization {
     }
 
     public void createDispute(){
-        Employee handler = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
-        Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-admin").get(0);
+        Employee handler = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
+        Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-admin");
 
         Dispute dispute1 = new Dispute("This is a ... dispute.", DisputeStatusEnum.ACTIVE, handler, creator);
         disputeRepository.save(dispute1);
@@ -155,8 +148,8 @@ public class SupplyChainInitialization {
     }
 
     public void createAction(){
-        Employee assignee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
-        Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-admin").get(0);
+        Employee assignee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
+        Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-admin");
 
         Action action = new Action("This is a ... action.", ActionStatusEnum.ACTIVE, assignee, creator);
         actionRepository.save(action);
@@ -187,7 +180,7 @@ public class SupplyChainInitialization {
 
     public void createOutsourcingAssessment(){
         OutsourcingAssessmentSection outsourcingAssessmentSection = outsourcingAssessmentSectionRepository.findOutsourcingAssessmentSectionByCode("Outsourcing_Assessment_Section1").get(0);
-        Employee employeeAssess = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
+        Employee employeeAssess = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
 
         OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
         outsourcingAssessment.setCode("Outsourcing_Assessment1");
@@ -203,7 +196,7 @@ public class SupplyChainInitialization {
 
     public void createOutsourcing(){
         OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findOutsourcingAssessmentByCode("Outsourcing_Assessment1").get(0);
-        Employee employeeInCharge = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
+        Employee employeeInCharge = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo").get(0);
 
         Outsourcing outsourcing = new Outsourcing();

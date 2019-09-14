@@ -1,4 +1,4 @@
-package capstone.is4103capstone.entities.finance;
+package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;

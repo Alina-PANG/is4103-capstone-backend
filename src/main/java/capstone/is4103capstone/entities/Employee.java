@@ -2,15 +2,12 @@ package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
-import capstone.is4103capstone.entities.finance.ApprovalForRequest;
 import capstone.is4103capstone.entities.finance.BJF;
-import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.entities.supplyChain.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,27 +56,21 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "assignee")
     private List<Action> actionsAssigned = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "creator")
     private List<Action> actionsCreated = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "handler")
     private List<Dispute> disputesHandling = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "creator")
     private List<Dispute> disputesCreated = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeInChargeOutsourcing")
     private List<Outsourcing> outsourcingInCharged = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeInChargeContract")
     private List<Contract> contractInCharged = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
@@ -94,6 +85,7 @@ public class Employee extends DBEntityTemplate {
         this.middleName = middleName;
         this.password = password;
     }
+
 
     public String getUserName() {
         return userName;
