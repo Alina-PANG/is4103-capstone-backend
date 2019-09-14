@@ -1,26 +1,28 @@
 package capstone.is4103capstone.finance.budget.model.res;
 
-import capstone.is4103capstone.entities.finance.BudgetPlan;
+
+import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.general.model.GeneralRes;
 
 import java.util.List;
 
 public class GetBudgetRes extends GeneralRes {
-    private BudgetPlan budgetPlan;
+    private Plan budgetPlan;
 
     public GetBudgetRes() {
     }
 
-    public GetBudgetRes(String message, Boolean error, BudgetPlan budgetPlan) {
+
+    public GetBudgetRes(String message, Boolean error, Plan budgetPlan) {
         super(message, error);
         this.budgetPlan = budgetPlan;
     }
 
-    public BudgetPlan getBudgetPlan() {
+    public Plan getBudgetPlan() {
         return budgetPlan;
     }
 
-    public void setBudgetPlan(BudgetPlan budgetPlan) {
+    public void setBudgetPlan(Plan budgetPlan) {
         this.budgetPlan = budgetPlan;
     }
 }

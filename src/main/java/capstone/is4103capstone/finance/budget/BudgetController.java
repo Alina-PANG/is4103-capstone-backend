@@ -24,14 +24,6 @@ public class BudgetController {
     @Autowired
     private BudgetService budgetService;
 
-    @PostMapping("/saveDraft")
-    public GeneralRes saveDraft(CreateBudgetReq createBudgetReq) {
-        if(Authentication.authenticateUser(createBudgetReq.getUsername()))
-            return budgetService.createBudget(createBudgetReq);
-        else
-            return new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true);
-    }
-
     @PostMapping("/createBudget")
     public GeneralRes createBudget(CreateBudgetReq createBudgetReq) {
         if(Authentication.authenticateUser(createBudgetReq.getUsername()))
@@ -56,19 +48,10 @@ public class BudgetController {
             return new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true);
     }
 
-    @GetMapping("/getSubmittedBudgetList")
-    public GeneralRes getSubmittedBudgetList(@RequestParam(name="username", required=true) String username){
+    @GetMapping("/getBudgetList")
+    public GeneralRes getPendingBudgetList(@RequestParam(name="username", required=true) String username, @RequestParam(name="type", required=true) String type, @RequestParam(name="status", required=true) String status){
         if(Authentication.authenticateUser(username))
-            return budgetService.getSubmittedBudgetList(username);
-        else
-            return new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true);
-
-    }
-
-    @GetMapping("/getPendingBudgetList")
-    public GeneralRes getPendingBudgetList(@RequestParam(name="username", required=true) String username){
-        if(Authentication.authenticateUser(username))
-            return budgetService.getPendingBudgetList(username);
+            return budgetService.getBudgetList(username, type, status);
         else
             return new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true);
     }
