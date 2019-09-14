@@ -101,36 +101,33 @@ public class SupplyChainInitialization {
         contract1.setContractStatus(ContractStatusEnum.ACTIVE);
         contract1.setContractType(ContractTypeEnum.SCHEDULE);
         contract1.setContractTerm("9 months");
-        Date startDate = new Date();
-        long time = startDate.getTime();
-        Timestamp startTs = new Timestamp(time);
-        contract1.setStartDate(startTs);
+        contract1.setStartDate(new Date());
+        contract1 = contractRepository.save(contract1);
 
         contract1.getContractLines().add(contractLine1);
         contract1.getContractLines().add(contractLine2);
+        contractLine1.setContract(contract1);
+        contractLine2.setContract(contract1);
+        contractLineRepository.saveAndFlush(contractLine1);
+        contractLineRepository.saveAndFlush(contractLine2);
 
         Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana").get(0);
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo").get(0);
         Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
 
         contract1.setVendor(vendor);
-        contract1.setEmployeeInChargeContract(newEmployee);
-
-        contract1 = contractRepository.save(contract1);
-
-        contractLine1.setContract(contract1);
-        contractLine2.setContract(contract1);
         vendor.setContract(contract1);
+
+        contract1.setEmployeeInChargeContract(newEmployee);
+        newEmployee.addContractIC(contract1);
+
         merchandise.setActiveContractCode("Contract1");
-
-        newEmployee.getContractInCharged().size();
-        newEmployee.getContractInCharged().add(contract1);
-
+//        newEmployee.getContractInCharged().size();
+//        newEmployee.getContractInCharged().add(contract1);
+        contractRepository.saveAndFlush(contract1);
         vendorRepository.saveAndFlush(vendor);
         merchandiseRepository.saveAndFlush(merchandise);
         employeeRepository.saveAndFlush(newEmployee);
-        contractLineRepository.saveAndFlush(contractLine1);
-        contractLineRepository.saveAndFlush(contractLine2);
     }
 
     public void createDispute(){
