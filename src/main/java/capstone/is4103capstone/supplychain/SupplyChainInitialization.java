@@ -116,7 +116,18 @@ public class SupplyChainInitialization {
         Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong").get(0);
 
         contract1.setVendor(vendor);
-        vendor.setContract(contract1);
+//<<<<<<< HEAD
+//        vendor.setContract(contract1);
+//=======
+//        contract1.setEmployeeInChargeContract(newEmployee);
+//
+//        contract1 = contractRepository.save(contract1);
+//
+//        contractLine1.setContract(contract1);
+//        contractLine2.setContract(contract1);
+//        vendor.getContracts().add(contract1);
+//        merchandise.setActiveContractCode("Contract1");
+//>>>>>>> 9d66026255b59edba97e13be400fafd4a6c64f01
 
         contract1.setEmployeeInChargeContract(newEmployee);
         newEmployee.addContractIC(contract1);
