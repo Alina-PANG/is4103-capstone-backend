@@ -2,7 +2,6 @@ package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.enums.EmployeeTypeEnum;
-import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -21,14 +20,16 @@ public class Employee extends DBEntityTemplate {
     private String lastName;
     private String middleName;
     private String password;
-    @Convert(converter = StringListConverter.class)
-    private List<String> groupsBelongTo = new ArrayList<>();
+
+    @ManyToMany
+    private List<SecurityGroup> memberOfSecurityGroups = new ArrayList<>();
+    private String securityId;
 
     private EmployeeTypeEnum employeeType;
     //A uni-directional with CostCenter
     private String costCenterCode;
 
-    @ManyToMany(mappedBy = "members",fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
     private List<Team> memberOfTeams = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -50,7 +51,6 @@ public class Employee extends DBEntityTemplate {
         this.middleName = middleName;
         this.password = password;
     }
-
 
 
     public String getUserName() {
@@ -93,14 +93,6 @@ public class Employee extends DBEntityTemplate {
         this.password = password;
     }
 
-    public List<String> getGroupsBelongTo() {
-        return groupsBelongTo;
-    }
-
-    public void setGroupsBelongTo(List<String> groupsBelongTo) {
-        this.groupsBelongTo = groupsBelongTo;
-    }
-
     public EmployeeTypeEnum getEmployeeType() {
         return employeeType;
     }
@@ -139,5 +131,21 @@ public class Employee extends DBEntityTemplate {
 
     public void setSubordinates(List<Employee> subordinates) {
         this.subordinates = subordinates;
+    }
+
+    public String getSecurityId() {
+        return securityId;
+    }
+
+    public void setSecurityId(String securityId) {
+        this.securityId = securityId;
+    }
+
+    public List<SecurityGroup> getMemberOfSecurityGroups() {
+        return memberOfSecurityGroups;
+    }
+
+    public void setMemberOfSecurityGroups(List<SecurityGroup> memberOfSecurityGroups) {
+        this.memberOfSecurityGroups = memberOfSecurityGroups;
     }
 }

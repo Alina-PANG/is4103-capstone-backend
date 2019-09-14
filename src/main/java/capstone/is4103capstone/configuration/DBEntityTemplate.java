@@ -1,5 +1,8 @@
 package capstone.is4103capstone.configuration;
 
+import capstone.is4103capstone.entities.enums.PermissionTypeEnum;
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.UUID;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -20,9 +22,30 @@ public class DBEntityTemplate {
             name = "uuid",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(unique = true, updatable = false, nullable = false,length = 36)
-    @Length(min=36, max=36)
+    @Column(unique = true, updatable = false, nullable = false, length = 36)
+    @Length(min = 36, max = 36)
     private String id;
+    private String objectName;
+
+    @Column(unique = true)
+    private String code;
+    private String hierachyPath;
+    private Boolean isDeleted = false;
+    private String createdBy;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(updatable = false)
+    @CreatedDate
+    private Date createdDateTime;
+    private String deletedBy;
+    private Date deletedDateTime;
+
+    //if the entity is modifiable:
+    private String lastModifiedBy;
+    @Temporal(TemporalType.TIMESTAMP)
+    @LastModifiedDate
+    private Date lastModifiedDateTime;
+    private MultiValuedMap<PermissionTypeEnum, String> permissionMap = new HashSetValuedHashMap<>();
 
     public DBEntityTemplate() {
     }
@@ -41,29 +64,6 @@ public class DBEntityTemplate {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    private String objectName;
-
-    @Column(unique = true)
-    private String code;
-
-    private String hierachyPath;
-
-    private Boolean isDeleted = false;
-
-    private String createdBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(updatable = false)
-    @CreatedDate
-    private Date createdDateTime;
-
-    private String deletedBy;
-    private Date deletedDateTime;
-
-    //if the entity is modifiable:
-    private String lastModifiedBy;
-    @Temporal(TemporalType.TIMESTAMP)
-    @LastModifiedDate
-    private Date lastModifiedDateTime;
     public String getId() {
         return id;
     }
@@ -71,6 +71,7 @@ public class DBEntityTemplate {
     public void setId(String id) {
         this.id = id;
     }
+
     public Boolean getDeleted() {
         return isDeleted;
     }
@@ -150,4 +151,13 @@ public class DBEntityTemplate {
     public void setObjectName(String objectName) {
         this.objectName = objectName;
     }
+    
+    public MultiValuedMap<PermissionTypeEnum, String> getPermissionMap() {
+        return permissionMap;
+    }
+
+    public void setPermissionMap(MultiValuedMap<PermissionTypeEnum, String> permissionMap) {
+        this.permissionMap = permissionMap;
+    }
+
 }
