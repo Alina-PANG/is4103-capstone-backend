@@ -43,6 +43,8 @@ public class SupplyChainInitialization {
     @Autowired
     ContractLineRepository contractLineRepository;
 
+    private final String opsUserId = "yingshi2502";
+
     @PostConstruct
     @Transactional
     public void init(){
@@ -58,13 +60,8 @@ public class SupplyChainInitialization {
     }
 
     public void createMechandise(){
-        Merchandise merchandise1 = new Merchandise("Banana", "SG_Banana", "dummy_hierachy", BigDecimal.valueOf(2.0), "SGD");
-        merchandise1.setCreatedBy("Admin");
-        merchandise1.setLastModifiedBy("admin");
-
-        Merchandise merchandise2 = new Merchandise("Mango", "SG_Mango", "dummy_hierachy", BigDecimal.valueOf(5.0), "SGD");
-        merchandise2.setCreatedBy("Admin");
-        merchandise2.setLastModifiedBy("admin");
+        Merchandise merchandise1 = new Merchandise("Banana", "SG_Banana", "dummy_hierachy","piece",opsUserId);
+        Merchandise merchandise2 = new Merchandise("Mango", "SG_Mango", "dummy_hierachy", "piece",opsUserId);
         merchandiseRepository.save(merchandise1);
         merchandiseRepository.save(merchandise2);
     }
@@ -83,7 +80,7 @@ public class SupplyChainInitialization {
         vendor1.setCode("Vendor-Lenovo");
         vendor1.setLastModifiedBy("admin");
 
-        Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana").get(0);
+        Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana");
         vendor1.getMerchandises().add(merchandise);
 
         vendorRepository.save(vendor1);
@@ -93,10 +90,20 @@ public class SupplyChainInitialization {
 
     @Transactional
     public void createContract(){
-        ContractLine contractLine1 = new ContractLine("SG_Banana",BigDecimal.valueOf(2.0));
-        ContractLine contractLine2 = new ContractLine("SG_Mango",BigDecimal.valueOf(5.0));
+
+        Merchandise banana = merchandiseRepository.findMerchandiseByCode("SG_Banana");
+        Merchandise mango = merchandiseRepository.findMerchandiseByCode("SG_Mango");
+
+        ContractLine contractLine1 = new ContractLine(BigDecimal.valueOf(2.0),"SGD");
+        ContractLine contractLine2 = new ContractLine(BigDecimal.valueOf(5.0),"SGD");
+
         contractLine1 = contractLineRepository.save(contractLine1);
         contractLine2 = contractLineRepository.save(contractLine2);
+
+        contractLine1.setMerchandise(banana);
+        contractLine2.setMerchandise(mango);
+        banana.setCurrentContract(contractLine1);
+        mango.setCurrentContract(contractLine2);
 
         Contract contract1 = new Contract();
         contract1.setPurchaseType(PurchaseTypeEnum.TERMLICENSE);
@@ -115,8 +122,7 @@ public class SupplyChainInitialization {
         contractLineRepository.saveAndFlush(contractLine1);
         contractLineRepository.saveAndFlush(contractLine2);
 
-        Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana").get(0);
-        Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo").get(0);
+        Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
         Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
 
         contract1.setVendor(vendor);
@@ -125,12 +131,10 @@ public class SupplyChainInitialization {
         newEmployee.getContractInCharged().size();
         newEmployee.getContractInCharged().add(contract1);
 
-        merchandise.setActiveContractCode("Contract1");
-//        newEmployee.getContractInCharged().size();
-//        newEmployee.getContractInCharged().add(contract1);
         contractRepository.saveAndFlush(contract1);
         vendorRepository.saveAndFlush(vendor);
-        merchandiseRepository.saveAndFlush(merchandise);
+        merchandiseRepository.saveAndFlush(banana);
+        merchandiseRepository.saveAndFlush(mango);
         employeeRepository.saveAndFlush(newEmployee);
     }
 
@@ -197,7 +201,7 @@ public class SupplyChainInitialization {
     public void createOutsourcing(){
         OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findOutsourcingAssessmentByCode("Outsourcing_Assessment1").get(0);
         Employee employeeInCharge = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
-        Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo").get(0);
+        Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
 
         Outsourcing outsourcing = new Outsourcing();
         outsourcing.setOutsourcingDescription("This is a ... outsourcing.");
