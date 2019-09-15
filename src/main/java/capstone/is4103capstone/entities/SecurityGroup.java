@@ -7,14 +7,15 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table
 public class SecurityGroup extends DBEntityTemplate {
 
     public String securityId;
-    @ManyToMany
-    public ArrayList<Employee> employeeList = new ArrayList<>();
+    @ManyToMany(mappedBy = "memberOfSecurityGroups")
+    public List<Employee> employeeList = new ArrayList<>();
 
     public SecurityGroup() {
     }
@@ -27,11 +28,11 @@ public class SecurityGroup extends DBEntityTemplate {
         this.securityId = securityId;
     }
 
-    public ArrayList<Employee> getEmployeeList() {
+    public List<Employee> getEmployeeList() {
         return employeeList;
     }
 
-    public void setEmployeeList(ArrayList<Employee> employeeList) {
+    public void setEmployeeList(List<Employee> employeeList) {
         this.employeeList = employeeList;
     }
 }

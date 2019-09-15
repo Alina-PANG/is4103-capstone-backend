@@ -50,7 +50,7 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "manager")
     private List<Employee> subordinates = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "requester")
     private List<BJF> bjfs= new ArrayList<>();
 
     @Convert(converter = StringListConverter.class)
