@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -16,6 +17,8 @@ public class Office extends DBEntityTemplate {
     private Address address;
 
     private Integer numOfFloors;
+    @ElementCollection(targetClass= String.class)
+    private List<String> floors = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
@@ -69,5 +72,13 @@ public class Office extends DBEntityTemplate {
 
     public void setFunctionsCodeInOffice(List<String> functionsCodeInOffice) {
         this.functionsCodeInOffice = functionsCodeInOffice;
+    }
+
+    public List<String> getFloors() {
+        return floors;
+    }
+
+    public void setFloors(List<String> floors) {
+        this.floors = floors;
     }
 }

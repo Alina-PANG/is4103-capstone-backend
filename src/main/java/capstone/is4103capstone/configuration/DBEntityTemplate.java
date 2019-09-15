@@ -24,23 +24,6 @@ public class DBEntityTemplate {
     @Length(min=36, max=36)
     private String id;
 
-    public DBEntityTemplate() {
-    }
-
-    public DBEntityTemplate(String objectName, String code, String hierachyPath) {
-        this.objectName = objectName;
-        this.code = code;
-        this.hierachyPath = hierachyPath;
-    }
-
-    public DBEntityTemplate(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy) {
-        this.objectName = objectName;
-        this.code = code;
-        this.hierachyPath = hierachyPath;
-        this.createdBy = createdBy;
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
     private String objectName;
 
     @Column(unique = true)
@@ -64,6 +47,24 @@ public class DBEntityTemplate {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date lastModifiedDateTime;
+
+    public DBEntityTemplate() {
+    }
+
+    public DBEntityTemplate(String objectName, String code, String hierachyPath) {
+        this.objectName = objectName;
+        this.code = code;
+        this.hierachyPath = hierachyPath;
+    }
+
+    public DBEntityTemplate(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy) {
+        this.objectName = objectName;
+        this.code = code;
+        this.hierachyPath = hierachyPath;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
     public String getId() {
         return id;
     }
@@ -71,6 +72,7 @@ public class DBEntityTemplate {
     public void setId(String id) {
         this.id = id;
     }
+
     public Boolean getDeleted() {
         return isDeleted;
     }

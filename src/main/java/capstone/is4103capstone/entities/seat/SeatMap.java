@@ -15,10 +15,10 @@ import java.util.List;
 public class SeatMap extends DBEntityTemplate {
     @Min(1)
     private Integer numOfSeats = 0;
-    @Min(1)
-    private Integer floor;
+    @NotNull
+    private String floor;
 
-    @OneToMany(mappedBy = "seatMap")
+    @OneToMany(mappedBy = "seatMap", fetch = FetchType.LAZY)
     private List<Seat> seats = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seatmap_id")
@@ -29,13 +29,13 @@ public class SeatMap extends DBEntityTemplate {
     public SeatMap() {
     }
 
-    public SeatMap(String objectName, String code, String hierachyPath, Office office, @Min(1) Integer floor) {
+    public SeatMap(String objectName, String code, String hierachyPath, Office office, String floor) {
         super(objectName, code, hierachyPath);
         this.office = office;
         this.floor = floor;
     }
 
-    public SeatMap(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Office office, @Min(1) Integer floor) {
+    public SeatMap(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Office office, String floor) {
         super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
         this.office = office;
         this.floor = floor;
@@ -46,9 +46,9 @@ public class SeatMap extends DBEntityTemplate {
 
     public void setOffice(Office office) { this.office = office; }
 
-    public Integer getFloor() { return floor; }
+    public String getFloor() { return floor; }
 
-    public void setFloor(Integer floor) { this.floor = floor; }
+    public void setFloor(String floor) { this.floor = floor; }
 
     public List<Seat> getSeats() {
         return seats;
