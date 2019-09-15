@@ -22,6 +22,11 @@ public class ApprovalForRequest extends DBEntityTemplate {
     private Employee requester;
 
     //use approvalType to match entity table, use requestedItemCode to find the actual item;
+    /*
+        e.g., request for a merchandiseItem:
+        approvalType will be BJFBUSINESS,
+        requestedItemCode will be the code for that BJF entity.
+     */
     private ApprovalTypeEnum approvalType;
 
     private String requestedItemCode;
@@ -35,7 +40,6 @@ public class ApprovalForRequest extends DBEntityTemplate {
 
     public ApprovalForRequest() {
     }
-
 
     public ApprovalForRequest(String ticketCode, ApprovalTypeEnum approvalType, String requestedItemCode, String commentByRequester) {
         super(ticketCode);

@@ -66,11 +66,11 @@ public class DBEntityTemplate implements Serializable {
     @CreatedDate
     private Date createdDateTime;
 
-    //if the entity is modifiable:
     private String lastModifiedBy;
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date lastModifiedDateTime;
+
     public String getId() {
         return id;
     }
