@@ -11,4 +11,6 @@ public interface CountryRepository extends JpaRepository<Country,String> {
     Optional<Country> findById(String s);
 
     Country findByObjectName(String objectName);
+
+    Country findCountryByCode(String countryCode);
 }

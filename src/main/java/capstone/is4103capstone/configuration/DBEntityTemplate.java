@@ -1,6 +1,7 @@
 package capstone.is4103capstone.configuration;
 
 import capstone.is4103capstone.entities.enums.PermissionTypeEnum;
+import capstone.is4103capstone.entities.helper.MultiValuedMapConverter;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.hibernate.annotations.GenericGenerator;
@@ -73,6 +74,8 @@ public class DBEntityTemplate implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date lastModifiedDateTime;
+
+    @Convert(converter = MultiValuedMapConverter.class)
     private MultiValuedMap<PermissionTypeEnum, String> permissionMap = new HashSetValuedHashMap<>();
 
     public String getId() {
