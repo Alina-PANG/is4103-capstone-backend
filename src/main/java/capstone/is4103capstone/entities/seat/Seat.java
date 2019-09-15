@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
 public class Seat extends DBEntityTemplate {
     @Enumerated(EnumType.STRING)
     private SeatTypeEnum type = SeatTypeEnum.FIXED;
-    private Point2D.Double coordinate;
+    private Point coordinate;
+    private Integer serialNumber;
 
     @OneToOne
     private SeatAllocation currentOccupancy;
@@ -28,15 +30,16 @@ public class Seat extends DBEntityTemplate {
     private List<SeatAllocation> seatAllocations = new ArrayList<>();
 
     public Seat() {
+
     }
 
-    public Seat(String objectName, String code, String hierachyPath, Point2D.Double coordinate, @NotNull SeatMap seatMap) {
+    public Seat(String objectName, String code, String hierachyPath, Point coordinate, @NotNull SeatMap seatMap) {
         super(objectName, code, hierachyPath);
         this.coordinate = coordinate;
         this.seatMap = seatMap;
     }
 
-    public Seat(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Point2D.Double coordinate, @NotNull SeatMap seatMap) {
+    public Seat(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Point coordinate, @NotNull SeatMap seatMap) {
         super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
         this.coordinate = coordinate;
         this.seatMap = seatMap;
@@ -50,13 +53,17 @@ public class Seat extends DBEntityTemplate {
         this.type = type;
     }
 
-    public Point2D.Double getCoordinate() {
+    public Point getCoordinate() {
         return coordinate;
     }
 
-    public void setCoordinate(Point2D.Double coordinate) {
+    public void setCoordinate(Point coordinate) {
         this.coordinate = coordinate;
     }
+
+    public Integer getSerialNumber() { return serialNumber; }
+
+    public void setSerialNumber(Integer serialNumber) { this.serialNumber = serialNumber; }
 
     public SeatMap getSeatMap() {
         return seatMap;
