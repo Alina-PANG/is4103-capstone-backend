@@ -35,11 +35,14 @@ public class MultiValuedMapConverter implements AttributeConverter<MultiValuedMa
 
     @Override
     public MultiValuedMap<PermissionTypeEnum, String> convertToEntityAttribute(String dbData) {
-        String[] pairs = dbData.split(";");
         MultiValuedMap<PermissionTypeEnum,String> map = new HashSetValuedHashMap<>();
+        if (dbData.length() == 0){
+            return map;
+        }
+        String[] pairs = dbData.split(OUTER_SEP);
 
         for (int i=0;i<pairs.length;i++){
-            String[] permission_sid = pairs[i].split(",");
+            String[] permission_sid = pairs[i].split(INNER_SEP);
             String permission = permission_sid[0];
             String sid = permission_sid[1];
             map.put(PermissionTypeEnum.valueOf(permission),sid);
