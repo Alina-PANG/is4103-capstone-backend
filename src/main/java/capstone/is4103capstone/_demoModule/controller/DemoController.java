@@ -1,7 +1,8 @@
 package capstone.is4103capstone._demoModule.controller;
 
 import capstone.is4103capstone._demoModule.repository.DemoEntityRepository;
-import capstone.is4103capstone.entities.DemoEntity;
+import capstone.is4103capstone._demoModule.service.DemoService;
+import capstone.is4103capstone.configuration.DemoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
