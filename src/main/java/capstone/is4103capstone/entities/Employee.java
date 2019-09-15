@@ -1,11 +1,11 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
-import capstone.is4103capstone.entities.finance.BJF;
+import capstone.is4103capstone.entities.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.entities.helper.StringListConverter;
-import capstone.is4103capstone.entities.supplyChain.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.*;
@@ -24,8 +24,10 @@ public class Employee extends DBEntityTemplate {
     private String lastName;
     private String middleName;
     private String password;
-    @Convert(converter = StringListConverter.class)
-    private List<String> groupsBelongTo = new ArrayList<>();
+
+    @ManyToMany
+    private List<SecurityGroup> memberOfSecurityGroups = new ArrayList<>();
+    private String securityId;
 
     private EmployeeTypeEnum employeeType;
 
@@ -34,6 +36,7 @@ public class Employee extends DBEntityTemplate {
     private CostCenter defaultCostCenter;
 
     @ManyToMany(mappedBy = "members")
+    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
     private List<Team> memberOfTeams = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -83,8 +86,9 @@ public class Employee extends DBEntityTemplate {
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
-        this.password = password;
+        this.setPassword(password);
     }
+
 
 
     public String getUserName() {
@@ -143,12 +147,12 @@ public class Employee extends DBEntityTemplate {
         this.employeeType = employeeType;
     }
 
-    public CostCenter getDefaultCostCenter() {
-        return defaultCostCenter;
+    public String getCostCenterCode() {
+        return costCenterCode;
     }
 
-    public void setDefaultCostCenter(CostCenter defaultCostCenter) {
-        this.defaultCostCenter = defaultCostCenter;
+    public void setCostCenterCode(String costCenterCode) {
+        this.costCenterCode = costCenterCode;
     }
 
     public List<Team> getMemberOfTeams() {
@@ -260,4 +264,20 @@ public class Employee extends DBEntityTemplate {
     }
 
 
+
+    public String getSecurityId() {
+        return securityId;
+    }
+
+    public void setSecurityId(String securityId) {
+        this.securityId = securityId;
+    }
+
+    public List<SecurityGroup> getMemberOfSecurityGroups() {
+        return memberOfSecurityGroups;
+    }
+
+    public void setMemberOfSecurityGroups(List<SecurityGroup> memberOfSecurityGroups) {
+        this.memberOfSecurityGroups = memberOfSecurityGroups;
+    }
 }
