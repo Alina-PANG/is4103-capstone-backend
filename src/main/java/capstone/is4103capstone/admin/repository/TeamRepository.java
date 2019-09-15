@@ -6,6 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TeamRepository extends JpaRepository<Team,String> {
-
-    public List<Team> findTeamByCode(String teamCode);
+    public Team findTeamByCode(String teamCode);
 }

@@ -2,7 +2,7 @@ package capstone.is4103capstone.admin;
 
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
-import capstone.is4103capstone.entities.enums.EmployeeTypeEnum;
+import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.entities.helper.Address;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,10 +44,16 @@ public class AdminInitialization {
         admin.setCreatedBy("admin");
         admin.setCode("EMPLOYEE-admin");
         admin.setLastModifiedBy("admin");
+
+        Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
+        newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        newEmployee2.setCode("EMPLOYEE-xuhong");
+
         employeeRepository.save(newEmployee);
         employeeRepository.save(admin);
+        employeeRepository.save(newEmployee2);
 
-        Team team = teamRepository.findTeamByCode("DTS").get(0);
+        Team team = teamRepository.findTeamByCode("DTS");
 
         newEmployee.getMemberOfTeams().add(team);
         admin.getMemberOfTeams().add(team);

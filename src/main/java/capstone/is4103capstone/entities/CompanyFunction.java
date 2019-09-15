@@ -11,7 +11,7 @@ import java.util.List;
 @Table
 public class CompanyFunction extends DBEntityTemplate {
 
-    @ManyToMany(mappedBy = "functions",fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "functions")
     private List<Country> countries = new ArrayList<>();
 
     @OneToMany(mappedBy = "function")

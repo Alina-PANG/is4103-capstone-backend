@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 @Table
 public class Region extends DBEntityTemplate {
 
-    @OneToMany(mappedBy = "region")
+    @OneToMany(mappedBy = "region",fetch = FetchType.EAGER)
     private List<Country> countries = new ArrayList<>();
 
     public Region() {
