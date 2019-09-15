@@ -3,6 +3,8 @@ package capstone.is4103capstone.entities;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.enums.EmployeeTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ public class Employee extends DBEntityTemplate {
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
-        this.password = password;
+        this.setPassword(password);
     }
 
 
@@ -90,7 +92,16 @@ public class Employee extends DBEntityTemplate {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+
+        // hash the password
+        // init argon2 hashing algo
+        Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
+
+        // hash the plaintext password
+        this.password = argon2.hash(8, 64*1024, 1, password);
+
+        // clear the password - probably unnecessary/insecure
+        password = null;
     }
 
     public EmployeeTypeEnum getEmployeeType() {
