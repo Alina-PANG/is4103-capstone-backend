@@ -21,7 +21,6 @@ public class controller {
 
   @Value("${test.fetch.property}")
   private String dbUrl;
-
   public String getDbUrl(){
     return dbUrl;
   }

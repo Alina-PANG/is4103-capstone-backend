@@ -1,9 +1,5 @@
 package capstone.is4103capstone.configuration;
 
-import capstone.is4103capstone.entities.enums.PermissionTypeEnum;
-import capstone.is4103capstone.entities.helper.MultiValuedMapConverter;
-import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
@@ -11,13 +7,12 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class DBEntityTemplate implements Serializable {
+public class DBEntityTemplate {
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -29,36 +24,10 @@ public class DBEntityTemplate implements Serializable {
     @Length(min=36, max=36)
     private String id;
 
-    public DBEntityTemplate() {
-    }
-
-    public DBEntityTemplate(String objectName, String code) {
-        this.objectName = objectName;
-        this.code = code;
-    }
-
-    public DBEntityTemplate(String code) {
-        this.code = code;
-    }
-
-    public DBEntityTemplate(String objectName, String code, String hierachyPath) {
-        this.objectName = objectName;
-        this.code = code;
-        this.hierachyPath = hierachyPath;
-    }
-
-    public DBEntityTemplate(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy) {
-        this.objectName = objectName;
-        this.code = code;
-        this.hierachyPath = hierachyPath;
-        this.createdBy = createdBy;
-        this.lastModifiedBy = lastModifiedBy;
-    }
-
     private String objectName;
 
     @Column(unique = true)
-    private String code;
+    private String runningId;
 
     private String hierachyPath;
 
@@ -70,14 +39,14 @@ public class DBEntityTemplate implements Serializable {
     @CreatedDate
     private Date createdDateTime;
 
+    private String deletedBy;
+    private Date deletedDateTime;
+
+    //if the entity is modifiable:
     private String lastModifiedBy;
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date lastModifiedDateTime;
-
-    @Convert(converter = MultiValuedMapConverter.class)
-    private MultiValuedMap<PermissionTypeEnum, String> permissionMap = new HashSetValuedHashMap<>();
-
     public String getId() {
         return id;
     }
@@ -109,6 +78,22 @@ public class DBEntityTemplate implements Serializable {
         this.createdDateTime = createdDateTime;
     }
 
+    public String getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(String deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public Date getDeletedDateTime() {
+        return deletedDateTime;
+    }
+
+    public void setDeletedDateTime(Date deletedDateTime) {
+        this.deletedDateTime = deletedDateTime;
+    }
+
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -125,12 +110,12 @@ public class DBEntityTemplate implements Serializable {
         this.lastModifiedDateTime = lastModifiedDateTime;
     }
 
-    public String getCode() {
-        return code;
+    public String getRunningId() {
+        return runningId;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setRunningId(String runningId) {
+        this.runningId = runningId;
     }
 
     public String getHierachyPath() {
@@ -147,13 +132,5 @@ public class DBEntityTemplate implements Serializable {
 
     public void setObjectName(String objectName) {
         this.objectName = objectName;
-    }
-
-    public MultiValuedMap<PermissionTypeEnum, String> getPermissionMap() {
-        return permissionMap;
-    }
-
-    public void setPermissionMap(MultiValuedMap<PermissionTypeEnum, String> permissionMap) {
-        this.permissionMap = permissionMap;
     }
 }
