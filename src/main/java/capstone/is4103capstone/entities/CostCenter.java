@@ -22,7 +22,8 @@ public class CostCenter extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ccmanager")
     @JsonIgnore
-    private Employee costCenterManager;p
+    private Employee costCenterManager;
+
 
     @OneToMany(mappedBy = "costCenter",fetch = FetchType.EAGER)
     private List<ActualsTable> actuals = new ArrayList<>();

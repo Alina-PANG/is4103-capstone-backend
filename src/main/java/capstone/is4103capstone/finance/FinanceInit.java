@@ -67,12 +67,25 @@ public class FinanceInit {
 
 
     }
+    /*
+        1. Always set createdBy/LastModifiedBy = username
+           (front-end should always communicate the active user with backend)
+        2. Logical Delete:  setIsDeleted = True
+           When retrieving objects: WHERE is_deleted = false/ or filter out the isDeleted = True ones
+        3. Setup objectCode/HierachyPath generation rules
 
+
+     */
     public void createSubCategories(String thisUser){
         BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode("CAT-TEL");
         BudgetSub1 sub1 = new BudgetSub1("Data","SUB1-DATA","SG-TELECOM-DATA");
+
+
+
         sub1.setCreatedBy(thisUser);
         sub1.setLastModifiedBy(thisUser);
+
+
         sub1 = budgetSub1Repository.save(sub1);
         cat.getBudgetSub1s().size();
         sub1.setBudgetCategory(cat);

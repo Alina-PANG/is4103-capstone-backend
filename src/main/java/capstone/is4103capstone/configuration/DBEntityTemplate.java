@@ -66,9 +66,6 @@ public class DBEntityTemplate implements Serializable {
     @CreatedDate
     private Date createdDateTime;
 
-    private String deletedBy;
-    private Date deletedDateTime;
-
     //if the entity is modifiable:
     private String lastModifiedBy;
     @Temporal(TemporalType.TIMESTAMP)
@@ -103,22 +100,6 @@ public class DBEntityTemplate implements Serializable {
 
     public void setCreatedDateTime(Date createdDateTime) {
         this.createdDateTime = createdDateTime;
-    }
-
-    public String getDeletedBy() {
-        return deletedBy;
-    }
-
-    public void setDeletedBy(String deletedBy) {
-        this.deletedBy = deletedBy;
-    }
-
-    public Date getDeletedDateTime() {
-        return deletedDateTime;
-    }
-
-    public void setDeletedDateTime(Date deletedDateTime) {
-        this.deletedDateTime = deletedDateTime;
     }
 
     public String getLastModifiedBy() {

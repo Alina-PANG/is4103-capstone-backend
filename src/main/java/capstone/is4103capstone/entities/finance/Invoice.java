@@ -18,6 +18,8 @@ public class Invoice extends DBEntityTemplate {
 
     private String description;
 
+    private String currencyCode;
+
     private BigDecimal paymentAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,10 +30,25 @@ public class Invoice extends DBEntityTemplate {
     public Invoice() {
     }
 
+    public Invoice(String description, String currencyCode, BigDecimal paymentAmount) {
+        this.description = description;
+
+        this.currencyCode = currencyCode;
+        this.paymentAmount = paymentAmount;
+    }
+
     public Invoice(String objectName, String code, String description, BigDecimal paymentAmount) {
         super(objectName, code);
         this.description = description;
         this.paymentAmount = paymentAmount;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public Invoice(PurchaseOrder purchaseOrder, String description, BigDecimal paymentAmount, Vendor vendor) {
