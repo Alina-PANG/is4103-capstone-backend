@@ -24,14 +24,20 @@ public class AdminInitialization {
     TeamRepository teamRepository;
     @Autowired
     OfficeRepository officeRepository;
+    @Autowired
+    CurrencyRepository currencyRepository;
 
     @PostConstruct
     public void init(){
-        createGeo();
-        System.out.println("-----Created Geographies-----");
-        createEmployee();
+        createCurrency();
+//        createGeo();
+//        System.out.println("-----Created Geographies-----");
+//        createEmployee();
     }
-
+    public void createCurrency(){
+        Currency c = new Currency("Singapore Dollars","SGD",'$',"SGD");
+        currencyRepository.save(c);
+    }
     public void createEmployee(){
         Employee newEmployee = new Employee("yingshi2502","Yingshi","Huang","","password");
         newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);

@@ -16,7 +16,7 @@ public class Currency extends DBEntityTemplate {
     public Currency() {
     }
 
-    public Currency(String currencyName, String currencyCode,Character symbol,String countryCode) {
+    public Currency(String currencyName, String currencyCode, char symbol, String countryCode) {
         super(currencyName, currencyCode);
         this.symbol = symbol;
         this.countryCode = countryCode;
