@@ -48,15 +48,15 @@ public class SupplyChainInitialization {
     @PostConstruct
     @Transactional
     public void init(){
-        createMechandise();
-        createVendors();
-        createContract();
-        createDispute();
-        createAction();
-        createOutsourcingAssessmentLine();
-        createOutsourcingAssessmentSection();
-        createOutsourcingAssessment();
-        createOutsourcing();
+//        createMechandise();
+//        createVendors();
+//        createContract();
+//        createDispute();
+//        createAction();
+//        createOutsourcingAssessmentLine();
+//        createOutsourcingAssessmentSection();
+//        createOutsourcingAssessment();
+//        createOutsourcing();
     }
 
     public void createMechandise(){

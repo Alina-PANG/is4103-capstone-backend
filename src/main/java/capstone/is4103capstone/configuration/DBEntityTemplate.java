@@ -29,12 +29,23 @@ public class DBEntityTemplate implements Serializable {
     @Length(min=36, max=36)
     private String id;
 
+    @Column(columnDefinition = "integer auto_increment")
+    private Integer seqNo;
+
     public DBEntityTemplate() {
     }
 
     public DBEntityTemplate(String objectName, String code) {
         this.objectName = objectName;
         this.code = code;
+    }
+
+    public int getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(int seqNo) {
+        this.seqNo = seqNo;
     }
 
     public DBEntityTemplate(String code) {
