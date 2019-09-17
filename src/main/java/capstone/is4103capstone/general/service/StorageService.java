@@ -1,4 +1,4 @@
-package capstone.is4103capstone._demoModule.service;
+package capstone.is4103capstone.general.service;
 
 import org.springframework.stereotype.Service;
 

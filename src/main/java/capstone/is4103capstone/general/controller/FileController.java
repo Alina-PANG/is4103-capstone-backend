@@ -1,8 +1,8 @@
-package capstone.is4103capstone._demoModule.controller;
+package capstone.is4103capstone.general.controller;
 
-import capstone.is4103capstone._demoModule.model.UploadFileResponse;
-import capstone.is4103capstone._demoModule.service.ExportToFileService;
-import capstone.is4103capstone._demoModule.service.FileStorageService;
+import capstone.is4103capstone.general.model.UploadFileResponse;
+import capstone.is4103capstone.general.service.ExportToFileService;
+import capstone.is4103capstone.general.service.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
