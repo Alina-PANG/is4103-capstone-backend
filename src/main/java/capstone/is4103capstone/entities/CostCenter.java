@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "costcenter")
+@Table
 public class CostCenter extends DBEntityTemplate {
 
     @OneToMany(mappedBy = "defaultCostCenter")

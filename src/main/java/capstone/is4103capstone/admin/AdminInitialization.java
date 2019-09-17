@@ -51,13 +51,10 @@ public class AdminInitialization {
         admin.setCode("EMPLOYEE-admin");
         admin.setLastModifiedBy("admin");
 
-        Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
-        newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        newEmployee2.setCode("EMPLOYEE-xuhong");
+
 
         employeeRepository.save(newEmployee);
         employeeRepository.save(admin);
-        employeeRepository.save(newEmployee2);
 
         Team team = teamRepository.findTeamByCode("DTS");
 
@@ -67,7 +64,7 @@ public class AdminInitialization {
         team.getMembers().add(admin);
         newEmployee.setHierachyPath("APAC-SG-TECH-DTS-yingshi2502");
         admin.setHierachyPath("APAC-ADMIN");
-
+//
         newEmployee.setManager(admin);
         admin.getSubordinates().add(newEmployee);
 

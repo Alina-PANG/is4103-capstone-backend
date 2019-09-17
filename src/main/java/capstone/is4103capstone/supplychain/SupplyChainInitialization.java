@@ -48,6 +48,11 @@ public class SupplyChainInitialization {
     @PostConstruct
     @Transactional
     public void init(){
+        Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
+        newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        newEmployee2.setCode("EMPLOYEE-xuhong");
+        employeeRepository.save(newEmployee2);
+
         createMechandise();
         createVendors();
         createContract();
@@ -78,7 +83,7 @@ public class SupplyChainInitialization {
         vendor1.setEscalationContactEmail("EscalationStaff@gmail.com");
         vendor1.setCreatedBy("Admin");
         vendor1.setCode("Vendor-Lenovo");
-        vendor1.setLastModifiedBy("admin");
+        vendor1.setLastModifiedBy("xuhong");
 
         Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana");
         vendor1.getMerchandises().add(merchandise);
@@ -129,7 +134,7 @@ public class SupplyChainInitialization {
 
         contract1.setVendor(vendor);
         contract1.setEmployeeInChargeContract(newEmployee);
-        Hibernate.initialize(newEmployee.getContractInCharged());
+//        Hibernate.initialize(newEmployee.getContractInCharged());
         newEmployee.getContractInCharged().size();
         newEmployee.getContractInCharged().add(contract1);
 
@@ -142,7 +147,7 @@ public class SupplyChainInitialization {
 
     public void createDispute(){
         Employee handler = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
-        Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-admin");
+        Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
 
         Dispute dispute1 = new Dispute("This is a ... dispute.", DisputeStatusEnum.ACTIVE, handler, creator);
         disputeRepository.save(dispute1);
@@ -155,7 +160,7 @@ public class SupplyChainInitialization {
 
     public void createAction(){
         Employee assignee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
-        Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-admin");
+        Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
 
         Action action = new Action("This is a ... action.", ActionStatusEnum.ACTIVE, assignee, creator);
         actionRepository.save(action);
