@@ -15,13 +15,13 @@
 ## Running the Project
 Find the main application: Is4103CapstoneApplication.java
 
-![image](./gitignore_screenshot/03.png)
+![image](./readme_screenshot/03.png)
 
-Right click anywhere in the file and select ![image](./gitignore_screenshot/04.png)
+Right click anywhere in the file and select ![image](./readme_screenshot/04.png)
 
 A sample controller & index page has been created. Open the browser, go to http://localhost:8080/ to view the webpage:
 
-![image](./gitignore_screenshot/05.png)
+![image](./readme_screenshot/05.png)
 
 Then you are ready to go!
 
@@ -31,7 +31,7 @@ Make sure to branch out when commiting later changes! :D
 1. Go to https://mvnrepository.com/
 2. Select the dependency & version
 3. Copy the Maven dependency and copy to the corresponding place in pom.xml
-![image](./gitignore_screenshot/01.png)
+![image](./readme_screenshot/01.png)
 4. Run bash: `mvn clean install` or right click pom.xml: Maven - Generate Sources and Update Folder
 
 ## Installed Dependencies

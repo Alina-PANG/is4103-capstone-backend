@@ -48,6 +48,7 @@ public class SupplyChainInitialization {
     @PostConstruct
     @Transactional
     public void init(){
+        if(employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong") == null){
         Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
         newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
         newEmployee2.setCode("EMPLOYEE-xuhong");
@@ -61,7 +62,7 @@ public class SupplyChainInitialization {
         createOutsourcingAssessmentLine();
         createOutsourcingAssessmentSection();
         createOutsourcingAssessment();
-        createOutsourcing();
+        createOutsourcing();}
     }
 
     public void createMechandise(){
