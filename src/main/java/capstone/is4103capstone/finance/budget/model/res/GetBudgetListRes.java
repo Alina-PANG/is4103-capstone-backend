@@ -3,9 +3,10 @@ package capstone.is4103capstone.finance.budget.model.res;
 import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.general.model.GeneralRes;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class GetBudgetListRes extends GeneralRes {
+public class GetBudgetListRes extends GeneralRes  implements Serializable {
     private List<Plan> budgetPlanList;
 
     public GetBudgetListRes() {

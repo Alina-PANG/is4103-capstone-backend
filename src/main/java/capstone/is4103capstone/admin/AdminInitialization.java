@@ -30,7 +30,7 @@ public class AdminInitialization {
     @PostConstruct
     public void init(){
 
-        createCurrency();
+//        createCurrency();
 //        createGeo();
 //        System.out.println("-----Created Geographies-----");
 //        createEmployee();

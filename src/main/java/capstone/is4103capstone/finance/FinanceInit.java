@@ -1,6 +1,8 @@
 package capstone.is4103capstone.finance;
 
+import capstone.is4103capstone.admin.repository.CostCenterRepository;
 import capstone.is4103capstone.admin.repository.CountryRepository;
+import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.finance.Repository.*;
@@ -30,11 +32,14 @@ public class FinanceInit {
     FXRecordRepository fxRecordRepository;
     @Autowired
     CountryRepository countryRepository;
+    @Autowired
+    CostCenterRepository costCenterRepository;
 
     @PostConstruct
     public void financeInit(){
         String thisUser = "yingshi2502";
         Country country = countryRepository.findCountryByCode("SG");
+        createCostCenter(thisUser);
         if(country == null){
         createFXRecord(thisUser);
         createCategories(thisUser);
@@ -47,6 +52,11 @@ public class FinanceInit {
         fx.setCreatedBy(userOps);
         fx.setLastModifiedBy(userOps);
         fx = fxRecordRepository.save(fx);
+    }
+
+    public void createCostCenter(String thisUser){
+        CostCenter costCenter = new CostCenter();
+        costCenterRepository.save(costCenter);
     }
 
     public void createCategories(String thisUser){
