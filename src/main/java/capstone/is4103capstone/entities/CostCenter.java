@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "costcenter")
+@Table
 public class CostCenter extends DBEntityTemplate {
 
     @OneToMany(mappedBy = "defaultCostCenter")
@@ -23,6 +23,13 @@ public class CostCenter extends DBEntityTemplate {
     @JoinColumn(name = "ccmanager")
     @JsonIgnore
     private Employee costCenterManager;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "function_id")
+    private CompanyFunction function;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    private Country country;
 
 
     @OneToMany(mappedBy = "costCenter",fetch = FetchType.EAGER)
