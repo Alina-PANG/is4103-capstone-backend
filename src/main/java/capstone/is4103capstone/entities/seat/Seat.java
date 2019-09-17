@@ -7,13 +7,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table
-public class Seat extends DBEntityTemplate {
+public class Seat extends DBEntityTemplate implements Comparable<Seat> {
+    // Seat code example: SG-ORQ-26-01
+
     @Enumerated(EnumType.STRING)
     private SeatTypeEnum type = SeatTypeEnum.FIXED;
     private Point coordinate;
@@ -27,7 +28,9 @@ public class Seat extends DBEntityTemplate {
     @NotNull
     private SeatMap seatMap;
     @OneToMany(mappedBy = "seat")
-    private List<SeatAllocation> seatAllocations = new ArrayList<>();
+    private List<SeatAllocation> activeSeatAllocations = new ArrayList<>();
+    @OneToMany(mappedBy = "seat")
+    private List<SeatAllocation> inactiveSeatAllocations = new ArrayList<>();
 
     public Seat() {
 
@@ -81,11 +84,24 @@ public class Seat extends DBEntityTemplate {
         this.currentOccupancy = currentOccupancy;
     }
 
-    public List<SeatAllocation> getSeatAllocations() {
-        return seatAllocations;
+    public List<SeatAllocation> getActiveSeatAllocations() {
+        return activeSeatAllocations;
     }
 
-    public void setSeatAllocations(List<SeatAllocation> seatAllocations) {
-        this.seatAllocations = seatAllocations;
+    public void setActiveSeatAllocations(List<SeatAllocation> activeSeatAllocations) {
+        this.activeSeatAllocations = activeSeatAllocations;
+    }
+
+    public List<SeatAllocation> getInactiveSeatAllocations() {
+        return inactiveSeatAllocations;
+    }
+
+    public void setInactiveSeatAllocations(List<SeatAllocation> inactiveSeatAllocations) {
+        this.inactiveSeatAllocations = inactiveSeatAllocations;
+    }
+
+    @Override
+    public int compareTo(Seat anotherSeat) {
+        return this.serialNumber - anotherSeat.getSerialNumber();
     }
 }
