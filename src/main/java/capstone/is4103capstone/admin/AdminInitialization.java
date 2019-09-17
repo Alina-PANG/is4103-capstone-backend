@@ -2,6 +2,7 @@ package capstone.is4103capstone.admin;
 
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
+import capstone.is4103capstone.util.EntityCodeGenerator;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.entities.helper.Address;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +28,27 @@ public class AdminInitialization {
     @Autowired
     CurrencyRepository currencyRepository;
 
+    private final EntityCodeGenerator g = new EntityCodeGenerator();
+
     @PostConstruct
     public void init(){
-        createCurrency();
+//        createCurrency();
 //        createGeo();
-//        System.out.println("-----Created Geographies-----");
+//      System.out.println("-----Created Geographies-----");
 //        createEmployee();
     }
+
+
     public void createCurrency(){
+
+
         Currency c = new Currency("Singapore Dollars","SGD",'$',"SGD");
-        currencyRepository.save(c);
+
+        c = currencyRepository.saveAndFlush(c);
+
     }
+
+
     public void createEmployee(){
         Employee newEmployee = new Employee("yingshi2502","Yingshi","Huang","","password");
         newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
