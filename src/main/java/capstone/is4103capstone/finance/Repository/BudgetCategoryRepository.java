@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface BudgetCategoryRepository extends JpaRepository<BudgetCategory,String> {
     List<BudgetCategory> findBudgetCategoriesByCountry_Id(String countryId);
+
+    BudgetCategory findBudgetCategoryByCode(String code);
 }

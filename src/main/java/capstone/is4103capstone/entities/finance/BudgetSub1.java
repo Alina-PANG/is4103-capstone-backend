@@ -27,10 +27,6 @@ public class BudgetSub1 extends DBEntityTemplate {
         super(sub1CatName, sub1CatCode, hierachyPath);
     }
 
-    public BudgetSub1(BudgetCategory budgetCategory, List<BudgetSub2> budgetSub2s) {
-        this.budgetCategory = budgetCategory;
-        this.budgetSub2s = budgetSub2s;
-    }
 
     public BudgetCategory getBudgetCategory() {
         return budgetCategory;

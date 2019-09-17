@@ -25,7 +25,7 @@ public class Plan extends DBEntityTemplate {
     @JsonIgnore
     CostCenter costCenter;
 
-    BudgetPlanStatusEnum budgetPlanStatusEnum;
+    BudgetPlanStatusEnum budgetPlanStatus;
 
     Integer version;
 
@@ -43,7 +43,7 @@ public class Plan extends DBEntityTemplate {
     public Plan(List<PlanLineItem> budgetItems, CostCenter costCenter, BudgetPlanStatusEnum budgetPlanStatusEnum, Integer version) {
         this.lineItems = budgetItems;
         this.costCenter = costCenter;
-        this.budgetPlanStatusEnum = budgetPlanStatusEnum;
+        this.budgetPlanStatus = budgetPlanStatusEnum;
         this.version = version;
     }
 
@@ -63,12 +63,12 @@ public class Plan extends DBEntityTemplate {
         this.costCenter = costCenter;
     }
 
-    public BudgetPlanStatusEnum getBudgetPlanStatusEnum() {
-        return budgetPlanStatusEnum;
+    public BudgetPlanStatusEnum getBudgetPlanStatus() {
+        return budgetPlanStatus;
     }
 
-    public void setBudgetPlanStatusEnum(BudgetPlanStatusEnum budgetPlanStatusEnum) {
-        this.budgetPlanStatusEnum = budgetPlanStatusEnum;
+    public void setBudgetPlanStatus(BudgetPlanStatusEnum budgetPlanStatus) {
+        this.budgetPlanStatus = budgetPlanStatus;
     }
 
     public Integer getVersion() {

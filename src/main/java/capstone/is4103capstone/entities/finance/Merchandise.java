@@ -1,10 +1,12 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Entity
@@ -20,6 +22,9 @@ public class Merchandise extends DBEntityTemplate {
     @JsonIgnore
     private Vendor vendor;
 
+    @NotNull
+    private String measureUnit;
+
 //  We don't need to view purchase orders under merchandise right, no this use case.
     // only know from po who are the items, which shows in the purchaseOrderLineItem
 //    @ManyToMany
@@ -31,31 +36,41 @@ public class Merchandise extends DBEntityTemplate {
 
     private BigDecimal currentPrice;
 
-    private String activeContractCode;
+    private String currentContractCode;
 
     private String currencyCode;
 
-    //Contract Line Item
 
     public Merchandise() {
     }
 
-    public Merchandise(String objectName, String code, String hierachyPath, BigDecimal currentPrice, String currencyCode) {
-        super(objectName, code, hierachyPath);
-        this.currentPrice = currentPrice;
-        this.currencyCode = currencyCode;
+    public String getCurrentContractCode() {
+        return currentContractCode;
+    }
+
+    public void setCurrentContractCode(String currentContractCode) {
+        this.currentContractCode = currentContractCode;
+    }
+
+    public Merchandise(String objectName, String code, String hierachyPath, String measureUnit, String opsUser) {
+        super(objectName, code,hierachyPath);
+        this.setCreatedBy(opsUser);
+        this.setLastModifiedBy(opsUser);
+        this.measureUnit = measureUnit;
+
+    }
+
+
+    public String getMeasureUnit() {
+        return measureUnit;
+    }
+
+    public void setMeasureUnit(String measureUnit) {
+        this.measureUnit = measureUnit;
     }
 
     public Merchandise(String merchandiseName, String merchandiseCode, String hierachyPath) {
         super(merchandiseName, merchandiseCode, hierachyPath);
-    }
-
-    public String getActiveContractCode() {
-        return activeContractCode;
-    }
-
-    public void setActiveContractCode(String activeContractCode) {
-        this.activeContractCode = activeContractCode;
     }
 
     public BudgetSub2 getBudgetSub2() {

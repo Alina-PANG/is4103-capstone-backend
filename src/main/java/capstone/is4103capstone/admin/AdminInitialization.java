@@ -24,14 +24,20 @@ public class AdminInitialization {
     TeamRepository teamRepository;
     @Autowired
     OfficeRepository officeRepository;
+    @Autowired
+    CurrencyRepository currencyRepository;
 
     @PostConstruct
     public void init(){
-        createGeo();
-        System.out.println("-----Created Geographies-----");
-        createEmployee();
+        createCurrency();
+//        createGeo();
+//        System.out.println("-----Created Geographies-----");
+//        createEmployee();
     }
-
+    public void createCurrency(){
+        Currency c = new Currency("Singapore Dollars","SGD",'$',"SGD");
+        currencyRepository.save(c);
+    }
     public void createEmployee(){
         Employee newEmployee = new Employee("yingshi2502","Yingshi","Huang","","password");
         newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
@@ -45,15 +51,12 @@ public class AdminInitialization {
         admin.setCode("EMPLOYEE-admin");
         admin.setLastModifiedBy("admin");
 
-        Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
-        newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        newEmployee2.setCode("EMPLOYEE-xuhong");
+
 
         employeeRepository.save(newEmployee);
         employeeRepository.save(admin);
-        employeeRepository.save(newEmployee2);
 
-        Team team = teamRepository.findTeamByCode("DTS").get(0);
+        Team team = teamRepository.findTeamByCode("DTS");
 
         newEmployee.getMemberOfTeams().add(team);
         admin.getMemberOfTeams().add(team);
@@ -61,7 +64,7 @@ public class AdminInitialization {
         team.getMembers().add(admin);
         newEmployee.setHierachyPath("APAC-SG-TECH-DTS-yingshi2502");
         admin.setHierachyPath("APAC-ADMIN");
-
+//
         newEmployee.setManager(admin);
         admin.getSubordinates().add(newEmployee);
 

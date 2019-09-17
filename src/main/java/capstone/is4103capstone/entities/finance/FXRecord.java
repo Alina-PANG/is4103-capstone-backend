@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "fx_record")
 public class FXRecord extends DBEntityTemplate {
 
     String baseCurrencyAbbr;

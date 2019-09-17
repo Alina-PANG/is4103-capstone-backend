@@ -1,20 +1,19 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.entities.supplyChain.*;
+import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-Haven't added in accessRequest
- */
 @Entity
 @Table
 public class Employee extends DBEntityTemplate {
@@ -24,8 +23,15 @@ public class Employee extends DBEntityTemplate {
     private String lastName;
     private String middleName;
     private String password;
-    @Convert(converter = StringListConverter.class)
-    private List<String> groupsBelongTo = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_securitygroup",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "securitygroup_id")
+    )
+    private List<SecurityGroup> memberOfSecurityGroups = new ArrayList<>();
+
+    private String securityId;
 
     private EmployeeTypeEnum employeeType;
 
@@ -33,7 +39,7 @@ public class Employee extends DBEntityTemplate {
     @JoinColumn(name = "costcenter_id")
     private CostCenter defaultCostCenter;
 
-    @ManyToMany(mappedBy = "members")
+    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
     private List<Team> memberOfTeams = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,7 +50,7 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "manager")
     private List<Employee> subordinates = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employee")
+    @OneToMany(mappedBy = "requester")
     private List<BJF> bjfs= new ArrayList<>();
 
     @Convert(converter = StringListConverter.class)
@@ -83,9 +89,17 @@ public class Employee extends DBEntityTemplate {
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
-        this.password = password;
+        this.setPassword(password);
     }
 
+
+    public CostCenter getDefaultCostCenter() {
+        return defaultCostCenter;
+    }
+
+    public void setDefaultCostCenter(CostCenter defaultCostCenter) {
+        this.defaultCostCenter = defaultCostCenter;
+    }
 
     public String getUserName() {
         return userName;
@@ -127,13 +141,6 @@ public class Employee extends DBEntityTemplate {
         this.password = password;
     }
 
-    public List<String> getGroupsBelongTo() {
-        return groupsBelongTo;
-    }
-
-    public void setGroupsBelongTo(List<String> groupsBelongTo) {
-        this.groupsBelongTo = groupsBelongTo;
-    }
 
     public EmployeeTypeEnum getEmployeeType() {
         return employeeType;
@@ -143,13 +150,6 @@ public class Employee extends DBEntityTemplate {
         this.employeeType = employeeType;
     }
 
-    public CostCenter getDefaultCostCenter() {
-        return defaultCostCenter;
-    }
-
-    public void setDefaultCostCenter(CostCenter defaultCostCenter) {
-        this.defaultCostCenter = defaultCostCenter;
-    }
 
     public List<Team> getMemberOfTeams() {
         return memberOfTeams;
@@ -260,4 +260,20 @@ public class Employee extends DBEntityTemplate {
     }
 
 
+
+    public String getSecurityId() {
+        return securityId;
+    }
+
+    public void setSecurityId(String securityId) {
+        this.securityId = securityId;
+    }
+
+    public List<SecurityGroup> getMemberOfSecurityGroups() {
+        return memberOfSecurityGroups;
+    }
+
+    public void setMemberOfSecurityGroups(List<SecurityGroup> memberOfSecurityGroups) {
+        this.memberOfSecurityGroups = memberOfSecurityGroups;
+    }
 }

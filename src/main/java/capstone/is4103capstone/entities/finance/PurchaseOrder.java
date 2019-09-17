@@ -4,10 +4,8 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +26,17 @@ public class PurchaseOrder extends DBEntityTemplate {
     private List<Invoice> invoices = new ArrayList<>();
 
     @OneToMany(mappedBy = "purchaseOrder")
-    private List<StatementOfAcctLineItem> statementOfAccounts= new ArrayList<>();
+    private List<StatementOfAcctLineItem> statementOfAccount = new ArrayList<>();
+
+    private String currencyCode;
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
 
     public PurchaseOrder() {
     }
@@ -74,12 +82,12 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.invoices = invoices;
     }
 
-    public List<StatementOfAcctLineItem> getStatementOfAccounts() {
-        return statementOfAccounts;
+    public List<StatementOfAcctLineItem> getStatementOfAccount() {
+        return statementOfAccount;
     }
 
-    public void setStatementOfAccounts(List<StatementOfAcctLineItem> statementOfAccounts) {
-        this.statementOfAccounts = statementOfAccounts;
+    public void setStatementOfAccount(List<StatementOfAcctLineItem> statementOfAccount) {
+        this.statementOfAccount = statementOfAccount;
     }
 
     public Double calculateTotalPrice(){
