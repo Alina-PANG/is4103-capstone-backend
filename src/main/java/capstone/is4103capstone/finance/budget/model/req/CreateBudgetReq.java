@@ -8,8 +8,26 @@ public class CreateBudgetReq {
     private String username;
     private List<PlanLineItem> items;
     private Integer year;
-    private boolean toSubmit;
-    private boolean isBudget;
+    private boolean toSubmit; // submit or draft
+    private boolean isBudget; // planType
+    private String costCenterCode;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCostCenterCode() {
+        return costCenterCode;
+    }
+
+    public void setCostCenterCode(String costCenterCode) {
+        this.costCenterCode = costCenterCode;
+    }
 
     public boolean isBudget() {
         return isBudget;

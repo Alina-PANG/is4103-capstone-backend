@@ -10,6 +10,8 @@ public class UpdateBudgetReq {
     private List<PlanLineItem> items;
     private Integer year;
     private boolean toSubmit;
+    private String costCenterCode;
+    private String description;
 
     public boolean isToSubmit() {
         return toSubmit;
@@ -17,6 +19,22 @@ public class UpdateBudgetReq {
 
     public void setToSubmit(boolean toSubmit) {
         this.toSubmit = toSubmit;
+    }
+
+    public String getCostCenterCode() {
+        return costCenterCode;
+    }
+
+    public void setCostCenterCode(String costCenterCode) {
+        this.costCenterCode = costCenterCode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<PlanLineItem> getItems() {

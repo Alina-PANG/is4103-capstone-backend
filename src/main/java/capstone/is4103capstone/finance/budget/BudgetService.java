@@ -1,5 +1,9 @@
 package capstone.is4103capstone.finance.budget;
 
+
+
+import capstone.is4103capstone.admin.repository.CostCenterRepository;
+import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.finance.PlanLineItem;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
@@ -15,6 +19,7 @@ import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,27 +33,51 @@ public class BudgetService {
     PlanLineItemRepository planLineItemRepository;
     @Autowired
     PlanRepository planRepository;
+    @Autowired
+    CostCenterRepository costCenterRepository;
+
+    private List<PlanLineItem> saveLineItem(List<PlanLineItem> items, Plan plan) throws Exception{
+        List<PlanLineItem> newItems = new ArrayList<>();
+        for(PlanLineItem i: items){
+            i.setPlanBelongsTo(plan);
+            newItems.add(planLineItemRepository.saveAndFlush(i));
+        }
+        return newItems;
+    }
+
+    private void deletePlanLineItem(Plan plan) throws Exception{
+        List<PlanLineItem> items = plan.getLineItems();
+        plan.setLineItems(null);
+        for(PlanLineItem i: items){
+            planLineItemRepository.delete(i);
+        }
+    }
 
     public GeneralRes createBudget(CreateBudgetReq createBudgetReq){
         logger.info("Start to create budget...");
         try{
             Plan newPlan = new Plan();
             if(createBudgetReq.isToSubmit()){
-                newPlan.setBudgetPlanStatusEnum(BudgetPlanStatusEnum.SUBMITTED);
+                newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.SUBMITTED);
             }
             else{
-                newPlan.setBudgetPlanStatusEnum(BudgetPlanStatusEnum.DRAFT);
+                newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.DRAFT);
             }
             if(createBudgetReq.isBudget()){
-                newPlan.setPlanType(BudgetPlanEnum.BUDGET);}else{
+                newPlan.setPlanType(BudgetPlanEnum.BUDGET);}
+            else{
                 newPlan.setPlanType(BudgetPlanEnum.REFORECAST);
             }
-            newPlan.setLineItems(createBudgetReq.getItems());
+            CostCenter cc = costCenterRepository.findCostCenterByCode(createBudgetReq.getCostCenterCode());
+            newPlan.setCostCenter(cc);
+            newPlan.setPlanDescription(createBudgetReq.getDescription());
             newPlan.setVersion(1);
             newPlan.setForYear(createBudgetReq.getYear());
             newPlan.setCreatedBy(createBudgetReq.getUsername());
             newPlan.setCreatedDateTime(new Date());
-            planRepository.saveAndFlush(newPlan);
+            Plan p = planRepository.saveAndFlush(newPlan);
+            List<PlanLineItem> newItems = saveLineItem(createBudgetReq.getItems(), p);
+            p.setLineItems(newItems);
             logger.info("Successully submitted the new plan! -- "+createBudgetReq.getUsername()+" "+new Date());
             return new GeneralRes("Successully submitted the new budget plan!", false);
         }catch (Exception ex){
@@ -60,16 +89,27 @@ public class BudgetService {
     public GeneralRes updateBudget(UpdateBudgetReq updateBudgetReq){
         try{
             Plan newPlan = planRepository.getOne(updateBudgetReq.getId());
-            if(newPlan.getBudgetPlanStatusEnum() != BudgetPlanStatusEnum.DRAFT){
-                return new GeneralRes("The status of the budget plan is "+newPlan.getBudgetPlanStatusEnum()+", and is not allowed to be further edited!", true);
+            if(newPlan.getBudgetPlanStatus() != BudgetPlanStatusEnum.DRAFT){
+                return new GeneralRes("The status of the budget plan is "+newPlan.getBudgetPlanStatus()+", and is not allowed to be further edited!", true);
             }
             if(updateBudgetReq.isToSubmit()){
-                newPlan.setBudgetPlanStatusEnum(BudgetPlanStatusEnum.SUBMITTED);
+                newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.SUBMITTED);
             }
             else{
-                newPlan.setBudgetPlanStatusEnum(BudgetPlanStatusEnum.DRAFT);
+                newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.DRAFT);
             }
-            newPlan.setLineItems(updateBudgetReq.getItems());
+            if(updateBudgetReq.getCostCenterCode() != null){
+                CostCenter cc = costCenterRepository.findCostCenterByCode(updateBudgetReq.getCostCenterCode());
+                newPlan.setCostCenter(cc);
+            }
+            if(updateBudgetReq.getDescription() != null){
+                newPlan.setPlanDescription(updateBudgetReq.getDescription());
+            }
+            if(updateBudgetReq.getItems() != null){
+                deletePlanLineItem(newPlan);
+                List<PlanLineItem> newItems = saveLineItem(updateBudgetReq.getItems(), newPlan);
+                newPlan.setLineItems(newItems);
+            }
             newPlan.setVersion(newPlan.getVersion() + 1);
             newPlan.setCreatedBy(updateBudgetReq.getUsername());
             newPlan.setCreatedDateTime(new Date());
@@ -107,9 +147,6 @@ public class BudgetService {
             if(status.toUpperCase().equals("SUBMITTED")){
                 budgetPlanStatusEnum = BudgetPlanStatusEnum.SUBMITTED;
             }
-            else if(status.toUpperCase().equals("PROCESSING")){
-                budgetPlanStatusEnum = BudgetPlanStatusEnum.PROCESSING;
-            }
             else if(status.toUpperCase().equals("APPROVED")){
                 budgetPlanStatusEnum = BudgetPlanStatusEnum.APPROVED;
             }
@@ -117,7 +154,7 @@ public class BudgetService {
                 budgetPlanStatusEnum = BudgetPlanStatusEnum.REJECTED;
             }
             for(Plan p: plans){
-                if(p.getCreatedBy().equals(username) && p.getBudgetPlanStatusEnum() == budgetPlanStatusEnum && p.getPlanType() == budgetPlanEnum){
+                if(p.getCreatedBy().equals(username) && p.getBudgetPlanStatus() == budgetPlanStatusEnum && p.getPlanType() == budgetPlanEnum){
                     pendingPlans.add(p);
                 }
             }
@@ -137,7 +174,7 @@ public class BudgetService {
             Plan plan = planRepository.getOne(approveBudgetReq.getId());
             BudgetPlanStatusEnum budgetPlanStatusEnum = BudgetPlanStatusEnum.APPROVED;
             if (!approveBudgetReq.getApproved()) {
-                plan.setBudgetPlanStatusEnum(BudgetPlanStatusEnum.REJECTED);
+                plan.setBudgetPlanStatus(BudgetPlanStatusEnum.REJECTED);
             }
             planRepository.saveAndFlush(plan);
             logger.info("Successully "+budgetPlanStatusEnum+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
