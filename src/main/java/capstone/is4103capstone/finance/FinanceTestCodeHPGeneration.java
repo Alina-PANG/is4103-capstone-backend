@@ -3,9 +3,10 @@ package capstone.is4103capstone.finance;
 import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.ApprovalForRequest;
+import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.finance.Repository.*;
-import capstone.is4103capstone.util.EntityCodeGenerator;
+import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Service
-public class FinanceTestCodeGeneration {
+public class FinanceTestCodeHPGeneration {
     @Autowired
     BudgetCategoryRepository budgetCategoryRepository;
     @Autowired
@@ -39,7 +40,7 @@ public class FinanceTestCodeGeneration {
     ActualsTableRepository actualsTableRepository;
 
 
-    EntityCodeGenerator g = new EntityCodeGenerator();
+    FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
     private String generateCode(JpaRepository repo, DBEntityTemplate entity){
         try {
             return g.generateCode(repo,entity);
@@ -56,9 +57,13 @@ public class FinanceTestCodeGeneration {
         fxRecordCode();
         approvalForRequestCode();
         actualsTableCode();
-        budgetCategoryCode();
-        budgetSub1();
-        budgetSub2();
+        String catCode = budgetCategoryCode();
+        System.out.println("Cat Code: " + catCode);
+        String sub1Code = budgetSub1(catCode);
+        System.out.println("Sub1Code: "+sub1Code);
+        String sub2Code = budgetSub2(sub1Code);
+        System.out.println("Sub2Code: "+sub2Code);
+
     }
 
     private void fxRecordCode(){
@@ -71,7 +76,7 @@ public class FinanceTestCodeGeneration {
     private void approvalForRequestCode(){
         ApprovalForRequest a = new ApprovalForRequest();
         a.setCreatedBy("yingshi2502");
-        a.setRequestedItemCode("BJF-Dummy-Code-000");
+        a.setRequestedItemCode("BJF-Dummy-Code-003");
         a = approvalForRequestRepository.save(a);
         System.out.println(generateCode(approvalForRequestRepository,a));
     }
@@ -81,23 +86,35 @@ public class FinanceTestCodeGeneration {
         a = actualsTableRepository.save(a);
         System.out.println(generateCode(actualsTableRepository,a));
     }
-    private void budgetCategoryCode(){
+    private String budgetCategoryCode(){
+        Country c = new Country("China","CN","APAC-CN");
         BudgetCategory cat = new BudgetCategory("Telecom");
         cat.setCreatedBy("yingshi2502");
+        cat.setHierachyPath(g.generateHierachyPath(c,cat));
         cat = budgetCategoryRepository.save(cat);
-        System.out.println(generateCode(budgetCategoryRepository,cat));
+        System.out.println(cat.getHierachyPath());
+        return generateCode(budgetCategoryRepository,cat);
     }
-    private void budgetSub1(){
+
+    private String budgetSub1(String catCode){
+        BudgetCategory parent = budgetCategoryRepository.findBudgetCategoryByCode(catCode);
         BudgetSub1 cat = new BudgetSub1("Data");
         cat.setCreatedBy("yingshi2502");
+        cat.setHierachyPath(g.generateHierachyPath(parent,cat));
         cat = budgetSub1Repository.save(cat);
-        System.out.println(generateCode(budgetSub1Repository,cat));
+        System.out.println(cat.getHierachyPath());
+
+        return generateCode(budgetSub1Repository,cat);
     }
-    private void budgetSub2(){
-        BudgetSub2 cat = new BudgetSub2("Data-Link");
+    private String budgetSub2(String sub1Code){
+        BudgetSub1 parent = budgetSub1Repository.findBudgetSub1ByCode(sub1Code);
+        BudgetSub2 cat = new BudgetSub2("Data Link");
         cat.setCreatedBy("yingshi2502");
+        cat.setHierachyPath(g.generateHierachyPath(parent,cat));
         cat = budgetSub2Repository.save(cat);
-        System.out.println(generateCode(budgetSub2Repository,cat));
+        System.out.println(cat.getHierachyPath());
+
+        return generateCode(budgetSub2Repository,cat);
     }
 
 

@@ -2,7 +2,7 @@ package capstone.is4103capstone.admin;
 
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
-import capstone.is4103capstone.util.EntityCodeGenerator;
+import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.entities.helper.Address;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class AdminInitialization {
     @Autowired
     CurrencyRepository currencyRepository;
 
-    private final EntityCodeGenerator g = new EntityCodeGenerator();
+    private final FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
 
     @PostConstruct
     public void init(){

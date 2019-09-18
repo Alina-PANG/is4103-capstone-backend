@@ -7,9 +7,8 @@ import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.*;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
-import capstone.is4103capstone.util.EntityCodeGenerator;
+import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
-import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class FinanceInit {
 
     private String generateCode(JpaRepository repo, DBEntityTemplate entity){
         try {
-            EntityCodeGenerator g = new EntityCodeGenerator();
+            FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
             return g.generateCode(repo,entity);
         }catch (RepositoryEntityMismatchException e){
             return null;//should log down
@@ -57,7 +56,7 @@ public class FinanceInit {
 //        generateCode(budgetCategoryRepository,cat);
 //        String thisUser = "yingshi2502";
 //        createFXRecord(thisUser);
-//        createCategories(thisUser);
+//        createCategoriezs(thisUser);
 //        createSubCategories(thisUser);
 //        createMerchandise(thisUser);
     }

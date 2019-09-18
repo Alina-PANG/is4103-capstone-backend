@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class EntityCodeGenerator {
+public class FinanceEntityCodeHPGenerator {
 
     private final String APPROVAL_FOR_REQUEST_TEMPLATE = "RT-%1$s-%2$s";
     private final String ACTUALS_TABLE_TEMPLATE = "ACTUALS-%1$s-%2$s";
@@ -32,13 +32,13 @@ public class EntityCodeGenerator {
     private final String INVOICE_TEMPLATE = "INV-%1$s-%2$s";
     private final String STATEMENT_OF_ACCT_TEMPLATE = "SOA-%1$s-%2$s";
 
-//    private final String
-
-//    private final Map<Class,String> classTempalteMap = new HashMap<Class,String>(){
-//        {
-//            put(ApprovalForRequest.class,APPROVAL_FOR_REQUEST_TEMPLATE);
-//        }
-//    };
+    public String generateHierachyPath(DBEntityTemplate parent, DBEntityTemplate son){
+        //for categories:cat: country's path + cat_name  -> parent'path + objectName;
+        String sonNmae = son.getObjectName().replaceAll("\\s+", "_").toUpperCase();
+        son.setHierachyPath(parent.getHierachyPath()+"-"+sonNmae);
+//        repo.saveAndFlush(son);
+        return son.getHierachyPath();
+    }
 
     //after connecting all the relationships:
     public String generateCode(JpaRepository repo, DBEntityTemplate entity) throws Exception {
