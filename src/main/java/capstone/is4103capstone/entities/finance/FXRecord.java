@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "fx_record")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class FXRecord extends DBEntityTemplate {
 
     String baseCurrencyAbbr;

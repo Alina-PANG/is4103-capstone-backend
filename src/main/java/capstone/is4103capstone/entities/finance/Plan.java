@@ -5,6 +5,7 @@ import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Plan extends DBEntityTemplate {
     @OneToMany(mappedBy = "planBelongsTo",fetch = FetchType.EAGER)
     private List<PlanLineItem> lineItems = new ArrayList<>();

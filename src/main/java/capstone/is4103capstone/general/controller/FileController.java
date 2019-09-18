@@ -1,8 +1,8 @@
-package capstone.is4103capstone._demoModule.controller;
+package capstone.is4103capstone.general.controller;
 
-import capstone.is4103capstone._demoModule.model.UploadFileResponse;
-import capstone.is4103capstone._demoModule.service.ExportToFileService;
-import capstone.is4103capstone._demoModule.service.FileStorageService;
+import capstone.is4103capstone.general.model.UploadFileResponse;
+import capstone.is4103capstone.general.service.ExportToFileService;
+import capstone.is4103capstone.general.service.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,13 +35,41 @@ public class FileController {
     @Autowired
     ExportToFileService exportToFileService;
 
-    @GetMapping(value = "/download/customers.xlsx")
-    public ResponseEntity<InputStreamResource> excelCustomersReport() {
-        ByteArrayInputStream in = exportToFileService.exportToExcel("customers");
+    @GetMapping(value = "/download/{filename}")
+    public ResponseEntity<InputStreamResource> excelCustomersReport(@PathVariable("filename") String filename) {
+        List<ArrayList<String>> content = new ArrayList<ArrayList<String>>();
+        ArrayList<String> contentItem01 = new ArrayList<String>(){
+            {
+                add("1");
+                add("test1");
+                add("password");
+                add("7");
+            }
+        };
+        ArrayList<String> contentItem02 = new ArrayList<String>(){
+            {
+                add("2");
+                add("test2");
+                add("password");
+                add("234");
+            }
+        };
+        ArrayList<String> contentItem03 = new ArrayList<String>(){
+            {
+                add("3");
+                add("test3");
+                add("password");
+                add("53");
+            }
+        };
+        content.add(contentItem01);
+        content.add(contentItem02);
+        content.add(contentItem03);
+        ByteArrayInputStream in = exportToFileService.exportToExcel(filename, new String[]{"Id", "Name", "Password", "Age"}, content);
         // return IOUtils.toByteArray(in);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=customers.xlsx");
+        headers.add("Content-Disposition", "attachment; filename="+filename);
 
         return ResponseEntity
                 .ok()

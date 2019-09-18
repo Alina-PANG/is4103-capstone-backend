@@ -1,5 +1,6 @@
-package capstone.is4103capstone._demoModule.service;
+package capstone.is4103capstone.general.service;
 
+import capstone.is4103capstone.general.service.FileStorageProperties;
 import capstone.is4103capstone.util.exception.FileNotFoundException;
 import capstone.is4103capstone.util.exception.FileStorageException;
 import org.springframework.beans.factory.annotation.Autowired;
