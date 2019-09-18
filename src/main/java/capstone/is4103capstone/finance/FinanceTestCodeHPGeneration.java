@@ -76,7 +76,7 @@ public class FinanceTestCodeHPGeneration {
     private void approvalForRequestCode(){
         ApprovalForRequest a = new ApprovalForRequest();
         a.setCreatedBy("yingshi2502");
-        a.setRequestedItemCode("BJF-Dummy-Code-003");
+        a.setRequestedItemCode("BJF-Dummy-Code-004");
         a = approvalForRequestRepository.save(a);
         System.out.println(generateCode(approvalForRequestRepository,a));
     }

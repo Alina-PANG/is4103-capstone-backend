@@ -36,7 +36,6 @@ public class FinanceEntityCodeHPGenerator {
         //for categories:cat: country's path + cat_name  -> parent'path + objectName;
         String sonNmae = son.getObjectName().replaceAll("\\s+", "_").toUpperCase();
         son.setHierachyPath(parent.getHierachyPath()+"-"+sonNmae);
-//        repo.saveAndFlush(son);
         return son.getHierachyPath();
     }
 
@@ -47,7 +46,10 @@ public class FinanceEntityCodeHPGenerator {
         if (entityOptional.isPresent()){
             entity = entityOptional.get();
             String seqNoStr = String.valueOf(entity.getSeqNo());
-
+            if (seqNoStr == null){//it's only at creation
+                entity.setSeqNo(new Long(repo.findAll().size()));
+                seqNoStr = String.valueOf(entity.getSeqNo());
+            }
             String entityClassName = entity.getClass().getSimpleName();
             try {
                 switch (entityClassName) {
