@@ -1,12 +1,10 @@
 package capstone.is4103capstone.admin.repository;
 
-import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.SessionKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EmployeeRepository extends JpaRepository<Employee,String> {
+public interface SessionKeyRepo extends JpaRepository<SessionKey, String> {
 
-    public Employee findEmployeeByUserName(String username);
-
-    public Employee findEmployeeByCode(String employeeCode);
+    public SessionKey findSessionKeyBySessionKey(String sessionKey);
 
 }
