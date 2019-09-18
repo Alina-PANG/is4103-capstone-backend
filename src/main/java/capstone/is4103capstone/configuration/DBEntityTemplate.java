@@ -65,8 +65,8 @@ public class DBEntityTemplate implements Serializable {
         this.code = code;
     }
 
-    public DBEntityTemplate(String code) {
-        this.code = code;
+    public DBEntityTemplate(String objectName) {
+        this.objectName = objectName;
     }
 
     public DBEntityTemplate(String objectName, String code, String hierachyPath) {

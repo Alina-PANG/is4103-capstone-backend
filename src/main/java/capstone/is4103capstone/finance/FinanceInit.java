@@ -50,11 +50,11 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
-        BudgetCategory cat = new BudgetCategory();
-        cat.setObjectName("CATEGORY");
-        cat.setCreatedBy("yingshi2502");
-        cat = budgetCategoryRepository.save(cat);
-        generateCode(budgetCategoryRepository,cat);
+//        BudgetCategory cat = new BudgetCategory();
+//        cat.setObjectName("CATEGORY");
+//        cat.setCreatedBy("yingshi2502");
+//        cat = budgetCategoryRepository.save(cat);
+//        generateCode(budgetCategoryRepository,cat);
 //        String thisUser = "yingshi2502";
 //        createFXRecord(thisUser);
 //        createCategories(thisUser);
