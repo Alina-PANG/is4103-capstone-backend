@@ -40,6 +40,22 @@ public class CostCenter extends DBEntityTemplate {
     public CostCenter() {
     }
 
+    public CompanyFunction getFunction() {
+        return function;
+    }
+
+    public void setFunction(CompanyFunction function) {
+        this.function = function;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
     public List<Plan> getPlans() {
         return plans;
     }

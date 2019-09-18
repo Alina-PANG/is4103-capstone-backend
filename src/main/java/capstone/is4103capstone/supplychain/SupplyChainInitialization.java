@@ -49,20 +49,21 @@ public class SupplyChainInitialization {
     @Transactional
     public void init(){
         if(employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong") == null){
-        Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
-        newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        newEmployee2.setCode("EMPLOYEE-xuhong");
-        employeeRepository.save(newEmployee2);
+            Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
+            newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+            newEmployee2.setCode("EMPLOYEE-xuhong");
+            employeeRepository.save(newEmployee2);
 
-        createMechandise();
-        createVendors();
-        createContract();
-        createDispute();
-        createAction();
-        createOutsourcingAssessmentLine();
-        createOutsourcingAssessmentSection();
-        createOutsourcingAssessment();
-        createOutsourcing();}
+            createMechandise();
+            createVendors();
+            createContract();
+            createDispute();
+            createAction();
+            createOutsourcingAssessmentLine();
+            createOutsourcingAssessmentSection();
+            createOutsourcingAssessment();
+            createOutsourcing();
+        }
     }
 
     public void createMechandise(){

@@ -2,6 +2,7 @@ package capstone.is4103capstone.finance;
 
 import capstone.is4103capstone.admin.repository.CostCenterRepository;
 import capstone.is4103capstone.admin.repository.CountryRepository;
+import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.finance.*;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class FinanceInit {
@@ -32,19 +34,20 @@ public class FinanceInit {
     FXRecordRepository fxRecordRepository;
     @Autowired
     CountryRepository countryRepository;
-    @Autowired
-    CostCenterRepository costCenterRepository;
+
 
     @PostConstruct
     public void financeInit(){
         String thisUser = "yingshi2502";
         Country country = countryRepository.findCountryByCode("SG");
-        createCostCenter(thisUser);
-        if(country == null){
-        createFXRecord(thisUser);
-        createCategories(thisUser);
-        createSubCategories(thisUser);
-        createMerchandise(thisUser);}
+
+        List<FXRecord> fxRecords = fxRecordRepository.findAll();
+        if(fxRecords == null || fxRecords.size() == 0){
+            createFXRecord(thisUser);
+            createCategories(thisUser);
+            createSubCategories(thisUser);
+            createMerchandise(thisUser);
+        }
     }
 
     public void createFXRecord(String userOps){
@@ -54,10 +57,7 @@ public class FinanceInit {
         fx = fxRecordRepository.save(fx);
     }
 
-    public void createCostCenter(String thisUser){
-        CostCenter costCenter = new CostCenter();
-        costCenterRepository.save(costCenter);
-    }
+
 
     public void createCategories(String thisUser){
         Country country = countryRepository.findCountryByCode("SG");
