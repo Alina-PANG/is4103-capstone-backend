@@ -8,17 +8,20 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ExportToFileService {
-    public ByteArrayInputStream exportToExcel(String filename){
-        String[] COLUMNs = {"Id", "Name", "Password", "Age"};
+    public ByteArrayInputStream exportToExcel(String filename, String[] COLUMNs, List<ArrayList<String>> content){
+
         try(
                 Workbook workbook = new XSSFWorkbook();
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
         ){
             CreationHelper createHelper = workbook.getCreationHelper();
 
-            Sheet sheet = workbook.createSheet("Customers");
+            Sheet sheet = workbook.createSheet("Document");
 
             Font headerFont = workbook.createFont();
             headerFont.setBold(true);
@@ -38,21 +41,19 @@ public class ExportToFileService {
             }
 
             // CellStyle for Age
-            CellStyle ageCellStyle = workbook.createCellStyle();
-            ageCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("#"));
+//            CellStyle ageCellStyle = workbook.createCellStyle();
+//            ageCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("#"));
 
             int rowIdx = 1;
 
-            for (int i=0;i<4;i++) {
+            for (int i=0;i<content.size();i++) {
                 Row row = sheet.createRow(rowIdx++);
 
-                row.createCell(0).setCellValue("test"+i);
-                row.createCell(1).setCellValue("name"+i);
-                row.createCell(2).setCellValue("password"+i);
-
-                Cell ageCell = row.createCell(3);
-                ageCell.setCellValue("age"+i);
-                ageCell.setCellStyle(ageCellStyle);
+                for(int j = 0; j < content.get(0).size(); j ++){
+                    Cell cell = row.createCell(j);
+                    cell.setCellValue(content.get(i).get(j));
+                }
+//                ageCell.setCellStyle(ageCellStyle);
             }
 
             workbook.write(out);
