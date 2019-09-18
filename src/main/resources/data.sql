@@ -1,3 +1,42 @@
+DROP TRIGGER IF EXISTS seq_no_generation_approval_for_request ^;
+DROP TRIGGER IF EXISTS seq_no_generation_company_function ^;
+DROP TRIGGER IF EXISTS seq_no_generation_cost_center ^;
+DROP TRIGGER IF EXISTS seq_no_generation_country ^;
+DROP TRIGGER IF EXISTS seq_no_generation_currency ^;
+DROP TRIGGER IF EXISTS seq_no_generation_demo_entity ^;
+DROP TRIGGER IF EXISTS seq_no_generation_employee ^;
+DROP TRIGGER IF EXISTS seq_no_generation_office ^;
+DROP TRIGGER IF EXISTS seq_no_generation_region ^;
+DROP TRIGGER IF EXISTS seq_no_generation_schedule ^;
+DROP TRIGGER IF EXISTS seq_no_generation_security_group ^;
+DROP TRIGGER IF EXISTS seq_no_generation_team ^;
+DROP TRIGGER IF EXISTS seq_no_generation_actuals_table ^;
+DROP TRIGGER IF EXISTS seq_no_generation_bjf ^;
+DROP TRIGGER IF EXISTS seq_no_generation_budget_category ^;
+DROP TRIGGER IF EXISTS seq_no_generation_budget_sub1 ^;
+DROP TRIGGER IF EXISTS seq_no_generation_budget_sub2 ^;
+DROP TRIGGER IF EXISTS seq_no_generation_fx_record ^;
+DROP TRIGGER IF EXISTS seq_no_generation_invoice ^;
+DROP TRIGGER IF EXISTS seq_no_generation_merchandise ^;
+DROP TRIGGER IF EXISTS seq_no_generation_plan ^;
+DROP TRIGGER IF EXISTS seq_no_generation_plan_line_item ^;
+DROP TRIGGER IF EXISTS seq_no_generation_project ^;
+DROP TRIGGER IF EXISTS seq_no_generation_purchase_order ^;
+DROP TRIGGER IF EXISTS seq_no_generation_purchase_order_line_item ^;
+DROP TRIGGER IF EXISTS seq_no_generation_statement_of_acct_line_item ^;
+DROP TRIGGER IF EXISTS seq_no_generation_seat ^;
+DROP TRIGGER IF EXISTS seq_no_generation_seat_allocation ^;
+DROP TRIGGER IF EXISTS seq_no_generation_seat_map ^;
+DROP TRIGGER IF EXISTS seq_no_generation_action ^;
+DROP TRIGGER IF EXISTS seq_no_generation_contract ^;
+DROP TRIGGER IF EXISTS seq_no_generation_contract_line ^;
+DROP TRIGGER IF EXISTS seq_no_generation_dispute ^;
+DROP TRIGGER IF EXISTS seq_no_generation_outsourcing ^;
+DROP TRIGGER IF EXISTS seq_no_generation_outsourcing_assessment ^;
+DROP TRIGGER IF EXISTS seq_no_generation_outsourcing_assessment_line ^;
+DROP TRIGGER IF EXISTS seq_no_generation_outsourcing_assessment_section ^;
+DROP TRIGGER IF EXISTS seq_no_generation_vendor ^;
+
 Create Trigger `seq_no_generation_approval_for_request`
 BEFORE INSERT ON `approval_for_request` FOR EACH ROW
 BEGIN

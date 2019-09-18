@@ -4,6 +4,7 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.helper.Address;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Office extends DBEntityTemplate {
     @Embedded
     private Address address;
