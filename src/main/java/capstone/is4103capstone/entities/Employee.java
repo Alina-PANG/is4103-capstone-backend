@@ -9,8 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
+import de.mkammerer.argon2.Argon2Factory.Argon2Types;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,14 +53,14 @@ public class Employee extends DBEntityTemplate {
     private List<Employee> subordinates = new ArrayList<>();
 
     @OneToMany(mappedBy = "requester")
-    private List<BJF> bjfs= new ArrayList<>();
+    private List<BJF> bjfs = new ArrayList<>();
 
     @Convert(converter = StringListConverter.class)
-    private List<String> myRequestTickets= new ArrayList<>();
+    private List<String> myRequestTickets = new ArrayList<>();
     @Convert(converter = StringListConverter.class)
     private List<String> myApprovals = new ArrayList<>();
 
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    //    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "assignee")
     private List<Action> actionsAssigned = new ArrayList<>();
 
@@ -140,7 +140,9 @@ public class Employee extends DBEntityTemplate {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        // init the argon2 hashing library
+        Argon2 argon2 = Argon2Factory.create(Argon2Types.ARGON2id);
+        this.password = argon2.hash(6, 128 * 1024, 1, password);
     }
 
 
@@ -249,7 +251,7 @@ public class Employee extends DBEntityTemplate {
         this.contractInCharged = contractInCharged;
     }
 
-    public void addContractIC(Contract newContract){
+    public void addContractIC(Contract newContract) {
         this.getContractInCharged().add(newContract);
     }
 
@@ -260,7 +262,6 @@ public class Employee extends DBEntityTemplate {
     public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
         this.outsourcingAssessmentList = outsourcingAssessmentList;
     }
-
 
 
     public String getSecurityId() {
