@@ -27,7 +27,7 @@ public class UserService {
         // save the new user
         return er.save(newUser);
     }
-
+    //lookupEmployee maybe null;
     public boolean checkPassword(String userName, String inputPassword) {
         Employee lookupEmployee = er.findEmployeeByUserName(userName);
 

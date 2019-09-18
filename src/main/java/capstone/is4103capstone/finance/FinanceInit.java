@@ -38,16 +38,16 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
-        String thisUser = "yingshi2502";
-        Country country = countryRepository.findCountryByCode("SG");
-
-        List<FXRecord> fxRecords = fxRecordRepository.findAll();
-        if(fxRecords == null || fxRecords.size() == 0){
-            createFXRecord(thisUser);
-            createCategories(thisUser);
-            createSubCategories(thisUser);
-            createMerchandise(thisUser);
-        }
+//        String thisUser = "yingshi2502";
+//        Country country = countryRepository.findCountryByCode("SG");
+//
+//        List<FXRecord> fxRecords = fxRecordRepository.findAll();
+//        if(fxRecords == null || fxRecords.size() == 0){
+//            createFXRecord(thisUser);
+//            createCategories(thisUser);
+//            createSubCategories(thisUser);
+//            createMerchandise(thisUser);
+//        }
     }
 
     public void createFXRecord(String userOps){

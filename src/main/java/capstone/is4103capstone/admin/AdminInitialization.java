@@ -32,17 +32,17 @@ public class AdminInitialization {
 
     @PostConstruct
     public void init() {
-        List<Currency> currencyList = currencyRepository.findAll();
-        if (currencyList == null || currencyList.size() == 0) {
-            createCurrency();
-            createGeo();
-            System.out.println("-----Created Geographies-----");
-            createEmployee();
-        }
-        List<CostCenter> costCenterList = costCenterRepository.findAll();
-        if (costCenterList == null || costCenterList.size() == 0) {
-            createCostCenter();
-        }
+//        List<Currency> currencyList = currencyRepository.findAll();
+//        if (currencyList == null || currencyList.size() == 0) {
+//            createCurrency();
+//            createGeo();
+//            System.out.println("-----Created Geographies-----");
+//            createEmployee();
+//        }
+//        List<CostCenter> costCenterList = costCenterRepository.findAll();
+//        if (costCenterList == null || costCenterList.size() == 0) {
+//            createCostCenter();
+//        }
     }
 
     public void createCurrency() {
@@ -83,21 +83,21 @@ public class AdminInitialization {
         employeeRepository.save(newEmployee);
         employeeRepository.save(admin);
 
-        Team team = teamRepository.findTeamByCode("DTS");
-
-        newEmployee.getMemberOfTeams().add(team);
-        admin.getMemberOfTeams().add(team);
-        team.getMembers().add(newEmployee);
-        team.getMembers().add(admin);
-        newEmployee.setHierachyPath("APAC-SG-TECH-DTS-yingshi2502");
-        admin.setHierachyPath("APAC-ADMIN");
+//        Team team = teamRepository.findTeamByCode("DTS");
 //
-        newEmployee.setManager(admin);
-        admin.getSubordinates().add(newEmployee);
-
-        teamRepository.saveAndFlush(team);
-        employeeRepository.saveAndFlush(newEmployee);
-        employeeRepository.saveAndFlush(admin);
+//        newEmployee.getMemberOfTeams().add(team);
+//        admin.getMemberOfTeams().add(team);
+//        team.getMembers().add(newEmployee);
+//        team.getMembers().add(admin);
+//        newEmployee.setHierachyPath("APAC-SG-TECH-DTS-yingshi2502");
+//        admin.setHierachyPath("APAC-ADMIN");
+////
+//        newEmployee.setManager(admin);
+//        admin.getSubordinates().add(newEmployee);
+//
+//        teamRepository.saveAndFlush(team);
+//        employeeRepository.saveAndFlush(newEmployee);
+//        employeeRepository.saveAndFlush(admin);
 
     }
 
