@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -29,6 +30,8 @@ public class FXRecord extends DBEntityTemplate {
         this.priceCurrencyAbbr = priceCurrencyAbbr;
         this.exchangeRate = exchangeRate;
         this.effectiveDate = effectiveDate;
+        SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+        this.setObjectName(this.baseCurrencyAbbr + "-" + this.priceCurrencyAbbr+"-"+format.format(this.effectiveDate));
     }
 
     public Date getEffectiveDate() {

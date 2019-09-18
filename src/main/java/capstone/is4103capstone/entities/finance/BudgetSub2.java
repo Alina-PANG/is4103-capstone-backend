@@ -24,8 +24,8 @@ public class BudgetSub2 extends DBEntityTemplate {
     }
 
 
-    public BudgetSub2(String sub2CatName, String sub2CatCode, String hierachyPath) {
-        super(sub2CatName, sub2CatCode, hierachyPath);
+    public BudgetSub2(String sub2CatName) {
+        super(sub2CatName);
     }
 
 
