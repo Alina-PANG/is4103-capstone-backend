@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Service
 public class AdminInitialization {
@@ -26,18 +27,34 @@ public class AdminInitialization {
     OfficeRepository officeRepository;
     @Autowired
     CurrencyRepository currencyRepository;
+    @Autowired
+    CostCenterRepository costCenterRepository;
 
     @PostConstruct
     public void init(){
-
-//        createCurrency();
-//        createGeo();
-//        System.out.println("-----Created Geographies-----");
-//        createEmployee();
+        List<Currency> currencyList = currencyRepository.findAll();
+        if(currencyList == null || currencyList.size() == 0){
+            createCurrency();
+            createGeo();
+            System.out.println("-----Created Geographies-----");
+            createEmployee();
+        }
+        List<CostCenter> costCenterList = costCenterRepository.findAll();
+        if(costCenterList == null || costCenterList.size() == 0){
+            createCostCenter();
+        }
     }
     public void createCurrency(){
         Currency c = new Currency("Singapore Dollars","SGD",'$',"SGD");
         currencyRepository.save(c);
+    }
+
+    public void createCostCenter(){
+        CostCenter costCenter = new CostCenter();
+        costCenter.setCountry(countryRepository.findCountryByCode("SG"));
+        costCenter.setCostCenterManager(employeeRepository.findEmployeeByUserName("yingshi2502"));
+        costCenter.setCreatedBy("test");
+        costCenterRepository.save(costCenter);
     }
     public void createEmployee(){
         Employee newEmployee = new Employee("yingshi2502","Yingshi","Huang","","password");
