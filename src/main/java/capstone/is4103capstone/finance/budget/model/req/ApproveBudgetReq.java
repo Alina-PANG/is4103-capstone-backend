@@ -2,7 +2,9 @@ package capstone.is4103capstone.finance.budget.model.req;
 
 import capstone.is4103capstone.general.model.GeneralRes;
 
-public class ApproveBudgetReq extends GeneralRes {
+import java.io.Serializable;
+
+public class ApproveBudgetReq extends GeneralRes implements Serializable {
     Boolean approved;
     String username;
     String id;

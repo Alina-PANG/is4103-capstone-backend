@@ -2,9 +2,10 @@ package capstone.is4103capstone.finance.budget.model.req;
 
 import capstone.is4103capstone.entities.finance.PlanLineItem;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CreateBudgetReq {
+public class CreateBudgetReq implements Serializable {
     private String username;
     private List<PlanLineItem> items;
     private Integer year;

@@ -21,9 +21,11 @@ public class BudgetLineItemService {
     @Autowired
     PlanRepository planRepository;
 
-//    public List<PlanLineItem> aggregatePlanStaticstics(){
-//
-//    }
+    public List<PlanLineItem> aggregatePlanStaticstics(String[] cols, List<ArrayList<String>> restrictions){
+        List<PlanLineItem> planLineItems = filterPlanItem(cols, restrictions);
+
+        return planLineItems;
+    }
 
     public List<PlanLineItem> filterPlanItem(String[] cols, List<ArrayList<String>> restrictions){
         List<PlanLineItem> planLineItems = planLineItemRepository.findAll();
@@ -40,13 +42,13 @@ public class BudgetLineItemService {
                         res.add(restrictions.get(i).get(j));
                     }
                     if(colName.toUpperCase().equals("COUNTRY")){
-                        String country = item.getCode();
+                        String country = item.getPlanBelongsTo().getCostCenter().getCountry().getCode();
                         if(!res.contains(country)){
                             flag = false;
                         }
                     }
                     else if(colName.toUpperCase().equals("REGION")){
-                        String region = item.getCode();
+                        String region = item.getPlanBelongsTo().getCostCenter().getCountry().getRegion().getCode();
                         if(!res.contains(region)){
                             flag = false;
                         }

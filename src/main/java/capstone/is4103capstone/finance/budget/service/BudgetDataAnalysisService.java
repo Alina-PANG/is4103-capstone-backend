@@ -3,7 +3,7 @@ package capstone.is4103capstone.finance.budget.service;
 import capstone.is4103capstone.entities.finance.PlanLineItem;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
-import capstone.is4103capstone.finance.budget.model.req.ExportBudgetReq;
+import capstone.is4103capstone.finance.budget.model.req.BudgetDataAnalysisReq;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ExportToFileService;
 import org.slf4j.Logger;
@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class BudgetDataAnalysisService {
@@ -28,14 +26,14 @@ public class BudgetDataAnalysisService {
     @Autowired
     BudgetLineItemService budgetLineItemService;
 
-    public Object exportToBudgetFile(String filename, ExportBudgetReq exportBudgetReq){
+    public Object exportToBudgetFile(String filename, BudgetDataAnalysisReq budgetDataAnalysisReq){
         try{
-            if(exportBudgetReq.getColContent() == null || exportBudgetReq.getColContent().size() == 0){
+            if(budgetDataAnalysisReq.getColContent() == null || budgetDataAnalysisReq.getColContent().size() == 0){
                 ArrayList<ArrayList<String>> content = new ArrayList<ArrayList<String>>();
-                retrieveContentFromDb(exportBudgetReq.getCols(), exportBudgetReq.getColsRestriction(), content);
-                return exportToFileService.exportToExcel(filename, exportBudgetReq.getCols(), content);
+                retrieveContentFromDb(budgetDataAnalysisReq.getCols(), budgetDataAnalysisReq.getColsRestriction(), content);
+                return exportToFileService.exportToExcel(filename, budgetDataAnalysisReq.getCols(), content);
             }else{
-                return exportToFileService.exportToExcel(filename, exportBudgetReq.getCols(), exportBudgetReq.getColContent());
+                return exportToFileService.exportToExcel(filename, budgetDataAnalysisReq.getCols(), budgetDataAnalysisReq.getColContent());
             }
         } catch(Exception ex){
             ex.printStackTrace();

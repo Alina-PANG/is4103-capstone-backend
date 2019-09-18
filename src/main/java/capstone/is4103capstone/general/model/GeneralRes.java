@@ -1,6 +1,8 @@
 package capstone.is4103capstone.general.model;
 
-public class GeneralRes {
+import java.io.Serializable;
+
+public class GeneralRes implements Serializable {
     String message;
     Boolean error;
 

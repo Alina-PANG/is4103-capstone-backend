@@ -1,7 +1,7 @@
 package capstone.is4103capstone.finance.budget.controller;
 
 import capstone.is4103capstone.finance.budget.service.BudgetDataAnalysisService;
-import capstone.is4103capstone.finance.budget.model.req.ExportBudgetReq;
+import capstone.is4103capstone.finance.budget.model.req.BudgetDataAnalysisReq;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ExportToFileService;
 import org.slf4j.Logger;
@@ -26,8 +26,8 @@ public class BudgetDataAnalysisController {
     ExportToFileService exportToFileService;
 
     @GetMapping(value = "/download/{filename}")
-    public ResponseEntity<Object> exportReport(@PathVariable("filename") String filename, @RequestBody ExportBudgetReq exportBudgetReq) {
-        Object in = budgetDataAnalysisService.exportToBudgetFile(filename, exportBudgetReq);
+    public ResponseEntity<Object> exportReport(@PathVariable("filename") String filename, @RequestBody BudgetDataAnalysisReq budgetDataAnalysisReq) {
+        Object in = budgetDataAnalysisService.exportToBudgetFile(filename, budgetDataAnalysisReq);
         // return IOUtils.toByteArray(in);
         if(in instanceof ByteArrayInputStream){
             HttpHeaders headers = new HttpHeaders();
