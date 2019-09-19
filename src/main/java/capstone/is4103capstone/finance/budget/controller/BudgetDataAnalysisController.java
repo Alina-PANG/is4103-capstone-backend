@@ -2,6 +2,8 @@ package capstone.is4103capstone.finance.budget.controller;
 
 import capstone.is4103capstone.finance.budget.service.BudgetDataAnalysisService;
 import capstone.is4103capstone.finance.budget.model.req.BudgetDataAnalysisReq;
+import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ExportToFileService;
 import org.slf4j.Logger;
@@ -17,7 +19,7 @@ import java.io.ByteArrayInputStream;
 @RestController
 @RequestMapping("/api/budgetData")
 public class BudgetDataAnalysisController {
-    private static final Logger logger = LoggerFactory.getLogger(BudgetController.class);
+    private static final Logger logger = LoggerFactory.getLogger(BudgetDataAnalysisController.class);
 
     @Autowired
     private BudgetDataAnalysisService budgetDataAnalysisService;
@@ -25,9 +27,9 @@ public class BudgetDataAnalysisController {
     @Autowired
     ExportToFileService exportToFileService;
 
-    @GetMapping(value = "/download/{filename}")
-    public ResponseEntity<Object> exportReport(@PathVariable("filename") String filename, @RequestBody BudgetDataAnalysisReq budgetDataAnalysisReq) {
-        Object in = budgetDataAnalysisService.exportToBudgetFile(filename, budgetDataAnalysisReq);
+    @GetMapping(value = "/download/{id}/{filename}") // TODO: Test
+    public ResponseEntity<Object> exportReport(@PathVariable("id") String id, @PathVariable("filename") String filename) {
+        Object in = budgetDataAnalysisService.exportToBudgetFile(filename, id);
         // return IOUtils.toByteArray(in);
         if(in instanceof ByteArrayInputStream){
             HttpHeaders headers = new HttpHeaders();
@@ -43,5 +45,19 @@ public class BudgetDataAnalysisController {
                     .badRequest()
                     .body((GeneralRes) in);
         }
+    }
+
+    // ======== TODO ============ //
+
+    @GetMapping(value = "/aggregation")
+    public ResponseEntity<Object> aggregateData(@RequestBody BudgetDataAnalysisReq budgetDataAnalysisReq) {
+        if(Authentication.authenticateUser(budgetDataAnalysisReq.getUsername()))
+            return ResponseEntity
+                    .ok()
+                    .body(budgetDataAnalysisService.aggregateBudgetLineItem(budgetDataAnalysisReq));
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 }

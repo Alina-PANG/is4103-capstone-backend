@@ -45,7 +45,7 @@ The url and auth info are in `application.properties`
 Demo schema is under `demo.sql`
 
 ## Error Handling
-Whenever there is any 'pom' or 'maven' error, or when any dependencies have been added to pom.xml, do:
+Whenever there is any 'pom' or 'maven' hasError, or when any dependencies have been added to pom.xml, do:
 - Terminal: `mvn clean install`, or
 - Right click pom.xml, select either:
 1. Maven - Generate Sources and Update Folder

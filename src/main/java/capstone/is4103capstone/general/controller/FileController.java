@@ -3,6 +3,7 @@ package capstone.is4103capstone.general.controller;
 import capstone.is4103capstone.general.model.UploadFileResponse;
 import capstone.is4103capstone.general.service.ExportToFileService;
 import capstone.is4103capstone.general.service.FileStorageService;
+import capstone.is4103capstone.general.service.ReadFromFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/files")
 public class FileController {
-
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
@@ -34,6 +34,21 @@ public class FileController {
 
     @Autowired
     ExportToFileService exportToFileService;
+
+    @Autowired
+    ReadFromFileService readFromFileService;
+
+    @PostMapping(value = "/upload/{filePath}") // TODO: test
+    public Boolean uploadFile(@PathVariable("filePath") String filePath) {
+        List<List<String>> test = readFromFileService.readFromExcel(filePath);
+        for(List<String> list: test){
+            for(String s: list){
+                System.out.print(s+" | ");
+            }
+            System.out.println();
+        }
+        return (test != null);
+    }
 
     @GetMapping(value = "/download/{filename}")
     public ResponseEntity<InputStreamResource> excelCustomersReport(@PathVariable("filename") String filename) {
