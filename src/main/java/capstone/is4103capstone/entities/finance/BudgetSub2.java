@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BudgetSub2 extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budgetSub1_id")
@@ -22,8 +24,8 @@ public class BudgetSub2 extends DBEntityTemplate {
     }
 
 
-    public BudgetSub2(String sub2CatName, String sub2CatCode, String hierachyPath) {
-        super(sub2CatName, sub2CatCode, hierachyPath);
+    public BudgetSub2(String sub2CatName) {
+        super(sub2CatName);
     }
 
 

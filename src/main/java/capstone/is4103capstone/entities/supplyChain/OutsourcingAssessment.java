@@ -17,6 +17,8 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     @JsonIgnore
     private Outsourcing outsourcing;
 
+    private String businessCaseDescription;
+
     @OneToMany(mappedBy = "outsourcingAssessment",fetch = FetchType.EAGER)
     private List<OutsourcingAssessmentSection> sectionList = new ArrayList<>();
 
@@ -30,7 +32,8 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     public OutsourcingAssessment() {
     }
 
-    public OutsourcingAssessment(List<OutsourcingAssessmentSection> sectionList, Employee employeeAssess, OutsourcingAssessmentStatusEnum outsourcingAssessmentStatus) {
+    public OutsourcingAssessment(String businessCaseDescription, List<OutsourcingAssessmentSection> sectionList, Employee employeeAssess, OutsourcingAssessmentStatusEnum outsourcingAssessmentStatus) {
+        this.businessCaseDescription = businessCaseDescription;
         this.sectionList = sectionList;
         this.employeeAssess = employeeAssess;
         this.outsourcingAssessmentStatus = outsourcingAssessmentStatus;
@@ -66,5 +69,13 @@ public class OutsourcingAssessment extends DBEntityTemplate {
 
     public void setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum outsourcingAssessmentStatus) {
         this.outsourcingAssessmentStatus = outsourcingAssessmentStatus;
+    }
+
+    public String getBusinessCaseDescription() {
+        return businessCaseDescription;
+    }
+
+    public void setBusinessCaseDescription(String businessCaseDescription) {
+        this.businessCaseDescription = businessCaseDescription;
     }
 }

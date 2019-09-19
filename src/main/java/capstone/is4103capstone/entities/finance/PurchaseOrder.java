@@ -4,6 +4,7 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PurchaseOrder extends DBEntityTemplate {
     @Convert(converter = StringListConverter.class)
     private List<String> relatedBJF;

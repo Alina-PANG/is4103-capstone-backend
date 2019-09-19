@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.util.Date;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class StatementOfAcctLineItem extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchaseOrder_id")

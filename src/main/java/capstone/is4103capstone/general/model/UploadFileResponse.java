@@ -1,4 +1,4 @@
-package capstone.is4103capstone._demoModule.model;
+package capstone.is4103capstone.general.model;
 
 public class UploadFileResponse {
     private String fileName;

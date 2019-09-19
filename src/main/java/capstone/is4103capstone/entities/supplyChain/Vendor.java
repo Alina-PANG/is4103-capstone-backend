@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table
 public class Vendor extends DBEntityTemplate {
-    private String businessUnit; //vendor company
+    private String businessUnit;
     private String serviceDescription;
     private String relationshipManagerName;
     private String relationshipManagerEmail;

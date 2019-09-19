@@ -1,13 +1,16 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "fx_record")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class FXRecord extends DBEntityTemplate {
 
     String baseCurrencyAbbr;
@@ -27,6 +30,8 @@ public class FXRecord extends DBEntityTemplate {
         this.priceCurrencyAbbr = priceCurrencyAbbr;
         this.exchangeRate = exchangeRate;
         this.effectiveDate = effectiveDate;
+        SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+        this.setObjectName(this.baseCurrencyAbbr + "-" + this.priceCurrencyAbbr+"-"+format.format(this.effectiveDate));
     }
 
     public Date getEffectiveDate() {

@@ -29,42 +29,7 @@ public class DBEntityTemplate implements Serializable {
     @Length(min=36, max=36)
     private String id;
 
-    @Column(columnDefinition = "integer auto_increment")
-    private Integer seqNo;
-
-    public DBEntityTemplate() {
-    }
-
-    public DBEntityTemplate(String objectName, String code) {
-        this.objectName = objectName;
-        this.code = code;
-    }
-
-    public int getSeqNo() {
-        return seqNo;
-    }
-
-    public void setSeqNo(int seqNo) {
-        this.seqNo = seqNo;
-    }
-
-    public DBEntityTemplate(String code) {
-        this.code = code;
-    }
-
-    public DBEntityTemplate(String objectName, String code, String hierachyPath) {
-        this.objectName = objectName;
-        this.code = code;
-        this.hierachyPath = hierachyPath;
-    }
-
-    public DBEntityTemplate(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy) {
-        this.objectName = objectName;
-        this.code = code;
-        this.hierachyPath = hierachyPath;
-        this.createdBy = createdBy;
-        this.lastModifiedBy = lastModifiedBy;
-    }
+    private Long seqNo;
 
     private String objectName;
 
@@ -91,6 +56,39 @@ public class DBEntityTemplate implements Serializable {
 
     public String getId() {
         return id;
+    }
+    public DBEntityTemplate() {
+    }
+
+    public DBEntityTemplate(String objectName, String code) {
+        this.objectName = objectName;
+        this.code = code;
+    }
+
+    public DBEntityTemplate(String objectName) {
+        this.objectName = objectName;
+    }
+
+    public DBEntityTemplate(String objectName, String code, String hierachyPath) {
+        this.objectName = objectName;
+        this.code = code;
+        this.hierachyPath = hierachyPath;
+    }
+
+    public DBEntityTemplate(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy) {
+        this.objectName = objectName;
+        this.code = code;
+        this.hierachyPath = hierachyPath;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Long getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(Long seqNo) {
+        this.seqNo = seqNo;
     }
 
     public void setId(String id) {

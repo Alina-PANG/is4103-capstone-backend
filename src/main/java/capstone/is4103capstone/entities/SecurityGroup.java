@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SecurityGroup extends DBEntityTemplate {
 
     public String securityId;

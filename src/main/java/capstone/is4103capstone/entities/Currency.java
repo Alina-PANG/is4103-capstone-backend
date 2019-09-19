@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Country;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
@@ -9,6 +10,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Currency extends DBEntityTemplate {
     private Character symbol;
     private String countryCode;
@@ -16,7 +18,7 @@ public class Currency extends DBEntityTemplate {
     public Currency() {
     }
 
-    public Currency(String currencyName, String currencyCode,Character symbol,String countryCode) {
+    public Currency(String currencyName, String currencyCode, char symbol, String countryCode) {
         super(currencyName, currencyCode);
         this.symbol = symbol;
         this.countryCode = countryCode;

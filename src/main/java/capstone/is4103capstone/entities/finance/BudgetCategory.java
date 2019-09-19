@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities.finance;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Country;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BudgetCategory extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
@@ -22,8 +24,8 @@ public class BudgetCategory extends DBEntityTemplate {
     public BudgetCategory() {
     }
 
-    public BudgetCategory(String categoryName, String categoryCode, String hierachyPath) {
-        super(categoryName, categoryCode, hierachyPath);
+    public BudgetCategory(String categoryName) {
+        super(categoryName);
     }
 
     public Country getCountry() {
