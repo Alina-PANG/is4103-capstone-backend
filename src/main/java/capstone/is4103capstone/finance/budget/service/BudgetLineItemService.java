@@ -1,5 +1,6 @@
 package capstone.is4103capstone.finance.budget.service;
 
+import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.finance.PlanLineItem;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +37,20 @@ public class BudgetLineItemService {
             content.add(list);
         }
         return content;
+    }
+
+    public List<PlanLineItem> convertListToPlanLineItem(List<List<String>> content) throws Exception{
+        List<PlanLineItem> list = new ArrayList<>();
+        for(int i = 1; i < content.size(); i ++){
+            PlanLineItem item = new PlanLineItem();
+            List<String> c = content.get(i);
+            item.setMerchandiseCode(c.get(0));
+            item.setBudgetAmount(new BigDecimal(c.get(1)));
+            item.setCurrencyAbbr(c.get(2));
+            item.setComment(c.get(3));
+            list.add(item);
+        }
+        return list;
     }
 
     // ======== TODO ============ //

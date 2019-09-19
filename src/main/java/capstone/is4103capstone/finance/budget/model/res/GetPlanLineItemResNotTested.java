@@ -5,19 +5,19 @@ import capstone.is4103capstone.entities.finance.Plan;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetFilteredLineItemRes extends GetBudgetRes{
+public class GetPlanLineItemResNotTested extends GetBudgetRes{
     List<List<String>> content;
     String[] cols;
 
-    public GetFilteredLineItemRes() {
+    public GetPlanLineItemResNotTested() {
     }
 
-    public GetFilteredLineItemRes(List<List<String>> content, String[] cols) {
+    public GetPlanLineItemResNotTested(List<List<String>> content, String[] cols) {
         this.content = content;
         this.cols = cols;
     }
 
-    public GetFilteredLineItemRes(String message, Boolean error, Plan budgetPlan, List<List<String>> content, String[] cols) {
+    public GetPlanLineItemResNotTested(String message, Boolean error, Plan budgetPlan, List<List<String>> content, String[] cols) {
         super(message, error, budgetPlan);
         this.content = content;
         this.cols = cols;

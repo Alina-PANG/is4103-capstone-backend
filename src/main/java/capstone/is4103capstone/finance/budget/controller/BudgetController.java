@@ -21,7 +21,7 @@ public class BudgetController {
     @Autowired
     private BudgetService budgetService;
 
-    @PostMapping("/createBudget") // [TODO] test
+    @PostMapping("/createBudget")
     public ResponseEntity<GeneralRes> createBudget(@RequestBody CreateBudgetReq createBudgetReq) {
         if(Authentication.authenticateUser(createBudgetReq.getUsername()))
             return ResponseEntity
@@ -45,7 +45,7 @@ public class BudgetController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @PostMapping("/updateBudget/{id}") // [TODO] test
+    @PostMapping("/updateBudget/{id}")
     public ResponseEntity<GeneralRes> updateBudget(@RequestBody CreateBudgetReq createBudgetReq, @PathVariable("id") String id) {
         if(Authentication.authenticateUser(createBudgetReq.getUsername()))
             return ResponseEntity

@@ -5,8 +5,11 @@ import capstone.is4103capstone.entities.finance.PlanLineItem;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.budget.model.req.BudgetDataAnalysisReq;
+import capstone.is4103capstone.finance.budget.model.res.GetPlanLineItemRes;
+import capstone.is4103capstone.finance.budget.model.res.GetPlanLineItemResNotTested;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ExportToFileService;
+import capstone.is4103capstone.general.service.ReadFromFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +29,22 @@ public class BudgetDataAnalysisService {
     ExportToFileService exportToFileService;
     @Autowired
     BudgetLineItemService budgetLineItemService;
+    @Autowired
+    ReadFromFileService readFromFileService;
+
 
     private static final String[] cols = {"Merchandise_Code", "Amount", "Currency", "Comment"};
+
+    public GeneralRes readUploadedFile(String filePath){
+        try{
+            List<List<String>> content = readFromFileService.readFromExcel(filePath);
+            List<PlanLineItem> items = budgetLineItemService.convertListToPlanLineItem(content);
+            return new GetPlanLineItemRes("Successfully Read the File!", false, items);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new GeneralRes("An unexpected error happened when trying to export the file!", true);
+        }
+    }
 
     public Object exportToBudgetFile(String filename, String id){
         try{

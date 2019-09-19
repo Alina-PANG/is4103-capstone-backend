@@ -4,7 +4,7 @@ import capstone.is4103capstone.general.model.GeneralRes;
 
 import java.io.Serializable;
 
-public class ApproveBudgetReq extends GeneralRes implements Serializable {
+public class ApproveBudgetReq implements Serializable {
     Boolean approved;
     String username;
     String id;
@@ -18,12 +18,6 @@ public class ApproveBudgetReq extends GeneralRes implements Serializable {
         this.id = id;
     }
 
-    public ApproveBudgetReq(String message, Boolean error, Boolean approved, String username, String id) {
-        super(message, error);
-        this.approved = approved;
-        this.username = username;
-        this.id = id;
-    }
 
     public Boolean getApproved() {
         return approved;

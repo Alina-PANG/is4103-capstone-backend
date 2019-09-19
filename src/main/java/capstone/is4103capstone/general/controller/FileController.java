@@ -1,5 +1,6 @@
 package capstone.is4103capstone.general.controller;
 
+import capstone.is4103capstone.general.model.FilePathReq;
 import capstone.is4103capstone.general.model.UploadFileResponse;
 import capstone.is4103capstone.general.service.ExportToFileService;
 import capstone.is4103capstone.general.service.FileStorageService;
@@ -38,9 +39,9 @@ public class FileController {
     @Autowired
     ReadFromFileService readFromFileService;
 
-    @PostMapping(value = "/upload/{filePath}") // TODO: test
-    public Boolean uploadFile(@PathVariable("filePath") String filePath) {
-        List<List<String>> test = readFromFileService.readFromExcel(filePath);
+    @PostMapping(value = "/upload")
+    public Boolean uploadFile(@RequestBody FilePathReq filePathReq) {
+        List<List<String>> test = readFromFileService.readFromExcel(filePathReq.getFilePath());
         for(List<String> list: test){
             for(String s: list){
                 System.out.print(s+" | ");
