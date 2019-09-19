@@ -2,10 +2,13 @@ package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -27,9 +30,11 @@ public class UserService {
         // save the new user
         return er.save(newUser);
     }
+
     //lookupEmployee maybe null;
-    public boolean checkPassword(String userName, String inputPassword) {
+    public boolean checkPassword(String userName, String inputPassword) throws DbObjectNotFoundException {
         Employee lookupEmployee = er.findEmployeeByUserName(userName);
+        if (Objects.isNull(lookupEmployee)) throw new DbObjectNotFoundException();
 
         // init the Argon2 hasher
         Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
