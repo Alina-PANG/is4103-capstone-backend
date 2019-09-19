@@ -14,6 +14,7 @@ import de.mkammerer.argon2.Argon2Factory.Argon2Types;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table
@@ -24,6 +25,7 @@ public class Employee extends DBEntityTemplate {
     private String firstName;
     private String lastName;
     private String middleName;
+    @JsonIgnore
     private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -92,6 +94,7 @@ public class Employee extends DBEntityTemplate {
         this.lastName = lastName;
         this.middleName = middleName;
         this.setPassword(password);
+        this.securityId = "S-" + UUID.randomUUID();
     }
 
 
@@ -262,15 +265,11 @@ public class Employee extends DBEntityTemplate {
     public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
         this.outsourcingAssessmentList = outsourcingAssessmentList;
     }
-
-
+    
     public String getSecurityId() {
         return securityId;
     }
 
-    public void setSecurityId(String securityId) {
-        this.securityId = securityId;
-    }
 
     public List<SecurityGroup> getMemberOfSecurityGroups() {
         return memberOfSecurityGroups;
