@@ -39,6 +39,13 @@ public class FinanceEntityCodeHPGenerator {
         return son.getHierachyPath();
     }
 
+    public String getPlanHP(Plan plan, CostCenter cc){
+        return cc.getCode() + "-" + plan.getPlanType().name()+"-"+plan.getForYear();
+    }
+    public String getPlanItemHP(PlanLineItem pl){
+        return pl.getPlanBelongsTo().getHierachyPath() + "-"+pl.getMerchandiseCode();
+    }
+
     //after connecting all the relationships:
     public String generateCode(JpaRepository repo, DBEntityTemplate entity) throws Exception {
         Optional<DBEntityTemplate> entityOptional = repo.findById(entity.getId());
