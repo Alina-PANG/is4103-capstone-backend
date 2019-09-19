@@ -1,9 +1,6 @@
 package capstone.is4103capstone.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -11,6 +8,7 @@ import java.util.Date;
 public class SessionKey {
 
     @Id
+    @GeneratedValue
     private int id;
     private String sessionKey;
     private Date lastAuthenticated;
