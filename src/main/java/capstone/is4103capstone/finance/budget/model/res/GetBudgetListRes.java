@@ -6,7 +6,7 @@ import capstone.is4103capstone.general.model.GeneralRes;
 import java.io.Serializable;
 import java.util.List;
 
-public class GetBudgetListRes extends GeneralRes  implements Serializable {
+public class GetBudgetListRes extends GeneralRes  {
     private List<Plan> budgetPlanList;
 
     public GetBudgetListRes() {

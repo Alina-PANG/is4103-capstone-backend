@@ -15,7 +15,7 @@ import java.util.List;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Plan extends DBEntityTemplate {
-    @OneToMany(mappedBy = "planBelongsTo",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "planBelongsTo",fetch = FetchType.LAZY)
     private List<PlanLineItem> lineItems = new ArrayList<>();
 
     private Integer forYear;

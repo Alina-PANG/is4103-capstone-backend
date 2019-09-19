@@ -1,5 +1,6 @@
 package capstone.is4103capstone.finance.budget.controller;
 
+import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
 import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
@@ -25,7 +26,19 @@ public class BudgetController {
         if(Authentication.authenticateUser(createBudgetReq.getUsername()))
             return ResponseEntity
                     .ok()
-                    .body(budgetService.createBudget(createBudgetReq));
+                    .body(budgetService.createBudget(createBudgetReq, null));
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @GetMapping("/getMostRecentDraft") // [TODO] test
+    public ResponseEntity<GeneralRes> getMostRecentDraft(@RequestParam(name="username", required=true) String username, @RequestParam(name="code", required=true) String code, @RequestParam(name="type", required=true) String type){
+        if(Authentication.authenticateUser(username))
+            return ResponseEntity
+                    .ok()
+                    .body(budgetService.getMostRecentPlanDraft(username, type, code));
         else
             return ResponseEntity
                     .badRequest()
@@ -37,7 +50,7 @@ public class BudgetController {
         if(Authentication.authenticateUser(createBudgetReq.getUsername()))
             return ResponseEntity
                     .ok()
-                    .body(budgetService.updateBudget(createBudgetReq, id));
+                    .body(budgetService.createBudget(createBudgetReq, id));
         else
             return ResponseEntity
                     .badRequest()
