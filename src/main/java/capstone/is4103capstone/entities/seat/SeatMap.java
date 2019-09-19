@@ -21,7 +21,7 @@ public class SeatMap extends DBEntityTemplate {
     @OneToMany(mappedBy = "seatMap", fetch = FetchType.LAZY)
     private List<Seat> seats = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seatmap_id")
+    @JoinColumn(name = "office_id")
     @JsonIgnore
     @NotNull
     private Office office;

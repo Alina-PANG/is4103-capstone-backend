@@ -5,6 +5,7 @@ import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.awt.*;
 import java.util.ArrayList;
@@ -17,7 +18,14 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     @Enumerated(EnumType.STRING)
     private SeatTypeEnum type = SeatTypeEnum.FIXED;
-    private Point coordinate;
+    @NotNull
+    @Min(0)
+    private Integer xCoordinate;
+    @NotNull
+    @Min(0)
+    private Integer yCoordinate;
+    @NotNull
+    @Min(1)
     private Integer serialNumber;
 
     @OneToOne
@@ -36,15 +44,17 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     }
 
-    public Seat(String objectName, String code, String hierachyPath, Point coordinate, @NotNull SeatMap seatMap) {
+    public Seat(String objectName, String code, String hierachyPath, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap) {
         super(objectName, code, hierachyPath);
-        this.coordinate = coordinate;
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
         this.seatMap = seatMap;
     }
 
-    public Seat(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Point coordinate, @NotNull SeatMap seatMap) {
+    public Seat(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap) {
         super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
-        this.coordinate = coordinate;
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
         this.seatMap = seatMap;
     }
 
@@ -56,13 +66,13 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
         this.type = type;
     }
 
-    public Point getCoordinate() {
-        return coordinate;
-    }
+    public Integer getxCoordinate() { return xCoordinate; }
 
-    public void setCoordinate(Point coordinate) {
-        this.coordinate = coordinate;
-    }
+    public void setxCoordinate(Integer xCoordinate) { this.xCoordinate = xCoordinate; }
+
+    public Integer getyCoordinate() { return yCoordinate; }
+
+    public void setyCoordinate(Integer yCoordinate) { this.yCoordinate = yCoordinate; }
 
     public Integer getSerialNumber() { return serialNumber; }
 

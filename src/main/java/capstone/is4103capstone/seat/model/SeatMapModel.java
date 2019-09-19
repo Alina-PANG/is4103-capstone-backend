@@ -74,6 +74,7 @@ public class SeatMapModel {
     }
 
     public SeatMapModel(String id, String region, String country, String office, String floor, List<SeatModelForSeatMap> seats) {
+        this.id = id;
         this.region = region;
         this.country = country;
         this.office = office;
@@ -81,13 +82,9 @@ public class SeatMapModel {
         this.seats = seats;
     }
 
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public void setId(String id) { this.id = id; }
 
     public String getRegion() {
         return region;

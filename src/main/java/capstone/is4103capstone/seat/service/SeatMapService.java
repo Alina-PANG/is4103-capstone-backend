@@ -7,6 +7,7 @@ import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.seat.model.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.model.SeatMapModel;
+import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
 import capstone.is4103capstone.util.exception.SeatCreationException;
@@ -26,6 +27,8 @@ public class SeatMapService {
     @Autowired
     private SeatRepository seatRepository;
     @Autowired
+    private SeatAllocationRepository seatAllocationRepository;
+    @Autowired
     private OfficeRepository officeRepository;
 
     @Autowired
@@ -44,8 +47,20 @@ public class SeatMapService {
     // 1. all the seats in the new seatmap are created
     public String createNewSeatMap(SeatMapModel createSeatMapReq) throws SeatMapCreationException {
 
-        if (createSeatMapReq.getRegion() == null || createSeatMapReq.getCountry() == null || createSeatMapReq.getOffice() == null || createSeatMapReq.getFloor() == null) {
-            throw new SeatMapCreationException("Creation of seat map failed: insufficient info given.");
+        if (createSeatMapReq.getRegion() == null) {
+            throw new SeatMapCreationException("Creation of seat map failed: region not given.");
+        }
+
+        if (createSeatMapReq.getCountry() == null) {
+            throw new SeatMapCreationException("Creation of seat map failed: country not given.");
+        }
+
+        if (createSeatMapReq.getOffice() == null) {
+            throw new SeatMapCreationException("Creation of seat map failed: office not given.");
+        }
+
+        if (createSeatMapReq.getFloor() == null) {
+            throw new SeatMapCreationException("Creation of seat map failed: floor not given.");
         }
 
         Optional<Office> optionalOffice = officeRepository.findByOfficeNameAndCountryName(createSeatMapReq.getOffice(), createSeatMapReq.getCountry());
@@ -77,14 +92,13 @@ public class SeatMapService {
         String countryCode = office.getCountry().getCode();
         String officeCode = office.getCode();
         newSeatMap.setCode(countryCode + "-" + officeCode + "-" + newSeatMap.getFloor());
-        for (Seat seat: newSeatMap.getSeats()) {
-            seat.setCode(newSeatMap.getCode() + seat.getSerialNumber());
-        }
+        newSeatMap = seatMapRepository.save(newSeatMap);
+
+        refreshSeatCode(newSeatMap);
 
         for (Seat seat: newSeatMap.getSeats()) {
             seatRepository.save(seat);
         }
-        newSeatMap = seatMapRepository.save(newSeatMap);
 
         return newSeatMap.getId();
     }
@@ -106,6 +120,8 @@ public class SeatMapService {
 
     public void updateSeatMap(SeatMapModel seatMapModel) throws SeatMapUpdateException, SeatMapNotFoundException {
 
+        System.out.println("******************** Update Seat Map ********************");
+
         if (seatMapModel.getId() == null || seatMapModel.getId().trim().length() == 0) {
             throw new SeatMapUpdateException("Seat map update failed: insufficient seat map info given.");
         }
@@ -116,6 +132,8 @@ public class SeatMapService {
              seatMap.getSeats()) {
             originalSeatsIds.add(originalSeat.getId());
         }
+
+        System.out.println("********** the number of original seats: " + originalSeatsIds.size() + " **********");
 
         // Sort the seats based on the serial number.
         Collections.sort(seatMapModel.getSeats());
@@ -136,15 +154,21 @@ public class SeatMapService {
                             "with id " + seatModel.getId());
                 } else {
                     Seat seatToUpdate = optionalSeatToUpdate.get();
+                    System.out.println("-------------------------------------------");
                     // The seat exists, but need to ensure it exists only in this seatmap
                     if (!seatToUpdate.getCode().contains(seatMap.getCode())) {
                         throw new SeatMapUpdateException("Seat map update failed: invalid seat info given. Seat with id " +
                                 seatModel.getId() + " does not exist in the seatmap");
                     } else {
                         // Update seat information directly, even if the information is actually the same
+                        System.out.println("***** updating seat: " + seatToUpdate.getId() + " *****");
+                        System.out.println("***** original X: " + seatToUpdate.getxCoordinate() + " *****");
+                        System.out.println("***** original Y: " + seatToUpdate.getyCoordinate() + " *****");
                         seatToUpdate.setSerialNumber(seatModel.getSerialNumber());
-                        seatToUpdate.getCoordinate().x = seatModel.getX();
-                        seatToUpdate.getCoordinate().y = seatModel.getY();
+                        seatToUpdate.setxCoordinate(seatModel.getX());
+                        seatToUpdate.setyCoordinate(seatModel.getY());
+                        System.out.println("***** new X: " + seatToUpdate.getxCoordinate() + " *****");
+                        System.out.println("***** new Y: " + seatToUpdate.getyCoordinate() + " *****");
                         originalSeatsIds.remove(seatToUpdate.getId());
                     }
                 }
@@ -156,18 +180,39 @@ public class SeatMapService {
         while (seatListIterator.hasNext()) {
             Seat thisSeat = seatListIterator.next();
             if (originalSeatsIds.contains(thisSeat.getId())) {
+                for (SeatAllocation seatAllocation:
+                        thisSeat.getActiveSeatAllocations()) {
+                    seatAllocation.setDeleted(true);
+                    seatAllocationRepository.save(seatAllocation);
+                }
+                for (SeatAllocation seatAllocation:
+                        thisSeat.getInactiveSeatAllocations()) {
+                    seatAllocation.setDeleted(true);
+                    seatAllocationRepository.save(seatAllocation);
+                }
+                thisSeat.setDeleted(true);
+                thisSeat.setSeatMap(null);
+                seatMap.getSeats().remove(thisSeat);
+                seatRepository.save(thisSeat);
                 seatListIterator.remove();
             }
         }
 
         // Check for duplicates of serial number in seatmap of type SeatMap.
         if (hasDuplicateSerialNumber(seatMap)) {
-            throw new SeatMapUpdateException("Seat map update failed: there are seats with duplicate seat number.");
+            throw new SeatMapUpdateException("Seat map update failed: there are seats with duplicate seat numbers.");
         }
 
         // Refresh the seat code.
         refreshSeatCode(seatMap);
         seatMap.setNumOfSeats(seatMap.getSeats().size());
+
+        // Save all the changes.
+        for (Seat updatedSeat:
+             seatMap.getSeats()) {
+            seatRepository.saveAndFlush(updatedSeat);
+        }
+        seatMapRepository.saveAndFlush(seatMap);
     }
 
     // Pre-condition:
@@ -205,9 +250,34 @@ public class SeatMapService {
     }
 
     private void refreshSeatCode(SeatMap seatMap) {
-        for (Seat seat:
-             seatMap.getSeats()) {
-            seat.setCode(seatMap.getCode() + seat.getSerialNumber());
+        for (Seat seat: seatMap.getSeats()) {
+            // Calculate how many 0s are needed
+            Integer numOf0Count = 0;
+            Integer bigCount = 0;
+            Integer smallCount = 0;
+
+            Integer numOfSeats = seatMap.getSeats().size();
+            while (numOfSeats > 0) {
+                bigCount++;
+                numOfSeats /= 10;
+            }
+
+            Integer serialSize = seat.getSerialNumber();
+            while (serialSize > 0) {
+                smallCount++;
+                serialSize /= 10;
+            }
+            numOf0Count = bigCount - smallCount;
+            String zeroString = "";
+            while(numOf0Count > 0) {
+                zeroString += "0";
+                numOf0Count --;
+            }
+
+            String finalString = seatMap.getCode() + "-" + zeroString + seat.getSerialNumber();
+            seat.setCode(finalString);
+            seat.setHierachyPath(finalString);
+            seat.setObjectName(finalString);
         }
     }
 }

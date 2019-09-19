@@ -36,7 +36,8 @@ public class SeatService {
         }
 
         Seat newSeat = new Seat();
-        newSeat.setCoordinate(new Point(newSeatModel.getX(), newSeatModel.getY()));
+        newSeat.setxCoordinate(newSeatModel.getX());
+        newSeat.setyCoordinate(newSeatModel.getY());
         newSeat.setSerialNumber(newSeatModel.getSerialNumber());
         return newSeat;
     }
