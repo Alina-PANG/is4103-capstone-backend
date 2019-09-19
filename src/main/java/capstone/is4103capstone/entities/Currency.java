@@ -12,26 +12,16 @@ import javax.persistence.Table;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Currency extends DBEntityTemplate {
-    private Character symbol;
     private String countryCode;
 
     public Currency() {
     }
 
-    public Currency(String currencyName, String currencyCode, char symbol, String countryCode) {
+    public Currency(String currencyName, String currencyCode, String countryCode) {
         super(currencyName, currencyCode);
-        this.symbol = symbol;
         this.countryCode = countryCode;
     }
 
-
-    public Character getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(Character symbol) {
-        this.symbol = symbol;
-    }
 
     public String getCountryCode() {
         return countryCode;
