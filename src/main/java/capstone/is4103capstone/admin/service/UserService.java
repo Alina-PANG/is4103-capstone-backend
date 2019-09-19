@@ -1,20 +1,31 @@
 package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.admin.repository.SessionKeyRepo;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.SessionKey;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
+import capstone.is4103capstone.util.exception.SessionKeyNotValidException;
+import capstone.is4103capstone.util.exception.UserAuthenticationFailedException;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Service
 public class UserService {
 
+    // set the global session key expiry time in seconds
+    public static int SESSION_KEY_EXPIRY = 3600;
     @Autowired
     EmployeeRepository er;
+    @Autowired
+    SessionKeyRepo sk;
 
     public Employee addNewUser(String userName, String password, String firstName, String lastName) {
         Employee newUser = new Employee();
@@ -43,6 +54,50 @@ public class UserService {
         } else {
             return false;
         }
+    }
+
+    public Employee getUserFromSessionKey(String sessionKey) throws SessionKeyNotValidException {
+        return sk.findSessionKeyBySessionKey(sessionKey).getLinkedUser();
+    }
+
+    public boolean checkSessionKeyValidity(String sessionKey) throws SessionKeyNotValidException {
+        SessionKey currentSessionKey = sk.findSessionKeyBySessionKey(sessionKey);
+        if (Objects.isNull(currentSessionKey))
+            throw new SessionKeyNotValidException("Key not found or session expired.");
+
+        // check if the key is still valid
+        Date dateNow = new Date();
+        if ((dateNow.getTime() - currentSessionKey.getLastAuthenticated().getTime()) / 1000 <= 3600) {
+            // update key last used timing
+            currentSessionKey.setLastAuthenticated(dateNow);
+            return true;
+        } else {
+            // delete session from db
+            sk.delete(currentSessionKey);
+            throw new SessionKeyNotValidException("Key not found or session expired.");
+        }
+    }
+
+    public boolean changePassword(String userName, String oldPassword, String newPassword) {
+        try {
+            // first verify the user password
+            if (checkPassword(userName, oldPassword)) {
+                // change the password
+                er.findEmployeeByUserName(userName).setPassword(newPassword);
+                // invalidate all session keys!
+                invalidateAllSessionKeys(userName);
+                return true;
+            } else {
+                throw new UserAuthenticationFailedException("Invalid Username or Password.");
+            }
+        } catch (DbObjectNotFoundException ex) {
+            throw new UserAuthenticationFailedException("Invalid Username or Password.");
+        }
+    }
+
+    // This function invalidates all session keys for the user
+    public void invalidateAllSessionKeys(String userName) {
+        sk.deleteSessionKeysByLinkedUser_UserName(userName);
     }
 
 }

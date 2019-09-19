@@ -7,4 +7,7 @@ public interface SessionKeyRepo extends JpaRepository<SessionKey, String> {
 
     public SessionKey findSessionKeyBySessionKey(String sessionKey);
 
+    public void deleteSessionKeysByLinkedUser_UserName(String userName);
+
+
 }
