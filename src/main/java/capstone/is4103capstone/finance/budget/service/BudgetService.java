@@ -3,6 +3,7 @@ package capstone.is4103capstone.finance.budget.service;
 
 
 import capstone.is4103capstone.admin.repository.CostCenterRepository;
+import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.finance.PlanLineItem;
@@ -13,12 +14,16 @@ import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetListRes;
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
+import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,11 +39,26 @@ public class BudgetService {
     @Autowired
     CostCenterRepository costCenterRepository;
 
+    FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
+    private String generateCode(JpaRepository repo, DBEntityTemplate entity){
+        try {
+            return g.generateCode(repo,entity);
+        }catch (RepositoryEntityMismatchException e){
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+//    @Transactional
     private List<PlanLineItem> saveLineItem(List<PlanLineItem> items, Plan plan) throws Exception{
         List<PlanLineItem> newItems = new ArrayList<>();
         for(PlanLineItem i: items){
             i.setPlanBelongsTo(plan);
+            i.setHierachyPath(g.getPlanItemHP(i));
             newItems.add(planLineItemRepository.saveAndFlush(i));
+            generateCode(planLineItemRepository,i);
         }
         return newItems;
     }
@@ -81,6 +101,7 @@ public class BudgetService {
             newPlan.setCostCenter(cc);
             newPlan.setPlanDescription(createBudgetReq.getDescription());
             newPlan.setVersion(version);
+            newPlan.setForMonth(createBudgetReq.getMonth());
             newPlan.setForYear(createBudgetReq.getYear());
             newPlan.setCreatedBy(createBudgetReq.getUsername());
             newPlan.setCreatedDateTime(new Date());
@@ -90,7 +111,11 @@ public class BudgetService {
                 List<PlanLineItem> newItems = saveLineItem(createBudgetReq.getItems(), p);
                 p.setLineItems(newItems);
             }
+
+            newPlan.setHierachyPath(g.getPlanHP(newPlan,cc));
             planRepository.saveAndFlush(newPlan);
+            generateCode(planRepository,newPlan);
+
             logger.info("Successully submitted the new plan! -- "+createBudgetReq.getUsername()+" "+new Date());
             return new GeneralRes("Successully submitted the new budget plan!", false);
         }catch (Exception ex){

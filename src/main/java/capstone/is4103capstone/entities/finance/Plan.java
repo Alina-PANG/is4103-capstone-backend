@@ -19,7 +19,7 @@ public class Plan extends DBEntityTemplate {
     private List<PlanLineItem> lineItems = new ArrayList<>();
 
     private Integer forYear;
-
+    private Integer forMonth; // only for planType == REFORECAST;
     private BudgetPlanEnum planType; //BUDGET OR REFORECAST
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,6 +47,14 @@ public class Plan extends DBEntityTemplate {
         this.costCenter = costCenter;
         this.budgetPlanStatus = budgetPlanStatusEnum;
         this.version = version;
+    }
+
+    public Integer getForMonth() {
+        return forMonth;
+    }
+
+    public void setForMonth(Integer forMonth) {
+        this.forMonth = forMonth;
     }
 
     public List<PlanLineItem> getLineItems() {

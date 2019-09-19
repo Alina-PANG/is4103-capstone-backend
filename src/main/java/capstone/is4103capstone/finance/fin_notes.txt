@@ -1,1 +1,31 @@
-#Dummy File
+Aggregation Logic:
+
+use testfinscm;
+
+
+
+select plans from budget plans where hiearchy path contains "region","country","function","costcenter";
+
+now you have a list of plans ;
+which means a list of plan_ids;
+
+select plan_items from plan_line_item where in_plan in (set of plan_ids)
+
+now you have a list of plan_items;
+
+if you group the items by merchandise_code;
+and sum(budget_amount)
+
+now you have a list of
+
+(merchandiseCode, totalBudgetAmt)
+merchandiseCodes
+
+select m.hiearchy_path from merchandise m where m.code in (merchandise_codes)
+and you have your input for
+category, sub1, sub2.
+
+if there is no input for categories,
+return the list of (merchandiseCode, totalBudgetAmt)
+
+otherwise, select m.hiearchy_path that contains (category, sub1, sub2)
