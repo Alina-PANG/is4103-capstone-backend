@@ -45,7 +45,7 @@ public class AdminInitialization {
         }
     }
     public void createCurrency(){
-        Currency c = new Currency("Singapore Dollars","SGD",'$',"SGD");
+        Currency c = new Currency("Singapore Dollars","SGD","SGD");
         currencyRepository.save(c);
     }
 
