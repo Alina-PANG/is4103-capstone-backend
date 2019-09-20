@@ -4,6 +4,7 @@ import capstone.is4103capstone.finance.admin.model.req.CreateSub1Sub2Request;
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
 import capstone.is4103capstone.finance.admin.service.Sub1Service;
+import capstone.is4103capstone.finance.admin.service.Sub2Service;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -15,19 +16,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/fin/sub1")
-public class Sub1CategoryController {
+@RequestMapping("/api/fin/sub2")
+public class Sub2CategoryController {
     private static final Logger logger = LoggerFactory.getLogger(BudgetCategoryController.class);
 
     @Autowired
-    Sub1Service sub1Service;
+    Sub2Service sub2Service;
 
     @PostMapping("/create")
-    public ResponseEntity<BudgetCategoryRes> createCategory(@RequestBody CreateSub1Sub2Request req) {
+    public ResponseEntity<BudgetCategoryRes> createSub2Category(@RequestBody CreateSub1Sub2Request req) {
         if(Authentication.authenticateUser(req.getUsername()))
             return ResponseEntity
                     .ok()
-                    .body(sub1Service.createSub1(req));
+                    .body(sub2Service.createSub2(req));
         else
             return ResponseEntity
                     .badRequest()
@@ -39,26 +40,26 @@ public class Sub1CategoryController {
         if(Authentication.authenticateUser(updateCategoryReq.getUsername()))
             return ResponseEntity
                     .ok()
-                    .body(sub1Service.updateSub1Name(updateCategoryReq));
+                    .body(sub2Service.updateSub2Name(updateCategoryReq));
         else
             return ResponseEntity
                     .badRequest()
                     .body(new BudgetCategoryRes(DefaultData.AUTHENTICATION_ERROR_MSG, true,null));
     }
 
-    @GetMapping("/view-by-category")
-    public @ResponseBody ResponseEntity<Object> viewCategoriesByCountry(@RequestParam(name="username", required=true) String username, @RequestParam(name="categoryCode", required=true) String categoryCode){
+    @GetMapping("/view-by-sub1")
+    public @ResponseBody ResponseEntity<Object> viewCategoriesByCountry(@RequestParam(name="username", required=true) String username, @RequestParam(name="sub1Code", required=true) String sub1Code){
         if(Authentication.authenticateUser(username))
-            return new ResponseEntity<Object>(sub1Service.viewSub1sUnderCategory(categoryCode).toString(), HttpStatus.OK);
+            return new ResponseEntity<Object>(sub2Service.viewSub2sUnderSub1Code(sub1Code).toString(), HttpStatus.OK);
 
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/delete")
-    public @ResponseBody ResponseEntity<Object> deleteCategory(@RequestParam(name="username", required=true) String username, @RequestParam(name="sub1CodeToDelete", required=true) String sub1CodeToDelete){
+    public @ResponseBody ResponseEntity<Object> deleteCategory(@RequestParam(name="username", required=true) String username, @RequestParam(name="sub2CodeToDelete", required=true) String sub2CodeToDelete){
         if(Authentication.authenticateUser(username))
-            return new ResponseEntity<Object>(sub1Service.removeSub1Category(sub1CodeToDelete,username).toString(), HttpStatus.OK);
+            return new ResponseEntity<Object>(sub2Service.removeSub2Category(sub2CodeToDelete,username).toString(), HttpStatus.OK);
 
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);

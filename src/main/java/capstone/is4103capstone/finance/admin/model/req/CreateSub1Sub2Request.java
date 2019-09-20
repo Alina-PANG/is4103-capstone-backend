@@ -1,25 +1,25 @@
 package capstone.is4103capstone.finance.admin.model.req;
 
 public class CreateSub1Sub2Request {
-    String upperLvlCode;
+    String upperCategoryCode;
     String name;
     String username;
 
     public CreateSub1Sub2Request() {
     }
 
-    public CreateSub1Sub2Request(String upperLvlCode, String name, String username) {
-        this.upperLvlCode = upperLvlCode;
+    public CreateSub1Sub2Request(String upperCategoryCode, String name, String username) {
+        this.upperCategoryCode = upperCategoryCode;
         this.name = name;
         this.username = username;
     }
 
-    public String getUpperLvlCode() {
-        return upperLvlCode;
+    public String getUpperCategoryCode() {
+        return upperCategoryCode;
     }
 
-    public void setUpperLvlCode(String upperLvlCode) {
-        this.upperLvlCode = upperLvlCode;
+    public void setUpperCategoryCode(String upperCategoryCode) {
+        this.upperCategoryCode = upperCategoryCode;
     }
 
     public String getName() {

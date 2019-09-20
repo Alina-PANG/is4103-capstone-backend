@@ -7,18 +7,31 @@ import java.util.List;
 public class CategoryModel implements Serializable {
     private String name;
     private String code;
+    private String countryCode;
     List<Sub1Model> sub1List = new ArrayList<>();
 
-
-    public CategoryModel(String name, String code) {
-        this.name = name;
-        this.code = code;
+    public CategoryModel() {
     }
 
-    public CategoryModel(String name, String code, List<Sub1Model> sub1List) {
+    public CategoryModel(String name, String code, String countryCode) {
         this.name = name;
         this.code = code;
+        this.countryCode = countryCode;
+    }
+
+    public CategoryModel(String name, String code, String countryCode, List<Sub1Model> sub1List) {
+        this.name = name;
+        this.code = code;
+        this.countryCode = countryCode;
         this.sub1List = sub1List;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 
     public List<Sub1Model> getSub1List() {

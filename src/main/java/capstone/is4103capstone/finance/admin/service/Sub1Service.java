@@ -2,7 +2,6 @@ package capstone.is4103capstone.finance.admin.service;
 
 import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.finance.BudgetCategory;
 import capstone.is4103capstone.entities.finance.BudgetSub1;
 import capstone.is4103capstone.entities.finance.BudgetSub2;
@@ -12,7 +11,6 @@ import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
 import capstone.is4103capstone.finance.admin.model.CategoryModel;
 import capstone.is4103capstone.finance.admin.model.Sub1Model;
 import capstone.is4103capstone.finance.admin.model.Sub2Model;
-import capstone.is4103capstone.finance.admin.model.req.CreateBudgetCategoryRequest;
 import capstone.is4103capstone.finance.admin.model.req.CreateSub1Sub2Request;
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
@@ -47,7 +45,7 @@ public class Sub1Service {
 
     public BudgetCategoryRes createSub1(CreateSub1Sub2Request request){
         try {
-            BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(request.getUpperLvlCode());
+            BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(request.getUpperCategoryCode());
             if (cat == null) {
                 return new BudgetCategoryRes("Category Code doesn't exist", true, null);
             }
@@ -64,7 +62,7 @@ public class Sub1Service {
             sub1 = sub1Repository.save(sub1);
             sub1.setCode(generateCode(sub1Repository,sub1));
 
-            return new BudgetCategoryRes("Successfully created new sub1 category under "+cat.getObjectName()+"!", false, new CategoryModel(sub1.getObjectName(), sub1.getCode()));
+            return new BudgetCategoryRes("Successfully created new sub1 category under "+cat.getObjectName()+"!", false, new Sub1Model(sub1.getObjectName(), sub1.getCode(),cat.getCode()));
         }catch (Exception e){
             return new BudgetCategoryRes(e.getMessage(),true,null);
         }
@@ -86,11 +84,11 @@ public class Sub1Service {
             List<Sub2Model> sub2s = new ArrayList<>();
             for (BudgetSub2 sub: sub1ToUpdate.getBudgetSub2s()){
                 if (!sub.getDeleted()){
-                    sub2s.add(new Sub2Model(sub.getObjectName(),sub.getCode()));
+                    sub2s.add(new Sub2Model(sub.getObjectName(),sub.getCode(),newCode));
             }
             }
 
-            return new BudgetCategoryRes("Successfully updated category name!", false, new Sub1Model(sub1ToUpdate.getObjectName(), newCode,sub2s));
+            return new BudgetCategoryRes("Successfully updated category name!", false, new Sub1Model(sub1ToUpdate.getObjectName(), newCode,sub1ToUpdate.getBudgetCategory().getCode(),sub2s));
         }catch (Exception e){
             return new BudgetCategoryRes(e.getMessage(),true,null);
         }
@@ -116,7 +114,7 @@ public class Sub1Service {
                 list.put(sub1ModelJson);
             }
             res.put("totalSub1s",list.length());
-            res.put("categories",list);
+            res.put("sub1List",list);
             res.put("message","Successfully retrieved sub1 categories under Category["+cat.getObjectName()+"]");
             res.put("hasError",false);
         }catch (Exception e){
@@ -129,7 +127,7 @@ public class Sub1Service {
 
 
     @Transactional
-    public JSONObject removeBudgetCategory(String catCode, String username){
+    public JSONObject removeSub1Category(String catCode, String username){
         JSONObject res = new JSONObject();
 
         try{
