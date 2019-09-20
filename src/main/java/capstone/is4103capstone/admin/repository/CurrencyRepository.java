@@ -7,4 +7,6 @@ public interface CurrencyRepository extends JpaRepository<Currency, String> {
 
     public void deleteCurrencyByCurrencyCode(String currencyCode);
 
+    public Currency findCurrencyByCurrencyCode(String currencyCode);
+
 }
