@@ -2,7 +2,7 @@ package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.repository.SessionKeyRepo;
-import capstone.is4103capstone.admin.service.UserService;
+import capstone.is4103capstone.admin.service.UserAuthenticationService;
 import capstone.is4103capstone.entities.SessionKey;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import capstone.is4103capstone.util.exception.UserAuthenticationFailedException;
@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
@@ -27,7 +30,7 @@ public class UserAuthenticationController {
     SessionKeyRepo skr;
 
     @Autowired
-    UserService us;
+    UserAuthenticationService us;
 
     @GetMapping("/changePassword")
     @Transactional
@@ -66,8 +69,18 @@ public class UserAuthenticationController {
     }
 
     @GetMapping("/invalidateAllSessions")
-    public ResponseEntity invalidateAllSessions(@RequestAttribute(name = "username") String userName) {
+    public ResponseEntity invalidateAllSessions(@RequestParam(name = "username") String userName) {
         us.invalidateAllSessionKeys(userName);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity logoutSession(@RequestParam(name = "key") String sessionKey) {
+        try {
+            us.invalidateSessionKey(sessionKey);
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (DbObjectNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Session key " + sessionKey + " is not valid.");
+        }
     }
 }

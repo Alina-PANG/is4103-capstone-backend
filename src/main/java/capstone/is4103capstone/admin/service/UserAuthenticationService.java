@@ -12,13 +12,11 @@ import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Service
-public class UserService {
+public class UserAuthenticationService {
 
     // set the global session key expiry time in seconds
     public static int SESSION_KEY_EXPIRY = 3600;
@@ -67,7 +65,7 @@ public class UserService {
 
         // check if the key is still valid
         Date dateNow = new Date();
-        if ((dateNow.getTime() - currentSessionKey.getLastAuthenticated().getTime()) / 1000 <= 3600) {
+        if ((dateNow.getTime() - currentSessionKey.getLastAuthenticated().getTime()) / 1000 <= SESSION_KEY_EXPIRY) {
             // update key last used timing
             currentSessionKey.setLastAuthenticated(dateNow);
             return true;
@@ -98,6 +96,14 @@ public class UserService {
     // This function invalidates all session keys for the user
     public void invalidateAllSessionKeys(String userName) {
         sk.deleteSessionKeysByLinkedUser_UserName(userName);
+    }
+
+    public boolean invalidateSessionKey(String sessionKey) {
+        // does key exist
+        SessionKey skey = sk.findSessionKeyBySessionKey(sessionKey);
+        if (Objects.isNull(skey)) throw new DbObjectNotFoundException("Session key not found!");
+        sk.delete(skey);
+        return true;
     }
 
 }
