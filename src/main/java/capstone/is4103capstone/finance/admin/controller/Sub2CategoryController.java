@@ -1,15 +1,13 @@
 package capstone.is4103capstone.finance.admin.controller;
 
-import capstone.is4103capstone.finance.admin.model.req.CreateBudgetCategoryRequest;
+import capstone.is4103capstone.finance.admin.model.req.CreateSub1Sub2Request;
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
-import capstone.is4103capstone.finance.admin.service.CategoryService;
+import capstone.is4103capstone.finance.admin.service.Sub1Service;
+import capstone.is4103capstone.finance.admin.service.Sub2Service;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.sql.Update;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,19 +16,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/fin/category")
-public class BudgetCategoryController {
+@RequestMapping("/api/fin/sub2")
+public class Sub2CategoryController {
     private static final Logger logger = LoggerFactory.getLogger(BudgetCategoryController.class);
 
     @Autowired
-    CategoryService categoryService;
+    Sub2Service sub2Service;
 
     @PostMapping("/create")
-    public ResponseEntity<BudgetCategoryRes> createCategory(@RequestBody CreateBudgetCategoryRequest categoryRequest) {
-        if(Authentication.authenticateUser(categoryRequest.getUsername()))
+    public ResponseEntity<BudgetCategoryRes> createSub2Category(@RequestBody CreateSub1Sub2Request req) {
+        if(Authentication.authenticateUser(req.getUsername()))
             return ResponseEntity
                     .ok()
-                    .body(categoryService.createCategory(categoryRequest));
+                    .body(sub2Service.createSub2(req));
         else
             return ResponseEntity
                     .badRequest()
@@ -42,28 +40,28 @@ public class BudgetCategoryController {
         if(Authentication.authenticateUser(updateCategoryReq.getUsername()))
             return ResponseEntity
                     .ok()
-                    .body(categoryService.updateBudgetName(updateCategoryReq));
+                    .body(sub2Service.updateSub2Name(updateCategoryReq));
         else
             return ResponseEntity
                     .badRequest()
                     .body(new BudgetCategoryRes(DefaultData.AUTHENTICATION_ERROR_MSG, true,null));
     }
 
-    @GetMapping("/view-by-country")
-    public @ResponseBody ResponseEntity<Object> viewCategoriesByCountry(@RequestParam(name="username", required=true) String username, @RequestParam(name="countryCode", required=true) String countryCode){
+    @GetMapping("/view-by-sub1")
+    public @ResponseBody ResponseEntity<Object> viewCategoriesByCountry(@RequestParam(name="username", required=true) String username, @RequestParam(name="sub1Code", required=true) String sub1Code){
         if(Authentication.authenticateUser(username))
-            return new ResponseEntity<Object>(categoryService.viewCategoriesUnderCountry(countryCode).toString(), HttpStatus.OK);
+            return new ResponseEntity<Object>(sub2Service.viewSub2sUnderSub1Code(sub1Code).toString(), HttpStatus.OK);
 
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
     }
+
     @GetMapping("/delete")
-    public @ResponseBody ResponseEntity<Object> deleteCategory(@RequestParam(name="username", required=true) String username, @RequestParam(name="categoryCode", required=true) String categoryCode){
+    public @ResponseBody ResponseEntity<Object> deleteCategory(@RequestParam(name="username", required=true) String username, @RequestParam(name="sub2CodeToDelete", required=true) String sub2CodeToDelete){
         if(Authentication.authenticateUser(username))
-            return new ResponseEntity<Object>(categoryService.removeBudgetCategory(categoryCode,username).toString(), HttpStatus.OK);
+            return new ResponseEntity<Object>(sub2Service.removeSub2Category(sub2CodeToDelete,username).toString(), HttpStatus.OK);
 
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
     }
-
 }

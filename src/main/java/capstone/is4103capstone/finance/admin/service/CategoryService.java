@@ -27,9 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class CategoryService {
@@ -65,7 +63,7 @@ public class CategoryService {
 //        newCat.setPermissionMap(null);
 //        newCat.setBudgetSub1s(null);
 
-            return new BudgetCategoryRes("Successfully created new category!", false, new CategoryModel(newCat.getObjectName(), newCat.getCode()));
+            return new BudgetCategoryRes("Successfully created new category!", false, new CategoryModel(newCat.getObjectName(), newCat.getCode(),country.getCode()));
         }catch (Exception e){
             return new BudgetCategoryRes(e.getMessage(),true,null);
         }
@@ -80,17 +78,19 @@ public class CategoryService {
             catToUpdate.setObjectName(updateCategoryReq.getNewName());
             catToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
             catToUpdate.setHierachyPath(g.generateHierachyPath(catToUpdate.getCountry(),catToUpdate));
+            catToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
             catToUpdate = budgetCategoryRepository.save(catToUpdate);
             String newCode = generateCode(budgetCategoryRepository,catToUpdate);
+
 
             List<Sub1Model> sub1s = new ArrayList<>();
             for (BudgetSub1 sub: catToUpdate.getBudgetSub1s()){
                 if (!sub.getDeleted()){
-                    sub1s.add(new Sub1Model(sub.getObjectName(),sub.getCode()));
+                    sub1s.add(new Sub1Model(sub.getObjectName(),sub.getCode(),newCode));
                 }
             }
 
-            return new BudgetCategoryRes("Successfully updated category name!", false, new CategoryModel(catToUpdate.getObjectName(), newCode,sub1s));
+            return new BudgetCategoryRes("Successfully updated category name!", false, new CategoryModel(catToUpdate.getObjectName(), newCode,catToUpdate.getCountry().getCode(),sub1s));
         }catch (Exception e){
             return new BudgetCategoryRes(e.getMessage(),true,null);
         }
@@ -125,8 +125,9 @@ public class CategoryService {
         return res;
 
     }
+
     @Transactional
-    public JSONObject removeBudgetCategory(String catCode){
+    public JSONObject removeBudgetCategory(String catCode, String username){
         JSONObject res = new JSONObject();
 
         try{
@@ -136,11 +137,14 @@ public class CategoryService {
             }
 
             cat.setDeleted(true);
+            cat.setLastModifiedBy(username);
             for (BudgetSub1 sub1: cat.getBudgetSub1s()){
                 sub1.setDeleted(true);
-                List<BudgetSub2> sub2s = sub2Repository.getBudgetSub2sByBudgetSub1_Id(sub1.getId());
+                sub1.setLastModifiedBy(username);
+                List<BudgetSub2> sub2s = sub2Repository.getBudgetSub2SByBudgetSub1Id(sub1.getId());
                 for (BudgetSub2 sub2: sub2s){
                     sub2.setDeleted(true);
+                    sub2.setLastModifiedBy(username);
                 }
             }
 
@@ -164,8 +168,4 @@ public class CategoryService {
         }
     }
 
-//    private Sub1Model sub1EntityToModelwoSub2(BudgetSub1 sub1){
-//        Sub1Model model = new Sub1Model(sub1.getObjectName(),sub1.getCode());
-//        return  model;
-//    }
 }
