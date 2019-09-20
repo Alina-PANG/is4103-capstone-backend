@@ -9,18 +9,18 @@ import java.io.Serializable;
 import java.util.List;
 
 public class BudgetCategoryRes extends GeneralRes {
-    CategoryModel category;
+    Object category;
 
-    public BudgetCategoryRes(String message, Boolean hasError, CategoryModel category) {
+    public BudgetCategoryRes(String message, Boolean hasError, Object category) {
         super(message, hasError);
         this.category = category;
     }
 
-    public CategoryModel getCategory() {
+    public Object getCategory() {
         return category;
     }
 
-    public void setCategory(CategoryModel category) {
+    public void setCategory(Object category) {
         this.category = category;
     }
     //    public BudgetCategoryRes(String message, Boolean hasError) {

@@ -80,8 +80,10 @@ public class CategoryService {
             catToUpdate.setObjectName(updateCategoryReq.getNewName());
             catToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
             catToUpdate.setHierachyPath(g.generateHierachyPath(catToUpdate.getCountry(),catToUpdate));
+            catToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
             catToUpdate = budgetCategoryRepository.save(catToUpdate);
             String newCode = generateCode(budgetCategoryRepository,catToUpdate);
+
 
             List<Sub1Model> sub1s = new ArrayList<>();
             for (BudgetSub1 sub: catToUpdate.getBudgetSub1s()){
@@ -125,8 +127,9 @@ public class CategoryService {
         return res;
 
     }
+
     @Transactional
-    public JSONObject removeBudgetCategory(String catCode){
+    public JSONObject removeBudgetCategory(String catCode, String username){
         JSONObject res = new JSONObject();
 
         try{
@@ -136,11 +139,14 @@ public class CategoryService {
             }
 
             cat.setDeleted(true);
+            cat.setLastModifiedBy(username);
             for (BudgetSub1 sub1: cat.getBudgetSub1s()){
                 sub1.setDeleted(true);
+                sub1.setLastModifiedBy(username);
                 List<BudgetSub2> sub2s = sub2Repository.getBudgetSub2sByBudgetSub1_Id(sub1.getId());
                 for (BudgetSub2 sub2: sub2s){
                     sub2.setDeleted(true);
+                    sub2.setLastModifiedBy(username);
                 }
             }
 
@@ -164,8 +170,4 @@ public class CategoryService {
         }
     }
 
-//    private Sub1Model sub1EntityToModelwoSub2(BudgetSub1 sub1){
-//        Sub1Model model = new Sub1Model(sub1.getObjectName(),sub1.getCode());
-//        return  model;
-//    }
 }

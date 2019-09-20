@@ -8,4 +8,11 @@ public class Sub2Model {
     String code;
     List<MerchandiseModel> merchandiselList = new ArrayList<>();
 
+    public Sub2Model(String name, String code) {
+        this.name = name;
+        this.code = code;
+    }
+
+    public Sub2Model() {
+    }
 }

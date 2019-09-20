@@ -22,8 +22,8 @@ public class FinanceEntityCodeHPGenerator {
     private final String ACTUALS_TABLE_TEMPLATE = "ACTUALS-%1$s-%2$s";
     private final String BJF_TEMPLATE = "BJF-%1$s-%2$s";
     private final String BUDGET_CATEGORY_TEMPLATE = "CAT-%1$s-%2$s";
-    private final String BUDGET_SUB1_TEMPLATE = "CATS1-%1$s";
-    private final String BUDGET_SUB2_TEMPLATE = "CATS2-%1$s";
+    private final String BUDGET_SUB1_TEMPLATE = "CATS1-%1$s-%2$s";
+    private final String BUDGET_SUB2_TEMPLATE = "CATS2-%1$s-%2$s";
     private final String FX_RECORD_TEMPLATE = "FX-%1$s-%2$s";
     private final String MERCHANDISE_TEMPALTE = "M-%1$s-%2$s";
     private final String PLAN_TEMPLATE = "%1$s-%2$s";
@@ -75,15 +75,13 @@ public class FinanceEntityCodeHPGenerator {
                         code = String.format(BJF_TEMPLATE, objectName, seqNoStr);
                         break;
                     case "BudgetCategory":
-                        //                    BudgetCategory cat = (BudgetCategory) entity;
-                        //name = name;
                         code = String.format(BUDGET_CATEGORY_TEMPLATE, objectName, seqNoStr);
                         break;
                     case "BudgetSub1":
-                        code = String.format(BUDGET_SUB1_TEMPLATE, seqNoStr);
+                        code = String.format(BUDGET_SUB1_TEMPLATE, objectName,seqNoStr);
                         break;
                     case "BudgetSub2":
-                        code = String.format(BUDGET_SUB2_TEMPLATE, seqNoStr);
+                        code = String.format(BUDGET_SUB2_TEMPLATE, objectName,seqNoStr);
                         break;
                     case "FXRecord":
                         //                    FXRecord fx = (FXRecord) entity;
@@ -125,7 +123,8 @@ public class FinanceEntityCodeHPGenerator {
             }catch (Exception e){
                 throw new Exception("entity have null name");
             }
-            entity.setCode(code.toUpperCase());
+            code = code.toUpperCase();
+            entity.setCode(code);
             repo.saveAndFlush(entity);
 
             return code;
