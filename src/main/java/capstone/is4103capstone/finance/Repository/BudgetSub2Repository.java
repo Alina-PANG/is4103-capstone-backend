@@ -9,4 +9,7 @@ public interface BudgetSub2Repository extends JpaRepository<BudgetSub2,String> {
     public BudgetSub2 getBudgetSub2ByCode(String code);
 
     public List<BudgetSub2> getBudgetSub2sByBudgetSub1_Code(String sub1Code);
+
+    public List<BudgetSub2> getBudgetSub2sByBudgetSub1_Id(String sub1Id);
+
 }
