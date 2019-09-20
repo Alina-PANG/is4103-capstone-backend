@@ -58,6 +58,7 @@ public class FinanceEntityCodeHPGenerator {
                 seqNoStr = String.valueOf(entity.getSeqNo());
             }
             String entityClassName = entity.getClass().getSimpleName();
+            String objectName = entity.getObjectName().replaceAll("\\s+", "_");
             try {
                 switch (entityClassName) {
                     case "ApprovalForRequest":
@@ -66,17 +67,17 @@ public class FinanceEntityCodeHPGenerator {
                     case "ActualsTable":
                         //                    ActualsTable at = (ActualsTable)entity;
                         //name = costcenter code + year
-                        code = String.format(ACTUALS_TABLE_TEMPLATE, entity.getObjectName(), entity.getSeqNo());
+                        code = String.format(ACTUALS_TABLE_TEMPLATE, objectName, entity.getSeqNo());
                         break;
                     case "BJF":
                         //                    BJF bjf = (BJF)entity;
                         //name = bjf type + created by who
-                        code = String.format(BJF_TEMPLATE, entity.getObjectName(), seqNoStr);
+                        code = String.format(BJF_TEMPLATE, objectName, seqNoStr);
                         break;
                     case "BudgetCategory":
                         //                    BudgetCategory cat = (BudgetCategory) entity;
                         //name = name;
-                        code = String.format(BUDGET_CATEGORY_TEMPLATE, entity.getObjectName(), seqNoStr);
+                        code = String.format(BUDGET_CATEGORY_TEMPLATE, objectName, seqNoStr);
                         break;
                     case "BudgetSub1":
                         code = String.format(BUDGET_SUB1_TEMPLATE, seqNoStr);
@@ -87,17 +88,17 @@ public class FinanceEntityCodeHPGenerator {
                     case "FXRecord":
                         //                    FXRecord fx = (FXRecord) entity;
                         //name = base+price+ddmmyy
-                        code = String.format(FX_RECORD_TEMPLATE, entity.getObjectName(), seqNoStr);
+                        code = String.format(FX_RECORD_TEMPLATE, objectName, seqNoStr);
                         break;
                     case "Merchandise":
                         //                    Merchandise m = (Merchandise) entity;
-                        code = String.format(MERCHANDISE_TEMPALTE, entity.getObjectName(), seqNoStr);
+                        code = String.format(MERCHANDISE_TEMPALTE, objectName, seqNoStr);
                         break;
                     case "Plan":
                         //                    Plan p = (Plan)entity;
                         //                    String abbr = p.getPlanType() == BudgetPlanEnum.BUDGET? "BGT":"RFC";
                         //name = abbr + cc + year
-                        code = String.format(PLAN_TEMPLATE, entity.getObjectName(), seqNoStr);
+                        code = String.format(PLAN_TEMPLATE, objectName, seqNoStr);
                         break;
                     case "PlanLineItem":
                         code = String.format(PLAN_ITEM_TEMPLATE, seqNoStr);
@@ -111,12 +112,12 @@ public class FinanceEntityCodeHPGenerator {
                     case "Invoice":
                         //                    Invoice inv = (Invoice) entity;
                         //name: "invoice" + ponumber
-                        code = String.format(INVOICE_TEMPLATE, entity.getObjectName(), seqNoStr);
+                        code = String.format(INVOICE_TEMPLATE, objectName, seqNoStr);
                         break;
                     case "StatementOfAcctLineItem":
                         //                    StatementOfAcctLineItem soa = (StatementOfAcctLineItem) entity;
                         //name: ponumber+index
-                        code = String.format(STATEMENT_OF_ACCT_TEMPLATE, entity.getObjectName(), seqNoStr);
+                        code = String.format(STATEMENT_OF_ACCT_TEMPLATE, objectName, seqNoStr);
                         break;
                     default:
                         System.out.println("Not found");
@@ -124,7 +125,7 @@ public class FinanceEntityCodeHPGenerator {
             }catch (Exception e){
                 throw new Exception("entity have null name");
             }
-            entity.setCode(code);
+            entity.setCode(code.toUpperCase());
             repo.saveAndFlush(entity);
 
             return code;
