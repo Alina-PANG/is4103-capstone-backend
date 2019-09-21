@@ -1,7 +1,6 @@
 package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.service.CompanyEntityService;
-import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Currency;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +20,23 @@ public class CompanyEntityController {
 
     // === CURRENCY METHODS ===
     @PostMapping("/currency")
-    public Currency createCurrency(@RequestParam(name = "name") String currencyName, @RequestParam(name = "code") String currencyCode) {
-        return ces.createCurrency(currencyName, currencyCode);
+    public Currency createCurrency(@RequestBody Currency currencyRequest) {
+        return ces.createCurrency(currencyRequest);
     }
 
     @GetMapping("/currency")
     public List<Currency> getAllCurrencies() {
         return ces.getAllCurrencies();
+    }
+
+    @PutMapping("/currency")
+    public ResponseEntity updateCurrency(@RequestBody Currency currency) {
+        try {
+            ces.updateCurrency(currency.getId(), currency);
+            return ResponseEntity.status(200).build();
+        } catch (DbObjectNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Currency " + currency.getId() + " not found!");
+        }
     }
 
     @DeleteMapping("/currency")
@@ -43,15 +52,34 @@ public class CompanyEntityController {
         }
     }
 
-    @PutMapping("/currency")
-    public ResponseEntity updateCurrency(@RequestBody Currency currency, @RequestParam(name = "uuid") String uuid) {
-        try {
-            ces.updateCurrency(uuid, currency);
-            return ResponseEntity.status(200).build();
-        } catch (DbObjectNotFoundException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Currency " + uuid + " not found!");
-        }
-    }
     // ===== END CURRENCY METHODS =====
 
+    /*
+    // ===== START COUNTRY METHODS =====
+    @PostMapping("/country")
+    public ResponseEntity createCountry(@RequestBody Country country) {
+
+    }
+
+    @GetMapping("/country")
+    public ResponseEntity getAllCountries() {
+
+    }
+
+    @GetMapping("/country")
+    public ResponseEntity getCountry(String uuid) {
+
+    }
+
+    @PutMapping("/country")
+    public ResponseEntity updateCountry(Country country) {
+
+    }
+
+    @DeleteMapping("/country")
+    public ResponseEntity deleteCountry(String uuid) {
+    }
+
+    // ===== END COUNTRY METHODS =====
+     */
 }

@@ -23,8 +23,8 @@ public class CompanyEntityService {
     CountryRepository countryRepository;
 
     // ===== START CURRENCY METHODS =====
-    public Currency createCurrency(String currencyName, String currencyCode) {
-        Currency toCreate = new Currency(currencyName, currencyCode);
+    public Currency createCurrency(Currency newCurrency) {
+        Currency toCreate = new Currency(newCurrency.getObjectName(), newCurrency.getCurrencyCode());
         currencyRepository.save(toCreate);
         return toCreate;
     }
@@ -53,8 +53,11 @@ public class CompanyEntityService {
 
     // ===== END CURRENCY METHODS =====
     // ===== START COUNTRY METHODS =====
-    public Country createCountry(String countryName, String countryCode) {
-        Country newCountry = new Country(countryName, countryCode, countryCode);
+    public Country createCountry(Country countryReq) {
+        Country newCountry = new Country();
+        newCountry.setObjectName(countryReq.getObjectName());
+        newCountry.setRegion(countryReq.getRegion());
+        newCountry.setCode(countryReq.getCode());
         return countryRepository.save(newCountry);
     }
 

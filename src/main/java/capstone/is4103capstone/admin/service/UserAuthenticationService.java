@@ -11,9 +11,11 @@ import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class UserAuthenticationService {
@@ -23,7 +25,29 @@ public class UserAuthenticationService {
     @Autowired
     EmployeeRepository er;
     @Autowired
-    SessionKeyRepo sk;
+    SessionKeyRepo sessionKeyRepo;
+
+    public SessionKey createNewSession(String username, String password) {
+        try {
+            if (checkPassword(username, password)) {
+                // generate new sessionKey
+                SessionKey sk = new SessionKey();
+                // set the linked user
+                sk.setLinkedUser(er.findEmployeeByUserName(username));
+                // set the expiry date of the cookie
+                sk.setLastAuthenticated(new Date());
+                // set the session key (UUID)
+                sk.setSessionKey(UUID.randomUUID().toString());
+                // save to DB
+                sessionKeyRepo.save(sk);
+                return sk;
+            } else {
+                throw new UserAuthenticationFailedException("Invalid Username or Password");
+            }
+        } catch (DbObjectNotFoundException ex) {
+            throw new UserAuthenticationFailedException("Invalid Username or Password");
+        }
+    }
 
     public Employee addNewUser(String userName, String password, String firstName, String lastName) {
         Employee newUser = new Employee();
@@ -55,11 +79,11 @@ public class UserAuthenticationService {
     }
 
     public Employee getUserFromSessionKey(String sessionKey) throws SessionKeyNotValidException {
-        return sk.findSessionKeyBySessionKey(sessionKey).getLinkedUser();
+        return sessionKeyRepo.findSessionKeyBySessionKey(sessionKey).getLinkedUser();
     }
 
     public boolean checkSessionKeyValidity(String sessionKey) throws SessionKeyNotValidException {
-        SessionKey currentSessionKey = sk.findSessionKeyBySessionKey(sessionKey);
+        SessionKey currentSessionKey = sessionKeyRepo.findSessionKeyBySessionKey(sessionKey);
         if (Objects.isNull(currentSessionKey))
             throw new SessionKeyNotValidException("Key not found or session expired.");
 
@@ -71,7 +95,7 @@ public class UserAuthenticationService {
             return true;
         } else {
             // delete session from db
-            sk.delete(currentSessionKey);
+            sessionKeyRepo.delete(currentSessionKey);
             throw new SessionKeyNotValidException("Key not found or session expired.");
         }
     }
@@ -93,16 +117,17 @@ public class UserAuthenticationService {
         }
     }
 
+    @Transactional
     // This function invalidates all session keys for the user
     public void invalidateAllSessionKeys(String userName) {
-        sk.deleteSessionKeysByLinkedUser_UserName(userName);
+        sessionKeyRepo.deleteSessionKeysByLinkedUser_UserName(userName);
     }
 
     public boolean invalidateSessionKey(String sessionKey) {
         // does key exist
-        SessionKey skey = sk.findSessionKeyBySessionKey(sessionKey);
+        SessionKey skey = sessionKeyRepo.findSessionKeyBySessionKey(sessionKey);
         if (Objects.isNull(skey)) throw new DbObjectNotFoundException("Session key not found!");
-        sk.delete(skey);
+        sessionKeyRepo.delete(skey);
         return true;
     }
 
