@@ -24,8 +24,8 @@ public class BudgetCategory extends DBEntityTemplate {
     public BudgetCategory() {
     }
 
-    public BudgetCategory(String categoryName, String categoryCode, String hierachyPath) {
-        super(categoryName, categoryCode, hierachyPath);
+    public BudgetCategory(String categoryName) {
+        super(categoryName);
     }
 
     public Country getCountry() {

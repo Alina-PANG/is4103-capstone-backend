@@ -8,7 +8,9 @@ import javax.persistence.Entity;
 //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Currency extends DBEntityTemplate {
 
+
     private String currencyCode;
+
 
     public Currency() {
     }

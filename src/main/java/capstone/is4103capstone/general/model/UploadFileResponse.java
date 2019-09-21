@@ -1,6 +1,8 @@
 package capstone.is4103capstone.general.model;
 
-public class UploadFileResponse {
+import java.io.Serializable;
+
+public class UploadFileResponse extends  GeneralRes{
     private String fileName;
     private String fileDownloadUri;
     private String fileType;

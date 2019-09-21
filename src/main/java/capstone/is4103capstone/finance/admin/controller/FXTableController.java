@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/FXTable")
+@RequestMapping("/api/fx-table")
 public class FXTableController {
     private static final Logger logger = LoggerFactory.getLogger(FXTableController.class);
+
+
+
 }

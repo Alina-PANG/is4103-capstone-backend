@@ -2,16 +2,26 @@ package capstone.is4103capstone.finance.budget.model.req;
 
 import capstone.is4103capstone.entities.finance.PlanLineItem;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CreateBudgetReq {
+public class CreateBudgetReq implements Serializable {
     private String username;
     private List<PlanLineItem> items;
     private Integer year;
     private boolean toSubmit; // submit or draft
     private boolean isBudget; // planType
     private String costCenterCode;
+    private Integer month;
     private String description;
+
+    public Integer getMonth() {
+        return month;
+    }
+
+    public void setMonth(Integer month) {
+        this.month = month;
+    }
 
     public String getDescription() {
         return description;

@@ -1,15 +1,17 @@
 package capstone.is4103capstone.general.model;
 
-public class GeneralRes {
+import java.io.Serializable;
+
+public class GeneralRes implements Serializable {
     String message;
-    Boolean error;
+    Boolean hasError;
 
     public GeneralRes() {
     }
 
-    public GeneralRes(String message, Boolean error) {
+    public GeneralRes(String message, Boolean hasError) {
         this.message = message;
-        this.error = error;
+        this.hasError = hasError;
     }
 
     public String getMessage() {
@@ -20,11 +22,11 @@ public class GeneralRes {
         this.message = message;
     }
 
-    public Boolean getError() {
-        return error;
+    public Boolean getHasError() {
+        return hasError;
     }
 
-    public void setError(Boolean error) {
-        this.error = error;
+    public void setHasError(Boolean hasError) {
+        this.hasError = hasError;
     }
 }

@@ -55,6 +55,7 @@ public class AdminInitialization {
         costCenter.setCountry(countryRepository.findCountryByCode("SG"));
         costCenter.setCostCenterManager(employeeRepository.findEmployeeByUserName("yingshi2502"));
         costCenter.setCreatedBy("test");
+        costCenter.setCode("TEST_COSTCENTER");
         costCenterRepository.save(costCenter);
     }
 
