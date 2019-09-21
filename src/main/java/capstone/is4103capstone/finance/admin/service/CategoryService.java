@@ -47,7 +47,7 @@ public class CategoryService {
     public BudgetCategoryRes createCategory(CreateBudgetCategoryRequest categoryRequest){
         try {
             Country country = countryRepository.findCountryByCode(categoryRequest.getCountryCode());
-            if (country == null) {
+            if (country == null || country.getDeleted()) {
                 return new BudgetCategoryRes("Country Code does not exist!", true, null);
             }
             if (hasRepeatName(categoryRequest.getCategoryName(),country.getId())){
@@ -76,7 +76,7 @@ public class CategoryService {
     public BudgetCategoryRes updateBudgetName(UpdateCategoryReq updateCategoryReq){
         try {
             BudgetCategory catToUpdate = budgetCategoryRepository.findBudgetCategoryByCode(updateCategoryReq.getCode());
-            if (catToUpdate == null){
+            if (catToUpdate == null || catToUpdate.getDeleted()){
                 throw new Exception("Wrong budget category code!");
             }
 
@@ -111,7 +111,7 @@ public class CategoryService {
         JSONObject res = new JSONObject();
         try{
             Country c = countryRepository.findCountryByCode(countryCode);
-            if (c == null){
+            if (c == null || c.getDeleted()){
                 throw new Exception("Wrong contry code");
             }
             List<BudgetCategory> cats = budgetCategoryRepository.findBudgetCategoriesByCountry_Id(c.getId());
@@ -143,7 +143,7 @@ public class CategoryService {
 
         try{
             BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(catCode);
-            if (cat == null){
+            if (cat == null || cat.getDeleted()){
                 throw new Exception("Wrong category code, cannot perform delete.");
             }
 

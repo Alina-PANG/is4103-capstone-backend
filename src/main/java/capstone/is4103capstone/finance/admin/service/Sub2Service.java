@@ -47,7 +47,7 @@ public class Sub2Service {
     public BudgetCategoryRes createSub2(CreateSub1Sub2Request request){
         try {
             BudgetSub1 sub1 = sub1Repository.findBudgetSub1ByCode(request.getUpperCategoryCode());
-            if (sub1 == null) {
+            if (sub1 == null || sub1.getDeleted()) {
                 return new BudgetCategoryRes("The upper level Sub1 Category Code doesn't exist", true, null);
             }
             if (hasRepeatName(request.getName(),sub1.getId())){
@@ -114,7 +114,7 @@ public class Sub2Service {
         JSONObject res = new JSONObject();
         try{
             BudgetSub1 sub1 = sub1Repository.findBudgetSub1ByCode(sub1Code);
-            if (sub1 == null){
+            if (sub1 == null || sub1.getDeleted()){
                 throw new Exception("Wrong category code");
             }
 
@@ -145,7 +145,7 @@ public class Sub2Service {
 
         try{
             BudgetSub2 sub2 = sub2Repository.findBudgetSub2ByCode(catCode);
-            if (sub2 == null){
+            if (sub2 == null || sub2.getDeleted()){
                 throw new Exception("Wrong sub1 category code, cannot perform delete.");
             }
 

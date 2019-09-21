@@ -47,7 +47,7 @@ public class Sub1Service {
     public BudgetCategoryRes createSub1(CreateSub1Sub2Request request){
         try {
             BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(request.getUpperCategoryCode());
-            if (cat == null) {
+            if (cat == null || cat.getDeleted()) {
                 return new BudgetCategoryRes("Category Code doesn't exist", true, null);
             }
 
@@ -78,7 +78,7 @@ public class Sub1Service {
     public BudgetCategoryRes updateSub1Name(UpdateCategoryReq updateCategoryReq){
         try {
             BudgetSub1 sub1ToUpdate = sub1Repository.findBudgetSub1ByCode(updateCategoryReq.getCode());
-            if (sub1ToUpdate == null){
+            if (sub1ToUpdate == null || sub1ToUpdate.getDeleted()){
                 throw new Exception("Wrong sub1 budget category code!");
             }
             boolean hasRepeatedName = checkWhetherSub1NameAlreadyExist(updateCategoryReq.getNewName(),sub1ToUpdate.getBudgetCategory().getId());
@@ -112,7 +112,7 @@ public class Sub1Service {
         JSONObject res = new JSONObject();
         try{
            BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(categoryCode);
-            if (cat == null){
+            if (cat == null || cat.getDeleted()){
                 throw new Exception("Wrong category code");
             }
 
@@ -144,7 +144,7 @@ public class Sub1Service {
 
         try{
             BudgetSub1 sub1 = sub1Repository.findBudgetSub1ByCode(catCode);
-            if (sub1 == null){
+            if (sub1 == null || sub1.getDeleted()){
                 throw new Exception("Wrong sub1 category code, cannot perform delete.");
             }
 
