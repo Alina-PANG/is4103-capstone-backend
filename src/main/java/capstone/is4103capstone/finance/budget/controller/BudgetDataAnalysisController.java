@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/budgetData")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000")
 public class BudgetDataAnalysisController {
     private static final Logger logger = LoggerFactory.getLogger(BudgetDataAnalysisController.class);
 
