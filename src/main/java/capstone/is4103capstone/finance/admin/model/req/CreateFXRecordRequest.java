@@ -1,4 +1,4 @@
-package capstone.is4103capstone.finance.admin.model;
+package capstone.is4103capstone.finance.admin.model.req;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

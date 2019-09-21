@@ -53,16 +53,16 @@ public class FinanceTestCodeHPGeneration {
 
     @PostConstruct
     public void financeInit() {
-        System.out.println(getClass().getSimpleName());
-        fxRecordCode();
-        approvalForRequestCode();
-        actualsTableCode();
-        String catCode = budgetCategoryCode();
-        System.out.println("Cat Code: " + catCode);
-        String sub1Code = budgetSub1(catCode);
-        System.out.println("Sub1Code: "+sub1Code);
-        String sub2Code = budgetSub2(sub1Code);
-        System.out.println("Sub2Code: "+sub2Code);
+//        System.out.println(getClass().getSimpleName());
+//        fxRecordCode();
+//        approvalForRequestCode();
+//        actualsTableCode();
+//        String catCode = budgetCategoryCode();
+//        System.out.println("Cat Code: " + catCode);
+//        String sub1Code = budgetSub1(catCode);
+//        System.out.println("Sub1Code: "+sub1Code);
+//        String sub2Code = budgetSub2(sub1Code);
+//        System.out.println("Sub2Code: "+sub2Code);
 
     }
 
