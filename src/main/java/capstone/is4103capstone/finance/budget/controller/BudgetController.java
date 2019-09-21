@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/budget")
+@CrossOrigin
 public class BudgetController {
     private static final Logger logger = LoggerFactory.getLogger(BudgetController.class);
 
