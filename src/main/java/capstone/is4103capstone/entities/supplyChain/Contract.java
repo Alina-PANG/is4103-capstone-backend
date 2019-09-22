@@ -2,7 +2,6 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.finance.Merchandise;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;

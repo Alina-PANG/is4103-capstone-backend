@@ -1,6 +1,8 @@
 package capstone.is4103capstone.supplychain.model.req;
 
-public class CreateVendorReq {
+import java.io.Serializable;
+
+public class CreateVendorReq implements Serializable {
     private String vendorName;
     private String businessUnit;
     private String serviceDescription;

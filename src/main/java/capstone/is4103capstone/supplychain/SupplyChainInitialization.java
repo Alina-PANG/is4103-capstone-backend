@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
@@ -48,7 +49,7 @@ public class SupplyChainInitialization {
     @PostConstruct
     @Transactional
 
-    public void init(){
+    public void init() throws ParseException {
         if(employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong") == null){
             Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
             newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
@@ -97,7 +98,7 @@ public class SupplyChainInitialization {
     }
 
     @Transactional
-    public void createContract() {
+    public void createContract() throws ParseException {
 
         Merchandise banana = merchandiseRepository.findMerchandiseByCode("SG_Banana");
         Merchandise mango = merchandiseRepository.findMerchandiseByCode("SG_Mango");
@@ -118,8 +119,9 @@ public class SupplyChainInitialization {
         contract1.setCode("Contract1");
         contract1.setContractStatus(ContractStatusEnum.ACTIVE);
         contract1.setContractType(ContractTypeEnum.SCHEDULE);
-        contract1.setContractTerm("9 months");
-        contract1.setStartDate(new Date());
+        contract1.setContractTerm("12 months");
+        contract1.setStartDate(new SimpleDateFormat("yyyy-MM-dd").parse("2019-11-15"));
+        contract1.setEndDate(new SimpleDateFormat("yyyy-MM-dd").parse("2020-11-15"));
         contract1 = contractRepository.save(contract1);
 
         banana.setCurrentContractCode("Contract1");
