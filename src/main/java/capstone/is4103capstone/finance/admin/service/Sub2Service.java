@@ -34,7 +34,7 @@ import java.util.List;
 
 @Service
 public class Sub2Service {
-    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
+    private static final Logger logger = LoggerFactory.getLogger(Sub2Service.class);
 
     @Autowired
     BudgetCategoryRepository budgetCategoryRepository;
@@ -48,7 +48,7 @@ public class Sub2Service {
         try {
             BudgetSub1 sub1 = sub1Repository.findBudgetSub1ByCode(request.getUpperCategoryCode());
             if (sub1 == null || sub1.getDeleted()) {
-                return new BudgetCategoryRes("The upper level Sub1 Category Code doesn't exist", true, null);
+                return new BudgetCategoryRes("The upper level Sub1 Category Code given doesn't exist", true, null);
             }
             if (hasRepeatName(request.getName(),sub1.getId())){
                 throw new Exception("Sub2 category with name '"+request.getName()+"' already exists in the sub1 category");
@@ -79,7 +79,7 @@ public class Sub2Service {
         try {
             BudgetSub2 sub2ToUpdate = sub2Repository.findBudgetSub2ByCode(updateCategoryReq.getCode());
             if (sub2ToUpdate == null){
-                throw new Exception("Wrong sub2 budget category code given!");
+                throw new Exception("Wrong original sub2 budget category code given!");
             }
 
             if (hasRepeatName(updateCategoryReq.getNewName(),sub2ToUpdate.getBudgetSub1().getId())){
@@ -115,7 +115,7 @@ public class Sub2Service {
         try{
             BudgetSub1 sub1 = sub1Repository.findBudgetSub1ByCode(sub1Code);
             if (sub1 == null || sub1.getDeleted()){
-                throw new Exception("Wrong category code");
+                throw new Exception("Wrong sub1 category code");
             }
 
             List<BudgetSub2> sub2s = sub2Repository.getBudgetSub2SByBudgetSub1Id(sub1.getId());
@@ -146,7 +146,7 @@ public class Sub2Service {
         try{
             BudgetSub2 sub2 = sub2Repository.findBudgetSub2ByCode(catCode);
             if (sub2 == null || sub2.getDeleted()){
-                throw new Exception("Wrong sub1 category code, cannot perform delete.");
+                throw new Exception("Wrong sub2 category code, cannot perform delete.");
             }
 
             sub2.setDeleted(true);

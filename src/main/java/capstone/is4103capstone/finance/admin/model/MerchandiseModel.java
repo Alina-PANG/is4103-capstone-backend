@@ -1,6 +1,7 @@
 package capstone.is4103capstone.finance.admin.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class MerchandiseModel implements Serializable {
     String merchandiseName;
@@ -8,7 +9,7 @@ public class MerchandiseModel implements Serializable {
     String vendorCode;
     String vendorName;
     String measureUnit;
-    String currentPrice;
+    BigDecimal currentPrice;
 
     public MerchandiseModel() {
     }
@@ -18,7 +19,7 @@ public class MerchandiseModel implements Serializable {
         this.merchandiseCode = merchandiseCode;
     }
 
-    public MerchandiseModel(String merchandiseName, String merchandiseCode, String vendorCode, String vendorName, String measureUnit, String currentPrice) {
+    public MerchandiseModel(String merchandiseName, String merchandiseCode, String vendorCode, String vendorName, String measureUnit, BigDecimal currentPrice) {
         this.merchandiseName = merchandiseName;
         this.merchandiseCode = merchandiseCode;
         this.vendorCode = vendorCode;
