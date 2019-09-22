@@ -9,6 +9,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -33,15 +34,15 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seatmap_id")
     @JsonIgnore
-    @NotNull
     private SeatMap seatMap;
+    private String originalSeatMapId;
     @OneToMany(mappedBy = "seat")
     private List<SeatAllocation> activeSeatAllocations = new ArrayList<>();
     @OneToMany(mappedBy = "seat")
     private List<SeatAllocation> inactiveSeatAllocations = new ArrayList<>();
 
     public Seat() {
-
+        this.setCreatedDateTime(new Date());
     }
 
     public Seat(String objectName, String code, String hierachyPath, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap) {
@@ -49,6 +50,8 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.seatMap = seatMap;
+        this.originalSeatMapId = seatMap.getId();
+        this.setCreatedDateTime(new Date());
     }
 
     public Seat(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap) {
@@ -56,6 +59,8 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.seatMap = seatMap;
+        this.originalSeatMapId = seatMap.getId();
+        this.setCreatedDateTime(new Date());
     }
 
     public SeatTypeEnum getType() {
@@ -64,19 +69,29 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     public void setType(SeatTypeEnum type) {
         this.type = type;
+        this.setLastModifiedDateTime(new Date());
     }
 
     public Integer getxCoordinate() { return xCoordinate; }
 
-    public void setxCoordinate(Integer xCoordinate) { this.xCoordinate = xCoordinate; }
+    public void setxCoordinate(Integer xCoordinate) {
+        this.xCoordinate = xCoordinate;
+        this.setLastModifiedDateTime(new Date());
+    }
 
     public Integer getyCoordinate() { return yCoordinate; }
 
-    public void setyCoordinate(Integer yCoordinate) { this.yCoordinate = yCoordinate; }
+    public void setyCoordinate(Integer yCoordinate) {
+        this.yCoordinate = yCoordinate;
+        this.setLastModifiedDateTime(new Date());
+    }
 
     public Integer getSerialNumber() { return serialNumber; }
 
-    public void setSerialNumber(Integer serialNumber) { this.serialNumber = serialNumber; }
+    public void setSerialNumber(Integer serialNumber) {
+        this.serialNumber = serialNumber;
+        this.setLastModifiedDateTime(new Date());
+    }
 
     public SeatMap getSeatMap() {
         return seatMap;
@@ -84,6 +99,11 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     public void setSeatMap(SeatMap seatMap) {
         this.seatMap = seatMap;
+        if (seatMap != null) {
+            this.originalSeatMapId = seatMap.getId();
+        }
+
+        this.setLastModifiedDateTime(new Date());
     }
 
     public SeatAllocation getCurrentOccupancy() {
@@ -92,6 +112,7 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     public void setCurrentOccupancy(SeatAllocation currentOccupancy) {
         this.currentOccupancy = currentOccupancy;
+        this.setLastModifiedDateTime(new Date());
     }
 
     public List<SeatAllocation> getActiveSeatAllocations() {
@@ -100,6 +121,7 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     public void setActiveSeatAllocations(List<SeatAllocation> activeSeatAllocations) {
         this.activeSeatAllocations = activeSeatAllocations;
+        this.setLastModifiedDateTime(new Date());
     }
 
     public List<SeatAllocation> getInactiveSeatAllocations() {
@@ -108,6 +130,7 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     public void setInactiveSeatAllocations(List<SeatAllocation> inactiveSeatAllocations) {
         this.inactiveSeatAllocations = inactiveSeatAllocations;
+        this.setLastModifiedDateTime(new Date());
     }
 
     @Override

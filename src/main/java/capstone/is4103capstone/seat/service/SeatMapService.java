@@ -17,6 +17,7 @@ import capstone.is4103capstone.util.exception.SeatMapUpdateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 
 @Service
@@ -122,8 +123,13 @@ public class SeatMapService {
 
         System.out.println("******************** Update Seat Map ********************");
 
+        // Validation of passed in seat map information
         if (seatMapModel.getId() == null || seatMapModel.getId().trim().length() == 0) {
             throw new SeatMapUpdateException("Seat map update failed: insufficient seat map info given.");
+        }
+        Collections.sort(seatMapModel.getSeats());
+        if (hasDuplicateSeatModelIdOrSerialNumber(seatMapModel)) {
+            throw new SeatMapUpdateException("Seat map update failed: there are seats with duplicate serial number or id.");
         }
 
         SeatMap seatMap = getSeatMapById(seatMapModel.getId().trim());
@@ -134,11 +140,6 @@ public class SeatMapService {
         }
 
         System.out.println("********** the number of original seats: " + originalSeatsIds.size() + " **********");
-
-        // Sort the seats based on the serial number.
-        Collections.sort(seatMapModel.getSeats());
-        Collections.sort(seatMap.getSeats());
-
         // Find the seat in the original seatmap.
         for (SeatModelForSeatMap seatModel:
              seatMapModel.getSeats()) {
@@ -148,18 +149,15 @@ public class SeatMapService {
                 seatMap.getSeats().add(newSeat);
                 newSeat.setSeatMap(seatMap);
             } else {
-                Optional<Seat> optionalSeatToUpdate = seatRepository.findById(seatModel.getId().trim());
-                if (!optionalSeatToUpdate.isPresent()) {
-                    throw new SeatMapUpdateException("Seat map update failed: invalid seat info given. There is no seat" +
-                            "with id " + seatModel.getId());
-                } else {
-                    Seat seatToUpdate = optionalSeatToUpdate.get();
-                    System.out.println("-------------------------------------------");
-                    // The seat exists, but need to ensure it exists only in this seatmap
-                    if (!seatToUpdate.getCode().contains(seatMap.getCode())) {
-                        throw new SeatMapUpdateException("Seat map update failed: invalid seat info given. Seat with id " +
-                                seatModel.getId() + " does not exist in the seatmap");
-                    } else {
+                // Find the seat in the original seatmap.
+                boolean doesSeatExist = false;
+
+                for (Seat seatToUpdate:
+                     seatMap.getSeats()) {
+                    if (seatToUpdate.getId().equals(seatModel.getId())) {
+                        doesSeatExist = true;
+
+                        System.out.println("-------------------------------------------");
                         // Update seat information directly, even if the information is actually the same
                         System.out.println("***** updating seat: " + seatToUpdate.getId() + " *****");
                         System.out.println("***** original X: " + seatToUpdate.getxCoordinate() + " *****");
@@ -170,46 +168,58 @@ public class SeatMapService {
                         System.out.println("***** new X: " + seatToUpdate.getxCoordinate() + " *****");
                         System.out.println("***** new Y: " + seatToUpdate.getyCoordinate() + " *****");
                         originalSeatsIds.remove(seatToUpdate.getId());
+
+                        break;
                     }
+                }
+
+                if (!doesSeatExist) {
+                    throw new SeatMapUpdateException("Seat map update failed: invalid seat info given. There is no seat" +
+                            "with id " + seatModel.getId() + "or the seatmap does not have such seat");
                 }
             }
         }
 
-        // Delete the seats that are in the original seatmap but not in the updated seatmap.
+        System.out.println("********** Pick out extra seats **********");
+        // Pick out the seats that are in the original seatmap but not in the updated seatmap.
         ListIterator<Seat> seatListIterator = seatMap.getSeats().listIterator();
+        List<Seat> extraSeats = new ArrayList<>();
         while (seatListIterator.hasNext()) {
             Seat thisSeat = seatListIterator.next();
             if (originalSeatsIds.contains(thisSeat.getId())) {
-                for (SeatAllocation seatAllocation:
-                        thisSeat.getActiveSeatAllocations()) {
-                    seatAllocation.setDeleted(true);
-                    seatAllocationRepository.save(seatAllocation);
-                }
-                for (SeatAllocation seatAllocation:
-                        thisSeat.getInactiveSeatAllocations()) {
-                    seatAllocation.setDeleted(true);
-                    seatAllocationRepository.save(seatAllocation);
-                }
-                thisSeat.setDeleted(true);
-                thisSeat.setSeatMap(null);
-                seatMap.getSeats().remove(thisSeat);
-                seatRepository.save(thisSeat);
+                extraSeats.add(thisSeat);
                 seatListIterator.remove();
             }
         }
 
+        System.out.println("********** Check for duplicates/consecutive condition of serial number **********");
         // Check for duplicates of serial number in seatmap of type SeatMap.
-        if (hasDuplicateSerialNumber(seatMap)) {
-            throw new SeatMapUpdateException("Seat map update failed: there are seats with duplicate seat numbers.");
+        Collections.sort(seatMap.getSeats());
+        if (hasDuplicateOrInconsecutiveSerialNumber(seatMap)) {
+            throw new SeatMapUpdateException("Seat map update failed: there are seats with duplicate or inconsecutive seat numbers.");
         }
 
-        // Refresh the seat code.
+        deleteExtraSeats(extraSeats);
+
+        System.out.println("********** Save all the changes **********");
+        // Save all the changes.
+        // Need to set all the seats' code to null to avoid SQLIntegrityConstraintViolationException: duplicate entry of code
+        for (Seat updatedSeat:
+                seatMap.getSeats()) {
+           updatedSeat.setCode(null);
+            seatRepository.saveAndFlush(updatedSeat);
+        }
+
         refreshSeatCode(seatMap);
         seatMap.setNumOfSeats(seatMap.getSeats().size());
 
-        // Save all the changes.
         for (Seat updatedSeat:
              seatMap.getSeats()) {
+            System.out.println("-------------------------------------------");
+            System.out.println("***** saving seat: " + updatedSeat.getId() + " *****");
+            System.out.println("***** serial number: " + updatedSeat.getSerialNumber() + " *****");
+            System.out.println("***** X coordinate: " + updatedSeat.getxCoordinate() + " *****");
+            System.out.println("***** Y coordinate: " + updatedSeat.getyCoordinate() + " *****");
             seatRepository.saveAndFlush(updatedSeat);
         }
         seatMapRepository.saveAndFlush(seatMap);
@@ -219,7 +229,7 @@ public class SeatMapService {
     // 1. a user will be warned at the front-end if any seat in the seatmap has active allocations
     // 2. a user can enforce to delete a seatmap even if being warned
     // Post-condition:
-    // 1. all the seats together with their active seat allocations in the  seatmap will soft-deleted
+    // 1. all the seats together with their seat allocations in the  seatmap will soft-deleted
     public void deleteSeatMapById(String id) throws SeatMapNotFoundException {
 
         SeatMap seatMap = getSeatMapById(id);
@@ -229,24 +239,72 @@ public class SeatMapService {
             for (SeatAllocation seatAllocation:
                  seat.getActiveSeatAllocations()) {
                 seatAllocation.setDeleted(true);
+                seatAllocationRepository.save(seatAllocation);
             }
             for (SeatAllocation seatAllocation:
                     seat.getInactiveSeatAllocations()) {
                 seatAllocation.setDeleted(true);
+                seatAllocationRepository.save(seatAllocation);
             }
             seat.setDeleted(true);
+            seat.setCode(null);
+            seatRepository.save(seat);
         }
+
+        seatMap.setDeleted(true);
+        seatMapRepository.save(seatMap);
     }
 
-    private boolean hasDuplicateSerialNumber(SeatMap seatMap) {
+    private boolean hasDuplicateSeatModelIdOrSerialNumber(SeatMapModel seatMap) {
+        List<String> ids = new ArrayList<>();
 
-        Collections.sort(seatMap.getSeats());
         for (int count = 0; count < seatMap.getSeats().size() - 1; count++ ) {
-            if (seatMap.getSeats().get(count).getSerialNumber().equals(seatMap.getSeats().get(count + 1).getSerialNumber())) {
+            SeatModelForSeatMap thisSeat = seatMap.getSeats().get(count);
+            if (thisSeat.getSerialNumber().equals(seatMap.getSeats().get(count + 1).getSerialNumber())) {
+                return true;
+            } else {
+                if (ids.contains(thisSeat.getId())) {
+                    return true;
+                } else {
+                    ids.add(thisSeat.getId());
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hasDuplicateOrInconsecutiveSerialNumber(SeatMap seatMap) {
+
+        for (int count = 0; count < seatMap.getSeats().size() - 1; count++ ) {
+            if (seatMap.getSeats().get(count).getSerialNumber().equals(seatMap.getSeats().get(count + 1).getSerialNumber())
+                | !seatMap.getSeats().get(count).getSerialNumber().equals(seatMap.getSeats().get(count + 1).getSerialNumber() - 1)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private void deleteExtraSeats(List<Seat> extraSeats) {
+        for (Seat seat :
+                extraSeats) {
+            System.out.println("-------------------------------------------");
+            System.out.println("***** removing seat: " + seat.getId() + " *****");
+            for (SeatAllocation seatAllocation:
+                    seat.getActiveSeatAllocations()) {
+                seatAllocation.setDeleted(true);
+                seatAllocationRepository.save(seatAllocation);
+            }
+            for (SeatAllocation seatAllocation:
+                    seat.getInactiveSeatAllocations()) {
+                seatAllocation.setDeleted(true);
+                seatAllocationRepository.save(seatAllocation);
+            }
+            seat.setDeleted(true);
+            seat.setSeatMap(null);
+            seat.setCode(null);
+            seatRepository.save(seat);
+        }
     }
 
     private void refreshSeatCode(SeatMap seatMap) {

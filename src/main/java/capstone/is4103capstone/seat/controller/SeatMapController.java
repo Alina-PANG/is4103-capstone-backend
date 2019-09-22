@@ -96,7 +96,7 @@ public class SeatMapController {
         }
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity deleteSeatMap(@PathVariable String id) {
         try {
             seatMapService.deleteSeatMapById(id);
