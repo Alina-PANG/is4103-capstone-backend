@@ -2,14 +2,12 @@ package capstone.is4103capstone.finance.admin.controller;
 
 import capstone.is4103capstone.finance.admin.model.req.CreateBudgetCategoryRequest;
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
+
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
 import capstone.is4103capstone.finance.admin.service.CategoryService;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.sql.Update;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/fin/category")
+@CrossOrigin(origins = "http://localhost:3000")
 public class BudgetCategoryController {
     private static final Logger logger = LoggerFactory.getLogger(BudgetCategoryController.class);
 
