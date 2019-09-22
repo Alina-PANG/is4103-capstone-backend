@@ -32,7 +32,7 @@ import java.util.List;
 
 @Service
 public class Sub1Service {
-    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
+    private static final Logger logger = LoggerFactory.getLogger(Sub1Service.class);
 
     @Autowired
     BudgetCategoryRepository budgetCategoryRepository;
@@ -48,7 +48,7 @@ public class Sub1Service {
         try {
             BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(request.getUpperCategoryCode());
             if (cat == null || cat.getDeleted()) {
-                return new BudgetCategoryRes("Category Code doesn't exist", true, null);
+                return new BudgetCategoryRes("Category Code ["+request.getUpperCategoryCode()+"]doesn't exist", true, null);
             }
 
             boolean hasRepeatedName = checkWhetherSub1NameAlreadyExist(request.getName(),cat.getId());
@@ -68,7 +68,7 @@ public class Sub1Service {
             String code = EntityCodeHPGeneration.getCode(sub1Repository,sub1);
             sub1.setCode(code);
 
-            return new BudgetCategoryRes("Successfully created new sub1 category under "+cat.getObjectName()+"!", false, new Sub1Model(sub1.getObjectName(), sub1.getCode(),cat.getCode()));
+            return new BudgetCategoryRes("Successfully created new sub1 ["+sub1.getObjectName()+"] under "+cat.getObjectName()+"!", false, new Sub1Model(sub1.getObjectName(), sub1.getCode(),cat.getCode()));
         }catch (Exception e){
             return new BudgetCategoryRes(e.getMessage(),true,null);
         }
@@ -100,7 +100,7 @@ public class Sub1Service {
             }
             }
 
-            return new BudgetCategoryRes("Successfully updated category name!", false, new Sub1Model(sub1ToUpdate.getObjectName(), newCode,sub1ToUpdate.getBudgetCategory().getCode(),sub2s));
+            return new BudgetCategoryRes("Successfully updated sub1 category name! New name ["+sub1ToUpdate.getObjectName()+"].", false, new Sub1Model(sub1ToUpdate.getObjectName(), newCode,sub1ToUpdate.getBudgetCategory().getCode(),sub2s));
         }catch (Exception e){
             return new BudgetCategoryRes(e.getMessage(),true,null);
         }
@@ -113,7 +113,7 @@ public class Sub1Service {
         try{
            BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(categoryCode);
             if (cat == null || cat.getDeleted()){
-                throw new Exception("Wrong category code");
+                throw new Exception("Wrong category code given");
             }
 
             List<BudgetSub1> sub1s = sub1Repository.findBudgetSub1sByBudgetCategoryId(cat.getId());

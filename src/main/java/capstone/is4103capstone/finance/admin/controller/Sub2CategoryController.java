@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/fin/sub2")
 @CrossOrigin(origins = "http://localhost:3000")
 public class Sub2CategoryController {
-    private static final Logger logger = LoggerFactory.getLogger(BudgetCategoryController.class);
+    private static final Logger logger = LoggerFactory.getLogger(Sub2CategoryController.class);
 
     @Autowired
     Sub2Service sub2Service;
