@@ -10,6 +10,16 @@ public class MerchandiseListRes extends GeneralRes {
     List<MerchandiseModel> items = new ArrayList<>();
     int totalCount;
 
+    public MerchandiseListRes(String message, Boolean hasError, List<MerchandiseModel> items, int totalCount) {
+        super(message, hasError);
+        this.items = items;
+        this.totalCount = totalCount;
+    }
+
+    public MerchandiseListRes(String message, Boolean hasError) {
+        super(message, hasError);
+    }
+
     public MerchandiseListRes() {
     }
 
