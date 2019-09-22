@@ -1,4 +1,4 @@
-package capstone.is4103capstone.seat.model.res;
+package capstone.is4103capstone.seat.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
