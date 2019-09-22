@@ -9,6 +9,7 @@ import capstone.is4103capstone.entities.finance.BudgetSub2;
 import capstone.is4103capstone.finance.Repository.BudgetCategoryRepository;
 import capstone.is4103capstone.finance.Repository.BudgetSub1Repository;
 import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
+import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.model.CategoryModel;
 import capstone.is4103capstone.finance.admin.model.Sub1Model;
 import capstone.is4103capstone.finance.admin.model.req.CreateBudgetCategoryRequest;
@@ -46,18 +47,21 @@ public class CategoryService {
     public BudgetCategoryRes createCategory(CreateBudgetCategoryRequest categoryRequest){
         try {
             Country country = countryRepository.findCountryByCode(categoryRequest.getCountryCode());
-            if (country == null) {
+            if (country == null || country.getDeleted()) {
                 return new BudgetCategoryRes("Country Code does not exist!", true, null);
+            }
+            if (hasRepeatName(categoryRequest.getCategoryName(),country.getId())){
+                throw new Exception("Repeated category name under country["+country.getObjectName()+"]!");
             }
 
             BudgetCategory newCat = new BudgetCategory(categoryRequest.getCategoryName());
             newCat.setCreatedBy(categoryRequest.getUsername());
-            newCat.setHierachyPath(g.generateHierachyPath(country, newCat));
+            EntityCodeHPGeneration.setHP(country,newCat);
 
             Authentication.configurePermissionMap(newCat);
             newCat.setCountry(country);
             newCat = budgetCategoryRepository.save(newCat);
-            newCat.setCode(generateCode(budgetCategoryRepository, newCat));
+            newCat.setCode(EntityCodeHPGeneration.getCode(budgetCategoryRepository,newCat));
 
             //below: unmanaged/change for reponse sending
 //        newCat.setPermissionMap(null);
@@ -72,15 +76,22 @@ public class CategoryService {
     public BudgetCategoryRes updateBudgetName(UpdateCategoryReq updateCategoryReq){
         try {
             BudgetCategory catToUpdate = budgetCategoryRepository.findBudgetCategoryByCode(updateCategoryReq.getCode());
-            if (catToUpdate == null){
+            if (catToUpdate == null || catToUpdate.getDeleted()){
                 throw new Exception("Wrong budget category code!");
             }
+
+            if (hasRepeatName(updateCategoryReq.getNewName(),catToUpdate.getCountry().getId())){
+                throw new Exception("Repeated category name under country["+catToUpdate.getCountry().getObjectName()+"]!");
+            }
+
+
             catToUpdate.setObjectName(updateCategoryReq.getNewName());
             catToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
-            catToUpdate.setHierachyPath(g.generateHierachyPath(catToUpdate.getCountry(),catToUpdate));
+            EntityCodeHPGeneration.setHP(catToUpdate.getCountry(),catToUpdate);
             catToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
             catToUpdate = budgetCategoryRepository.save(catToUpdate);
-            String newCode = generateCode(budgetCategoryRepository,catToUpdate);
+
+            String newCode = EntityCodeHPGeneration.getCode(budgetCategoryRepository,catToUpdate);
 
 
             List<Sub1Model> sub1s = new ArrayList<>();
@@ -100,7 +111,7 @@ public class CategoryService {
         JSONObject res = new JSONObject();
         try{
             Country c = countryRepository.findCountryByCode(countryCode);
-            if (c == null){
+            if (c == null || c.getDeleted()){
                 throw new Exception("Wrong contry code");
             }
             List<BudgetCategory> cats = budgetCategoryRepository.findBudgetCategoriesByCountry_Id(c.getId());
@@ -132,7 +143,7 @@ public class CategoryService {
 
         try{
             BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(catCode);
-            if (cat == null){
+            if (cat == null || cat.getDeleted()){
                 throw new Exception("Wrong category code, cannot perform delete.");
             }
 
@@ -157,15 +168,14 @@ public class CategoryService {
         return res;
     }
 
-    FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
-    private String generateCode(JpaRepository repo, DBEntityTemplate entity){
-        try {
-            return g.generateCode(repo,entity);
-        }catch (RepositoryEntityMismatchException e){
-            return null;
-        } catch (Exception e) {
-            return null;
+
+    private boolean hasRepeatName(String name, String countryId){
+        Integer numOfThisName = budgetCategoryRepository.countCategoryNameByCountryId(countryId,name);
+        if (numOfThisName > 0){
+            return true;
         }
+        return false;
     }
+
 
 }

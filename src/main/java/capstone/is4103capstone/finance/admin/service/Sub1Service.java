@@ -8,6 +8,7 @@ import capstone.is4103capstone.entities.finance.BudgetSub2;
 import capstone.is4103capstone.finance.Repository.BudgetCategoryRepository;
 import capstone.is4103capstone.finance.Repository.BudgetSub1Repository;
 import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
+import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.model.CategoryModel;
 import capstone.is4103capstone.finance.admin.model.Sub1Model;
 import capstone.is4103capstone.finance.admin.model.Sub2Model;
@@ -46,21 +47,26 @@ public class Sub1Service {
     public BudgetCategoryRes createSub1(CreateSub1Sub2Request request){
         try {
             BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(request.getUpperCategoryCode());
-            if (cat == null) {
+            if (cat == null || cat.getDeleted()) {
                 return new BudgetCategoryRes("Category Code doesn't exist", true, null);
             }
+
+            boolean hasRepeatedName = checkWhetherSub1NameAlreadyExist(request.getName(),cat.getId());
+            if (hasRepeatedName){
+                throw new Exception("Sub1 Category '"+request.getName()+"' already exits under CAT["+cat.getObjectName()+"]");
+            }
+
 
             BudgetSub1 sub1 = new BudgetSub1(request.getName());
             sub1.setCreatedBy(request.getUsername());
             sub1.setLastModifiedBy(request.getUsername());
-            sub1.setHierachyPath(g.generateHierachyPath(cat,sub1));
-
+            EntityCodeHPGeneration.setHP(cat,sub1);
             Authentication.configurePermissionMap(sub1);
 
             sub1.setBudgetCategory(cat);
-
             sub1 = sub1Repository.save(sub1);
-            sub1.setCode(generateCode(sub1Repository,sub1));
+            String code = EntityCodeHPGeneration.getCode(sub1Repository,sub1);
+            sub1.setCode(code);
 
             return new BudgetCategoryRes("Successfully created new sub1 category under "+cat.getObjectName()+"!", false, new Sub1Model(sub1.getObjectName(), sub1.getCode(),cat.getCode()));
         }catch (Exception e){
@@ -72,14 +78,20 @@ public class Sub1Service {
     public BudgetCategoryRes updateSub1Name(UpdateCategoryReq updateCategoryReq){
         try {
             BudgetSub1 sub1ToUpdate = sub1Repository.findBudgetSub1ByCode(updateCategoryReq.getCode());
-            if (sub1ToUpdate == null){
+            if (sub1ToUpdate == null || sub1ToUpdate.getDeleted()){
                 throw new Exception("Wrong sub1 budget category code!");
             }
+            boolean hasRepeatedName = checkWhetherSub1NameAlreadyExist(updateCategoryReq.getNewName(),sub1ToUpdate.getBudgetCategory().getId());
+            if (hasRepeatedName){
+                throw new Exception("Sub1 category '"+updateCategoryReq.getNewName()+"' already exits under CAT["+sub1ToUpdate.getBudgetCategory().getObjectName()+"]");
+            }
+
             sub1ToUpdate.setObjectName(updateCategoryReq.getNewName());
             sub1ToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
-            sub1ToUpdate.setHierachyPath(g.generateHierachyPath(sub1ToUpdate.getBudgetCategory(),sub1ToUpdate));
+
+            EntityCodeHPGeneration.setHP(sub1ToUpdate.getBudgetCategory(),sub1ToUpdate);
             sub1ToUpdate = sub1Repository.save(sub1ToUpdate);
-            String newCode = generateCode(sub1Repository,sub1ToUpdate);
+            String newCode = EntityCodeHPGeneration.getCode(sub1Repository,sub1ToUpdate);
 
             List<Sub2Model> sub2s = new ArrayList<>();
             for (BudgetSub2 sub: sub1ToUpdate.getBudgetSub2s()){
@@ -100,7 +112,7 @@ public class Sub1Service {
         JSONObject res = new JSONObject();
         try{
            BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(categoryCode);
-            if (cat == null){
+            if (cat == null || cat.getDeleted()){
                 throw new Exception("Wrong category code");
             }
 
@@ -132,7 +144,7 @@ public class Sub1Service {
 
         try{
             BudgetSub1 sub1 = sub1Repository.findBudgetSub1ByCode(catCode);
-            if (sub1 == null){
+            if (sub1 == null || sub1.getDeleted()){
                 throw new Exception("Wrong sub1 category code, cannot perform delete.");
             }
 
@@ -152,14 +164,12 @@ public class Sub1Service {
         return res;
     }
 
-    FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
-    private String generateCode(JpaRepository repo, DBEntityTemplate entity){
-        try {
-            return g.generateCode(repo,entity);
-        }catch (RepositoryEntityMismatchException e){
-            return null;
-        } catch (Exception e) {
-            return null;
+    private boolean checkWhetherSub1NameAlreadyExist(String name, String catId){
+        Integer numOfThisName = sub1Repository.countBudgetSub1NameByCategoryId(catId,name);
+        if (numOfThisName > 0){
+            return true;
         }
+        return false;
     }
+
 }
