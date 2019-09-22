@@ -1,16 +1,12 @@
 package capstone.is4103capstone.finance;
 
-import capstone.is4103capstone.admin.repository.CostCenterRepository;
 import capstone.is4103capstone.admin.repository.CountryRepository;
-import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.finance.Repository.*;
 import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
-import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -18,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class FinanceInit {
@@ -52,16 +47,16 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
-        String thisUser = "yingshi2502";
-        Country country = countryRepository.findCountryByCode("SG");
-
-        List<FXRecord> fxRecords = fxRecordRepository.findAll();
-        if(fxRecords == null || fxRecords.size() == 0){
-            createFXRecord(thisUser);
-            String catCode = createCategories(thisUser);
-            String sub2Code = createSubCategories(thisUser,catCode);
-            createMerchandise(thisUser,sub2Code);
-        }
+//        String thisUser = "yingshi2502";
+//        Country country = countryRepository.findCountryByCode("SG");
+//
+//        List<FXRecord> fxRecords = fxRecordRepository.findAll();
+//        if(fxRecords == null || fxRecords.size() == 0){
+//            createFXRecord(thisUser);
+//            String catCode = createCategories(thisUser);
+//            String sub2Code = createSubCategories(thisUser,catCode);
+//            createMerchandise(thisUser,sub2Code);
+//        }
     }
 
     public void createFXRecord(String userOps){
@@ -148,7 +143,7 @@ public class FinanceInit {
         Merchandise m = new Merchandise("Data Link","MER-DL-12","SG-TELECOM-DATA-DATA_LINK-SINGTEL","bps",thisUser);
         merchandiseRepository.save(m);
 
-        BudgetSub2 sub2 = budgetSub2Repository.getBudgetSub2ByCode(sub2Code);
+        BudgetSub2 sub2 = budgetSub2Repository.findBudgetSub2ByCode(sub2Code);
         System.out.println(sub2.getId());
         sub2.getMerchandises().size();
         sub2.getMerchandises().add(m);
