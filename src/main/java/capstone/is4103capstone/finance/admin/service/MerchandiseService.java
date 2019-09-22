@@ -137,7 +137,7 @@ public class MerchandiseService {
                 model = retrieveContractInformation(m,model);
                 mlist.add(model);
             }
-            return new MerchandiseListRes("Successfully retrieved merchandises under sub2["+sub2+"]",false,mlist,mlist.size());
+            return new MerchandiseListRes("Successfully retrieved merchandises under sub2["+sub2.getCode()+"]",false,mlist,mlist.size());
         }catch (Exception e){
             return new MerchandiseListRes(e.getMessage(),true);
         }
@@ -151,9 +151,15 @@ public class MerchandiseService {
             return basicModel;
         }
         Contract contract = contractRepository.findContractByCode(m.getCurrentContractCode());
+        if (contract == null || contractHasExpired(contract) || contract.getDeleted()){
+            logProblem("[Internal Error]Contract has problem, either incorrect code or expired contract, or contract is deleted");
+            basicModel.setHasActiveContract(false);
+            return basicModel;
+        }
+
         Optional<ContractLine> clOptional = contractLineRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
-        if (contract == null || contractHasExpired(contract) || !clOptional.isPresent()){
-            logProblem("[Internal Error]Contract has problem, either incorrect code or expired contract, or no such merchandise in the contract");
+        if (!clOptional.isPresent()){
+            logProblem("[Internal Error]No such merchandise in the contract");
             basicModel.setHasActiveContract(false);
             return basicModel;
         }
@@ -177,7 +183,10 @@ public class MerchandiseService {
 
     private boolean contractHasExpired(Contract c){
         Date today = new Date();
-        return c.getStartDate().compareTo(today) * today.compareTo(c.getEndDate()) > 0;
+        Date endDate = c.getEndDate() == null? new Date(Long.MAX_VALUE) : c.getEndDate();
+        int r1 = c.getStartDate().compareTo(today);
+        int r2 = today.compareTo(endDate);
+        return c.getStartDate().compareTo(today) * today.compareTo(endDate) < 0;
     }
 
     private void checkRepeatedName(String sub2Id, String vendorId, String name) throws Exception {

@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface ContractLineRepository extends JpaRepository<ContractLine, String> {
 
-    @Query(value = "SELECT * FROM contract_line cl WHERE cl.id_deleted=false AND cl.merchandise_code=?1 AND cl.contract=?2",nativeQuery = true)
+    @Query(value = "SELECT * FROM contract_line cl WHERE cl.is_deleted=false AND cl.merchandise_code=?1 AND cl.contract=?2",nativeQuery = true)
     Optional<ContractLine> findContractLineByMerchandiseCodeAndContractId(String merchandiseCode, String contractId);
 }
