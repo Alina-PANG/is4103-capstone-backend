@@ -46,6 +46,11 @@ public class Merchandise extends DBEntityTemplate {
     public Merchandise() {
     }
 
+    public Merchandise(String itemName, @NotNull String measureUnit) {
+        super(itemName);
+        this.measureUnit = measureUnit;
+    }
+
     public String getCurrentContractCode() {
         return currentContractCode;
     }

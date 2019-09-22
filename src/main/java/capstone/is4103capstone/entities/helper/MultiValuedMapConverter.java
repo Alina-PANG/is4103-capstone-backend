@@ -39,7 +39,14 @@ public class MultiValuedMapConverter implements AttributeConverter<MultiValuedMa
         if (dbData.length() == 0){
             return map;
         }
-        String[] pairs = dbData.split(OUTER_SEP);
+
+        String[] pairs;
+        if (dbData.contains(OUTER_SEP)){
+            pairs = dbData.split(OUTER_SEP);
+        }else{
+            pairs = new String[1];
+            pairs[0] = dbData;
+        }
 
         for (int i=0;i<pairs.length;i++){
             String[] permission_sid = pairs[i].split(INNER_SEP);
