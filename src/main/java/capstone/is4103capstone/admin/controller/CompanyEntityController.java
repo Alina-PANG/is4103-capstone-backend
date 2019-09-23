@@ -2,6 +2,7 @@ package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.service.CompanyEntityService;
 import capstone.is4103capstone.entities.Currency;
+import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,39 @@ public class CompanyEntityController {
     }
 
     // ===== END CURRENCY METHODS =====
+
+    // ===== START REGION METHODS =====
+    @PostMapping("/region")
+    public Region createRegion(@RequestBody Region region) {
+        return ces.createRegion(region);
+    }
+
+    @GetMapping("/region/{regionName}")
+    public Region getRegion(@PathVariable(name = "regionName", required = true) String regionName) {
+        try {
+            return ces.getRegionByName(regionName);
+        } catch (DbObjectNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Region with name " + regionName + " was not found.");
+        }
+    }
+
+    @GetMapping("/region")
+    public List<Region> getAllRegions() {
+        if (ces.getAllRegions().isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No regions are saved in the database.");
+        return ces.getAllRegions();
+    }
+
+    @PutMapping("/region")
+    public Region updateRegion(@RequestBody Region region) {
+        return ces.updateRegion(region);
+    }
+
+    @DeleteMapping("/region/{uuid}")
+    public ResponseEntity deleteRegion(@PathVariable(name = "uuid") String uuid) {
+        ces.deleteRegion(ces.getRegionByUuid(uuid));
+        return ResponseEntity.status(HttpStatus.OK).body("Region with UUID " + uuid + " was successfully deleted.");
+    }
 
     /*
     // ===== START COUNTRY METHODS =====

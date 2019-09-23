@@ -1,14 +1,18 @@
 package capstone.is4103capstone.admin.service;
 
+import capstone.is4103capstone.admin.model.req.CountryRestApiReq;
 import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.admin.repository.CurrencyRepository;
+import capstone.is4103capstone.admin.repository.RegionRepository;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Currency;
+import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +25,9 @@ public class CompanyEntityService {
 
     @Autowired
     CountryRepository countryRepository;
+
+    @Autowired
+    RegionRepository regionRepository;
 
     // ===== START CURRENCY METHODS =====
     public Currency createCurrency(Currency newCurrency) {
@@ -52,14 +59,63 @@ public class CompanyEntityService {
     }
 
     // ===== END CURRENCY METHODS =====
+
+    // ===== START REGION METHODS =====
+    public Region createRegion(Region input) {
+        Region toPersist = new Region();
+        toPersist.setObjectName(input.getObjectName());
+        toPersist.setCode(input.getCode());
+        return regionRepository.save(toPersist);
+    }
+
+    public List<Region> getAllRegions() {
+        List<Region> regionList = regionRepository.findAll();
+        if (regionList.isEmpty()) throw new DbObjectNotFoundException("No regions found.");
+        return regionList;
+    }
+
+    public Region getRegionByName(String regionName) {
+        Region region = regionRepository.getRegionByObjectName(regionName);
+        if (Objects.isNull(region))
+            throw new DbObjectNotFoundException("Region with name " + regionName + " was not found.");
+        return region;
+    }
+
+    public Region getRegionByUuid(String uuid) {
+        try {
+            Region region = regionRepository.getOne(uuid);
+            return region;
+        } catch (IllegalArgumentException ex) {
+            throw new DbObjectNotFoundException("Region with UUID " + uuid + " was not found.");
+        }
+    }
+
+    @Transactional
+    public Region updateRegion(Region regionToChange) throws EntityNotFoundException {
+        Region workingRegion = regionRepository.getOne(regionToChange.getId());
+        workingRegion.setObjectName(regionToChange.getObjectName());
+        workingRegion.setCode(regionToChange.getCode());
+        return workingRegion;
+    }
+
+    @Transactional
+    public boolean deleteRegion(Region region) {
+        try {
+            regionRepository.getOne(region.getId()).setDeleted(true);
+            return true;
+        } catch (IllegalArgumentException ex) {
+            throw new DbObjectNotFoundException("Object not found!");
+        }
+    }
+
     // ===== START COUNTRY METHODS =====
-    public Country createCountry(Country countryReq) {
+    public Country createCountry(CountryRestApiReq countryReq) {
         Country newCountry = new Country();
-        newCountry.setObjectName(countryReq.getObjectName());
-        newCountry.setRegion(countryReq.getRegion());
-        newCountry.setCode(countryReq.getCode());
+        newCountry.setObjectName(countryReq.getName());
+        newCountry.setCode(countryReq.getCountryCode());
         return countryRepository.save(newCountry);
     }
+
 
     public List<Country> getAllCountries() {
         return countryRepository.findAll();
