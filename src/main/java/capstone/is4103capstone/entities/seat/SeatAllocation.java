@@ -15,7 +15,6 @@ import java.util.List;
 @Table
 public class SeatAllocation extends DBEntityTemplate {
 
-    private SeatTypeEnum seatType = SeatTypeEnum.FIXED;
 
     @OneToOne
     private Schedule schedule;
@@ -33,39 +32,27 @@ public class SeatAllocation extends DBEntityTemplate {
         this.setCreatedDateTime(new Date());
     }
 
-    public SeatAllocation(SeatTypeEnum seatType, Schedule schedule, Seat seat, Employee employee) {
-        this.seatType = seatType;
+    public SeatAllocation(Schedule schedule, Seat seat, Employee employee) {
         this.schedule = schedule;
         this.seat = seat;
         this.employee = employee;
         this.setCreatedDateTime(new Date());
     }
 
-    public SeatAllocation(String objectName, String code, String hierachyPath, SeatTypeEnum seatType, Schedule schedule, Seat seat, Employee employee) {
+    public SeatAllocation(String objectName, String code, String hierachyPath, Schedule schedule, Seat seat, Employee employee) {
         super(objectName, code, hierachyPath);
-        this.seatType = seatType;
         this.schedule = schedule;
         this.seat = seat;
         this.employee = employee;
         this.setCreatedDateTime(new Date());
     }
 
-    public SeatAllocation(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, SeatTypeEnum seatType, Schedule schedule, Seat seat, Employee employee) {
+    public SeatAllocation(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Schedule schedule, Seat seat, Employee employee) {
         super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
-        this.seatType = seatType;
         this.schedule = schedule;
         this.seat = seat;
         this.employee = employee;
         this.setCreatedDateTime(new Date());
-    }
-
-    public SeatTypeEnum getSeatType() {
-        return seatType;
-    }
-
-    public void setSeatType(SeatTypeEnum seatType) {
-        this.seatType = seatType;
-        this.setLastModifiedDateTime(new Date());
     }
 
     public Schedule getSchedule() {

@@ -1,6 +1,8 @@
 package capstone.is4103capstone.entities.seat;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.CompanyFunction;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -29,6 +31,15 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     @Min(1)
     private Integer serialNumber;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "function_id")
+    @JsonIgnore
+    private CompanyFunction functionAssigned;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    @JsonIgnore
+    private Team teamAssigned;
+
     @OneToOne
     private SeatAllocation currentOccupancy;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,9 +47,9 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     @JsonIgnore
     private SeatMap seatMap;
     private String originalSeatMapId;
-    @OneToMany(mappedBy = "seat")
+    @OneToMany(mappedBy = "seat", fetch = FetchType.LAZY)
     private List<SeatAllocation> activeSeatAllocations = new ArrayList<>();
-    @OneToMany(mappedBy = "seat")
+    @OneToMany(mappedBy = "seat", fetch = FetchType.LAZY)
     private List<SeatAllocation> inactiveSeatAllocations = new ArrayList<>();
 
     public Seat() {
@@ -91,6 +102,26 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     public void setSerialNumber(Integer serialNumber) {
         this.serialNumber = serialNumber;
         this.setLastModifiedDateTime(new Date());
+    }
+
+    public CompanyFunction getFunctionAssigned() {
+        return functionAssigned;
+    }
+
+    public void setFunctionAssigned(CompanyFunction functionAssigned) {
+        this.functionAssigned = functionAssigned;
+    }
+
+    public Team getTeamAssigned() {
+        return teamAssigned;
+    }
+
+    public void setTeamAssigned(Team teamAssigned) {
+        this.teamAssigned = teamAssigned;
+    }
+
+    public String getOriginalSeatMapId() {
+        return originalSeatMapId;
     }
 
     public SeatMap getSeatMap() {
