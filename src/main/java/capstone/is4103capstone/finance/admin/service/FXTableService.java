@@ -80,6 +80,10 @@ public class FXTableService {
             List<FXRecordModel> records = new ArrayList<>();
             List<FXRecord> fxUnderContraints = fxRecordRepository.findAllWithConstraints(req.getBaseCurr(),req.getPriceCurr(),startDate,endDate);
 
+            if (fxUnderContraints.size()==0){
+                throw new Exception("No FX exchange records match your search. ");
+            }
+
             FXRecordModel model;
             for (FXRecord fx:fxUnderContraints){
                 String efctStr = formatter.format(fx.getEffectiveDate());

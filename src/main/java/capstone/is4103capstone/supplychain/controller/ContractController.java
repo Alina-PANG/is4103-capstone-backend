@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/contract")
@@ -31,6 +28,32 @@ public class ContractController {
         } else {
             return ResponseEntity
                     .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
+
+    @GetMapping("/getContract/{id}")
+    public ResponseEntity<GeneralRes> getContract(@PathVariable("id") String id, @RequestParam(name = "username", required = true) String username){
+        if (Authentication.authenticateUser(username)) {
+            return ResponseEntity
+                    .ok()
+                    .body(contractService.getContract(id));
+        }else{
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
+
+    @PostMapping("/updateContract/{id}")
+    public ResponseEntity<GeneralRes> updateContract(@RequestBody CreateContractReq updateContractReq, @PathVariable("id") String id) {
+        if (Authentication.authenticateUser(updateContractReq.getModifierUsername())) {
+            return ResponseEntity
+                    .ok()
+                    .body(contractService.UpdateContract(updateContractReq, id));
+        } else {
+            return ResponseEntity
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
