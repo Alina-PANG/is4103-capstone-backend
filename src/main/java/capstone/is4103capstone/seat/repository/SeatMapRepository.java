@@ -14,6 +14,9 @@ public interface SeatMapRepository extends JpaRepository<SeatMap, String> {
     @Query(value = "SELECT * FROM seat_map s WHERE s.id = ?1 AND s.is_deleted=false", nativeQuery = true)
     Optional<SeatMap> findById(String id);
 
+    @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.office_id=?1 AND s.floor=?2", nativeQuery = true)
+    List<SeatMap> findByOfficeIdAndFloor(String officeId, String floor);
+
     @Override
     @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false", nativeQuery = true)
     List<SeatMap> findAll();

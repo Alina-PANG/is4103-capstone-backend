@@ -18,7 +18,7 @@ public class Team extends DBEntityTemplate {
     @JsonIgnore
     private CompanyFunction function;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "team_employee",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id")

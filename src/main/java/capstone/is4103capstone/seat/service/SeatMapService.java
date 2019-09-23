@@ -95,6 +95,13 @@ public class SeatMapService {
         newSeatMap.setCode(countryCode + "-" + officeCode + "-" + newSeatMap.getFloor());
         newSeatMap = seatMapRepository.save(newSeatMap);
 
+        // Update numOfFloors in office if needed
+        if (!office.getFloors().contains(newSeatMap.getFloor())) {
+            office.getFloors().add(newSeatMap.getFloor());
+            office.setNumOfFloors(office.getFloors().size());
+            officeRepository.save(office);
+        }
+
         refreshSeatCode(newSeatMap);
 
         for (Seat seat: newSeatMap.getSeats()) {
@@ -249,6 +256,15 @@ public class SeatMapService {
             seat.setDeleted(true);
             seat.setCode(null);
             seatRepository.save(seat);
+        }
+
+        Office office = seatMap.getOffice();
+
+        // Update numOfFloors in office if needed
+        if (seatMapRepository.findByOfficeIdAndFloor(office.getId(), seatMap.getFloor()).size() <= 1) {
+            office.getFloors().remove(seatMap.getFloor());
+            office.setNumOfFloors(office.getFloors().size());
+            officeRepository.save(office);
         }
 
         seatMap.setDeleted(true);
