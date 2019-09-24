@@ -26,57 +26,37 @@ public class SeatAllocationController {
 
     @PostMapping("/function")
     public ResponseEntity allocateSeatsToFunction(@RequestBody SeatAllocationModelForFunction seatAllocationModelForFunction) {
-        try {
-            seatAllocationService.allocateSeatsToFunction(seatAllocationModelForFunction);
-            return ResponseEntity.ok("Allocated Seats to the function successfully");
-        } catch (SeatAllocationException ex) {
-            CustomErrorRes error = new CustomErrorRes();
-            error.setTimestamp(LocalDateTime.now());
-            error.setError(ex.getMessage());
-            error.setStatus(HttpStatus.BAD_REQUEST.value());
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
+        seatAllocationService.allocateSeatsToFunction(seatAllocationModelForFunction);
+        return ResponseEntity.ok("Allocated Seats to the function successfully");
     }
 
     @PostMapping("/team")
     public ResponseEntity allocateSeatsToTeam(@RequestBody SeatAllocationModelForTeam seatAllocationModelForTeam) {
-        try {
-            seatAllocationService.allocateSeatsToTeam(seatAllocationModelForTeam);
-            return ResponseEntity.ok("Allocated Seats to the team successfully");
-        } catch (SeatAllocationException ex) {
-            CustomErrorRes error = new CustomErrorRes();
-            error.setTimestamp(LocalDateTime.now());
-            error.setError(ex.getMessage());
-            error.setStatus(HttpStatus.BAD_REQUEST.value());
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
+        seatAllocationService.allocateSeatsToTeam(seatAllocationModelForTeam);
+        return ResponseEntity.ok("Allocated Seats to the team successfully");
     }
 
     @DeleteMapping("/function")
     public ResponseEntity deallocateSeatsFromFunction(@RequestBody List<SeatModelForAllocation> seatModels) {
-        try {
-            seatAllocationService.deallocateSeatsFromFunction(seatModels);
-            return ResponseEntity.ok("Deallocated seats from the function successfully");
-        } catch (SeatAllocationException ex) {
-            CustomErrorRes error = new CustomErrorRes();
-            error.setTimestamp(LocalDateTime.now());
-            error.setError(ex.getMessage());
-            error.setStatus(HttpStatus.BAD_REQUEST.value());
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
+        seatAllocationService.deallocateSeatsFromFunction(seatModels);
+        return ResponseEntity.ok("Deallocated seats from the function successfully");
     }
 
     @DeleteMapping("/team")
     public ResponseEntity deallocateSeatsFromTeam(@RequestBody List<SeatModelForAllocation> seatModels) {
-        try {
-            seatAllocationService.deallocateSeatsFromTeam(seatModels);
-            return ResponseEntity.ok("Deallocated seats from the team successfully");
-        } catch (SeatAllocationException ex) {
-            CustomErrorRes error = new CustomErrorRes();
-            error.setTimestamp(LocalDateTime.now());
-            error.setError(ex.getMessage());
-            error.setStatus(HttpStatus.BAD_REQUEST.value());
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        }
+        seatAllocationService.deallocateSeatsFromTeam(seatModels);
+        return ResponseEntity.ok("Deallocated seats from the team successfully");
+    }
+
+    @PostMapping("/hotdesk")
+    public ResponseEntity assignHotDesks(@RequestBody SeatModelForAllocation seatModelForAllocation) {
+        seatAllocationService.assignHotDesk(seatModelForAllocation);
+        return ResponseEntity.ok("Assigned hot desk successfully");
+    }
+
+    @PostMapping("/fixed")
+    public ResponseEntity assignFixedSeatToEmployee(@RequestBody SeatModelForAllocation seatModelForAllocation) {
+        seatAllocationService.assignFixedSeatToEmployee(seatModelForAllocation);
+        return ResponseEntity.ok("Assigned fixed seat successfully");
     }
 }

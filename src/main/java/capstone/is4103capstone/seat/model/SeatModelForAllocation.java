@@ -6,18 +6,26 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class SeatModelForAllocation {
     private String id;
     private String code;
-    private String functionAssigned;
-    private String teamAssigned;
+    private String type;
+
+    private EmployeeModel employee;
+    private GroupModel functionAssigned;
+    private GroupModel teamAssigned;
+
+    private ScheduleModel schedule;
     private boolean hasAllocation;
 
     public SeatModelForAllocation() {
     }
 
-    public SeatModelForAllocation(String id, String code, String functionAssigned, String teamAssigned, boolean hasAllocation) {
+    public SeatModelForAllocation(String id, String code, String type, EmployeeModel employee, GroupModel functionAssigned, GroupModel teamAssigned, ScheduleModel schedule, boolean hasAllocation) {
         this.id = id;
         this.code = code;
+        this.type = type;
+        this.employee = employee;
         this.functionAssigned = functionAssigned;
         this.teamAssigned = teamAssigned;
+        this.schedule = schedule;
         this.hasAllocation = hasAllocation;
     }
 
@@ -37,20 +45,44 @@ public class SeatModelForAllocation {
         this.code = code;
     }
 
-    public String getFunctionAssigned() {
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public EmployeeModel getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(EmployeeModel employee) {
+        this.employee = employee;
+    }
+
+    public GroupModel getFunctionAssigned() {
         return functionAssigned;
     }
 
-    public void setFunctionAssigned(String functionAssigned) {
+    public void setFunctionAssigned(GroupModel functionAssigned) {
         this.functionAssigned = functionAssigned;
     }
 
-    public String getTeamAssigned() {
+    public GroupModel getTeamAssigned() {
         return teamAssigned;
     }
 
-    public void setTeamAssigned(String teamAssigned) {
+    public void setTeamAssigned(GroupModel teamAssigned) {
         this.teamAssigned = teamAssigned;
+    }
+
+    public ScheduleModel getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(ScheduleModel schedule) {
+        this.schedule = schedule;
     }
 
     public boolean isHasAllocation() {
