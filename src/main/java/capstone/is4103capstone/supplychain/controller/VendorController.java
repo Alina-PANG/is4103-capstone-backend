@@ -5,6 +5,7 @@ import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
 import capstone.is4103capstone.supplychain.service.VendorService;
+import com.sun.tools.javah.Gen;
 import org.hibernate.annotations.GeneratorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,19 @@ public class VendorController {
             return ResponseEntity
                     .ok()
                     .body(vendorService.getVendor(id));
+        }else{
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
+
+    @GetMapping("/get-all-vendors")
+    public  ResponseEntity<GeneralRes> getAllVendors(@RequestParam(name = "username", required = true) String username){
+        if (Authentication.authenticateUser(username)) {
+            return ResponseEntity
+                    .ok()
+                    .body(vendorService.getAllVendors());
         }else{
             return ResponseEntity
                     .ok()

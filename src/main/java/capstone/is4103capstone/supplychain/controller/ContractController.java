@@ -57,4 +57,17 @@ public class ContractController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
+
+    @GetMapping("/get-all-contracts")
+    public  ResponseEntity<GeneralRes> getAllContract(@RequestParam(name = "username", required = true) String username){
+        if (Authentication.authenticateUser(username)) {
+            return ResponseEntity
+                    .ok()
+                    .body(contractService.getAllContracts());
+        }else{
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
 }

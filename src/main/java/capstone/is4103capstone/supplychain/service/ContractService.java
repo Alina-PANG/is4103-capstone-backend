@@ -12,6 +12,8 @@ import capstone.is4103capstone.supplychain.Repository.ContractLineRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
+import capstone.is4103capstone.supplychain.model.res.GetAllContractsRes;
+import capstone.is4103capstone.supplychain.model.res.GetAllVendorsRes;
 import capstone.is4103capstone.supplychain.model.res.GetContractRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,11 +90,23 @@ public class ContractService {
             if(contract == null){
                 return new GetContractRes("There is no contract in the database with id " + id, true, null);
             }else{
-                return new GetContractRes("Successfullt retrieved the contract with id " + id, false, null);
+                return new GetContractRes("Successfullt retrieved the contract with id " + id, false, contract);
             }
         }catch(Exception ex){
             ex.printStackTrace();
             return new GetContractRes("An unexpected error happens: "+ex.getMessage(), true, null);
+        }
+    }
+
+    public GetAllContractsRes getAllContracts(){
+        try {
+            logger.info("Getting all contracts");
+            List<Contract> contractList = contractRepository.findAll();
+
+            return new GetAllContractsRes("Successfully retrieved all contracts", false, contractList);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return new GetAllContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 

@@ -4,6 +4,7 @@ import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
+import capstone.is4103capstone.supplychain.model.res.GetAllVendorsRes;
 import capstone.is4103capstone.supplychain.model.res.GetVendorRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class VendorService {
@@ -59,6 +61,17 @@ public class VendorService {
         }
     }
 
+    public GetAllVendorsRes getAllVendors(){
+        try {
+            logger.info("Getting all vendors");
+            List<Vendor> vendorList = vendorRepository.findAll();
+
+            return new GetAllVendorsRes("Successfully retrieved all vendors", false, vendorList);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return new GetAllVendorsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+        }
+    }
 
     public GeneralRes updateVendor(CreateVendorReq updateVendorReq, String id){
         try{
