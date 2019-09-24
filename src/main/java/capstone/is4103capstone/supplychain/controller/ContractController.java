@@ -19,7 +19,7 @@ public class ContractController {
     @Autowired
     private ContractService contractService;
 
-    @PostMapping("/createContract")
+    @PostMapping("/create-contract")
     public ResponseEntity<GeneralRes> createContract(@RequestBody CreateContractReq createContractReq) {
         if (Authentication.authenticateUser(createContractReq.getModifierUsername())) {
             return ResponseEntity
@@ -32,7 +32,7 @@ public class ContractController {
         }
     }
 
-    @GetMapping("/getContract/{id}")
+    @GetMapping("/get-contract/{id}")
     public ResponseEntity<GeneralRes> getContract(@PathVariable("id") String id, @RequestParam(name = "username", required = true) String username){
         if (Authentication.authenticateUser(username)) {
             return ResponseEntity
@@ -45,7 +45,7 @@ public class ContractController {
         }
     }
 
-    @PostMapping("/updateContract/{id}")
+    @PostMapping("/update-contract/{id}")
     public ResponseEntity<GeneralRes> updateContract(@RequestBody CreateContractReq updateContractReq, @PathVariable("id") String id) {
         if (Authentication.authenticateUser(updateContractReq.getModifierUsername())) {
             return ResponseEntity

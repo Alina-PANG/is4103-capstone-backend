@@ -20,7 +20,7 @@ public class VendorController {
     @Autowired
     private VendorService vendorService;
 
-    @PostMapping("/createBudget")
+    @PostMapping("/create-budget")
     public ResponseEntity<GeneralRes> createVendor(@RequestBody CreateVendorReq createVendorReq) {
         if (Authentication.authenticateUser(createVendorReq.getUsername())) {
             return ResponseEntity
@@ -33,7 +33,7 @@ public class VendorController {
         }
     }
 
-    @PostMapping("/updateVendor/{id}")
+    @PostMapping("/update-vendor/{id}")
     public ResponseEntity<GeneralRes> updateVendor(@RequestBody CreateVendorReq updateVendorReq, @PathVariable("id") String id) {
         if (Authentication.authenticateUser(updateVendorReq.getUsername())) {
             return ResponseEntity
@@ -46,7 +46,7 @@ public class VendorController {
         }
     }
 
-    @GetMapping("/getVendor/{id}")
+    @GetMapping("/get-vendor/{id}")
     public ResponseEntity<GeneralRes> getVendor(@PathVariable("id") String id, @RequestParam(name = "username", required = true) String username) {
         if (Authentication.authenticateUser(username)) {
             return ResponseEntity
