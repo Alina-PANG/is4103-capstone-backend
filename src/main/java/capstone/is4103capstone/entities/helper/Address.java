@@ -16,18 +16,15 @@ public class Address {
 
     private String countryCode;
 
-    private String regionCode;
-
     public Address() {
     }
 
-    public Address(String addressLine1, String addressLine2, String postalCode, String city, String countryCode, String regionCode) {
+    public Address(String addressLine1, String addressLine2, String postalCode, String city, String countryCode) {
         this.addressLine1 = addressLine1;
         this.addressLine2 = addressLine2;
         this.postalCode = postalCode;
         this.city = city;
         this.countryCode = countryCode;
-        this.regionCode = regionCode;
     }
 
     public String getAddressLine1() {
@@ -68,13 +65,5 @@ public class Address {
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
-    }
-
-    public String getRegionCode() {
-        return regionCode;
-    }
-
-    public void setRegionCode(String regionCode) {
-        this.regionCode = regionCode;
     }
 }
