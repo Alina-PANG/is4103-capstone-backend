@@ -85,6 +85,7 @@ public class Employee extends DBEntityTemplate {
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
     public Employee() {
+        this.securityId = "S-" + UUID.randomUUID();
     }
 
     public Employee(String userName, String firstName, String lastName, String middleName, String password) {
@@ -265,7 +266,7 @@ public class Employee extends DBEntityTemplate {
     public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
         this.outsourcingAssessmentList = outsourcingAssessmentList;
     }
-    
+
     public String getSecurityId() {
         return securityId;
     }
