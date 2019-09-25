@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PlanRepository extends JpaRepository<Plan,String> {
-    @Query(value = "SELECT * FROM Plan p WHERE p.created_by=?1 AND p.planType=?2 AND p.objectName=?3 AND p.isDeleted=false AND p.budgetPlanStatus='DRAFT'", nativeQuery = true)
-    Plan findMostRecentPlanDraft(String username, String type, String name);
 
+//    @Query(value = "SELECT * FROM Plan p WHERE p.cost_center_id = ?1")
+    List<Plan> findByCostCenterId(String id);
 
 }

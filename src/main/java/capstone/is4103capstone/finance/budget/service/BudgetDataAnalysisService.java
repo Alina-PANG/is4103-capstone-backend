@@ -61,15 +61,4 @@ public class BudgetDataAnalysisService {
         List<PlanLineItem> planLineItems = p.getLineItems();
         return budgetLineItemService.convertPlanLineItemToList(planLineItems);
     }
-
-    // ======== TODO ============ //
-
-    public GeneralRes aggregateBudgetLineItem(BudgetDataAnalysisReq budgetDataAnalysisReq){
-        return null;
-    }
-
-    private List<ArrayList<String>> retrieveContentFromDb(BudgetDataAnalysisReq budgetDataAnalysisReq) throws Exception{
-        List<PlanLineItem> items = budgetLineItemService.filterPlanItem(budgetDataAnalysisReq.getCols(), budgetDataAnalysisReq.getColsRestriction());
-        return budgetLineItemService.convertPlanLineItemToList(items, budgetDataAnalysisReq.getColsToShow());
-    }
 }

@@ -64,17 +64,4 @@ public class BudgetDataAnalysisController {
         }
     }
 
-    // ======== TODO ============ //
-
-    @GetMapping(value = "/aggregation")
-    public ResponseEntity<Object> aggregateData(@RequestBody BudgetDataAnalysisReq budgetDataAnalysisReq) {
-        if(Authentication.authenticateUser(budgetDataAnalysisReq.getUsername()))
-            return ResponseEntity
-                    .ok()
-                    .body(budgetDataAnalysisService.aggregateBudgetLineItem(budgetDataAnalysisReq));
-        else
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-    }
 }
