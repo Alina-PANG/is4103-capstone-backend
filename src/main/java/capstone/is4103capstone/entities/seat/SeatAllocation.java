@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -29,6 +30,7 @@ public class SeatAllocation extends DBEntityTemplate {
     private Employee employee;
 
     public SeatAllocation(){
+        this.setCreatedDateTime(new Date());
     }
 
     public SeatAllocation(SeatTypeEnum seatType, Schedule schedule, Seat seat, Employee employee) {
@@ -36,6 +38,7 @@ public class SeatAllocation extends DBEntityTemplate {
         this.schedule = schedule;
         this.seat = seat;
         this.employee = employee;
+        this.setCreatedDateTime(new Date());
     }
 
     public SeatAllocation(String objectName, String code, String hierachyPath, SeatTypeEnum seatType, Schedule schedule, Seat seat, Employee employee) {
@@ -44,6 +47,7 @@ public class SeatAllocation extends DBEntityTemplate {
         this.schedule = schedule;
         this.seat = seat;
         this.employee = employee;
+        this.setCreatedDateTime(new Date());
     }
 
     public SeatAllocation(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, SeatTypeEnum seatType, Schedule schedule, Seat seat, Employee employee) {
@@ -52,6 +56,7 @@ public class SeatAllocation extends DBEntityTemplate {
         this.schedule = schedule;
         this.seat = seat;
         this.employee = employee;
+        this.setCreatedDateTime(new Date());
     }
 
     public SeatTypeEnum getSeatType() {
@@ -60,6 +65,7 @@ public class SeatAllocation extends DBEntityTemplate {
 
     public void setSeatType(SeatTypeEnum seatType) {
         this.seatType = seatType;
+        this.setLastModifiedDateTime(new Date());
     }
 
     public Schedule getSchedule() {
@@ -68,6 +74,7 @@ public class SeatAllocation extends DBEntityTemplate {
 
     public void setSchedule(Schedule schedule) {
         this.schedule = schedule;
+        this.setLastModifiedDateTime(new Date());
     }
 
     public Seat getSeat() {
@@ -76,6 +83,7 @@ public class SeatAllocation extends DBEntityTemplate {
 
     public void setSeat(Seat seat) {
         this.seat = seat;
+        this.setLastModifiedDateTime(new Date());
     }
 
     public Employee getEmployee() {
@@ -84,5 +92,6 @@ public class SeatAllocation extends DBEntityTemplate {
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
+        this.setLastModifiedDateTime(new Date());
     }
 }

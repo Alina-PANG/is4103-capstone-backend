@@ -13,4 +13,7 @@ public interface BudgetCategoryRepository extends JpaRepository<BudgetCategory,S
     List<BudgetCategory> findBudgetCategoriesByCountry_Id(String countryId);
 
     BudgetCategory findBudgetCategoryByCode(String code);
+
+    @Query(value = "SELECT COUNT(*) FROM budget_category cat WHERE cat.is_deleted=false and cat.country_id=?1 and UPPER(cat.object_name)=UPPER(?2)",nativeQuery = true)
+    Integer countCategoryNameByCountryId(String countryId,String newName);
 }

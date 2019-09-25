@@ -53,6 +53,7 @@ public class FinanceTestCodeHPGeneration {
 
     @PostConstruct
     public void financeInit() {
+
 //        System.out.println(getClass().getSimpleName());
 //        fxRecordCode();
 //        approvalForRequestCode();
