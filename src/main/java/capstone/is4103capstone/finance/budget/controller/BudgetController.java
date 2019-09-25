@@ -46,7 +46,7 @@ public class BudgetController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @GetMapping("/getBudget/{id}")
+    @GetMapping("/getBudgetDetails/{id}")
     public ResponseEntity<GeneralRes> getBudget(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username){
         if(Authentication.authenticateUser(username))
             return ResponseEntity.ok().body(budgetService.getBudget(id));
@@ -57,11 +57,11 @@ public class BudgetController {
     }
 
     @GetMapping("/getBudgetList/{costcenterId}")
-    public ResponseEntity<GeneralRes> getPendingBudgetList(@PathVariable("costcenterId") String costcenterId, @RequestParam(name="username", required=true) String username, @RequestParam(name="type", required=true) boolean isBudget){
+    public ResponseEntity<GeneralRes> getPendingBudgetList(@PathVariable("costcenterId") String costcenterId, @RequestParam(name="username", required=true) String username, @RequestParam(name="type") Integer retrieveType, @RequestParam(name="year") Integer year){
         if(Authentication.authenticateUser(username))
             return ResponseEntity
                     .ok()
-                    .body(budgetService.getBudgetList(costcenterId, username, isBudget));
+                    .body(budgetService.getBudgetList(costcenterId, username, retrieveType,year));
         else
             return ResponseEntity
                     .badRequest()

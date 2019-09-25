@@ -23,13 +23,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class BudgetService {
@@ -42,6 +40,9 @@ public class BudgetService {
     CostCenterRepository costCenterRepository;
     @Autowired
     MerchandiseRepository merchandiseRepository;
+
+    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
     private String generateCode(JpaRepository repo, DBEntityTemplate entity){
@@ -101,6 +102,9 @@ public class BudgetService {
             }
             else{
                 newPlan.setPlanType(BudgetPlanEnum.REFORECAST);
+                if (createBudgetReq.getMonth() == null){
+                    throw new Exception("You must select the month of reforecast!");
+                }
                 newPlan.setObjectName(createBudgetReq.getYear()+"-"+createBudgetReq.getMonth()+"-REFORECAST");
             }
             CostCenter cc = costCenterRepository.findCostCenterByCode(createBudgetReq.getCostCenterCode());
@@ -111,13 +115,13 @@ public class BudgetService {
             newPlan.setForMonth(createBudgetReq.getMonth());
             newPlan.setForYear(createBudgetReq.getYear());
             newPlan.setCreatedBy(createBudgetReq.getUsername());
-            newPlan.setCreatedDateTime(new Date());
-            newPlan.setDeleted(false);
-            Plan p = planRepository.saveAndFlush(newPlan);
+
+            newPlan = planRepository.saveAndFlush(newPlan);
             if(createBudgetReq.getItems() != null && createBudgetReq.getItems().size() != 0){
-                List<PlanLineItem> newItems = saveLineItem(createBudgetReq.getItems(), p);
-                p.setLineItems(newItems);
+                List<PlanLineItem> newItems = saveLineItem(createBudgetReq.getItems(), newPlan);
+                newPlan.setLineItems(newItems);
             }
+
 
             newPlan.setHierachyPath(g.getPlanHP(newPlan,cc));
             planRepository.saveAndFlush(newPlan);
@@ -136,8 +140,15 @@ public class BudgetService {
         try{
             logger.info("Getting plan with id "+id+"...");
             Plan p = planRepository.getOne(id);
+            if(p == null){
+                return new GetBudgetRes("There is no plan in the database with id "+id, true, null);
+            }
+
             List<BudgetLineItemModel> items = new ArrayList<>();
-            BudgetModel budget = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), id, p.getBudgetPlanStatus());
+            BudgetModel plan = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), id, p.getBudgetPlanStatus(),p.getPlanType());
+            plan.setCreateBy(p.getCreatedBy());
+            plan.setLastModifiedTime(datetimeFormatter.format(p.getLastModifiedDateTime() == null ? p.getCreatedDateTime() : p.getLastModifiedDateTime()));
+
             for(int i = 0; i < p.getLineItems().size(); i ++){
                 PlanLineItem item = p.getLineItems().get(i);
                 Merchandise m = merchandiseRepository.findMerchandiseByCode(item.getMerchandiseCode());
@@ -150,34 +161,41 @@ public class BudgetService {
                 System.out.println("category: "+budgetCategory.getCode());
                 items.add(new BudgetLineItemModel(item.getId(), budgetCategory.getObjectName(), budgetCategory.getCode(), budgetSub1.getObjectName(), budgetSub1.getCode(), budgetSub2.getObjectName(), budgetSub2.getCode(), m.getObjectName(), m.getCode(), item.getBudgetAmount(), item.getCurrencyAbbr(), item.getComment()));
             }
-            if(p == null){
-                return new GetBudgetRes("There is no plan in the database with id "+id, true, null);
-            }
-            budget.setItems(items);
-            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, budget);
+
+            plan.setItems(items);
+
+            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan);
         } catch(Exception ex){
             ex.printStackTrace();
             return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 
-    public GetBudgetListRes getBudgetList(String costcenterId, String username, boolean isBudget){
+    public GetBudgetListRes getBudgetList(String costcenterId, String username, Integer retrieveType, Integer year){
+        //retrieveType: by default: null or 0: all, 1-budget, 2-reforecast
         try{
+            if (retrieveType != null && (retrieveType > 2 || retrieveType < 0))
+                throw new Exception("Retrieve Type can only take value 0,1,2");
+
+
             List<Plan> plans = planRepository.findByCostCenterId(costcenterId);
             List<BudgetModel> result = new ArrayList<>();
-            BudgetPlanEnum budgetPlanEnum = BudgetPlanEnum.REFORECAST;
-            if(isBudget) budgetPlanEnum = BudgetPlanEnum.BUDGET;
-            logger.info("Req: username: "+username+" plan type: "+budgetPlanEnum);
+
+
+            logger.info("Req: username: "+username+" plan type: "+retrieveType);
             for(Plan p: plans){
-                if(p.getCreatedBy() == null || p.getBudgetPlanStatus() == null || p.getPlanType() == null) continue;
-                if(!p.getDeleted() && p.getPlanType() == budgetPlanEnum){
-                    result.add(new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), p.getId(), p.getBudgetPlanStatus()));
+                if(p.getDeleted() || p.getCreatedBy() == null || p.getBudgetPlanStatus() == null || p.getPlanType() == null) continue;
+                if(checkPlanTypeAndYear(p,retrieveType,year)){
+                    BudgetModel thisPlan = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), p.getId(), p.getBudgetPlanStatus(),p.getPlanType());
+                    thisPlan.setCreateBy(p.getCreatedBy());
+                    thisPlan.setLastModifiedTime(datetimeFormatter.format(p.getLastModifiedDateTime() == null ? p.getCreatedDateTime() : p.getLastModifiedDateTime()));
+                    result.add(thisPlan);
                 }
             }
             if(result.size() == 0){
-                return new GetBudgetListRes("There is no "+budgetPlanEnum+" plan to view!", true, null);
+                return new GetBudgetListRes("There is no plan to view according to the search type!", true, null);
             }
-            return new GetBudgetListRes("Successsfully retrieved your pending plans!",false, result);
+            return new GetBudgetListRes("Successsfully retrieved plans under the cost center!",false, result);
         } catch(Exception ex){
             ex.printStackTrace();
             return new GetBudgetListRes("An unexpected error happens: "+ex.getMessage(), true, null);
@@ -199,6 +217,29 @@ public class BudgetService {
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
         }
+    }
+
+    private boolean checkPlanTypeAndYear(Plan p, Integer request, Integer year){
+        boolean passRequest = false;
+        boolean passYear = false;
+        if (request == null || request.equals(0)){
+            passRequest = true;
+        }
+        if (request.equals(1)){
+            passRequest = p.getPlanType() == BudgetPlanEnum.BUDGET;
+        }else if (request.equals(2)){
+            passRequest = p.getPlanType() == BudgetPlanEnum.REFORECAST;
+        }
+
+        if (year == 0) {
+            passYear = true;
+        }else {
+            passYear = (year.equals(p.getForYear()));
+        }
+        return passRequest && passYear;
+
+
+
     }
 }
 

@@ -13,6 +13,7 @@ public class CreateBudgetReq implements Serializable {
     private Boolean isBudget; // planType
     private String costCenterCode;
     private Integer month;
+
     private String description;
 
     public Integer getMonth() {

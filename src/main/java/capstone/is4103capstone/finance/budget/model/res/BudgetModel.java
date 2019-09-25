@@ -1,5 +1,6 @@
 package capstone.is4103capstone.finance.budget.model.res;
 
+import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 
 import java.util.List;
@@ -11,16 +12,55 @@ public class BudgetModel {
     private String name;
     private String id;
     private BudgetPlanStatusEnum budgetPlanStatus;
+    private BudgetPlanEnum planType;
+    private String createBy;
+    private String lastModifiedTime;
 
     public BudgetModel() {
     }
 
-    public BudgetModel(Integer forYear, Integer forMonth, String name, String id, BudgetPlanStatusEnum budgetPlanStatus) {
+    public BudgetModel(Integer forYear, Integer forMonth, String name, String id, BudgetPlanStatusEnum budgetPlanStatus, BudgetPlanEnum planType) {
         this.forYear = forYear;
         this.forMonth = forMonth;
         this.name = name;
         this.id = id;
         this.budgetPlanStatus = budgetPlanStatus;
+        this.planType = planType;
+    }
+
+    public BudgetModel(Integer forYear, Integer forMonth, String name, String id, BudgetPlanStatusEnum budgetPlanStatus, BudgetPlanEnum planType, String createBy, String lastModifiedTime) {
+        this.forYear = forYear;
+        this.forMonth = forMonth;
+        this.name = name;
+        this.id = id;
+        this.budgetPlanStatus = budgetPlanStatus;
+        this.planType = planType;
+        this.createBy = createBy;
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
+
+    public String getLastModifiedTime() {
+        return lastModifiedTime;
+    }
+
+    public void setLastModifiedTime(String lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public BudgetPlanEnum getPlanType() {
+        return planType;
+    }
+
+    public void setPlanType(BudgetPlanEnum planType) {
+        this.planType = planType;
     }
 
     public List<BudgetLineItemModel> getItems() {

@@ -3,7 +3,7 @@ package capstone.is4103capstone.finance.budget.model.res;
 import java.math.BigDecimal;
 
 public class BudgetLineItemModel {
-    private String id;
+    private String lineId;
     private String categoryName;
     private String categoryCode;
     private String sub1Name;
@@ -19,8 +19,8 @@ public class BudgetLineItemModel {
     public BudgetLineItemModel() {
     }
 
-    public BudgetLineItemModel(String id, String categoryName, String categoryCode, String sub1Name, String sub1Code, String sub2Name, String sub2Code, String merchandiseName, String merchandiseCode, BigDecimal amount, String currency, String comment) {
-        this.id = id;
+    public BudgetLineItemModel(String lineId, String categoryName, String categoryCode, String sub1Name, String sub1Code, String sub2Name, String sub2Code, String merchandiseName, String merchandiseCode, BigDecimal amount, String currency, String comment) {
+        this.lineId = lineId;
         this.categoryName = categoryName;
         this.categoryCode = categoryCode;
         this.sub1Name = sub1Name;
@@ -34,12 +34,12 @@ public class BudgetLineItemModel {
         this.comment = comment;
     }
 
-    public String getId() {
-        return id;
+    public String getLineId() {
+        return lineId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setLineId(String lineId) {
+        this.lineId = lineId;
     }
 
     public String getCategoryName() {
