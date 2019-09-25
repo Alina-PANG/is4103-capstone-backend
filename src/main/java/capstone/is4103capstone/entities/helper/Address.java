@@ -1,17 +1,14 @@
 package capstone.is4103capstone.entities.helper;
 
 
-import capstone.is4103capstone.configuration.DBEntityTemplate;
-
 import javax.persistence.Embeddable;
-import javax.persistence.Entity;
 
 @Embeddable
-public class Address{
+public class Address {
 
     private String addressLine1;
 
-    private String adddressLine2;
+    private String addressLine2;
 
     private String postalCode;
 
@@ -24,9 +21,9 @@ public class Address{
     public Address() {
     }
 
-    public Address(String addressLine1, String adddressLine2, String postalCode, String city, String countryCode, String regionCode) {
+    public Address(String addressLine1, String addressLine2, String postalCode, String city, String countryCode, String regionCode) {
         this.addressLine1 = addressLine1;
-        this.adddressLine2 = adddressLine2;
+        this.addressLine2 = addressLine2;
         this.postalCode = postalCode;
         this.city = city;
         this.countryCode = countryCode;
@@ -41,12 +38,12 @@ public class Address{
         this.addressLine1 = addressLine1;
     }
 
-    public String getAdddressLine2() {
-        return adddressLine2;
+    public String getAddressLine2() {
+        return addressLine2;
     }
 
-    public void setAdddressLine2(String adddressLine2) {
-        this.adddressLine2 = adddressLine2;
+    public void setAddressLine2(String addressLine2) {
+        this.addressLine2 = addressLine2;
     }
 
     public String getPostalCode() {
