@@ -52,6 +52,12 @@
             <version>20190722</version>
         </dependency>
 
+        <!-- Session Management -->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-jdbc</artifactId>
+        </dependency>
+
         <!-- DB Connection -->
         <dependency>
             <groupId>org.hsqldb</groupId>
@@ -84,6 +90,19 @@
             <groupId>de.mkammerer</groupId>
             <artifactId>argon2-jvm</artifactId>
             <version>2.5</version>
+        </dependency>
+
+        <!-- Model Mapping and Getter/Setter Autoamtion -->
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>2.3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Export -->
