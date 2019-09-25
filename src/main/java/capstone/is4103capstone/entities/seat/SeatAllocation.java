@@ -21,7 +21,7 @@ public class SeatAllocation extends DBEntityTemplate {
     private SeatAllocationTypeEnum allocationType;
     @OneToOne
     private Schedule schedule;
-    private boolean isActive = false;
+    private boolean isActive = true;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "seat_id",nullable = false)

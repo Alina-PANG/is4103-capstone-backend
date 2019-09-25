@@ -1,17 +1,13 @@
 package capstone.is4103capstone.seat.controller;
 
-import capstone.is4103capstone.seat.model.CustomErrorRes;
 import capstone.is4103capstone.seat.model.SeatAllocationModelForFunction;
 import capstone.is4103capstone.seat.model.SeatAllocationModelForTeam;
 import capstone.is4103capstone.seat.model.SeatModelForAllocation;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
-import capstone.is4103capstone.util.exception.SeatAllocationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -54,9 +50,23 @@ public class SeatAllocationController {
         return ResponseEntity.ok("Assigned hot desk successfully");
     }
 
-    @PostMapping("/fixed")
-    public ResponseEntity assignFixedSeatToEmployee(@RequestBody SeatModelForAllocation seatModelForAllocation) {
-        seatAllocationService.assignFixedSeatToEmployee(seatModelForAllocation);
+    @PostMapping("/fixed/permanent")
+    public ResponseEntity assignFixedSeatToPermanentEmployee(@RequestBody SeatModelForAllocation seatModelForAllocation) {
+        seatAllocationService.assignFixedSeatToPermanentEmployee(seatModelForAllocation);
         return ResponseEntity.ok("Assigned fixed seat successfully");
     }
+
+    @PostMapping("/fixed/temporary")
+    public ResponseEntity assignFixedSeatToTemporaryEmployee(@RequestBody SeatModelForAllocation seatModelForAllocation) {
+        seatAllocationService.assignFixedSeatToTemporaryEmployee(seatModelForAllocation);
+        return ResponseEntity.ok("Assigned fixed seat successfully");
+    }
+
+    @PostMapping("/fixed/shared")
+    public ResponseEntity assignSharedSeatToEmployee(@RequestBody SeatModelForAllocation seatModelForAllocation) {
+        seatAllocationService.assignSharedSeatToEmployee(seatModelForAllocation);
+        return ResponseEntity.ok("Assigned fixed seat successfully");
+    }
+
+
 }
