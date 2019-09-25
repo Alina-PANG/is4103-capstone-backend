@@ -34,17 +34,17 @@ public class BudgetController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @GetMapping("/getMostRecentDraft") // [TODO] test
-    public ResponseEntity<GeneralRes> getMostRecentDraft(@RequestParam(name="username", required=true) String username, @RequestParam(name="code", required=true) String code, @RequestParam(name="type", required=true) String type){
-        if(Authentication.authenticateUser(username))
-            return ResponseEntity
-                    .ok()
-                    .body(budgetService.getMostRecentPlanDraft(username, type, code));
-        else
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-    }
+//    @GetMapping("/getMostRecentDraft") // [TODO] test
+//    public ResponseEntity<GeneralRes> getMostRecentDraft(@RequestParam(name="username", required=true) String username, @RequestParam(name="code", required=true) String code, @RequestParam(name="type", required=true) String type){
+//        if(Authentication.authenticateUser(username))
+//            return ResponseEntity
+//                    .ok()
+//                    .body(budgetService.getMostRecentPlanDraft(username, type, code));
+//        else
+//            return ResponseEntity
+//                    .badRequest()
+//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+//    }
 
     @PostMapping("/updateBudget/{id}")
     public ResponseEntity<GeneralRes> updateBudget(@RequestBody CreateBudgetReq createBudgetReq, @PathVariable("id") String id) {
@@ -68,12 +68,12 @@ public class BudgetController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @GetMapping("/getBudgetList")
-    public ResponseEntity<GeneralRes> getPendingBudgetList(@RequestParam(name="username", required=true) String username, @RequestParam(name="type", required=true) String type, @RequestParam(name="status", required=true) String status){
+    @GetMapping("/getBudgetList/{costcenterId}")
+    public ResponseEntity<GeneralRes> getPendingBudgetList(@PathVariable("costcenterId") String costcenterId, @RequestParam(name="username", required=true) String username, @RequestParam(name="type", required=true) boolean isBudget){
         if(Authentication.authenticateUser(username))
             return ResponseEntity
                     .ok()
-                    .body(budgetService.getBudgetList(username, type, status));
+                    .body(budgetService.getBudgetList(costcenterId, username, isBudget));
         else
             return ResponseEntity
                     .badRequest()

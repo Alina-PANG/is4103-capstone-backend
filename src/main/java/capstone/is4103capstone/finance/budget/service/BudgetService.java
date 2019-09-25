@@ -1,16 +1,16 @@
 package capstone.is4103capstone.finance.budget.service;
 
-
-
 import capstone.is4103capstone.admin.repository.CostCenterRepository;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.CostCenter;
-import capstone.is4103capstone.entities.finance.Plan;
-import capstone.is4103capstone.entities.finance.PlanLineItem;
+import capstone.is4103capstone.entities.finance.*;
+import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
+import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
+import capstone.is4103capstone.finance.budget.model.res.BudgetModel;
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetListRes;
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -25,9 +25,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class BudgetService {
@@ -38,6 +40,8 @@ public class BudgetService {
     PlanRepository planRepository;
     @Autowired
     CostCenterRepository costCenterRepository;
+    @Autowired
+    MerchandiseRepository merchandiseRepository;
 
     FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
     private String generateCode(JpaRepository repo, DBEntityTemplate entity){
@@ -177,60 +181,55 @@ public class BudgetService {
         try{
             logger.info("Getting plan with id "+id+"...");
             Plan p = planRepository.getOne(id);
+            List<BudgetLineItemModel> items = new ArrayList<>();
+            BudgetModel budget = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), id, p.getBudgetPlanStatus());
             for(int i = 0; i < p.getLineItems().size(); i ++){
-                p.getLineItems().get(i);
+                PlanLineItem item = p.getLineItems().get(i);
+                Merchandise m = merchandiseRepository.findMerchandiseByCode(item.getMerchandiseCode());
+                BudgetSub2 budgetSub2 = m.getBudgetSub2();
+                BudgetSub1 budgetSub1 = budgetSub2.getBudgetSub1();
+                BudgetCategory budgetCategory = budgetSub1.getBudgetCategory();
+                items.add(new BudgetLineItemModel(item.getId(), budgetCategory.getObjectName(), budgetCategory.getCode(), budgetSub1.getObjectName(), budgetSub1.getCode(), budgetSub2.getObjectName(), budgetSub2.getCode(), m.getObjectName(), m.getCode(), item.getBudgetAmount(), item.getCurrencyAbbr(), item.getComment()));
             }
-
             if(p == null){
                 return new GetBudgetRes("There is no plan in the database with id "+id, true, null);
             }
-            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, p);
+            budget.setItems(items);
+            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, budget);
         } catch(Exception ex){
             ex.printStackTrace();
             return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 
-    public GetBudgetRes getMostRecentPlanDraft(String username, String type, String name){
-        try{
-            Plan p = planRepository.findMostRecentPlanDraft(username, type, name);
-            return new GetBudgetRes("Successfully retrieved all your currently editing drafts!", false, p);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
-        }
-    }
 
-    public GetBudgetListRes getBudgetList(String username, String type, String status){
+//    public GetBudgetRes getMostRecentPlanDraft(String username, String type, String name){
+//        try{
+//            Plan p = planRepository.findMostRecentPlanDraft(username, type, name);
+//            return new GetBudgetRes("Successfully retrieved all your currently editing drafts!", false, p);
+//        }catch (Exception ex){
+//            ex.printStackTrace();
+//            return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
+//        }
+//    }
+
+    public GetBudgetListRes getBudgetList(String costcenterId, String username, boolean isBudget){
         try{
-            List<Plan> plans = planRepository.findAll();
-            List<Plan> pendingPlans = new ArrayList<>();
-            BudgetPlanStatusEnum budgetPlanStatusEnum = BudgetPlanStatusEnum.DRAFT;
+            List<Plan> plans = planRepository.findByCostCenterId(costcenterId);
+            List<BudgetModel> result = new ArrayList<>();
             BudgetPlanEnum budgetPlanEnum = BudgetPlanEnum.REFORECAST;
-            logger.info("Req: username: "+username+" plan status: "+budgetPlanEnum+" plan type: "+budgetPlanStatusEnum);
-            if(type.toUpperCase().equals("BUDGET")){
-                budgetPlanEnum = BudgetPlanEnum.BUDGET;
-            }
-            if(status.toUpperCase().equals("SUBMITTED")){
-                budgetPlanStatusEnum = BudgetPlanStatusEnum.SUBMITTED;
-            }
-            else if(status.toUpperCase().equals("APPROVED")){
-                budgetPlanStatusEnum = BudgetPlanStatusEnum.APPROVED;
-            }
-            else if(status.toUpperCase().equals("REJECTED")){
-                budgetPlanStatusEnum = BudgetPlanStatusEnum.REJECTED;
-            }
+            if(isBudget) budgetPlanEnum = BudgetPlanEnum.BUDGET;
+            logger.info("Req: username: "+username+" plan type: "+budgetPlanEnum);
             for(Plan p: plans){
                 if(p.getCreatedBy() == null || p.getBudgetPlanStatus() == null || p.getPlanType() == null) continue;
-                logger.info("username: "+p.getCreatedBy()+" plan status; "+p.getBudgetPlanStatus()+" plan type"+p.getPlanType());
-                if(p.getCreatedBy().equals(username) && p.getBudgetPlanStatus().equals(budgetPlanStatusEnum) && p.getPlanType().equals(budgetPlanEnum)){
-                    pendingPlans.add(p);
+                if(!p.getDeleted() && p.getPlanType() == budgetPlanEnum){
+                    result.add(new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), p.getId(), p.getBudgetPlanStatus()));
                 }
             }
-            if(pendingPlans.size() == 0){
-                return new GetBudgetListRes("There is no "+type+" plan in "+status+" status for you!", true, null);
+            if(result.size() == 0){
+                return new GetBudgetListRes("There is no "+budgetPlanEnum+" plan to view!", true, null);
             }
-            return new GetBudgetListRes("Successsfully retrieved your pending plans!",false, plans);
+            return new GetBudgetListRes("Successsfully retrieved your pending plans!",false, result);
         } catch(Exception ex){
             ex.printStackTrace();
             return new GetBudgetListRes("An unexpected error happens: "+ex.getMessage(), true, null);

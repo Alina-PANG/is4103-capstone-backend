@@ -17,10 +17,18 @@ public class GetPlanLineItemResNotTested extends GetBudgetRes{
         this.cols = cols;
     }
 
-    public GetPlanLineItemResNotTested(String message, Boolean error, Plan budgetPlan, List<List<String>> content, String[] cols) {
-        super(message, error, budgetPlan);
+    public GetPlanLineItemResNotTested(List<List<String>> content) {
         this.content = content;
-        this.cols = cols;
+    }
+
+    public GetPlanLineItemResNotTested(BudgetModel budgetPlan, List<List<String>> content) {
+        super(budgetPlan);
+        this.content = content;
+    }
+
+    public GetPlanLineItemResNotTested(String message, Boolean hasError, BudgetModel budgetPlan, List<List<String>> content) {
+        super(message, hasError, budgetPlan);
+        this.content = content;
     }
 
     public List<List<String>> getContent() {
