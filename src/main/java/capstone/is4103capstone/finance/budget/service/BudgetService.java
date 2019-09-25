@@ -96,11 +96,15 @@ public class BudgetService {
                 newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.DRAFT);
             }
             if(createBudgetReq.isBudget()){
-                newPlan.setPlanType(BudgetPlanEnum.BUDGET);}
+                newPlan.setPlanType(BudgetPlanEnum.BUDGET);
+                newPlan.setObjectName(createBudgetReq.getYear()+"-BUDGET");
+            }
             else{
                 newPlan.setPlanType(BudgetPlanEnum.REFORECAST);
+                newPlan.setObjectName(createBudgetReq.getYear()+"-"+createBudgetReq.getMonth()+"-REFORECAST");
             }
             CostCenter cc = costCenterRepository.findCostCenterByCode(createBudgetReq.getCostCenterCode());
+
             newPlan.setCostCenter(cc);
             newPlan.setPlanDescription(createBudgetReq.getDescription());
             newPlan.setVersion(version);
@@ -127,55 +131,6 @@ public class BudgetService {
         }
     }
 
-//    public GeneralRes updateBudget(CreateBudgetReq updateBudgetReq, String id){
-//        try{
-//            Plan newPlan = planRepository.getOne(id);
-//            Plan shallowCopyPlan = new Plan();
-//            shallowCopyPlan.setForYear(updateBudgetReq.getYear());
-//            shallowCopyPlan.setLineItems(updateBudgetReq.getItems());
-//            shallowCopyPlan.setPlanDescription(updateBudgetReq.getDescription());
-//            CostCenter cc = costCenterRepository.findCostCenterByCode(updateBudgetReq.getCostCenterCode());
-//            newPlan.setCostCenter(cc);
-//            shallowCopyPlan.setCostCenter(cc);
-//            shallowCopyPlan.setBudgetPlanStatus(updateBudgetReq.isToSubmit());
-////            shallowCopyPlan.setForYear(updateBudgetReq);
-////            if(newPlan.getBudgetPlanStatus() != BudgetPlanStatusEnum.DRAFT){
-////                return new GeneralRes("The status of the budget plan is "+newPlan.getBudgetPlanStatus()+", and is not allowed to be further edited!", true);
-////            }
-////            if(updateBudgetReq.isToSubmit()){
-////                newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.SUBMITTED);
-////            }
-////            else{
-////                newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.DRAFT);
-////            }
-////            if(updateBudgetReq.getCostCenterCode() != null){
-////                CostCenter cc = costCenterRepository.findCostCenterByCode(updateBudgetReq.getCostCenterCode());
-////                newPlan.setCostCenter(cc);
-////            }
-////            if(updateBudgetReq.getYear() != null){
-////                newPlan.setForYear(updateBudgetReq.getYear());
-////            }
-////            if(updateBudgetReq.getDescription() != null){
-////                newPlan.setPlanDescription(updateBudgetReq.getDescription());
-////            }
-////            if(updateBudgetReq.getItems() != null){
-////                // update plan line item
-////
-////                deletePlanLineItem(newPlan);
-////                List<PlanLineItem> newItems = saveLineItem(updateBudgetReq.getItems(), newPlan);
-////                newPlan.setLineItems(newItems);
-////            }
-//            newPlan.setVersion(newPlan.getVersion() + 1);
-////            newPlan.setCreatedBy(updateBudgetReq.getUsername());
-////            newPlan.setCreatedDateTime(new Date());
-//            planRepository.saveAndFlush(newPlan);
-//            logger.info("Successully updated the new plan! -- "+updateBudgetReq.getUsername()+" "+new Date());
-//            return new GeneralRes("Successully submitted the new plan!", false);
-//        }catch (Exception ex){
-//            ex.printStackTrace();
-//            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
-//        }
-//    }
 
     public GetBudgetRes getBudget(String id){
         try{
@@ -186,9 +141,13 @@ public class BudgetService {
             for(int i = 0; i < p.getLineItems().size(); i ++){
                 PlanLineItem item = p.getLineItems().get(i);
                 Merchandise m = merchandiseRepository.findMerchandiseByCode(item.getMerchandiseCode());
+                System.out.println(item.getMerchandiseCode());
                 BudgetSub2 budgetSub2 = m.getBudgetSub2();
+                System.out.println("sub2: "+budgetSub2.getCode());
                 BudgetSub1 budgetSub1 = budgetSub2.getBudgetSub1();
+                System.out.println("sub1: "+budgetSub1.getCode());
                 BudgetCategory budgetCategory = budgetSub1.getBudgetCategory();
+                System.out.println("category: "+budgetCategory.getCode());
                 items.add(new BudgetLineItemModel(item.getId(), budgetCategory.getObjectName(), budgetCategory.getCode(), budgetSub1.getObjectName(), budgetSub1.getCode(), budgetSub2.getObjectName(), budgetSub2.getCode(), m.getObjectName(), m.getCode(), item.getBudgetAmount(), item.getCurrencyAbbr(), item.getComment()));
             }
             if(p == null){
@@ -201,17 +160,6 @@ public class BudgetService {
             return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
-
-
-//    public GetBudgetRes getMostRecentPlanDraft(String username, String type, String name){
-//        try{
-//            Plan p = planRepository.findMostRecentPlanDraft(username, type, name);
-//            return new GetBudgetRes("Successfully retrieved all your currently editing drafts!", false, p);
-//        }catch (Exception ex){
-//            ex.printStackTrace();
-//            return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
-//        }
-//    }
 
     public GetBudgetListRes getBudgetList(String costcenterId, String username, boolean isBudget){
         try{
