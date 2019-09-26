@@ -48,6 +48,16 @@ public class BudgetCategoryController {
                     .body(new BudgetCategoryRes(DefaultData.AUTHENTICATION_ERROR_MSG, true,null));
     }
 
+    @GetMapping("/view-all-levels")
+    public @ResponseBody ResponseEntity<Object> viewAllLevelsByCountry(@RequestParam(name = "country",required = true) String countryCode,@RequestParam(name="username", required=true) String username){
+        if(Authentication.authenticateUser(username))
+            return new ResponseEntity<Object>(categoryService.viewAllLevelsByCountry(countryCode).toString(), HttpStatus.OK);
+
+        else
+            return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
+
+    }
+
     @GetMapping("/view-by-country")
     public @ResponseBody ResponseEntity<Object> viewCategoriesByCountry(@RequestParam(name="username", required=true) String username, @RequestParam(name="countryCode", required=true) String countryCode){
         if(Authentication.authenticateUser(username))
@@ -64,5 +74,7 @@ public class BudgetCategoryController {
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
     }
+
+
 
 }

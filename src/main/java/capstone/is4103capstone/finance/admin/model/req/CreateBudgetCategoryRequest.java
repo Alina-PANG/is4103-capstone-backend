@@ -1,6 +1,8 @@
 package capstone.is4103capstone.finance.admin.model.req;
 
-public class CreateBudgetCategoryRequest {
+import java.io.Serializable;
+
+public class CreateBudgetCategoryRequest implements Serializable {
     private String categoryName;
     private String countryCode;
     private String username;

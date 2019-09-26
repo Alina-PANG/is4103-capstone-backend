@@ -1,6 +1,8 @@
 package capstone.is4103capstone.finance.admin.model.req;
 
-public class UpdateCategoryReq {
+import java.io.Serializable;
+
+public class UpdateCategoryReq implements Serializable {
     private String code;
     private String newName;
     private String username;

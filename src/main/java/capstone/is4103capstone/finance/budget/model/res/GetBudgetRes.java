@@ -8,22 +8,25 @@ import java.io.Serializable;
 import java.util.List;
 
 public class GetBudgetRes extends GeneralRes {
-    private Plan budgetPlan;
+    private BudgetModel budgetPlan;
 
     public GetBudgetRes() {
     }
 
-
-    public GetBudgetRes(String message, Boolean error, Plan budgetPlan) {
-        super(message, error);
+    public GetBudgetRes(BudgetModel budgetPlan) {
         this.budgetPlan = budgetPlan;
     }
 
-    public Plan getBudgetPlan() {
+    public GetBudgetRes(String message, Boolean hasError, BudgetModel budgetPlan) {
+        super(message, hasError);
+        this.budgetPlan = budgetPlan;
+    }
+
+    public BudgetModel getBudgetPlan() {
         return budgetPlan;
     }
 
-    public void setBudgetPlan(Plan budgetPlan) {
+    public void setBudgetPlan(BudgetModel budgetPlan) {
         this.budgetPlan = budgetPlan;
     }
 }
