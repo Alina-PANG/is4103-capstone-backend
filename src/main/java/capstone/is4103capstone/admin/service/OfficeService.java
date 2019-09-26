@@ -83,7 +83,21 @@ public class OfficeService {
 
     @Transactional
     public OfficeDto updateOffice(OfficeDto input) {
-        return entityToDto(updateOfficeEntity(dtoToEntity(input)));
+        Office working = officeRepository.getOne(input.getId().orElseThrow(() -> new NullPointerException("UUID is empty!")));
+        input.getObjectName().ifPresent(working::setObjectName);
+        input.getAddressLine1().ifPresent(value -> working.getAddress().setAddressLine1(value));
+        input.getAddressLine2().ifPresent(value -> working.getAddress().setAddressLine2(value));
+        input.getPostalCode().ifPresent(value -> working.getAddress().setPostalCode(value));
+        input.getCity().ifPresent(value -> working.getAddress().setCity(value));
+        // set country-specific data
+        try {
+            Country country = countryRepository.getOne(input.getCountryId().orElseThrow(() -> new NullPointerException("UUID is null!")));
+            working.getAddress().setCountryCode(country.getCode());
+            working.setCountry(country);
+        } catch (IllegalArgumentException ex) {
+            throw new DbObjectNotFoundException("Country " + input.getCountryId().get() + " not found!");
+        }
+        return entityToDto(working);
     }
 
     // === DELETE ===
@@ -102,14 +116,14 @@ public class OfficeService {
         OfficeDto officeDto = new OfficeDto();
         // standard attributes
         officeDto.setId(Optional.of(input.getId()));
-        officeDto.setCode(input.getCode());
-        officeDto.setObjectName(input.getObjectName());
+        officeDto.setCode(Optional.of(input.getCode()));
+        officeDto.setObjectName(Optional.of(input.getObjectName()));
         // non-standard
-        officeDto.setAddressLine1(input.getAddress().getAddressLine1());
-        officeDto.setAddressLine2(input.getAddress().getAddressLine2());
-        officeDto.setPostalCode(input.getAddress().getPostalCode());
-        officeDto.setCountryCode(input.getAddress().getCountryCode());
-        officeDto.setCountryId(input.getCountry().getId());
+        officeDto.setAddressLine1(Optional.of(input.getAddress().getAddressLine1()));
+        officeDto.setAddressLine2(Optional.of(input.getAddress().getAddressLine2()));
+        officeDto.setPostalCode(Optional.of(input.getAddress().getPostalCode()));
+        officeDto.setCountryCode(Optional.of(input.getAddress().getCountryCode()));
+        officeDto.setCountryId(Optional.of(input.getCountry().getId()));
         return officeDto;
     }
 
@@ -117,19 +131,21 @@ public class OfficeService {
         Office office = new Office();
         // standard attributes
         input.getId().ifPresent(id -> office.setId(id));
-        office.setCode(input.getCode());
-        office.setObjectName(input.getObjectName());
+        input.getCode().ifPresent(office::setCode);
+        input.getObjectName().ifPresent(name -> office.setObjectName(name));
         // non-standard attributes
         Address address = new Address();
-        address.setAddressLine1(input.getAddressLine1());
-        address.setAddressLine2(input.getAddressLine2());
-        address.setPostalCode(input.getPostalCode());
-        address.setCity(input.getCity());
+        input.getAddressLine1().ifPresent(value -> address.setAddressLine1(value));
+        input.getAddressLine2().ifPresent(value -> address.setAddressLine2(value));
+        input.getPostalCode().ifPresent(value -> address.setPostalCode(value));
+        input.getCity().ifPresent(value -> address.setCity(value));
         // set country-specific data
         try {
-            Country country = countryRepository.getOne(input.getCountryId());
-            address.setCountryCode(country.getCode());
-            office.setCountry(country);
+            input.getCountryId().ifPresent(value -> {
+                Country country = countryRepository.getOne(value);
+                address.setCountryCode(country.getCode());
+                office.setCountry(country);
+            });
         } catch (IllegalArgumentException ex) {
             throw new DbObjectNotFoundException("Country " + input.getCountryId() + " not found!");
         }

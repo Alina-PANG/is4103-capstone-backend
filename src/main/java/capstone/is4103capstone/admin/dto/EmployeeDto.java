@@ -10,11 +10,12 @@ import java.util.Optional;
 public class EmployeeDto {
 
     private Optional<String> id = Optional.empty();
-    private String code;
-    private String userName;
-    private String firstName;
-    private String lastName;
+    private Optional<String> code = Optional.empty();
+    private Optional<String> userName = Optional.empty();
+    private Optional<String> firstName = Optional.empty();
+    private Optional<String> lastName = Optional.empty();
     private Optional<String> middleName = Optional.empty();
-    private Optional<String> securityId;
+    private Optional<String> securityId = Optional.empty();
+    private Optional<String> password = Optional.empty();
 
 }

@@ -36,7 +36,11 @@ public class CountryController {
 
     @PutMapping
     public CountryDto updateCountry(@RequestBody CountryDto input) {
-        return cs.updateCountry(input);
+        try {
+            return cs.updateCountry(input);
+        } catch (NullPointerException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
     }
 
     @DeleteMapping("/{uuid}")

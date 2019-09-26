@@ -4,14 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
 public class RegionDto {
 
-    public String id;
-    public String objectName;
-    public String code;
-    public List<String> countryIds;
+    public Optional<String> id = Optional.empty();
+    public Optional<String> objectName = Optional.empty();
+    public Optional<String> code = Optional.empty();
+    public Optional<List<String>> countryIds = Optional.empty();
 
 }

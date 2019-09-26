@@ -11,13 +11,13 @@ import java.util.Optional;
 public class OfficeDto {
 
     private Optional<String> id = Optional.empty();
-    private String objectName;
-    private String code;
-    private String addressLine1;
-    private String addressLine2;
-    private String postalCode;
-    private String city;
-    private String countryCode;
-    private String countryId;
-    private List<String> floors;
+    private Optional<String> objectName = Optional.empty();
+    private Optional<String> code = Optional.empty();
+    private Optional<String> addressLine1 = Optional.empty();
+    private Optional<String> addressLine2 = Optional.empty();
+    private Optional<String> postalCode = Optional.empty();
+    private Optional<String> city = Optional.empty();
+    private Optional<String> countryCode = Optional.empty();
+    private Optional<String> countryId = Optional.empty();
+    private Optional<List<String>> floors = Optional.empty();
 }

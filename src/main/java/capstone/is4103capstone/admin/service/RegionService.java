@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class RegionService {
@@ -78,8 +78,13 @@ public class RegionService {
 
     @Transactional
     public RegionDto updateRegion(RegionDto input) {
-        Region region = convertDtoToRegion(input);
-        return convertRegionToDto(updateRegionEntity(region));
+        try {
+            Region workingRegion = regionRepository.getOne(input.getId().orElseThrow(() -> new NullPointerException("UUID is null!")));
+            input.getObjectName().ifPresent(workingRegion::setObjectName);
+            return convertRegionToDto(workingRegion);
+        } catch (IllegalArgumentException ex) {
+            throw new DbObjectNotFoundException("Region with UUID " + input.getId() + " not found!");
+        }
     }
 
     // === DELETE ===
@@ -97,34 +102,33 @@ public class RegionService {
     public RegionDto convertRegionToDto(Region input) {
 
         RegionDto regionDto = new RegionDto();
-        regionDto.setId(input.getId());
-        regionDto.setCode(input.getCode());
-        regionDto.setObjectName(input.getObjectName());
+        regionDto.setId(Optional.of(input.getId()));
+        regionDto.setCode(Optional.of(input.getCode()));
+        regionDto.setObjectName(Optional.of(input.getObjectName()));
 
         // convert all country list objects
         List<String> countryList = new ArrayList<>();
         for (Country country : input.getCountries()) {
             countryList.add(country.getId());
         }
-        regionDto.setCountryIds(countryList);
+        regionDto.setCountryIds(Optional.of(countryList));
         return regionDto;
     }
 
     public Region convertDtoToRegion(RegionDto input) {
 
         Region region = new Region();
-        if (!Objects.isNull(input.getId())) region.setId(input.getId());
-        region.setCode(input.getCode());
-        region.setObjectName(input.getObjectName());
+        input.getId().ifPresent(value -> region.setId(value));
+        input.getCode().ifPresent(value -> region.setCode(value));
+        input.getObjectName().ifPresent(value -> region.setObjectName(value));
 
-        if (!Objects.isNull(input.getCountryIds())) {
-            // convert all country list objects
+        input.getCountryIds().ifPresent(value -> {
             List<Country> countryList = new ArrayList<>();
-            for (String countryUuid : input.getCountryIds()) {
+            for (String countryUuid : value) {
                 countryList.add(countryRepository.findById(countryUuid).get());
             }
             region.setCountries(countryList);
-        }
+        });
         return region;
     }
 

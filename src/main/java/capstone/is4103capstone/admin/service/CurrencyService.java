@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CurrencyService {
@@ -69,7 +70,14 @@ public class CurrencyService {
 
     @Transactional
     public CurrencyDto updateCurrency(CurrencyDto input) {
-        return entityToDto(updateCurrencyEntity(dtoToEntity(input)));
+        try {
+            Currency toUpdate = currencyRepository.getOne(input.getId().orElseThrow(() -> new NullPointerException("UUID is null!")));
+            input.getObjectName().ifPresent(toUpdate::setObjectName);
+            input.getCurrencyCode().ifPresent(toUpdate::setCurrencyCode);
+            return entityToDto(toUpdate);
+        } catch (IllegalArgumentException ex) {
+            throw new DbObjectNotFoundException("Currency object with UUID " + input + "  not found!");
+        }
     }
 
     // === DELETE ===
@@ -83,19 +91,19 @@ public class CurrencyService {
     // ===== ENTITY TO DTO CONVERSION METHODS =====
     public Currency dtoToEntity(CurrencyDto input) {
         Currency currency = new Currency();
-        currency.setId(input.getId());
-        currency.setCode(input.getCode());
-        currency.setCurrencyCode(input.getCurrencyCode());
-        currency.setObjectName(input.getObjectName());
+        input.getId().ifPresent(id -> currency.setId(id));
+        input.getCode().ifPresent(code -> currency.setCode(code));
+        input.getCurrencyCode().ifPresent(code -> currency.setCurrencyCode(code));
+        input.getObjectName().ifPresent(name -> currency.setObjectName(name));
         return currency;
     }
 
     public CurrencyDto entityToDto(Currency input) {
         CurrencyDto currencyDto = new CurrencyDto();
-        currencyDto.setId(input.getId());
-        currencyDto.setCode(input.getCode());
-        currencyDto.setCurrencyCode(input.getCurrencyCode());
-        currencyDto.setObjectName(input.getObjectName());
+        currencyDto.setId(Optional.of(input.getId()));
+        currencyDto.setCode(Optional.of(input.getCode()));
+        currencyDto.setCurrencyCode(Optional.of(input.getCurrencyCode()));
+        currencyDto.setObjectName(Optional.of(input.getObjectName()));
         return currencyDto;
     }
 }

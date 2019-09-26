@@ -79,7 +79,10 @@ public class CountryService {
 
     @Transactional
     public CountryDto updateCountry(CountryDto input) {
-        return entityToDto(updateCountryEntity(dtoToEntity(input)));
+        Country country = countryRepository.getOne(input.getId().orElseThrow(() -> new NullPointerException("Empty UUID provided!")));
+        input.getRegionId().ifPresent(value -> country.setRegion(regionRepository.getOne(value)));
+        input.getObjectName().ifPresent(value -> country.setObjectName(value));
+        return entityToDto(country);
     }
 
     // === DELETE ===
@@ -96,8 +99,7 @@ public class CountryService {
     public Country dtoToEntity(CountryDto input) {
         Country country = new Country();
         input.getId().ifPresent(id -> country.setId(id));
-        country.setObjectName(input.getObjectName());
-        country.setCode(input.getCode());
+        input.getObjectName().ifPresent(name -> country.setObjectName(name));
         input.getRegionId().ifPresent(regionId -> country.setRegion(regionRepository.getOne(regionId)));
         return country;
     }
@@ -105,8 +107,8 @@ public class CountryService {
     public CountryDto entityToDto(Country input) {
         CountryDto countryDto = new CountryDto();
         countryDto.setId(Optional.of(input.getId()));
-        countryDto.setCode(input.getCode());
-        countryDto.setObjectName(input.getObjectName());
+        countryDto.setCode(Optional.of(input.getCode()));
+        countryDto.setObjectName(Optional.of(input.getObjectName()));
         if (!Objects.isNull(input.getRegion())) countryDto.setRegionId(Optional.of(input.getRegion().getId()));
         return countryDto;
     }

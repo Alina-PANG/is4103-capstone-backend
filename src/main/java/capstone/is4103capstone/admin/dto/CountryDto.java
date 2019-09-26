@@ -10,8 +10,8 @@ import java.util.Optional;
 public class CountryDto {
 
     private Optional<String> id = Optional.empty();
-    private String objectName;
-    private String code;
+    private Optional<String> objectName = Optional.empty();
+    private Optional<String> code = Optional.empty();
     private Optional<String> regionId = Optional.empty();
 
 }

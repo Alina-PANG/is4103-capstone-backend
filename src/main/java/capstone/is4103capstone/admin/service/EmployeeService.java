@@ -67,7 +67,13 @@ public class EmployeeService {
 
     @Transactional
     public EmployeeDto updateEmployee(EmployeeDto input) {
-        return entityToDto(updateEmployeeEntity(dtoToEntity(input)));
+        Employee working = employeeRepository.getOne(input.getId().orElseThrow(() -> new NullPointerException("UUID is null!")));
+        input.getFirstName().ifPresent(working::setFirstName);
+        input.getMiddleName().ifPresent(working::setMiddleName);
+        input.getLastName().ifPresent(working::setLastName);
+        input.getUserName().ifPresent(working::setUserName);
+        input.getPassword().ifPresent(working::setPassword);
+        return entityToDto(working);
     }
 
     // === DELETE ===
@@ -85,11 +91,11 @@ public class EmployeeService {
     public EmployeeDto entityToDto(Employee input) {
         EmployeeDto employeeDto = new EmployeeDto();
         employeeDto.setId(Optional.of(input.getId()));
-        employeeDto.setCode(input.getCode());
-        employeeDto.setFirstName(input.getFirstName());
+        employeeDto.setCode(Optional.of(input.getCode()));
+        employeeDto.setFirstName(Optional.of(input.getFirstName()));
         employeeDto.setMiddleName(Optional.of(input.getMiddleName()));
-        employeeDto.setLastName(input.getLastName());
-        employeeDto.setUserName(input.getUserName());
+        employeeDto.setLastName(Optional.of(input.getLastName()));
+        employeeDto.setUserName(Optional.of(input.getUserName()));
         employeeDto.setSecurityId(Optional.of(input.getSecurityId()));
         return employeeDto;
     }
@@ -97,10 +103,11 @@ public class EmployeeService {
     public Employee dtoToEntity(EmployeeDto input) {
         Employee employee = new Employee();
         input.getId().ifPresent(id -> employee.setId(id));
-        employee.setFirstName(input.getFirstName());
+        input.getFirstName().ifPresent(name -> employee.setFirstName(name));
         input.getMiddleName().ifPresent(middleName -> employee.setMiddleName(middleName));
-        employee.setLastName(input.getLastName());
-        employee.setUserName(input.getUserName());
+        input.getLastName().ifPresent(name -> employee.setLastName(name));
+        input.getUserName().ifPresent(name -> employee.setUserName(name));
+        input.getPassword().ifPresent(employee::setPassword);
         employee.setCode("EMP-" + input.getUserName());
         return employee;
     }
