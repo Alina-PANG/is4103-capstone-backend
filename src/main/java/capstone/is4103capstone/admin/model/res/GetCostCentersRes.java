@@ -9,5 +9,4 @@ import java.util.List;
 public class GetCostCentersRes extends GeneralRes {
     List<CostCenterModel> costCentersList = new ArrayList<>();
 
-
 }
