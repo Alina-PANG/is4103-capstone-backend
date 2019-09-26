@@ -4,38 +4,38 @@ import java.io.Serializable;
 
 public class CostCenterModel implements Serializable {
 
-    private String ccName;
-    private String ccCode;
+    private String name;
+    private String code;
+    private String id;
     private String countryCode;
-    private String ccId;
-    private String ccManagerId;
+    private String managerId;
 
 
     public CostCenterModel() {
     }
 
-    public CostCenterModel(String ccName, String ccCode, String countryCode, String ccId, String ccManagerId) {
-        this.ccName = ccName;
-        this.ccCode = ccCode;
+    public CostCenterModel(String ccName, String code, String costCenterId, String countryCode, String ccManagerId) {
+        this.name = ccName;
+        this.code = code;
         this.countryCode = countryCode;
-        this.ccId = ccId;
-        this.ccManagerId = ccManagerId;
+        this.id = costCenterId;
+        this.managerId = ccManagerId;
     }
 
-    public String getCcName() {
-        return ccName;
+    public String getName() {
+        return name;
     }
 
-    public void setCcName(String ccName) {
-        this.ccName = ccName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getCcCode() {
-        return ccCode;
+    public String getCode() {
+        return code;
     }
 
-    public void setCcCode(String ccCode) {
-        this.ccCode = ccCode;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getCountryCode() {
@@ -46,19 +46,19 @@ public class CostCenterModel implements Serializable {
         this.countryCode = countryCode;
     }
 
-    public String getCcId() {
-        return ccId;
+    public String getId() {
+        return id;
     }
 
-    public void setCcId(String ccId) {
-        this.ccId = ccId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getCcManagerId() {
-        return ccManagerId;
+    public String getManagerId() {
+        return managerId;
     }
 
-    public void setCcManagerId(String ccManagerId) {
-        this.ccManagerId = ccManagerId;
+    public void setManagerId(String managerId) {
+        this.managerId = managerId;
     }
 }
