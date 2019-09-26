@@ -1,6 +1,8 @@
 package capstone.is4103capstone.finance.admin.model.req;
 
-public class CreateMerchandiseRequest {
+import java.io.Serializable;
+
+public class CreateMerchandiseRequest implements Serializable {
 
     private String vendorCode;
     private String itemName;

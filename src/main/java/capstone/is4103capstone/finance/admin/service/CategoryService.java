@@ -53,7 +53,6 @@ public class CategoryService {
             if (hasRepeatName(categoryRequest.getCategoryName(),country.getId())){
                 throw new Exception("Repeated category name under country["+country.getObjectName()+"]!");
             }
-
             BudgetCategory newCat = new BudgetCategory(categoryRequest.getCategoryName());
             newCat.setCreatedBy(categoryRequest.getUsername());
             EntityCodeHPGeneration.setHP(country,newCat);

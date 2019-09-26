@@ -1,7 +1,6 @@
 package capstone.is4103capstone.finance.Repository;
 
 import capstone.is4103capstone.entities.finance.BudgetCategory;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
