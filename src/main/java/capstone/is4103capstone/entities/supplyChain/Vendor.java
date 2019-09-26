@@ -13,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Vendor extends DBEntityTemplate {
     private String businessUnit;
     private String serviceDescription;

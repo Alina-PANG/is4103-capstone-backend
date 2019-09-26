@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/vendor")
+@CrossOrigin(origins = "http://localhost:3000")
 public class VendorController {
     private static final Logger logger = LoggerFactory.getLogger(VendorController.class);
 
     @Autowired
     private VendorService vendorService;
 
-    @PostMapping("/create-budget")
+    @PostMapping("/create-vendor")
     public ResponseEntity<GeneralRes> createVendor(@RequestBody CreateVendorReq createVendorReq) {
         if (Authentication.authenticateUser(createVendorReq.getUsername())) {
             return ResponseEntity

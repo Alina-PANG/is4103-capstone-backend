@@ -2,24 +2,22 @@ package capstone.is4103capstone.supplychain.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.finance.PlanLineItem;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
-import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ContractLineRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.model.res.GetAllContractsRes;
-import capstone.is4103capstone.supplychain.model.res.GetAllVendorsRes;
 import capstone.is4103capstone.supplychain.model.res.GetContractRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +33,7 @@ public class ContractService {
     @Autowired
     EmployeeRepository employeeRepository;
 
+    //contract and contractLine will be created together.
     public GeneralRes CreateContract(CreateContractReq createContractReq){
         try{
             Contract newContract = new Contract();
@@ -47,9 +46,12 @@ public class ContractService {
             newContract.setNoticeDaysToExit(createContractReq.getNoticeDaysToExit());
             newContract.setPurchaseType(createContractReq.getPurchaseType());
             newContract.setRenewalStartDate(createContractReq.getRenewalStartDate());
-
+            newContract.setSpendType(createContractReq.getSpendType());
+            newContract.setObjectName(createContractReq.getContractName());
             newContract.setCreatedBy(createContractReq.getModifierUsername());
+            newContract.setLastModifiedBy(createContractReq.getModifierUsername());
             newContract.setCreatedDateTime(new Date());
+            newContract.setLastModifiedDateTime(new Date());
             newContract.setDeleted(false);
 
             Vendor vendor = vendorRepository.getOne(createContractReq.getVendorId());
@@ -60,14 +62,10 @@ public class ContractService {
             newContract.setEmployeeInChargeContract(employeeInCharge);
             employeeInCharge.getContractInCharged().add(newContract);
 
+            contractRepository.saveAndFlush(newContract);
             if(createContractReq.getContractLineList() != null && createContractReq.getContractLineList().size() != 0){
-                newContract.setContractLines(createContractReq.getContractLineList());
-                contractRepository.saveAndFlush(newContract);
-
-                for(ContractLine i: createContractReq.getContractLineList()){
-                    i.setContract(newContract);
-                    contractLineRepository.saveAndFlush(i);
-                }
+                List<ContractLine> savedContractLineList = createContractLine(newContract, createContractReq.getContractLineList(), createContractReq);
+                newContract.setContractLines(savedContractLineList);
             }
 
             contractRepository.saveAndFlush(newContract);
@@ -80,6 +78,21 @@ public class ContractService {
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
         }
+    }
+
+    private List<ContractLine> createContractLine(Contract contract, List<ContractLine> contractLineList, CreateContractReq createContractReq){
+        List<ContractLine> newContractLineList = new ArrayList<>();
+        for(ContractLine e: contractLineList){
+            e.setCreatedBy(createContractReq.getModifierUsername());
+            e.setLastModifiedBy(createContractReq.getModifierUsername());
+            e.setCreatedDateTime(new Date());
+            e.setLastModifiedDateTime(new Date());
+            e.setContract(contract);
+            contractLineRepository.saveAndFlush(e);
+            logger.info("Successfully created new contract line!");
+            newContractLineList.add(e);
+        }
+        return newContractLineList;
     }
 
     public GetContractRes getContract(String id){
@@ -179,5 +192,10 @@ public class ContractService {
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
         }
+    }
+
+    private List<ContractLine> updateContractLine(){
+        List<ContractLine> updatedContractLineList = new ArrayList<>();
+        return updatedContractLineList;
     }
 }

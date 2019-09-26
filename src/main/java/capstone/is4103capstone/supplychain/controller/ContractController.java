@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/contract")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ContractController {
     private static final Logger logger = LoggerFactory.getLogger(ContractController.class);
 

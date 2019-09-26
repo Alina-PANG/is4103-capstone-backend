@@ -35,6 +35,15 @@ public class CreateContractReq implements Serializable {
     private List<ContractLine> contractLineList;
     private String modifierUsername;
     private String employeeInChargeId;
+    private String contractName;
+
+    public String getContractName() {
+        return contractName;
+    }
+
+    public void setContractName(String contractName) {
+        this.contractName = contractName;
+    }
 
     public PurchaseTypeEnum getPurchaseType() {
         return purchaseType;

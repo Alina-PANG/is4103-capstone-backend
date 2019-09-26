@@ -34,6 +34,8 @@ public class VendorService {
             newVendor.setRelationshipManagerName(createVendorReq.getRelationshipManagerName());
             newVendor.setRelationshipManagerEmail(createVendorReq.getRelationshipManagerEmail());
             newVendor.setCreatedBy(createVendorReq.getUsername());
+            newVendor.setLastModifiedBy(createVendorReq.getUsername());
+            newVendor.setLastModifiedDateTime(new Date());
             newVendor.setCreatedDateTime(new Date());
 
             newVendor = vendorRepository.saveAndFlush(newVendor);
@@ -99,6 +101,9 @@ public class VendorService {
             }
             if(updateVendorReq.getRelationshipManagerEmail() != null){
                 vendor.setRelationshipManagerEmail(updateVendorReq.getRelationshipManagerEmail());
+            }
+            if(updateVendorReq.getServiceDescription() != null){
+                vendor.setServiceDescription(updateVendorReq.getServiceDescription());
             }
 
             vendor.setLastModifiedBy(updateVendorReq.getUsername());
