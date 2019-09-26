@@ -129,6 +129,9 @@ public class ContractService {
             if (updateContractReq.getRenewalStartDate() != null) {
                 contract.setRenewalStartDate(updateContractReq.getRenewalStartDate());
             }
+            if(updateContractReq.getContractName() != null){
+                contract.setObjectName(updateContractReq.getContractName());
+            }
             if (updateContractReq.getPurchaseType() != null) {
                 contract.setPurchaseType(updateContractReq.getPurchaseType());
             }
@@ -176,14 +179,13 @@ public class ContractService {
                 vendor.getContracts().add(contract);
                 vendorRepository.saveAndFlush(vendor);
             }
-            if (updateContractReq.getContractLineList() != null && updateContractReq.getContractLineList().size() != 0) {
-                contract.setContractLines(updateContractReq.getContractLineList());
-                contractRepository.saveAndFlush(contract);
 
-                for(ContractLine i: updateContractReq.getContractLineList()){
-                    i.setContract(contract);
-                    contractLineRepository.saveAndFlush(i);
-                }
+            if (updateContractReq.getContractLineList() != null && updateContractReq.getContractLineList().size() != 0) {
+                contractRepository.saveAndFlush(contract);
+                List<ContractLine> updatedContractLineList = updateContractLine(updateContractReq);
+
+                contract.setContractLines(updatedContractLineList);
+                contractRepository.saveAndFlush(contract);
             }
 
             contractRepository.saveAndFlush(contract);
@@ -194,8 +196,28 @@ public class ContractService {
         }
     }
 
-    private List<ContractLine> updateContractLine(){
+    private List<ContractLine> updateContractLine(CreateContractReq updatedContractReq){
         List<ContractLine> updatedContractLineList = new ArrayList<>();
+        for(ContractLine e: updatedContractReq.getContractLineList()){
+            ContractLine contractLine = contractLineRepository.getOne(e.getId());
+            if(e.getPrice() != null){
+                contractLine.setPrice(e.getPrice());
+            }
+            if(e.getCurrencyCode() != null){
+                contractLine.setCurrencyCode(e.getCurrencyCode());
+            }
+            if(e.getMerchandiseCode() != null){
+                contractLine.setMerchandiseCode(e.getMerchandiseCode());
+            }
+            if(e.getObjectName() != null){
+                contractLine.setObjectName(e.getObjectName());
+            }
+            contractLine.setLastModifiedDateTime(new Date());
+            contractLine.setLastModifiedBy(updatedContractReq.getModifierUsername());
+
+            contractLineRepository.saveAndFlush(contractLine);
+            updatedContractLineList.add(contractLine);
+        }
         return updatedContractLineList;
     }
 }
