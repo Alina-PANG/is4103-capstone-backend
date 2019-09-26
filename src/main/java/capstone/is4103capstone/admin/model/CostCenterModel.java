@@ -11,7 +11,6 @@ public class CostCenterModel implements Serializable {
     private String ccManagerId;
 
 
-
     public CostCenterModel() {
     }
 
