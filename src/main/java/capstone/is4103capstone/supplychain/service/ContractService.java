@@ -62,7 +62,7 @@ public class ContractService {
             newContract.setEmployeeInChargeContract(employeeInCharge);
             employeeInCharge.getContractInCharged().add(newContract);
 
-            contractRepository.saveAndFlush(newContract);
+            newContract = contractRepository.saveAndFlush(newContract);
             if(createContractReq.getContractLineList() != null && createContractReq.getContractLineList().size() != 0){
                 List<ContractLine> savedContractLineList = createContractLine(newContract, createContractReq.getContractLineList(), createContractReq);
                 newContract.setContractLines(savedContractLineList);
@@ -167,7 +167,7 @@ public class ContractService {
                 Employee employee = employeeRepository.getOne(updateContractReq.getEmployeeInChargeId());
                 contract.setEmployeeInChargeContract(employee);
 
-                contractRepository.saveAndFlush(contract);
+                contract = contractRepository.saveAndFlush(contract);
                 employee.getContractInCharged().add(contract);
                 employeeRepository.saveAndFlush(employee);
             }
@@ -175,17 +175,17 @@ public class ContractService {
                 Vendor vendor = vendorRepository.getOne(updateContractReq.getVendorId());
                 contract.setVendor(vendor);
 
-                contractRepository.saveAndFlush(contract);
+                contract = contractRepository.saveAndFlush(contract);
                 vendor.getContracts().add(contract);
                 vendorRepository.saveAndFlush(vendor);
             }
 
             if (updateContractReq.getContractLineList() != null && updateContractReq.getContractLineList().size() != 0) {
-                contractRepository.saveAndFlush(contract);
+                contract = contractRepository.saveAndFlush(contract);
                 List<ContractLine> updatedContractLineList = updateContractLine(updateContractReq);
 
                 contract.setContractLines(updatedContractLineList);
-                contractRepository.saveAndFlush(contract);
+                contract = contractRepository.saveAndFlush(contract);
             }
 
             contractRepository.saveAndFlush(contract);
@@ -215,7 +215,7 @@ public class ContractService {
             contractLine.setLastModifiedDateTime(new Date());
             contractLine.setLastModifiedBy(updatedContractReq.getModifierUsername());
 
-            contractLineRepository.saveAndFlush(contractLine);
+            contractLine = contractLineRepository.saveAndFlush(contractLine);
             updatedContractLineList.add(contractLine);
         }
         return updatedContractLineList;
