@@ -15,6 +15,11 @@ public class BudgetModel {
     private BudgetPlanEnum planType;
     private String createBy;
     private String lastModifiedTime;
+    private String costCenterCode;
+    private String teamCode;
+    private String countryCode;
+    private String functionCode;
+
 
     public BudgetModel() {
     }
@@ -37,6 +42,14 @@ public class BudgetModel {
         this.planType = planType;
         this.createBy = createBy;
         this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public String getTeamCode() {
+        return teamCode;
+    }
+
+    public void setTeamCode(String teamCode) {
+        this.teamCode = teamCode;
     }
 
     public String getCreateBy() {
@@ -109,5 +122,44 @@ public class BudgetModel {
 
     public void setBudgetPlanStatus(BudgetPlanStatusEnum budgetPlanStatus) {
         this.budgetPlanStatus = budgetPlanStatus;
+    }
+
+    public String getCostCenterCode() {
+        return costCenterCode;
+    }
+
+    public void setCostCenterCode(String costCenterCode) {
+        this.costCenterCode = costCenterCode;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getFunctionCode() {
+        return functionCode;
+    }
+
+    public void setFunctionCode(String functionCode) {
+        this.functionCode = functionCode;
+    }
+
+    public BudgetModel(List<BudgetLineItemModel> items, Integer forYear, Integer forMonth, String name, String id, BudgetPlanStatusEnum budgetPlanStatus, BudgetPlanEnum planType, String createBy, String lastModifiedTime, String costCenterCode, String countryCode, String functionCode) {
+        this.items = items;
+        this.forYear = forYear;
+        this.forMonth = forMonth;
+        this.name = name;
+        this.id = id;
+        this.budgetPlanStatus = budgetPlanStatus;
+        this.planType = planType;
+        this.createBy = createBy;
+        this.lastModifiedTime = lastModifiedTime;
+        this.costCenterCode = costCenterCode;
+        this.countryCode = countryCode;
+        this.functionCode = functionCode;
     }
 }

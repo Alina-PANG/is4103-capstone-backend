@@ -4,6 +4,7 @@ import capstone.is4103capstone.entities.CostCenter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CostCenterRepository extends JpaRepository<CostCenter,String> {
@@ -13,4 +14,7 @@ public interface CostCenterRepository extends JpaRepository<CostCenter,String> {
 
 //    @Query(value = "SELECT * FROM costCenter s WHERE s.code=?1", nativeQuery = true)
     CostCenter findCostCenterByCode(String code);
+
+    @Query(value = "SELECT * FROM cost_center cc WHERE cc.is_deleted=false",nativeQuery = true)
+    List<CostCenter> findAllNotDeleted();
 }
