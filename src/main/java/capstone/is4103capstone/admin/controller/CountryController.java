@@ -34,6 +34,11 @@ public class CountryController {
         return cs.getCountryByUuid(uuid);
     }
 
+    @GetMapping("/byRegion/{uuid}")
+    public List<CountryDto> getCountryDtoByRegion(@PathVariable(name = "uuid") String uuid) {
+        return cs.getCountryEntityByRegion(uuid);
+    }
+
     @PutMapping
     public CountryDto updateCountry(@RequestBody CountryDto input) {
         try {

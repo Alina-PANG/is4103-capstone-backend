@@ -59,6 +59,18 @@ public class CountryService {
         }
     }
 
+    public List<CountryDto> getCountryEntityByRegion(String uuid) throws DbObjectNotFoundException {
+        try {
+            List<CountryDto> countryDtos = new ArrayList<>();
+            for (Country country : countryRepository.findCountriesByRegionId(uuid)) {
+                if (!country.getDeleted()) countryDtos.add(entityToDto(country));
+            }
+            return countryDtos;
+        } catch (Exception ex) {
+            throw new DbObjectNotFoundException("Country with UUID " + uuid + " not found!");
+        }
+    }
+
     public CountryDto getCountryByUuid(String uuid) {
         return entityToDto(getCountryEntityByUuid(uuid));
     }
@@ -99,6 +111,7 @@ public class CountryService {
     public Country dtoToEntity(CountryDto input) {
         Country country = new Country();
         input.getId().ifPresent(id -> country.setId(id));
+        input.getCode().ifPresent(id -> country.setCode(id));
         input.getObjectName().ifPresent(name -> country.setObjectName(name));
         input.getRegionId().ifPresent(regionId -> country.setRegion(regionRepository.getOne(regionId)));
         return country;
