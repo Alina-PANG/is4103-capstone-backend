@@ -1,13 +1,11 @@
 package capstone.is4103capstone.finance.budget.model.req;
 
-import capstone.is4103capstone.general.model.GeneralRes;
-
 import java.io.Serializable;
 
 public class ApproveBudgetReq implements Serializable {
     Boolean approved;
     String username;
-    String id;
+    String planId;
 
     public ApproveBudgetReq() {
     }
@@ -15,7 +13,7 @@ public class ApproveBudgetReq implements Serializable {
     public ApproveBudgetReq(Boolean approved, String username, String id) {
         this.approved = approved;
         this.username = username;
-        this.id = id;
+        this.planId = id;
     }
 
 
@@ -35,11 +33,11 @@ public class ApproveBudgetReq implements Serializable {
         this.username = username;
     }
 
-    public String getId() {
-        return id;
+    public String getPlanId() {
+        return planId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setPlanId(String planId) {
+        this.planId = planId;
     }
 }

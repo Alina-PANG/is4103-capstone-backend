@@ -1,8 +1,11 @@
 package capstone.is4103capstone.finance.budget.service;
 
 import capstone.is4103capstone.admin.repository.CostCenterRepository;
+import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.CostCenter;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
@@ -14,6 +17,7 @@ import capstone.is4103capstone.finance.budget.model.res.BudgetModel;
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetListRes;
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
@@ -42,6 +46,8 @@ public class BudgetService {
     CostCenterRepository costCenterRepository;
     @Autowired
     MerchandiseRepository merchandiseRepository;
+    @Autowired
+    EmployeeRepository employeeRepository;
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -130,7 +136,18 @@ public class BudgetService {
             generateCode(planRepository,newPlan);
 
             logger.info("Successully submitted the new plan! -- "+createBudgetReq.getUsername()+" "+new Date());
-            return new GeneralRes("Successully submitted the new budget plan!", false);
+
+            //TODO: create approval ticket sending email notification to the approver:
+            if (createBudgetReq.getToSubmit()){
+                try{
+                    createApprovalTicket(createBudgetReq.getUsername(),cc.getBmApprover(),newPlan,"BM Approver please view the budget plan.");
+                    createApprovalTicket(createBudgetReq.getUsername(),cc.getFunctionApprover(),newPlan,"Function approver please view the budget plan.");
+                }catch (Exception emailExc){
+                }
+            }
+
+
+            return new GeneralRes("Successully "+(createBudgetReq.getToSubmit()?"submit":"save")+" the plan!", false);
         }catch (Exception ex){
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
@@ -155,7 +172,7 @@ public class BudgetService {
             List<BudgetLineItemModel> items = new ArrayList<>();
             BudgetModel plan = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), id, p.getBudgetPlanStatus(),p.getPlanType());
             plan.setCreateBy(p.getCreatedBy());
-
+            plan.setDescription(p.getPlanDescription());
             plan.setCostCenterCode(p.getCostCenter().getCode());
             plan.setTeamCode(p.getCostCenter().getTeam().getCode());
             plan.setCountryCode(p.getCostCenter().getTeam().getCountry().getCode());
@@ -256,14 +273,24 @@ public class BudgetService {
 
     public GeneralRes approveBudget(ApproveBudgetReq approveBudgetReq) {
         try {
-            Plan plan = planRepository.getOne(approveBudgetReq.getId());
-            BudgetPlanStatusEnum budgetPlanStatusEnum = BudgetPlanStatusEnum.APPROVED;
-            if (!approveBudgetReq.getApproved()) {
-                plan.setBudgetPlanStatus(BudgetPlanStatusEnum.REJECTED);
+            Optional<Plan> planOp = planRepository.findById(approveBudgetReq.getPlanId());
+            if (!planOp.isPresent()){
+                throw new Exception("Plan Id not found");
             }
+            Plan plan = planOp.get();
+            if (!approveBudgetReq.getApproved())
+                plan.setBudgetPlanStatus(BudgetPlanStatusEnum.REJECTED);
+            else
+                plan.setBudgetPlanStatus(BudgetPlanStatusEnum.APPROVED);
+
+            //disable the approval ticket also.
+
+
+
+
             planRepository.saveAndFlush(plan);
-            logger.info("Successully "+budgetPlanStatusEnum+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
-            return new GeneralRes("Successfully "+budgetPlanStatusEnum+" the plan!", false);
+            logger.info("Successully "+plan.getBudgetPlanStatus()+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
+            return new GeneralRes("Successfully "+plan.getBudgetPlanStatus()+" the plan!", false);
         }catch(Exception ex){
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
@@ -317,6 +344,11 @@ public class BudgetService {
     }
 
 
+    private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content){
+        Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
+        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,"Please review the plan submitted");
+        //TODO: What's the message content?
+    }
 
 
 }

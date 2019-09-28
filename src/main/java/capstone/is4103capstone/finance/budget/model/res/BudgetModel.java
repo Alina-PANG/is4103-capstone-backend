@@ -19,6 +19,7 @@ public class BudgetModel {
     private String teamCode;
     private String countryCode;
     private String functionCode;
+    private String description;
 
 
     public BudgetModel() {
@@ -148,8 +149,7 @@ public class BudgetModel {
         this.functionCode = functionCode;
     }
 
-    public BudgetModel(List<BudgetLineItemModel> items, Integer forYear, Integer forMonth, String name, String id, BudgetPlanStatusEnum budgetPlanStatus, BudgetPlanEnum planType, String createBy, String lastModifiedTime, String costCenterCode, String countryCode, String functionCode) {
-        this.items = items;
+    public BudgetModel(Integer forYear, Integer forMonth, String name, String id, BudgetPlanStatusEnum budgetPlanStatus, BudgetPlanEnum planType, String createBy, String lastModifiedTime, String costCenterCode, String teamCode, String countryCode, String functionCode, String description) {
         this.forYear = forYear;
         this.forMonth = forMonth;
         this.name = name;
@@ -159,7 +159,17 @@ public class BudgetModel {
         this.createBy = createBy;
         this.lastModifiedTime = lastModifiedTime;
         this.costCenterCode = costCenterCode;
+        this.teamCode = teamCode;
         this.countryCode = countryCode;
         this.functionCode = functionCode;
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
