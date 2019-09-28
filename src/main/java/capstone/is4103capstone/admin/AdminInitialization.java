@@ -133,7 +133,7 @@ public class AdminInitialization {
         countrySG.getFunctions().add(function);
 
         Office office = new Office("One Raffles Quay", "ORQ", "APAC-SG-ORQ");
-        Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG", "APAC");
+        Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG");
         office.setAddress(orqAddress);
         office.setNumOfFloors(2);
 
