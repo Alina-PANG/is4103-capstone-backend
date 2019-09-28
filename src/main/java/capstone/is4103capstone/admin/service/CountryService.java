@@ -68,18 +68,18 @@ public class CountryService {
     }
 
     // === UPDATE ===
-    @Transactional
-    public Country updateCountryEntity(Country country) throws Exception {
-        try {
-            Country workingCountry = countryRepository.getOne(country.getId());
-            workingCountry.setCode(country.getCode());
-            workingCountry.setRegion(country.getRegion());
-            workingCountry.setObjectName(country.getObjectName());
-            return workingCountry;
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Country with UUID " + country.getId() + " not found!");
-        }
-    }
+//    @Transactional
+//    public Country updateCountryEntity(Country country) throws Exception {
+//        try {
+//            Country workingCountry = countryRepository.getOne(country.getId());
+//            workingCountry.setCode(country.getCode());
+//            workingCountry.setRegion(country.getRegion());
+//            workingCountry.setObjectName(country.getObjectName());
+//            return workingCountry;
+//        } catch (IllegalArgumentException ex) {
+//            throw new DbObjectNotFoundException("Country with UUID " + country.getId() + " not found!");
+//        }
+//    }
 
     @Transactional
     public CountryDto updateCountry(CountryDto input) throws Exception {

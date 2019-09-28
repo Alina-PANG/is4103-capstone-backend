@@ -8,8 +8,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Optional;
 
-@Getter
-@Setter
 @JsonInclude(JsonInclude.Include.NON_EMPTY) // don't serialize nulls since there are optional classes
 public class AuditTrailActivityDto implements Serializable {
 
@@ -18,4 +16,35 @@ public class AuditTrailActivityDto implements Serializable {
     private Optional<String> activity = Optional.empty();
     private Optional<Date> timeStamp = Optional.empty();
 
+    public Optional<Integer> getId() {
+        return id;
+    }
+
+    public void setId(Optional<Integer> id) {
+        this.id = id;
+    }
+
+    public Optional<String> getUserUuid() {
+        return userUuid;
+    }
+
+    public void setUserUuid(Optional<String> userUuid) {
+        this.userUuid = userUuid;
+    }
+
+    public Optional<String> getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Optional<String> activity) {
+        this.activity = activity;
+    }
+
+    public Optional<Date> getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Optional<Date> timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 }

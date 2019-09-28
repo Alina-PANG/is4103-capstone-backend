@@ -4,6 +4,7 @@ import capstone.is4103capstone.admin.controller.model.res.CountryRes;
 import capstone.is4103capstone.admin.dto.CountryDto;
 import capstone.is4103capstone.admin.service.AuditTrailActivityService;
 import capstone.is4103capstone.admin.service.CountryService;
+import capstone.is4103capstone.general.service.WriteAuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,8 +49,9 @@ public class CountryController {
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CountryRes> getCountryByUuid(@PathVariable(name = "uuid") String uuid) {
+    public ResponseEntity<CountryRes> getCountryByUuid(@PathVariable(name = "uuid") String uuid,@RequestParam(name = "username",required = true) String username) {
         try {
+            WriteAuditTrail.auditActivity("View all countries",username);
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.getCountryByUuid(uuid)))));
@@ -61,8 +63,9 @@ public class CountryController {
     }
 
     @GetMapping("/byRegion/{region}")
-    public ResponseEntity<CountryRes> getCountryDtoByRegion(@PathVariable(name = "region") String region) throws Exception {
+    public ResponseEntity<CountryRes> getCountryDtoByRegion(@PathVariable(name = "region") String region,@RequestParam(name = "username",required = true) String username) throws Exception {
         try {
+            WriteAuditTrail.autoAudit(username);
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(cs.getCountryEntityByRegion(region))));

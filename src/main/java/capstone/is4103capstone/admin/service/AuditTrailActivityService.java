@@ -22,11 +22,14 @@ public class AuditTrailActivityService {
     @Autowired
     EmployeeRepository employeeRepository;
 
+    private final int[] TRACE_TRACK_LEVELS = {5,4,3,2,1};
+    private final String SPLIT_CHAR = ".";
+
     public AuditTrailActivity createNewRecordUsingUserUuid(String activityName, String userUuid) {
         AuditTrailActivity ata;
         // check if you want autodetection
         if (activityName.equalsIgnoreCase("autodetect")) {
-            ata = new AuditTrailActivity(userUuid, Thread.currentThread().getStackTrace()[2].getMethodName());
+            ata = new AuditTrailActivity(userUuid, composeTraceTrack());
         } else {
             ata = new AuditTrailActivity(userUuid, activityName);
         }
@@ -40,12 +43,21 @@ public class AuditTrailActivityService {
         if (Objects.isNull(employee)) throw new Exception("User with username " + userName + " not found!");
         // check if you want autodetection
         if (activityName.equalsIgnoreCase("autodetect")) {
-            ata = new AuditTrailActivity(employee.getId(), Thread.currentThread().getStackTrace()[2].getMethodName());
+            ata = new AuditTrailActivity(employee.getId(), composeTraceTrack());
         } else {
             ata = new AuditTrailActivity(employee.getId(), activityName);
         }
         return auditTrailActivityRepo.save(ata);
     }
+
+    private String composeTraceTrack(){//[TODO: not done]
+        List<String> levels = new ArrayList<>();
+        for (int i = 0; i < TRACE_TRACK_LEVELS.length; i++){
+            levels.add(Thread.currentThread().getStackTrace()[i].getMethodName());
+        }
+        return String.join(SPLIT_CHAR,levels);
+    }
+
 
     public List<AuditTrailActivity> getAllAuditTrailRecords() throws Exception {
         List<AuditTrailActivity> result = auditTrailActivityRepo.findAll();
