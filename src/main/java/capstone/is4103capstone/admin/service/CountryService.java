@@ -85,7 +85,7 @@ public class CountryService {
     public CountryDto updateCountry(CountryDto input) throws Exception {
         Country country = getCountryEntityByUuid(input.getId().orElseThrow(() -> new Exception("Empty UUID provided!")));
         if (country.getDeleted())
-            throw new Exception("Country with UUID " + country.getId() + " has deleted status and cannot be modified!");
+            throw new Exception("Country with UUID " + country.getId() + " has already been deleted and cannot be modified!");
         Country newObj = dtoToEntity(input);
         country.setObjectName(newObj.getObjectName());
         country.setRegion(newObj.getRegion());
