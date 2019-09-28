@@ -13,19 +13,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/email/{username}")
+@RequestMapping("/api/email")
 @CrossOrigin(origins = "http://localhost:3000")
 public class EmailController {
     @Autowired
     MailSenderService mailSenderService;
 
-    @RequestMapping(value = "/send")
+    @RequestMapping(value = "/send/{username}")
     public ResponseEntity<GeneralRes> sendEmail(@RequestBody Mail mail, @PathVariable("username") String username) {
         String template = "mailTemplate";
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("name", "Hangzhi");
         model.put("message", "test message");
         mail.setModel(model);
+//        mailSenderService.sendmail();
         if(Authentication.authenticateUser(username))
             return ResponseEntity
                     .ok()
