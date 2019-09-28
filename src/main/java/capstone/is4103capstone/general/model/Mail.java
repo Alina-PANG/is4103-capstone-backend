@@ -1,9 +1,10 @@
 package capstone.is4103capstone.general.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Mail {
+public class Mail implements Serializable {
     private String from;
     private String to;
     private String subject;
