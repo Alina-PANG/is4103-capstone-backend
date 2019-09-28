@@ -1,50 +1,88 @@
 package capstone.is4103capstone.admin.controller;
 
+import capstone.is4103capstone.admin.controller.model.res.CountryRes;
 import capstone.is4103capstone.admin.dto.CountryDto;
+import capstone.is4103capstone.admin.service.AuditTrailActivityService;
 import capstone.is4103capstone.admin.service.CountryService;
-import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/ce/country")
 public class CountryController {
 
+    @Autowired
+    AuditTrailActivityService atas;
 
     @Autowired
     CountryService cs;
 
     @PostMapping
-    public CountryDto createCountry(@RequestBody CountryDto input) {
-        return cs.createCountry(input);
+    public ResponseEntity<CountryRes> createCountry(@RequestBody CountryDto input) {
+        try {
+            return ResponseEntity
+                    .ok()
+                    .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.createCountry(input)))));
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new CountryRes(ex.getMessage(), true, Optional.empty()));
+        }
     }
 
     @GetMapping
-    public List<CountryDto> getAllCountries() {
-        return cs.getAllCountries();
+    public ResponseEntity<CountryRes> getAllCountries() {
+        try {
+            return ResponseEntity
+                    .ok()
+                    .body(new CountryRes(null, false, Optional.of(cs.getAllCountries())));
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new CountryRes(ex.getMessage(), true, Optional.empty()));
+        }
     }
 
     @GetMapping("/{uuid}")
-    public CountryDto getCountryDto(@PathVariable(name = "uuid") String uuid) {
-        return cs.getCountryByUuid(uuid);
+    public ResponseEntity<CountryRes> getCountryByUuid(@PathVariable(name = "uuid") String uuid) {
+        try {
+            return ResponseEntity
+                    .ok()
+                    .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.getCountryByUuid(uuid)))));
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new CountryRes(ex.getMessage(), true, Optional.empty()));
+        }
     }
 
-    @GetMapping("/byRegion/{uuid}")
-    public List<CountryDto> getCountryDtoByRegion(@PathVariable(name = "uuid") String uuid) {
-        return cs.getCountryEntityByRegion(uuid);
+    @GetMapping("/byRegion/{region}")
+    public ResponseEntity<CountryRes> getCountryDtoByRegion(@PathVariable(name = "region") String region) throws Exception {
+        try {
+            return ResponseEntity
+                    .ok()
+                    .body(new CountryRes(null, false, Optional.of(cs.getCountryEntityByRegion(region))));
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new CountryRes(ex.getMessage(), true, Optional.empty()));
+        }
     }
 
     @PutMapping
-    public CountryDto updateCountry(@RequestBody CountryDto input) {
+    public ResponseEntity<CountryRes> updateCountry(@RequestBody CountryDto input) throws Exception {
         try {
-            return cs.updateCountry(input);
-        } catch (NullPointerException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+            return ResponseEntity
+                    .ok()
+                    .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.updateCountry(input)))));
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new CountryRes(ex.getMessage(), true, Optional.empty()));
         }
     }
 
@@ -52,9 +90,13 @@ public class CountryController {
     public ResponseEntity deleteCountry(@PathVariable(name = "uuid") String uuid) {
         try {
             cs.deleteCountry(uuid);
-            return ResponseEntity.status(HttpStatus.OK).body("Country with UUID " + uuid + " sucessfully deleted.");
-        } catch (DbObjectNotFoundException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+            return ResponseEntity
+                    .ok()
+                    .body(new CountryRes("Country with UUID " + uuid + " has been successfully deleted.", false, Optional.empty()));
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new CountryRes(ex.getMessage(), true, Optional.empty()));
         }
     }
 }
