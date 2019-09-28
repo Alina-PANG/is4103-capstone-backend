@@ -1,6 +1,6 @@
 package capstone.is4103capstone;
 
-import capstone.is4103capstone.general.service.FileStorageProperties;
+import capstone.is4103capstone.general.properties.FileStorageProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
