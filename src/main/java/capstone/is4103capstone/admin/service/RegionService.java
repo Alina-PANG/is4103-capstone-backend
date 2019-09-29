@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -34,8 +34,8 @@ public class RegionService {
     }
 
     public RegionDto createRegion(RegionDto input) {
-        Region toCreate = convertDtoToRegion(input);
-        return convertRegionToDto(createRegionByEntity(toCreate));
+        Region toCreate = dtoToEntity(input);
+        return entityToDto(createRegionByEntity(toCreate));
     }
 
     // === RETRIEVE ===
@@ -45,61 +45,49 @@ public class RegionService {
         return regionList;
     }
 
-    public List<RegionDto> getAllRegions() {
-        List<Region> regionList = getAllRegionEntities();
-        List<RegionDto> regionDtos = new ArrayList<>();
-        for (Region region : regionList) {
-            if (!region.getDeleted()) regionDtos.add(convertRegionToDto(region));
-        }
-        return regionDtos;
+    public List<RegionDto> getAllRegions() throws Exception {
+        return entityToDto(getAllRegionEntities(), true);
     }
 
-    public Region getRegionEntityByUuid(String uuid) {
-        try {
-            Region region = regionRepository.getOne(uuid);
-            return region;
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Region with UUID " + uuid + " was not found.");
-        }
+    public Region getRegionEntityByUuid(String uuid) throws Exception {
+        Region region = regionRepository.findRegionById(uuid);
+        if (Objects.isNull(region)) throw new Exception("Region with UUID " + uuid + " was not found.");
+        return region;
     }
 
-    public RegionDto getRegionByUuid(String uuid) {
-        return convertRegionToDto(getRegionEntityByUuid(uuid));
+    public RegionDto getRegionByUuid(String uuid) throws Exception {
+        return entityToDto(getRegionEntityByUuid(uuid));
     }
 
     // === UPDATE ===
     @Transactional
-    public Region updateRegionEntity(Region regionToChange) throws EntityNotFoundException {
-        Region workingRegion = regionRepository.getOne(regionToChange.getId());
+    public Region updateRegionEntity(Region regionToChange) throws Exception {
+        Region workingRegion = regionRepository.findRegionById(regionToChange.getId());
+        if (Objects.isNull(workingRegion))
+            throw new Exception("Region with UUID " + regionToChange.getId() + " was not found!");
+        if (workingRegion.getDeleted())
+            throw new Exception("Region with UUID " + regionToChange.getId() + " has already been deleted and cannot be modified!");
         workingRegion.setObjectName(regionToChange.getObjectName());
-        workingRegion.setCode(regionToChange.getCode());
         return workingRegion;
     }
 
     @Transactional
-    public RegionDto updateRegion(RegionDto input) {
-        try {
-            Region workingRegion = regionRepository.getOne(input.getId().orElseThrow(() -> new NullPointerException("UUID is null!")));
-            input.getObjectName().ifPresent(workingRegion::setObjectName);
-            return convertRegionToDto(workingRegion);
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Region with UUID " + input.getId() + " not found!");
-        }
+    public RegionDto updateRegion(RegionDto input) throws Exception {
+        return entityToDto(updateRegionEntity(dtoToEntity(input)));
     }
 
     // === DELETE ===
     @Transactional
-    public boolean deleteRegion(String regionUuid) {
-        try {
-            regionRepository.getOne(regionUuid).setDeleted(true);
-            return true;
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Object not found!");
-        }
+    public boolean deleteRegion(String regionUuid) throws Exception {
+        Region region = regionRepository.findRegionById(regionUuid);
+        if (Objects.isNull(region)) throw new Exception("Region with UUID " + regionUuid + " was not found!");
+        if (region.getDeleted()) throw new Exception(("Region with UUID " + regionUuid + " has already been deleted!"));
+        region.setDeleted(true);
+        return true;
     }
 
     // ===== DTO TO ENTITY CONVERSION METHODS =====
-    public RegionDto convertRegionToDto(Region input) {
+    public RegionDto entityToDto(Region input) {
 
         RegionDto regionDto = new RegionDto();
         regionDto.setId(Optional.of(input.getId()));
@@ -115,7 +103,20 @@ public class RegionService {
         return regionDto;
     }
 
-    public Region convertDtoToRegion(RegionDto input) {
+    public List<RegionDto> entityToDto(List<Region> input, boolean suppressDeleted) throws Exception {
+        List<RegionDto> regionDtos = new ArrayList<>();
+        for (Region region : input) {
+            if (suppressDeleted) {
+                if (!region.getDeleted()) regionDtos.add(entityToDto(region));
+            } else {
+                regionDtos.add(entityToDto(region));
+            }
+        }
+        if (regionDtos.isEmpty()) throw new Exception("No records found!");
+        return regionDtos;
+    }
+
+    public Region dtoToEntity(RegionDto input) {
 
         Region region = new Region();
         input.getId().ifPresent(value -> region.setId(value));
@@ -130,6 +131,15 @@ public class RegionService {
             region.setCountries(countryList);
         });
         return region;
+    }
+
+    public List<Region> dtoToEntity(List<RegionDto> input) throws Exception {
+        List<Region> regions = new ArrayList<>();
+        for (RegionDto regionDto : input) {
+            regions.add(dtoToEntity(regionDto));
+        }
+        if (regions.isEmpty()) throw new Exception("No regions were input!");
+        return regions;
     }
 
 }
