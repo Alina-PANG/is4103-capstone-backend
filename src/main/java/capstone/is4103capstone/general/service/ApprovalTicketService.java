@@ -21,29 +21,53 @@ public class ApprovalTicketService {
     private static final Logger logger = LoggerFactory.getLogger(ApprovalTicketService.class);
 
     @Autowired
-    static  EmployeeRepository employeeRepository;
+    EmployeeRepository _employeeRepository;
     @Autowired
-    static ApprovalForRequestRepository approvalForRequestRepository;
+    ApprovalForRequestRepository _approvalForRequestRepository;
 
-    public static boolean createTicketAndSendEmail(String requesterUsername, String approverUsername, DBEntityTemplate requestedItem, String content){
-        return false;
+    static  EmployeeRepository employeeRepo;
+    static ApprovalForRequestRepository approvalForRequestRepo;
+
+    @Autowired
+    public void setEmployeeRepo(EmployeeRepository repo){
+        ApprovalTicketService.employeeRepo = repo;
+    }
+    @Autowired
+    public void setApprovalRepo(ApprovalForRequestRepository repo){
+        ApprovalTicketService.approvalForRequestRepo = repo;
     }
 
-    public static boolean createTicketAndSendEmail(Employee requester, Employee receiver, DBEntityTemplate requestedItem, String content){
+    public static boolean createTicketAndSendEmail(String requesterUsername, String approverUsername, DBEntityTemplate requestedItem, String content,ApprovalTypeEnum approvalType){
+        try{
+            Employee requester = employeeRepo.findEmployeeByUserName(requesterUsername);
+            Employee approver = employeeRepo.findEmployeeByUserName(approverUsername);
+            if (requester == null || approver == null){
+                throw new Exception("Usernames not correct.");
+            }
+            return createTicketAndSendEmail(requester,approver,requestedItem,content,approvalType);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return false;
+        }
+
+
+    }
+
+    public static boolean createTicketAndSendEmail(Employee requester, Employee receiver, DBEntityTemplate requestedItem, String content,ApprovalTypeEnum approvalType){
         try {
             ApprovalForRequest ticket = new ApprovalForRequest();
             ticket.setCreatedBy(requester.getUserName());
-            ticket.setRequestedItemCode(requestedItem.getCode());
-            ticket.setApprovalType(ApprovalTypeEnum.BUDGETPLAN);
+            ticket.setRequestedItemId(requestedItem.getId());
+            ticket.setApprovalType(approvalType);
             ticket.setRequester(requester);
             ticket.setApprover(receiver);
             ticket.setApprovalStatus(ApprovalStatusEnum.PENDING);
             ticket.setCommentByRequester(content);
-            ticket = approvalForRequestRepository.save(ticket);
-            String code = EntityCodeHPGeneration.getCode(approvalForRequestRepository, ticket);
+            ticket = approvalForRequestRepo.save(ticket);
+            String code = EntityCodeHPGeneration.getCode(approvalForRequestRepo, ticket);
             ticket.setCode(code);
             ticket.setObjectName(code);
-            approvalForRequestRepository.save(ticket);
+            approvalForRequestRepo.save(ticket);
             requester.getMyRequestTickets().add(ticket.getId());
             receiver.getMyApprovals().add(ticket.getId());
             sendEmail(ticket);
@@ -53,7 +77,7 @@ public class ApprovalTicketService {
         return true;
     }
     public static boolean approveTicket(String ticketId, String comment){
-        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepository.findById(ticketId);
+        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findById(ticketId);
         if (!ticketOp.isPresent()) return false;
 
         ApprovalForRequest ticket = ticketOp.get();
@@ -61,18 +85,29 @@ public class ApprovalTicketService {
         return modifyRequest(ApprovalStatusEnum.APPROVED, ticket);
     }
 
-    public static boolean approveTicket(DBEntityTemplate requestedItem, String comment){
-        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepository.findById(ticketId);
+    public static boolean approveTicketByEntity(DBEntityTemplate requestedItem, String comment, String approverUsername){
+        String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
+        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityId(requestedItem.getId(),approverId);
         if (!ticketOp.isPresent()) return false;
 
         ApprovalForRequest ticket = ticketOp.get();
         ticket.setCommentByApprover(comment);
         return modifyRequest(ApprovalStatusEnum.APPROVED, ticket);
+    }
+
+    public static boolean rejectTicketByEntity(DBEntityTemplate requestedItem, String comment, String approverUsername){
+        String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
+        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityId(requestedItem.getId(),approverId);
+        if (!ticketOp.isPresent()) return false;
+
+        ApprovalForRequest ticket = ticketOp.get();
+        ticket.setCommentByApprover(comment);
+        return modifyRequest(ApprovalStatusEnum.REJECTED, ticket);
     }
 
 
     public static boolean rejectTicket(String ticketId, String comment){
-        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepository.findById(ticketId);
+        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findById(ticketId);
         if (!ticketOp.isPresent()) return false;
 
         ApprovalForRequest ticket = ticketOp.get();
@@ -85,7 +120,7 @@ public class ApprovalTicketService {
 
             ticket.setApprovalStatus(result);
             ticket.setLastModifiedBy(ticket.getRequester().getUserName());
-            approvalForRequestRepository.save(ticket);
+            approvalForRequestRepo.save(ticket);
             return true;
         }catch (Exception e){
             logger.error(e.getMessage());
@@ -94,7 +129,7 @@ public class ApprovalTicketService {
     }
 
 
-    private static boolean approveRequest(){
+    private static void approveRequest(){
 
     }
 

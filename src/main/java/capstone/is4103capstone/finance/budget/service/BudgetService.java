@@ -19,6 +19,7 @@ import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
+import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
@@ -29,6 +30,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.GenerationType;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -99,7 +101,7 @@ public class BudgetService {
             }
             Plan newPlan = new Plan();
             if(createBudgetReq.isToSubmit()){
-                newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.PENDING_APPROVAL);
+                newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.PENDING_BM_APPROVAL);
             }
             else{
                 newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.DRAFT);
@@ -141,7 +143,7 @@ public class BudgetService {
             if (createBudgetReq.getToSubmit()){
                 try{
                     createApprovalTicket(createBudgetReq.getUsername(),cc.getBmApprover(),newPlan,"BM Approver please view the budget plan.");
-                    createApprovalTicket(createBudgetReq.getUsername(),cc.getFunctionApprover(),newPlan,"Function approver please view the budget plan.");
+//                    createApprovalTicket(createBudgetReq.getUsername(),cc.getFunctionApprover(),newPlan,"Function approver please view the budget plan.");
                 }catch (Exception emailExc){
                 }
             }
@@ -270,31 +272,59 @@ public class BudgetService {
 //        }
     }
 
-
     public GeneralRes approveBudget(ApproveBudgetReq approveBudgetReq) {
         try {
             Optional<Plan> planOp = planRepository.findById(approveBudgetReq.getPlanId());
-            if (!planOp.isPresent()){
+            if (!planOp.isPresent()) {
                 throw new Exception("Plan Id not found");
             }
             Plan plan = planOp.get();
-            if (!approveBudgetReq.getApproved())
-                plan.setBudgetPlanStatus(BudgetPlanStatusEnum.REJECTED);
-            else
-                plan.setBudgetPlanStatus(BudgetPlanStatusEnum.APPROVED);
+            if (!plan.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.PENDING_BM_APPROVAL) && !plan.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.PENDING_FUNCTION_APPROVAL)) {
+                logger.error("Internal error, a non-pending budget plan goes into approve function");
+                throw new Exception("Internal error, a non-pending budget plan goes into approve function");
+            }
+            if (approveBudgetReq.getApprovalType() == 0) { //0:bm
+                return BMApproval(approveBudgetReq, plan);
+            } else {
+                return functionApproval(approveBudgetReq, plan);
+            }
 
-            //disable the approval ticket also.
-
-
-
-
-            planRepository.saveAndFlush(plan);
-            logger.info("Successully "+plan.getBudgetPlanStatus()+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
-            return new GeneralRes("Successfully "+plan.getBudgetPlanStatus()+" the plan!", false);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+            return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
         }
+    }
+    private GeneralRes BMApproval(ApproveBudgetReq approveBudgetReq, Plan plan) throws Exception{
+        if (!approveBudgetReq.getApproved()){
+            plan.setBudgetPlanStatus(BudgetPlanStatusEnum.REJECTED);
+            ApprovalTicketService.rejectTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
+        }
+        else{
+            plan.setBudgetPlanStatus(BudgetPlanStatusEnum.PENDING_FUNCTION_APPROVAL);
+            ApprovalTicketService.approveTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
+            createApprovalTicket(approveBudgetReq.getUsername(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.");
+
+        }
+
+        planRepository.saveAndFlush(plan);
+        logger.info("BM APPROVEL Successully "+plan.getBudgetPlanStatus()+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
+        return new GeneralRes("BM APPROVAL Successfully "+plan.getBudgetPlanStatus()+" the plan!", false);
+
+    }
+    private GeneralRes functionApproval(ApproveBudgetReq approveBudgetReq, Plan plan) throws Exception{
+        if (!approveBudgetReq.getApproved()){
+            plan.setBudgetPlanStatus(BudgetPlanStatusEnum.REJECTED);
+            ApprovalTicketService.rejectTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
+        }
+        else{
+            plan.setBudgetPlanStatus(BudgetPlanStatusEnum.APPROVED);
+            ApprovalTicketService.approveTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
+        }
+
+        planRepository.saveAndFlush(plan);
+        logger.info("BM APPROVEL Successully "+plan.getBudgetPlanStatus()+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
+        return new GeneralRes("BM APPROVAL Successfully "+plan.getBudgetPlanStatus()+" the plan!", false);
+
     }
 
     private boolean checkPlanTypeAndYear(Plan p, Integer request, Integer year){
@@ -346,7 +376,7 @@ public class BudgetService {
 
     private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content){
         Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
-        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,"Please review the plan submitted");
+        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, ApprovalTypeEnum.BUDGETPLAN);
         //TODO: What's the message content?
     }
 

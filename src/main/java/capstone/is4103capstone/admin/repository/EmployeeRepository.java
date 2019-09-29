@@ -10,4 +10,5 @@ public interface EmployeeRepository extends JpaRepository<Employee,String> {
 
     public Employee findEmployeeByCode(String employeeCode);
 
+    public Employee findEmployeeById(String id);
 }
