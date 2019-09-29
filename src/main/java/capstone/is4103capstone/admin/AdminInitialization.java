@@ -62,9 +62,15 @@ public class AdminInitialization {
     public void createEmployee() {
         Employee newEmployee = new Employee("yingshi2502", "Yingshi", "Huang", "", "password");
         newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        newEmployee.setCode("ENPLOYEE-yingshi2502");
+        newEmployee.setCode("EMPLOYEE-yingshi2502");
         newEmployee.setCreatedBy("admin");
         newEmployee.setLastModifiedBy("admin");
+
+        Employee newEmployee2 = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
+        newEmployee2.setEmployeeType(EmployeeTypeEnum.WORKINGFROMHOME);
+        newEmployee2.setCode("EMPLOYEE-caiyuqian");
+        newEmployee2.setCreatedBy("admin");
+        newEmployee2.setLastModifiedBy("admin");
 
         Employee admin = new Employee("admin", "adminFirstName", "adminLastName", "adminMiddleName", "password");
         admin.setEmployeeType(EmployeeTypeEnum.PERMANENT);
@@ -82,23 +88,24 @@ public class AdminInitialization {
         */
 
         employeeRepository.save(newEmployee);
+        employeeRepository.save(newEmployee2);
         employeeRepository.save(admin);
 
-//        Team team = teamRepository.findTeamByCode("DTS");
-//
-//        newEmployee.getMemberOfTeams().add(team);
-//        admin.getMemberOfTeams().add(team);
-//        team.getMembers().add(newEmployee);
-//        team.getMembers().add(admin);
-//        newEmployee.setHierachyPath("APAC-SG-TECH-DTS-yingshi2502");
-//        admin.setHierachyPath("APAC-ADMIN");
-////
-//        newEmployee.setManager(admin);
-//        admin.getSubordinates().add(newEmployee);
-//
-//        teamRepository.saveAndFlush(team);
-//        employeeRepository.saveAndFlush(newEmployee);
-//        employeeRepository.saveAndFlush(admin);
+        Team team = teamRepository.findTeamByCode("APP");
+
+        newEmployee.getMemberOfTeams().add(team);
+        newEmployee2.getMemberOfTeams().add(team);
+        team.getMembers().add(newEmployee);
+        team.getMembers().add(newEmployee2);
+        newEmployee.setHierachyPath("APAC-SG-TECH-APP-yingshi2502");
+        newEmployee2.setHierachyPath("APAC-SG-TECH-APP-caiyuqian");
+
+        newEmployee2.setManager(newEmployee);
+        newEmployee.getSubordinates().add(newEmployee2);
+
+        teamRepository.saveAndFlush(team);
+        employeeRepository.saveAndFlush(newEmployee);
+        employeeRepository.saveAndFlush(newEmployee2);
 
     }
 
@@ -152,6 +159,12 @@ public class AdminInitialization {
         team = teamRepository.save(team);
         team.setFunction(function);
 
+        Team team2 = new Team("App Development", "APP", "Tech-APP");
+        team2.setCreatedBy("admin");
+        team2.setLastModifiedBy("admin");
+        team2 = teamRepository.save(team2);
+        team2.setFunction(function);
+
         //last update
         regionRepository.saveAndFlush(region);
         countryRepository.saveAndFlush(countryHK);
@@ -159,6 +172,11 @@ public class AdminInitialization {
         functionRepository.saveAndFlush(function);
         officeRepository.saveAndFlush(office);
         teamRepository.saveAndFlush(team);
+        teamRepository.saveAndFlush(team2);
 
+        office.getFunctionsCodeInOffice().add("Tech");
+        function.getOfficesCodeOfFunction().add("ORQ");
+        officeRepository.save(office);
+        functionRepository.save(function);
     }
 }

@@ -2,8 +2,10 @@ package capstone.is4103capstone.seat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GroupModel {
+public class GroupModel implements Serializable {
     private String id;
     private String code;
     private String name;

@@ -2,35 +2,36 @@ package capstone.is4103capstone.seat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeatAllocationModelForFunction {
-    private GroupModel function; // function id
-    private List<SeatModelForAllocation> seats = new ArrayList<>();
+public class SeatAllocationModelForFunction implements Serializable {
+    private String functionId;
+    private List<String> seatIds = new ArrayList<>();
 
     public SeatAllocationModelForFunction() {
     }
 
-    public SeatAllocationModelForFunction(GroupModel function, List<SeatModelForAllocation> seats) {
-        this.function = function;
-        this.seats = seats;
+    public SeatAllocationModelForFunction(String functionId, List<String> seatIds) {
+        this.functionId = functionId;
+        this.seatIds = seatIds;
     }
 
-    public GroupModel getFunction() {
-        return function;
+    public String getFunctionId() {
+        return functionId;
     }
 
-    public void setFunction(GroupModel function) {
-        this.function = function;
+    public void setFunctionId(String functionId) {
+        this.functionId = functionId;
     }
 
-    public List<SeatModelForAllocation> getSeats() {
-        return seats;
+    public List<String> getSeatIds() {
+        return seatIds;
     }
 
-    public void setSeats(List<SeatModelForAllocation> seats) {
-        this.seats = seats;
+    public void setSeatIds(List<String> seatIds) {
+        this.seatIds = seatIds;
     }
 }

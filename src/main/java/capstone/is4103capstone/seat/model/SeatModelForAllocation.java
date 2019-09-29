@@ -2,31 +2,34 @@ package capstone.is4103capstone.seat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeatModelForAllocation {
+public class SeatModelForAllocation implements Serializable {
     private String id;
     private String code;
     private String type;
 
-    private EmployeeModel employee;
     private GroupModel functionAssigned;
     private GroupModel teamAssigned;
 
-    private ScheduleModel schedule;
-    private boolean hasAllocation;
+    private SeatAllocationModelForEmployee currentOccupancy;
+    private List<SeatAllocationModelForEmployee> allocations = new ArrayList<>();
 
     public SeatModelForAllocation() {
     }
 
-    public SeatModelForAllocation(String id, String code, String type, EmployeeModel employee, GroupModel functionAssigned, GroupModel teamAssigned, ScheduleModel schedule, boolean hasAllocation) {
+    public SeatModelForAllocation(String id, String code, String type, GroupModel functionAssigned, GroupModel teamAssigned,
+                                  SeatAllocationModelForEmployee currentOccupancy, List<SeatAllocationModelForEmployee> allocations) {
         this.id = id;
         this.code = code;
         this.type = type;
-        this.employee = employee;
         this.functionAssigned = functionAssigned;
         this.teamAssigned = teamAssigned;
-        this.schedule = schedule;
-        this.hasAllocation = hasAllocation;
+        this.currentOccupancy = currentOccupancy;
+        this.allocations = allocations;
     }
 
     public String getId() {
@@ -53,14 +56,6 @@ public class SeatModelForAllocation {
         this.type = type;
     }
 
-    public EmployeeModel getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(EmployeeModel employee) {
-        this.employee = employee;
-    }
-
     public GroupModel getFunctionAssigned() {
         return functionAssigned;
     }
@@ -77,19 +72,19 @@ public class SeatModelForAllocation {
         this.teamAssigned = teamAssigned;
     }
 
-    public ScheduleModel getSchedule() {
-        return schedule;
+    public SeatAllocationModelForEmployee getCurrentOccupancy() {
+        return currentOccupancy;
     }
 
-    public void setSchedule(ScheduleModel schedule) {
-        this.schedule = schedule;
+    public void setCurrentOccupancy(SeatAllocationModelForEmployee currentOccupancy) {
+        this.currentOccupancy = currentOccupancy;
     }
 
-    public boolean isHasAllocation() {
-        return hasAllocation;
+    public List<SeatAllocationModelForEmployee> getAllocations() {
+        return allocations;
     }
 
-    public void setHasAllocation(boolean hasAllocation) {
-        this.hasAllocation = hasAllocation;
+    public void setAllocations(List<SeatAllocationModelForEmployee> allocations) {
+        this.allocations = allocations;
     }
 }

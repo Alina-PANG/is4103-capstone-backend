@@ -14,7 +14,7 @@ import java.util.List;
 
 @Entity
 @Table
-public class SeatAllocation extends DBEntityTemplate {
+public class SeatAllocation extends DBEntityTemplate implements Comparable<SeatAllocation> {
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -101,5 +101,10 @@ public class SeatAllocation extends DBEntityTemplate {
     public void setEmployee(Employee employee) {
         this.employee = employee;
         this.setLastModifiedDateTime(new Date());
+    }
+
+    @Override
+    public int compareTo(SeatAllocation anotherSeatAllocation) {
+        return this.schedule.getStartDateTime().compareTo(anotherSeatAllocation.schedule.getStartDateTime());
     }
 }

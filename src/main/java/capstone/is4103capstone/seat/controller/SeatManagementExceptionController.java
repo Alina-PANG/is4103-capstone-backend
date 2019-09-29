@@ -1,10 +1,7 @@
 package capstone.is4103capstone.seat.controller;
 
 import capstone.is4103capstone.seat.model.CustomErrorRes;
-import capstone.is4103capstone.util.exception.SeatAllocationException;
-import capstone.is4103capstone.util.exception.SeatMapCreationException;
-import capstone.is4103capstone.util.exception.SeatMapNotFoundException;
-import capstone.is4103capstone.util.exception.SeatMapUpdateException;
+import capstone.is4103capstone.util.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -44,6 +41,15 @@ public class SeatManagementExceptionController {
 
     @ExceptionHandler(value = SeatMapNotFoundException.class)
     public ResponseEntity handleSeatMapNotFoundException(SeatMapNotFoundException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = SeatNotFoundException.class)
+    public ResponseEntity handleSeatNotFoundException(SeatNotFoundException ex) {
         CustomErrorRes error = new CustomErrorRes();
         error.setTimestamp(LocalDateTime.now());
         error.setError(ex.getMessage());

@@ -1,11 +1,12 @@
 package capstone.is4103capstone.seat.model;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ScheduleModel {
+public class ScheduleModel implements Serializable {
     private String id;
     private Date startDateTime; // >= today && < one year later
     private Date endDateTime; // > startDateTime

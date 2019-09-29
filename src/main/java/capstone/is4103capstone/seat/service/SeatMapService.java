@@ -93,6 +93,8 @@ public class SeatMapService {
         String countryCode = office.getCountry().getCode();
         String officeCode = office.getCode();
         newSeatMap.setCode(countryCode + "-" + officeCode + "-" + newSeatMap.getFloor());
+        newSeatMap.setObjectName(newSeatMap.getCode());
+        newSeatMap.setHierachyPath(newSeatMap.getCode());
         newSeatMap = seatMapRepository.save(newSeatMap);
 
         // Update numOfFloors in office if needed
@@ -207,7 +209,6 @@ public class SeatMapService {
         }
 
         deleteExtraSeats(extraSeats);
-
         System.out.println("********** Save all the changes **********");
         // Save all the changes.
         // Need to set all the seats' code to null to avoid SQLIntegrityConstraintViolationException: duplicate entry of code

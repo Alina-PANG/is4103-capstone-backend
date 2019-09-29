@@ -2,6 +2,7 @@ package capstone.is4103capstone.seat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +63,7 @@ import java.util.List;
 //        }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeatMapModel {
+public class SeatMapModel implements Serializable {
     private String id;
     private String region;
     private String country;

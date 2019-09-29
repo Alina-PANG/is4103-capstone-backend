@@ -47,9 +47,17 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     @JsonIgnore
     private SeatMap seatMap;
     private String originalSeatMapId;
-    @OneToMany(mappedBy = "seat", fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "seat_activeallocations",
+            joinColumns = @JoinColumn(name = "seat_id"),
+            inverseJoinColumns = @JoinColumn(name = "allocation_id")
+    )
     private List<SeatAllocation> activeSeatAllocations = new ArrayList<>();
-    @OneToMany(mappedBy = "seat", fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "seat_inactiveallocations",
+            joinColumns = @JoinColumn(name = "seat_id"),
+            inverseJoinColumns = @JoinColumn(name = "allocation_id")
+    )
     private List<SeatAllocation> inactiveSeatAllocations = new ArrayList<>();
 
     public Seat() {
