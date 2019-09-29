@@ -112,7 +112,6 @@ public class RegionService {
                 regionDtos.add(entityToDto(region));
             }
         }
-        if (regionDtos.isEmpty()) throw new Exception("No records found!");
         return regionDtos;
     }
 
