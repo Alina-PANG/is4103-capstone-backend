@@ -149,21 +149,21 @@ public class BudgetModel {
         this.functionCode = functionCode;
     }
 
-    public BudgetModel(Integer forYear, Integer forMonth, String name, String id, BudgetPlanStatusEnum budgetPlanStatus, BudgetPlanEnum planType, String createBy, String lastModifiedTime, String costCenterCode, String teamCode, String countryCode, String functionCode, String description) {
-        this.forYear = forYear;
-        this.forMonth = forMonth;
-        this.name = name;
-        this.id = id;
-        this.budgetPlanStatus = budgetPlanStatus;
-        this.planType = planType;
-        this.createBy = createBy;
-        this.lastModifiedTime = lastModifiedTime;
-        this.costCenterCode = costCenterCode;
-        this.teamCode = teamCode;
-        this.countryCode = countryCode;
-        this.functionCode = functionCode;
-        this.description = description;
-    }
+//    public BudgetModel(Integer forYear, Integer forMonth, String name, String id, BudgetPlanStatusEnum budgetPlanStatus, BudgetPlanEnum planType, String createBy, String lastModifiedTime, String costCenterCode, String teamCode, String countryCode, String functionCode, String description) {
+//        this.forYear = forYear;
+//        this.forMonth = forMonth;
+//        this.name = name;
+//        this.id = id;
+//        this.budgetPlanStatus = budgetPlanStatus;
+//        this.planType = planType;
+//        this.createBy = createBy;
+//        this.lastModifiedTime = lastModifiedTime;
+//        this.costCenterCode = costCenterCode;
+//        this.teamCode = teamCode;
+//        this.countryCode = countryCode;
+//        this.functionCode = functionCode;
+//        this.description = description;
+//    }
 
     public String getDescription() {
         return description;

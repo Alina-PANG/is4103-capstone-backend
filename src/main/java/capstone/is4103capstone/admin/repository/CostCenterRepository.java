@@ -17,4 +17,7 @@ public interface CostCenterRepository extends JpaRepository<CostCenter,String> {
 
     @Query(value = "SELECT * FROM cost_center cc WHERE cc.is_deleted=false",nativeQuery = true)
     List<CostCenter> findAllNotDeleted();
+
+    @Query(value = "SELECT * FROM cost_center cc WHERE cc.is_deleted=false AND cc.team_id=?1",nativeQuery = true)
+    List<CostCenter> findCostCentersByTeamId(String teamId);
 }

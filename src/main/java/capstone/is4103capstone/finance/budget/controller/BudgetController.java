@@ -56,12 +56,12 @@ public class BudgetController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @GetMapping("/getBudgetList")
-    public ResponseEntity<GeneralRes> getAllBudgetListByUser(@RequestParam(name="username", required=true) String username, @RequestParam(value = "ccId",required = false) String costcenterId, @RequestParam(name="type",required = false) Integer retrieveType, @RequestParam(name="year",required = false) Integer year){
+    @GetMapping("/getBudgetListByTeam")
+    public ResponseEntity<GeneralRes> getAllBudgetListByUser(@RequestParam(name="username", required=true) String username, @RequestParam(name="teamId", required=true) String teamId,@RequestParam(value = "ccId",required = false) String costcenterId, @RequestParam(name="type",required = false) Integer retrieveType, @RequestParam(name="year",required = false) Integer year){
         if(Authentication.authenticateUser(username))
             return ResponseEntity
                     .ok()
-                    .body(budgetService.getBudgetList(username));//,costcenterId,  retrieveType,year));
+                    .body(budgetService.getBudgetList(username,teamId));//,costcenterId,  retrieveType,year));
         else
             return ResponseEntity
                     .badRequest()

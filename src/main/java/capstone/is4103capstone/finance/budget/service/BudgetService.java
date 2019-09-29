@@ -6,6 +6,7 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
@@ -195,8 +196,6 @@ public class BudgetService {
                 items.add(new BudgetLineItemModel(item.getId(), budgetCategory.getObjectName(), budgetCategory.getCode(), budgetSub1.getObjectName(), budgetSub1.getCode(), budgetSub2.getObjectName(), budgetSub2.getCode(), m.getObjectName(), m.getCode(), item.getBudgetAmount(), item.getCurrencyAbbr(), item.getComment()));
             }
 
-
-
             plan.setItems(items);
 
             return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover);
@@ -206,29 +205,29 @@ public class BudgetService {
         }
     }
 
-    public GetBudgetListRes getBudgetList(String username){//, String costcenterId, Integer retrieveType, Integer year){
+    public GetBudgetListRes getBudgetList(String username, String teamId){//, String costcenterId, Integer retrieveType, Integer year){
         //retrieveType: by default: null or 0: all, 1-budget, 2-reforecast
         try{
-            List<CostCenter> ccList = getCostCentersByUserAccess(username);
+
+            List<CostCenter> ccList = costCenterRepository.findCostCentersByTeamId(teamId);
             List<BudgetModel> result = new ArrayList<>();
             for (CostCenter c : ccList){
                 List<Plan> plans = planRepository.findByCostCenterId(c.getId());
-                //组装好cc返回即可
+                //组装好cc返回
                 for (Plan p : plans) {
                     if (p.getDeleted() || p.getCreatedBy() == null || p.getBudgetPlanStatus() == null || p.getPlanType() == null)
                         continue;
 
                     BudgetModel thisPlan = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), p.getId(), p.getBudgetPlanStatus(), p.getPlanType());
                     thisPlan.setCostCenterCode(c.getCode());
-                    thisPlan.setTeamCode(c.getTeam().getCode());
-                    thisPlan.setFunctionCode(c.getTeam().getFunction().getCode());
-                    thisPlan.setCountryCode(c.getTeam().getCountry().getCode());
+//                    thisPlan.setTeamCode(c.getTeam().getCode());
+//                    thisPlan.setFunctionCode(c.getTeam().getFunction().getCode());
+//                    thisPlan.setCountryCode(c.getTeam().getCountry().getCode());
                     thisPlan.setCreateBy(p.getCreatedBy());
                     thisPlan.setLastModifiedTime(datetimeFormatter.format(p.getLastModifiedDateTime() == null ? p.getCreatedDateTime() : p.getLastModifiedDateTime()));
                     result.add(thisPlan);
                 }
             }
-
 
 
             return new GetBudgetListRes("Successsfully retrieved plans under the cost center!",false, result);
