@@ -1,11 +1,17 @@
 package capstone.is4103capstone.general.model;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Mail implements Serializable {
+    @Email
+    @NotNull
     private String from;
+    @Email
+    @NotNull
     private String to;
     private String subject;
     private String content;

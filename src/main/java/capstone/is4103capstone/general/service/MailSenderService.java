@@ -42,34 +42,34 @@ public class MailSenderService {
     @Autowired
     private JavaMailSender emailSender;
 
-    @Autowired
-    public MailSenderService(MailSenderProperties mailSenderProperties) {
-        System.out.println("username: "+mailSenderProperties.getUsername());
-        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setUsername(mailSenderProperties.getUsername());
-        javaMailSender.setPassword(mailSenderProperties.getPassword());
-        javaMailSender.setHost(mailSenderProperties.getHost());
-        javaMailSender.setPort(mailSenderProperties.getPort());
-
-    }
+//    @Autowired
+//    public MailSenderService(MailSenderProperties mailSenderProperties) {
+//        System.out.println("username: "+mailSenderProperties.getUsername());
+//        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+//        javaMailSender.setUsername(mailSenderProperties.getUsername());
+//        javaMailSender.setPassword(mailSenderProperties.getPassword());
+//        javaMailSender.setHost(mailSenderProperties.getHost());
+//        javaMailSender.setPort(mailSenderProperties.getPort());
+//
+//    }
 
 
     public GeneralRes sendEmail(Mail mail, String template) {
         try{
             MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message,
-                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name());
-
-    //        helper.addAttachment("logo.png", new ClassPathResource("memorynotfound-logo.png"));
             String html = mailContentBuilder.build(mail.getModel(), template);
+            MimeMessagePreparator messagePreparator = mimeMessage -> {
+                MimeMessageHelper messageHelper = new MimeMessageHelper(message,
+                        MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                        StandardCharsets.UTF_8.name());
+                messageHelper.setFrom(mail.getFrom());
+                messageHelper.setTo(mail.getSubject());
+                messageHelper.setText(html, true);
+                messageHelper.setSubject(mail.getSubject());
+            };
 
-            helper.setTo(mail.getTo());
-            helper.setText(html, true);
-            helper.setSubject(mail.getSubject());
-            helper.setFrom(mail.getFrom());
-
-            emailSender.send(message);
+            //        helper.addAttachment("logo.png", new ClassPathResource("memorynotfound-logo.png"));
+            emailSender.send(messagePreparator);
             return new GeneralRes("Email successfully sent!", false);
         }catch (Exception ex){
             ex.printStackTrace();
@@ -77,19 +77,19 @@ public class MailSenderService {
         }
     }
 
-    private Properties getMailProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("mail.smtp.auth", "true");
-        properties.setProperty("mail.smtp.starttls.enable", "false");
-//        properties.setProperty("mail.smtp.quitwait", "false");
-        properties.setProperty("mail.smtp.connectiontimeout", "5000");
-        properties.setProperty("mail.smtp.timeout", "3000");
-        properties.setProperty("mail.smtp.writetimeout", "5000");
-//        properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-//        properties.setProperty("mail.smtp.socketFactory.fallback", "false");
-//        properties.setProperty("mail.debug", "true");
-        return properties;
-    }
+//    private Properties getMailProperties() {
+//        Properties properties = new Properties();
+//        properties.setProperty("mail.smtp.auth", "true");
+//        properties.setProperty("mail.smtp.starttls.enable", "false");
+////        properties.setProperty("mail.smtp.quitwait", "false");
+//        properties.setProperty("mail.smtp.connectiontimeout", "5000");
+//        properties.setProperty("mail.smtp.timeout", "3000");
+//        properties.setProperty("mail.smtp.writetimeout", "5000");
+////        properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+////        properties.setProperty("mail.smtp.socketFactory.fallback", "false");
+////        properties.setProperty("mail.debug", "true");
+//        return properties;
+//    }
 
 //    private void sendEmail() throws Exception{
 //        MimeMessage message = javaMailSender.createMimeMessage();
@@ -123,40 +123,40 @@ public class MailSenderService {
 //
 //
 //
-    public void sendmail()  {
-        try{
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
-
-        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("is4103.capstone@gmail.com", "capstone4103");
-            }
-        });
-        Message msg = new MimeMessage(session);
-        msg.setFrom(new InternetAddress("is4103.capstone@gmail.com", false));
-
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("is4103.capstone@gmail.com"));
-        msg.setSubject("Tutorials point email");
-        msg.setContent("Tutorials point email", "text/html");
-        msg.setSentDate(new Date());
-
-        MimeBodyPart messageBodyPart = new MimeBodyPart();
-        messageBodyPart.setContent("Tutorials point email", "text/html");
-
-        Multipart multipart = new MimeMultipart();
-        multipart.addBodyPart(messageBodyPart);
-        MimeBodyPart attachPart = new MimeBodyPart();
-
-//        attachPart.attachFile("/var/tmp/image19.png");
-        multipart.addBodyPart(attachPart);
-        msg.setContent(multipart);
-        Transport.send(msg);
-    }catch(Exception ex){
-        ex.printStackTrace();
-    }}
+//    public void sendmail()  {
+//        try{
+//        Properties props = new Properties();
+//        props.put("mail.smtp.auth", "true");
+//        props.put("mail.smtp.starttls.enable", "true");
+//        props.put("mail.smtp.host", "smtp.gmail.com");
+//        props.put("mail.smtp.port", "587");
+//
+//        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+//            protected PasswordAuthentication getPasswordAuthentication() {
+//                return new PasswordAuthentication("is4103.capstone@gmail.com", "capstone4103");
+//            }
+//        });
+//        Message msg = new MimeMessage(session);
+//        msg.setFrom(new InternetAddress("is4103.capstone@gmail.com", false));
+//
+//        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("is4103.capstone@gmail.com"));
+//        msg.setSubject("Tutorials point email");
+//        msg.setContent("Tutorials point email", "text/html");
+//        msg.setSentDate(new Date());
+//
+//        MimeBodyPart messageBodyPart = new MimeBodyPart();
+//        messageBodyPart.setContent("Tutorials point email", "text/html");
+//
+//        Multipart multipart = new MimeMultipart();
+//        multipart.addBodyPart(messageBodyPart);
+//        MimeBodyPart attachPart = new MimeBodyPart();
+//
+////        attachPart.attachFile("/var/tmp/image19.png");
+//        multipart.addBodyPart(attachPart);
+//        msg.setContent(multipart);
+//        Transport.send(msg);
+//    }catch(Exception ex){
+//        ex.printStackTrace();
+//    }}
 
 }
