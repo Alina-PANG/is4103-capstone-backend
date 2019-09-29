@@ -2,24 +2,23 @@ package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.controller.model.res.AuditTrailRes;
 import capstone.is4103capstone.admin.service.AuditTrailActivityService;
+import capstone.is4103capstone.general.service.WriteAuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/at")
+@RequestMapping("/api/audit")
 public class AuditTrailController {
 
     @Autowired
     AuditTrailActivityService atas;
 
     @GetMapping
-    public ResponseEntity<AuditTrailRes> getAllAuditTrailRecords() {
+    public ResponseEntity<AuditTrailRes> getAllAuditTrailRecords(@RequestParam(name = "username") String username) {
+        WriteAuditTrail.autoAudit(username);
         try {
             return ResponseEntity
                     .ok()
