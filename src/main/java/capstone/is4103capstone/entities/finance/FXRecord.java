@@ -22,6 +22,11 @@ public class FXRecord extends DBEntityTemplate {
     @Temporal(TemporalType.DATE)
     Date effectiveDate;
 
+    @Temporal(TemporalType.DATE)
+    Date expireDate;
+
+    Boolean hasExpired = false;
+
     public FXRecord() {
     }
 
@@ -32,6 +37,14 @@ public class FXRecord extends DBEntityTemplate {
         this.effectiveDate = effectiveDate;
         SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
         this.setObjectName(this.baseCurrencyAbbr + "-" + this.priceCurrencyAbbr+"-"+format.format(this.effectiveDate));
+    }
+
+    public Boolean getHasExpired() {
+        return hasExpired;
+    }
+
+    public void setHasExpired(Boolean hasExpired) {
+        this.hasExpired = hasExpired;
     }
 
     public Date getEffectiveDate() {
@@ -64,5 +77,13 @@ public class FXRecord extends DBEntityTemplate {
 
     public void setExchangeRate(BigDecimal exchangeRate) {
         this.exchangeRate = exchangeRate;
+    }
+
+    public Date getExpireDate() {
+        return expireDate;
+    }
+
+    public void setExpireDate(Date expireDate) {
+        this.expireDate = expireDate;
     }
 }

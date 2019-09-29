@@ -25,6 +25,8 @@ public class Employee extends DBEntityTemplate {
     private String firstName;
     private String lastName;
     private String middleName;
+    private String email;
+
     @JsonIgnore
     private String password;
 
@@ -85,6 +87,7 @@ public class Employee extends DBEntityTemplate {
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
     public Employee() {
+        this.securityId = "S-" + UUID.randomUUID();
     }
 
     public Employee(String userName, String firstName, String lastName, String middleName, String password) {
@@ -272,7 +275,7 @@ public class Employee extends DBEntityTemplate {
     public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
         this.outsourcingAssessmentList = outsourcingAssessmentList;
     }
-    
+
     public String getSecurityId() {
         return securityId;
     }
@@ -284,5 +287,17 @@ public class Employee extends DBEntityTemplate {
 
     public void setMemberOfSecurityGroups(List<SecurityGroup> memberOfSecurityGroups) {
         this.memberOfSecurityGroups = memberOfSecurityGroups;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setSecurityId(String securityId) {
+        this.securityId = securityId;
     }
 }

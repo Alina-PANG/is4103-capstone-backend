@@ -1,6 +1,8 @@
 package capstone.is4103capstone.finance.admin.model.req;
 
-public class FXRecordQueryReq {
+import java.io.Serializable;
+
+public class FXRecordQueryReq implements Serializable {
     String startDate;
     String endDate;
     String baseCurr;

@@ -1,8 +1,9 @@
 package capstone.is4103capstone.finance.admin.model.req;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class CreateFXRequest {
+public class CreateFXRequest implements Serializable {
     private String baseCurr;
     private String priceCurr;
     private String effectiveDate;

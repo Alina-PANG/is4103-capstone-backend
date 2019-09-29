@@ -52,13 +52,21 @@ public class FinanceEntityCodeHPGenerator {
         String code = "";
         if (entityOptional.isPresent()){
             entity = entityOptional.get();
-            String seqNoStr = String.valueOf(entity.getSeqNo());
-            if (seqNoStr == null){//it's only at creation
+            if (entity.getSeqNo() == null){
                 entity.setSeqNo(new Long(repo.findAll().size()));
-                seqNoStr = String.valueOf(entity.getSeqNo());
             }
+            String seqNoStr = String.valueOf(entity.getSeqNo());
+//            if (seqNoStr == null){//it's only at creation
+//                entity.setSeqNo(new Long(repo.findAll().size()));
+//                seqNoStr = String.valueOf(entity.getSeqNo());
+//            }
             String entityClassName = entity.getClass().getSimpleName();
-            String objectName = entity.getObjectName().replaceAll("\\s+", "_");
+            String objectName;
+            try{
+                objectName = entity.getObjectName().replaceAll("\\s+", "_");
+            }catch (NullPointerException ne){
+                objectName = "";
+            }
             try {
                 switch (entityClassName) {
                     case "ApprovalForRequest":

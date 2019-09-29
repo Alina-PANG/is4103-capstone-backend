@@ -52,7 +52,7 @@ public class AdminInitialization {
 
     public void createCostCenter() {
         CostCenter costCenter = new CostCenter();
-        costCenter.setCountry(countryRepository.findCountryByCode("SG"));
+//        costCenter.setCountry(countryRepository.findCountryByCode("SG"));
         costCenter.setCostCenterManager(employeeRepository.findEmployeeByUserName("yingshi2502"));
         costCenter.setCreatedBy("test");
         costCenter.setCode("TEST_COSTCENTER");
@@ -140,7 +140,7 @@ public class AdminInitialization {
         countrySG.getFunctions().add(function);
 
         Office office = new Office("One Raffles Quay", "ORQ", "APAC-SG-ORQ");
-        Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG", "APAC");
+        Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG");
         office.setAddress(orqAddress);
         office.setNumOfFloors(2);
 

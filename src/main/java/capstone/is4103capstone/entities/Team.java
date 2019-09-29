@@ -18,14 +18,51 @@ public class Team extends DBEntityTemplate {
     @JsonIgnore
     private CompanyFunction function;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    @JsonIgnore
+    private Country country;
+
+    @OneToMany(mappedBy = "team")
+    private List<CostCenter> costCenters;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "team_employee",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private List<Employee> members = new ArrayList<>();
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="team_leader_id")
+    private Employee teamLeader;
+
     public Team() {
+    }
+
+    public Employee getTeamLeader() {
+        return teamLeader;
+    }
+
+    public void setTeamLeader(Employee teamLeader) {
+        this.teamLeader = teamLeader;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    public List<CostCenter> getCostCenters() {
+        return costCenters;
+    }
+
+    public void setCostCenters(List<CostCenter> costCenters) {
+        this.costCenters = costCenters;
     }
 
     public Team(String teamName, String teamCode, String hierachyPath) {

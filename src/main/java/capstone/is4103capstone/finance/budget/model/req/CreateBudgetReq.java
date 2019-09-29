@@ -9,10 +9,11 @@ public class CreateBudgetReq implements Serializable {
     private String username;
     private List<PlanLineItem> items;
     private Integer year;
-    private boolean toSubmit; // submit or draft
-    private boolean isBudget; // planType
+    private Boolean toSubmit; // submit or draft
+    private Boolean isBudget; // planType
     private String costCenterCode;
     private Integer month;
+
     private String description;
 
     public Integer getMonth() {
@@ -39,7 +40,31 @@ public class CreateBudgetReq implements Serializable {
         this.costCenterCode = costCenterCode;
     }
 
-    public boolean isBudget() {
+    public Boolean getToSubmit() {
+        return toSubmit;
+    }
+
+    public void setToSubmit(Boolean toSubmit) {
+        this.toSubmit = toSubmit;
+    }
+
+    public Boolean getBudget() {
+        return isBudget;
+    }
+
+    public void setBudget(Boolean budget) {
+        isBudget = budget;
+    }
+
+    public Boolean getIsBudget() {
+        return isBudget;
+    }
+
+    public void setIsBudget(Boolean budget) {
+        isBudget = budget;
+    }
+
+    public Boolean isBudget() {
         return isBudget;
     }
 

@@ -18,4 +18,5 @@ public interface EmployeeRepository extends JpaRepository<Employee,String> {
     @Query(value = "SELECT * FROM employee e WHERE e.id = ?1 AND e.is_deleted=false", nativeQuery = true)
     Optional<Employee> findById(String id);
 
+    public Employee findEmployeeById(String id);
 }
