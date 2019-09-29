@@ -14,8 +14,6 @@ import java.util.List;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
@@ -37,7 +35,6 @@ public class EmployeeService {
 
         return optionalEmployee.get();
     }
-    EmployeeRepository employeeRepository;
 
     // ===== CRUD METHODS =====
     // === CREATE ===

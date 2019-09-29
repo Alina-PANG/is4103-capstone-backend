@@ -3,7 +3,6 @@ package capstone.is4103capstone.admin.service;
 import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.Team;
-import capstone.is4103capstone.util.exception.CompanyFunctionNotFoundException;
 import capstone.is4103capstone.util.exception.TeamNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +12,6 @@ import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -35,7 +32,7 @@ public class TeamService {
         }
 
         return optionalTeam.get();
-    TeamRepository teamRepository;
+    }
 
     public JSONObject getTeamsManagedByUser(String username){
         JSONObject res = new JSONObject();
