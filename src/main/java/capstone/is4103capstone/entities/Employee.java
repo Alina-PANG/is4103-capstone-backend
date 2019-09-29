@@ -141,6 +141,13 @@ public class Employee extends DBEntityTemplate {
         this.middleName = middleName;
     }
 
+    public String getFullName() {
+        if (this.middleName == null || this.middleName.trim().length() == 0) {
+            return this.firstName + " " + this.lastName;
+        }
+        return this.firstName + " " + this.middleName + " " + this.lastName;
+    }
+
     public String getPassword() {
         return password;
     }

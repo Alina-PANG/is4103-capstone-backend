@@ -11,13 +11,30 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
+
 import java.util.Optional;
 
 @Service
 public class EmployeeService {
 
     @Autowired
-    EmployeeRepository employeeRepository;
+    private EmployeeRepository employeeRepository;
+
+    public Employee retrieveEmployeeById(String employeeId) throws EmployeeNotFoundException {
+        if (employeeId == null || employeeId.trim().length() == 0) {
+            throw new EmployeeNotFoundException("Invalid employee ID given!");
+        }
+        employeeId = employeeId.trim();
+        Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
+        if (!optionalEmployee.isPresent()) {
+            throw new EmployeeNotFoundException("Employee with ID " + employeeId + " does not exist!");
+        }
+
+        return optionalEmployee.get();
+    }
 
     // ===== CRUD METHODS =====
     // === CREATE ===
