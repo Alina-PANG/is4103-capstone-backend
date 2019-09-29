@@ -31,7 +31,7 @@ public class ApprovalForRequest extends DBEntityTemplate {
      */
     private ApprovalTypeEnum approvalType;
 
-    private String requestedItemCode;
+    private String requestedItemId;
 
     private String commentByApprover = "";
 
@@ -43,18 +43,18 @@ public class ApprovalForRequest extends DBEntityTemplate {
     public ApprovalForRequest() {
     }
 
-    public ApprovalForRequest(String ticketCode, ApprovalTypeEnum approvalType, String requestedItemCode, String commentByRequester) {
+    public ApprovalForRequest(String ticketCode, ApprovalTypeEnum approvalType, String requestedItemId, String commentByRequester) {
         super(ticketCode);
         this.approvalType = approvalType;
-        this.requestedItemCode = requestedItemCode;
+        this.requestedItemId = requestedItemId;
         this.commentByRequester = commentByRequester;
     }
 
-    public ApprovalForRequest(Employee requester, Employee approver, ApprovalTypeEnum approvalType, String requestedItemCode) {
+    public ApprovalForRequest(Employee requester, Employee approver, ApprovalTypeEnum approvalType, String requestedItemId) {
         this.requester = requester;
         this.approver = approver;
         this.approvalType = approvalType;
-        this.requestedItemCode = requestedItemCode;
+        this.requestedItemId = requestedItemId;
     }
 
     public Employee getRequester() {
@@ -97,12 +97,12 @@ public class ApprovalForRequest extends DBEntityTemplate {
         this.approvalType = approvalType;
     }
 
-    public String getRequestedItemCode() {
-        return requestedItemCode;
+    public String getRequestedItemId() {
+        return requestedItemId;
     }
 
-    public void setRequestedItemCode(String requestedItemCode) {
-        this.requestedItemCode = requestedItemCode;
+    public void setRequestedItemId(String requestedItemCode) {
+        this.requestedItemId = requestedItemCode;
     }
 
     public String getCommentByApprover() {

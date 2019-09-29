@@ -6,17 +6,17 @@ import capstone.is4103capstone.general.model.GeneralRes;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetCostCentersRes extends GeneralRes {
+public class GetCostCenterListRes extends GeneralRes {
     List<CostCenterModel> costCentersList = new ArrayList<>();
 
-    public GetCostCentersRes() {
+    public GetCostCenterListRes() {
     }
 
-    public GetCostCentersRes(String message, Boolean hasError) {
+    public GetCostCenterListRes(String message, Boolean hasError) {
         super(message, hasError);
     }
 
-    public GetCostCentersRes(String message, Boolean hasError, List<CostCenterModel> costCentersList) {
+    public GetCostCenterListRes(String message, Boolean hasError, List<CostCenterModel> costCentersList) {
         super(message, hasError);
         this.costCentersList = costCentersList;
     }

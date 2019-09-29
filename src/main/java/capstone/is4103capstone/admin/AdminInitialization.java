@@ -52,7 +52,7 @@ public class AdminInitialization {
 
     public void createCostCenter() {
         CostCenter costCenter = new CostCenter();
-        costCenter.setCountry(countryRepository.findCountryByCode("SG"));
+//        costCenter.setCountry(countryRepository.findCountryByCode("SG"));
         costCenter.setCostCenterManager(employeeRepository.findEmployeeByUserName("yingshi2502"));
         costCenter.setCreatedBy("test");
         costCenter.setCode("TEST_COSTCENTER");

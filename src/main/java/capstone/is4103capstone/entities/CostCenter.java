@@ -26,35 +26,69 @@ public class CostCenter extends DBEntityTemplate {
     @JsonIgnore
     private Employee costCenterManager;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "function_id")
-    private CompanyFunction function;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
-    private Country country;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "function_id")
+//    private CompanyFunction function;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "country_id")
+//    private Country country;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @OneToMany(mappedBy = "costCenter",fetch = FetchType.EAGER)
     private List<ActualsTable> actuals = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="bm_approver_id")
+    private Employee bmApprover;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="function_approver_id")
+    private Employee functionApprover;
+
     public CostCenter() {
     }
 
-    public CompanyFunction getFunction() {
-        return function;
+    public Team getTeam() {
+        return team;
     }
 
-    public void setFunction(CompanyFunction function) {
-        this.function = function;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
-    public Country getCountry() {
-        return country;
+    public Employee getBmApprover() {
+        return bmApprover;
     }
 
-    public void setCountry(Country country) {
-        this.country = country;
+    public void setBmApprover(Employee bmApprover) {
+        this.bmApprover = bmApprover;
     }
+
+    public Employee getFunctionApprover() {
+        return functionApprover;
+    }
+
+    public void setFunctionApprover(Employee functionApprover) {
+        this.functionApprover = functionApprover;
+    }
+
+//    public CompanyFunction getFunction() {
+//        return function;
+//    }
+//
+//    public void setFunction(CompanyFunction function) {
+//        this.function = function;
+//    }
+//
+//    public Country getCountry() {
+//        return country;
+//    }
+//
+//    public void setCountry(Country country) {
+//        this.country = country;
+//    }
 
     public List<Plan> getPlans() {
         return plans;
