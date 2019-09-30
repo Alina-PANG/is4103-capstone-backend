@@ -3,14 +3,13 @@ package capstone.is4103capstone.admin.service;
 import capstone.is4103capstone.admin.dto.CurrencyDto;
 import capstone.is4103capstone.admin.repository.CurrencyRepository;
 import capstone.is4103capstone.entities.Currency;
-import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -34,56 +33,46 @@ public class CurrencyService {
         return currencyRepository.findAll();
     }
 
-    public List<CurrencyDto> getAllCurrencies() {
-        List<CurrencyDto> currencyDtos = new ArrayList<>();
-        for (Currency currency : getAllCurrencyEntities()) {
-            if (!currency.getDeleted()) currencyDtos.add(entityToDto(currency));
-        }
+    public List<CurrencyDto> getAllCurrencies() throws Exception {
+        List<CurrencyDto> currencyDtos = entityToDto(getAllCurrencyEntities(), true);
+        if (currencyDtos.isEmpty()) throw new Exception("No currencies were found in the database!");
         return currencyDtos;
     }
 
-    public Currency getCurrencyEntityByUuid(String input) {
-        try {
-            return currencyRepository.getOne(input);
-        } catch (EntityNotFoundException ex) {
-            throw new DbObjectNotFoundException("Currency object with UUID " + input + "  not found!");
-        }
+    public Currency getCurrencyEntityByUuid(String input) throws Exception {
+        Currency currency = currencyRepository.findCurrencyById(input);
+        if (Objects.isNull(currency)) throw new Exception("Currency with UUID " + input + " was not found!");
+        return currency;
     }
 
-    public CurrencyDto getCurrencyByUuid(String input) {
+    public CurrencyDto getCurrencyByUuid(String input) throws Exception {
         return entityToDto(getCurrencyEntityByUuid(input));
     }
 
     // === UPDATE ===
     @Transactional
-    public Currency updateCurrencyEntity(Currency input) {
-        try {
-            Currency toUpdate = currencyRepository.getOne(input.getId());
-            toUpdate.setObjectName(input.getObjectName());
-            toUpdate.setCurrencyCode(input.getCurrencyCode());
-            toUpdate.setCode(input.getCode());
-            return toUpdate;
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Currency object with UUID " + input + "  not found!");
-        }
+    public Currency updateCurrencyEntity(Currency input) throws Exception {
+        Currency toUpdate = getCurrencyEntityByUuid(input.getId());
+        toUpdate.setObjectName(input.getObjectName());
+        toUpdate.setCurrencyCode(input.getCurrencyCode());
+        return toUpdate;
     }
 
     @Transactional
-    public CurrencyDto updateCurrency(CurrencyDto input) {
-        try {
-            Currency toUpdate = currencyRepository.getOne(input.getId().orElseThrow(() -> new NullPointerException("UUID is null!")));
-            input.getObjectName().ifPresent(toUpdate::setObjectName);
-            input.getCurrencyCode().ifPresent(toUpdate::setCurrencyCode);
-            return entityToDto(toUpdate);
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Currency object with UUID " + input + "  not found!");
-        }
+    public CurrencyDto updateCurrency(CurrencyDto input) throws Exception {
+        Currency toUpdate = getCurrencyEntityByUuid(input.getId().orElseThrow(() -> new NullPointerException("UUID is null!")));
+        if (toUpdate.getDeleted())
+            throw new Exception("Currency with UUID " + input.getId().get() + " has already been deleted and cannot be modified!");
+        input.getObjectName().ifPresent(toUpdate::setObjectName);
+        input.getCurrencyCode().ifPresent(toUpdate::setCurrencyCode);
+        return entityToDto(toUpdate);
     }
 
     // === DELETE ===
     @Transactional
-    public boolean deleteCurrency(String input) {
+    public boolean deleteCurrency(String input) throws Exception {
         Currency working = getCurrencyEntityByUuid(input);
+        if (working.getDeleted()) throw new Exception("Currency with UUID " + input + " has already been deleted!");
         working.setDeleted(true);
         return true;
     }
@@ -98,6 +87,14 @@ public class CurrencyService {
         return currency;
     }
 
+    public List<Currency> dtoToEntity(List<CurrencyDto> input) {
+        List<Currency> currencies = new ArrayList<>();
+        for (CurrencyDto currencyDto : input) {
+            currencies.add(dtoToEntity(currencyDto));
+        }
+        return currencies;
+    }
+
     public CurrencyDto entityToDto(Currency input) {
         CurrencyDto currencyDto = new CurrencyDto();
         currencyDto.setId(Optional.of(input.getId()));
@@ -105,5 +102,17 @@ public class CurrencyService {
         currencyDto.setCurrencyCode(Optional.of(input.getCurrencyCode()));
         currencyDto.setObjectName(Optional.of(input.getObjectName()));
         return currencyDto;
+    }
+
+    public List<CurrencyDto> entityToDto(List<Currency> input, boolean suppressDeleted) {
+        List<CurrencyDto> currencyDtos = new ArrayList<>();
+        for (Currency currency : input) {
+            if (suppressDeleted) {
+                if (!currency.getDeleted()) currencyDtos.add(entityToDto(currency));
+            } else {
+                currencyDtos.add(entityToDto(currency));
+            }
+        }
+        return currencyDtos;
     }
 }

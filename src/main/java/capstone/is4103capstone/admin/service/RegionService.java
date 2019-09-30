@@ -62,9 +62,7 @@ public class RegionService {
     // === UPDATE ===
     @Transactional
     public Region updateRegionEntity(Region regionToChange) throws Exception {
-        Region workingRegion = regionRepository.findRegionById(regionToChange.getId());
-        if (Objects.isNull(workingRegion))
-            throw new Exception("Region with UUID " + regionToChange.getId() + " was not found!");
+        Region workingRegion = getRegionEntityByUuid(regionToChange.getId());
         if (workingRegion.getDeleted())
             throw new Exception("Region with UUID " + regionToChange.getId() + " has already been deleted and cannot be modified!");
         workingRegion.setObjectName(regionToChange.getObjectName());
@@ -73,7 +71,11 @@ public class RegionService {
 
     @Transactional
     public RegionDto updateRegion(RegionDto input) throws Exception {
-        return entityToDto(updateRegionEntity(dtoToEntity(input)));
+        Region workingRegion = getRegionEntityByUuid(input.getId().orElseThrow(() -> new NullPointerException("UUID is null!")));
+        if (workingRegion.getDeleted())
+            throw new Exception("Region with UUID " + input.getId().get() + " has already been deleted and cannot be modified!");
+        input.getObjectName().ifPresent(workingRegion::setObjectName);
+        return entityToDto(workingRegion);
     }
 
     // === DELETE ===

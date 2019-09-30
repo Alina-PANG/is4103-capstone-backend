@@ -5,8 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CurrencyRepository extends JpaRepository<Currency, String> {
 
-    public void deleteCurrencyByCurrencyCode(String currencyCode);
+    void deleteCurrencyByCurrencyCode(String currencyCode);
 
-    public Currency findCurrencyByCurrencyCode(String currencyCode);
+    Currency findCurrencyByCurrencyCode(String currencyCode);
+
+    Currency findCurrencyById(String uuid);
 
 }

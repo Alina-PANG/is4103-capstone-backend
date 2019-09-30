@@ -1,17 +1,14 @@
 package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.dto.OfficeDto;
-import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.admin.repository.OfficeRepository;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.helper.Address;
-import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +20,7 @@ public class OfficeService {
     OfficeRepository officeRepository;
 
     @Autowired
-    CountryRepository countryRepository;
+    CountryService countryService;
 
     // ===== CRUD METHODS =====
     // === CREATE ===
@@ -31,39 +28,40 @@ public class OfficeService {
         return officeRepository.save(input);
     }
 
-    public OfficeDto createNewOffice(OfficeDto input) {
+    public OfficeDto createNewOffice(OfficeDto input) throws Exception {
         return entityToDto(createNewOfficeEntity(dtoToEntity(input)));
     }
 
     // === RETRIEVE ===
-    public List<Office> getAllOfficeEntities() {
-        return officeRepository.findAll();
+    public List<Office> getAllOfficeEntities() throws Exception {
+        List<Office> offices = officeRepository.findAll();
+        if (offices.isEmpty()) throw new Exception("No offices in database!");
+        return offices;
     }
 
-    public List<OfficeDto> getAllOffices() {
-        List<OfficeDto> OfficeDtos = new ArrayList<>();
-        for (Office Office : getAllOfficeEntities()) {
-            if (!Office.getDeleted()) OfficeDtos.add(entityToDto(Office));
+    public List<OfficeDto> getAllOffices() throws Exception {
+        List<OfficeDto> officeDtos = entityToDto(getAllOfficeEntities(), true);
+        if (officeDtos.isEmpty()) throw new Exception("No offices with non-deleted status to display!");
+        return officeDtos;
+    }
+
+    public Office getOfficeEntityByUuid(String input) throws Exception {
+        Optional<Office> office = officeRepository.findById(input);
+        if (office.isPresent()) {
+            return office.get();
+        } else {
+            throw new Exception("Office with UUID " + input + " does not exist!");
         }
-        return OfficeDtos;
     }
 
-    public Office getOfficeEntityByUuid(String input) {
-        try {
-            return officeRepository.getOne(input);
-        } catch (EntityNotFoundException ex) {
-            throw new DbObjectNotFoundException("Office with UUID " + input + " not found!");
-        }
-    }
-
-    public OfficeDto getOfficeByUuid(String input) {
+    public OfficeDto getOfficeByUuid(String input) throws Exception {
         return entityToDto(getOfficeEntityByUuid(input));
     }
 
     // === UPDATE ===
     @Transactional
-    public Office updateOfficeEntity(Office input) {
-        Office working = officeRepository.getOne(input.getId());
+    public Office updateOfficeEntity(Office input) throws Exception {
+        Office working = getOfficeEntityByUuid(input.getId());
         working.setObjectName(input.getObjectName());
         // non-standard attributes
         working.getAddress().setAddressLine1(input.getAddress().getAddressLine1());
@@ -71,44 +69,41 @@ public class OfficeService {
         working.getAddress().setPostalCode(input.getAddress().getPostalCode());
         working.getAddress().setCity(input.getAddress().getCity());
         // set country-specific data
-        try {
-            Country country = countryRepository.getOne(input.getCountry().getId());
-            working.getAddress().setCountryCode(country.getCode());
-            working.setCountry(country);
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Country " + input.getCountry().getId() + " not found!");
-        }
+        Country country = countryService.getCountryEntityByUuid(input.getCountry().getId());
+        working.getAddress().setCountryCode(country.getCode());
+        working.setCountry(country);
         return working;
     }
 
     @Transactional
-    public OfficeDto updateOffice(OfficeDto input) {
-        Office working = officeRepository.getOne(input.getId().orElseThrow(() -> new NullPointerException("UUID is empty!")));
+    public OfficeDto updateOffice(OfficeDto input) throws Exception {
+        Office working = getOfficeEntityByUuid(input.getId().orElseThrow(() -> new NullPointerException("UUID is empty!")));
+        if (working.getDeleted())
+            throw new Exception("Office with UUID " + input.getId() + " has already been deleted and cannot be modified!");
         input.getObjectName().ifPresent(working::setObjectName);
         input.getAddressLine1().ifPresent(value -> working.getAddress().setAddressLine1(value));
         input.getAddressLine2().ifPresent(value -> working.getAddress().setAddressLine2(value));
         input.getPostalCode().ifPresent(value -> working.getAddress().setPostalCode(value));
         input.getCity().ifPresent(value -> working.getAddress().setCity(value));
         // set country-specific data
-        try {
-            Country country = countryRepository.getOne(input.getCountryId().orElseThrow(() -> new NullPointerException("UUID is null!")));
+        if (input.getCountryId().isPresent()) {
+            Country country = countryService.getCountryEntityByUuid(input.getCountryId().orElseThrow(() -> new NullPointerException("UUID is null!")));
+            if (country.getDeleted())
+                throw new Exception("Country with UUID " + input.getCountryId() + " has already been deleted and cannot be used!");
             working.getAddress().setCountryCode(country.getCode());
             working.setCountry(country);
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Country " + input.getCountryId().get() + " not found!");
         }
         return entityToDto(working);
     }
 
     // === DELETE ===
     @Transactional
-    public boolean deleteOffice(String uuid) {
-        try {
-            officeRepository.getOne(uuid).setDeleted(true);
-            return true;
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Office " + uuid + " not found!");
-        }
+    public boolean deleteOffice(String uuid) throws Exception {
+        Office office = getOfficeEntityByUuid(uuid);
+        if (office.getDeleted())
+            throw new Exception("Office with UUID " + uuid + " has already been deleted and cannot be modified!");
+        office.setDeleted(true);
+        return true;
     }
 
     // ===== ENTITY TO DTO CONVERTER METHODS =====
@@ -127,7 +122,19 @@ public class OfficeService {
         return officeDto;
     }
 
-    public Office dtoToEntity(OfficeDto input) {
+    public List<OfficeDto> entityToDto(List<Office> offices, boolean suppressDeleted) {
+        List<OfficeDto> officeDtos = new ArrayList<>();
+        for (Office office : offices) {
+            if (suppressDeleted) {
+                if (!office.getDeleted()) officeDtos.add(entityToDto(office));
+            } else {
+                officeDtos.add(entityToDto(office));
+            }
+        }
+        return officeDtos;
+    }
+
+    public Office dtoToEntity(OfficeDto input) throws Exception {
         Office office = new Office();
         // standard attributes
         input.getId().ifPresent(id -> office.setId(id));
@@ -140,17 +147,20 @@ public class OfficeService {
         input.getPostalCode().ifPresent(value -> address.setPostalCode(value));
         input.getCity().ifPresent(value -> address.setCity(value));
         // set country-specific data
-        try {
-            input.getCountryId().ifPresent(value -> {
-                Country country = countryRepository.getOne(value);
-                address.setCountryCode(country.getCode());
-                office.setCountry(country);
-            });
-        } catch (IllegalArgumentException ex) {
-            throw new DbObjectNotFoundException("Country " + input.getCountryId() + " not found!");
+        if (input.getCountryId().isPresent()) {
+            Country country = countryService.getCountryEntityByUuid(input.getCountryId().get());
+            address.setCountryCode(country.getCode());
+            office.setCountry(country);
         }
         office.setAddress(address);
         return office;
     }
 
+    public List<Office> dtoToEntity(List<OfficeDto> officeDtos) throws Exception {
+        List<Office> offices = new ArrayList<>();
+        for (OfficeDto officeDto : officeDtos) {
+            offices.add(dtoToEntity(officeDto));
+        }
+        return offices;
+    }
 }

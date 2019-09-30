@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface OfficeRepository extends JpaRepository<Office,String> {
+public interface OfficeRepository extends JpaRepository<Office, String> {
     @Override
     <S extends Office> S save(S s);
 
