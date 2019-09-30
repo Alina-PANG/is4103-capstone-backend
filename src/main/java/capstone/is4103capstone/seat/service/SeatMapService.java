@@ -93,7 +93,16 @@ public class SeatMapService {
         String countryCode = office.getCountry().getCode();
         String officeCode = office.getCode();
         newSeatMap.setCode(countryCode + "-" + officeCode + "-" + newSeatMap.getFloor());
+        newSeatMap.setObjectName(newSeatMap.getCode());
+        newSeatMap.setHierachyPath(newSeatMap.getCode());
         newSeatMap = seatMapRepository.save(newSeatMap);
+
+        // Update numOfFloors in office if needed
+        if (!office.getFloors().contains(newSeatMap.getFloor())) {
+            office.getFloors().add(newSeatMap.getFloor());
+            office.setNumOfFloors(office.getFloors().size());
+            officeRepository.save(office);
+        }
 
         refreshSeatCode(newSeatMap);
 
@@ -200,7 +209,6 @@ public class SeatMapService {
         }
 
         deleteExtraSeats(extraSeats);
-
         System.out.println("********** Save all the changes **********");
         // Save all the changes.
         // Need to set all the seats' code to null to avoid SQLIntegrityConstraintViolationException: duplicate entry of code
@@ -249,6 +257,15 @@ public class SeatMapService {
             seat.setDeleted(true);
             seat.setCode(null);
             seatRepository.save(seat);
+        }
+
+        Office office = seatMap.getOffice();
+
+        // Update numOfFloors in office if needed
+        if (seatMapRepository.findByOfficeIdAndFloor(office.getId(), seatMap.getFloor()).size() <= 1) {
+            office.getFloors().remove(seatMap.getFloor());
+            office.setNumOfFloors(office.getFloors().size());
+            officeRepository.save(office);
         }
 
         seatMap.setDeleted(true);

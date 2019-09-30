@@ -6,6 +6,7 @@ import capstone.is4103capstone.seat.model.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
 import capstone.is4103capstone.util.exception.SeatCreationException;
+import capstone.is4103capstone.util.exception.SeatNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,4 +43,18 @@ public class SeatService {
         return newSeat;
     }
 
+    Seat retrieveSeatById(String seatId) throws SeatNotFoundException {
+
+        if (seatId == null || seatId.trim().length() == 0) {
+            throw new SeatNotFoundException("No seat ID given!");
+        }
+
+        seatId = seatId.trim();
+        Optional<Seat> optionalSeat = seatRepository.findById(seatId);
+        if(!optionalSeat.isPresent()) {
+            throw new SeatNotFoundException("Seat with ID " + seatId + " does not exist!");
+        } else {
+            return optionalSeat.get();
+        }
+    }
 }

@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SessionKeyRepo extends JpaRepository<SessionKey, String> {
 
-    public SessionKey findSessionKeyBySessionKey(String sessionKey);
+    SessionKey findSessionKeyBySessionKey(String sessionKey);
 
-    public void deleteSessionKeysByLinkedUser_UserName(String userName);
+    void deleteSessionKeysByLinkedUser_UserName(String userName);
 
 
 }

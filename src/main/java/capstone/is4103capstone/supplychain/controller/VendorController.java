@@ -5,7 +5,6 @@ import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
 import capstone.is4103capstone.supplychain.service.VendorService;
-import com.sun.tools.javah.Gen;
 import org.hibernate.annotations.GeneratorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

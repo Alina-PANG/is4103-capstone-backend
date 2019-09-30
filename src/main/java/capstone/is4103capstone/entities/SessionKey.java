@@ -1,11 +1,12 @@
 package capstone.is4103capstone.entities;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table
-public class SessionKey {
+public class SessionKey implements Serializable {
 
     @Id
     @GeneratedValue

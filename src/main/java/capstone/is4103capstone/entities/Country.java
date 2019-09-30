@@ -18,7 +18,7 @@ public class Country extends DBEntityTemplate {
     @JsonIgnore
     private Region region;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "country_function",
             joinColumns = @JoinColumn(name = "country_id"),
             inverseJoinColumns = @JoinColumn(name = "function_id")

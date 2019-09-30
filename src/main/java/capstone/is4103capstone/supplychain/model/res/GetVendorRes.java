@@ -1,26 +1,30 @@
 package capstone.is4103capstone.supplychain.model.res;
 
-import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.model.VendorModel;
 
 import java.io.Serializable;
 
 public class GetVendorRes extends GeneralRes implements Serializable {
-    private Vendor vendor;
+    VendorModel vendorModel;
 
     public GetVendorRes() {
     }
 
-    public GetVendorRes(String message, Boolean error, Vendor vendor) {
-        super(message, error);
-        this.vendor = vendor;
+    public GetVendorRes(String message, Boolean hasError, VendorModel vendorModel) {
+        super(message, hasError);
+        this.vendorModel = vendorModel;
     }
 
-    public Vendor getVendor() {
-        return vendor;
+    public GetVendorRes(String message, Boolean hasError) {
+        super(message, hasError);
     }
 
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
+    public VendorModel getVendorModel() {
+        return vendorModel;
+    }
+
+    public void setVendorModel(VendorModel vendorModel) {
+        this.vendorModel = vendorModel;
     }
 }

@@ -61,7 +61,12 @@ public class FinanceEntityCodeHPGenerator {
 //                seqNoStr = String.valueOf(entity.getSeqNo());
 //            }
             String entityClassName = entity.getClass().getSimpleName();
-            String objectName = entity.getObjectName().replaceAll("\\s+", "_");
+            String objectName;
+            try{
+                objectName = entity.getObjectName().replaceAll("\\s+", "_");
+            }catch (NullPointerException ne){
+                objectName = "";
+            }
             try {
                 switch (entityClassName) {
                     case "ApprovalForRequest":

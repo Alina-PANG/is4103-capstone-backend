@@ -3,6 +3,7 @@ package capstone.is4103capstone.supplychain.service;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.supplychain.model.VendorModel;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
 import capstone.is4103capstone.supplychain.model.res.GetAllVendorsRes;
 import capstone.is4103capstone.supplychain.model.res.GetVendorRes;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -54,8 +56,17 @@ public class VendorService {
 
             if (vendor == null) {
                 return new GetVendorRes("There is no vendor in the database with id " + id, true, null);
-            } else {
-                return new GetVendorRes("Successfully retrieved the vendor with id " + id, false, vendor);
+            }
+            else if(vendor.getDeleted()){
+                return new GetVendorRes("This vendor is deleted.", true, null);
+            }
+            else {
+                VendorModel vendorModel = new VendorModel(
+                        vendor.getId(), vendor.getCode(), vendor.getObjectName(), vendor.getBusinessUnit(),
+                        vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
+                        vendor.getBillingContactName(), vendor.getBillingContactEmail(),
+                        vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
+                return new GetVendorRes("Successfully retrieved the vendor with id " + id, false, vendorModel);
             }
         }catch(Exception ex){
             ex.printStackTrace();
@@ -66,9 +77,28 @@ public class VendorService {
     public GetAllVendorsRes getAllVendors(){
         try {
             logger.info("Getting all vendors");
+            List<VendorModel> returnList = new ArrayList<>();
             List<Vendor> vendorList = vendorRepository.findAll();
 
-            return new GetAllVendorsRes("Successfully retrieved all vendors", false, vendorList);
+            if(vendorList.size() == 0){
+                throw new Exception("No vendor available.");
+            }
+
+            for(Vendor vendor: vendorList){
+                if(vendor.getDeleted()){
+                    continue;
+                }
+
+                VendorModel vendorModel = new VendorModel(
+                        vendor.getId(), vendor.getCode(), vendor.getObjectName(), vendor.getBusinessUnit(),
+                        vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
+                        vendor.getBillingContactName(), vendor.getBillingContactEmail(),
+                        vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
+
+                returnList.add(vendorModel);
+            }
+
+            return new GetAllVendorsRes("Successfully retrieved all vendors", false, returnList);
         }catch(Exception ex){
             ex.printStackTrace();
             return new GetAllVendorsRes("An unexpected error happens: "+ex.getMessage(), true, null);
