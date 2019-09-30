@@ -2,6 +2,7 @@ package capstone.is4103capstone.admin.repository;
 
 import capstone.is4103capstone.entities.CostCenter;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;

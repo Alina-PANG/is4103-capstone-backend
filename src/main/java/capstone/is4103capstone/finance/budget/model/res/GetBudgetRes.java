@@ -1,12 +1,15 @@
 package capstone.is4103capstone.finance.budget.model.res;
 
 
+import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 
 public class GetBudgetRes extends GeneralRes {
     private BudgetModel budgetPlan;
     private boolean userIsBMApprover;
     private boolean userIsFunctionApprover;
+    ApprovalTicketModel latestReview;
+
 
     public GetBudgetRes() {
     }
@@ -25,6 +28,22 @@ public class GetBudgetRes extends GeneralRes {
         this.budgetPlan = budgetPlan;
         this.userIsBMApprover = isBMApprover;
         this.userIsFunctionApprover = userIsFunctionApprover;
+    }
+
+    public GetBudgetRes(String message, Boolean hasError, BudgetModel budgetPlan, boolean userIsBMApprover, boolean userIsFunctionApprover, ApprovalTicketModel latestReview) {
+        super(message, hasError);
+        this.budgetPlan = budgetPlan;
+        this.userIsBMApprover = userIsBMApprover;
+        this.userIsFunctionApprover = userIsFunctionApprover;
+        this.latestReview = latestReview;
+    }
+
+    public ApprovalTicketModel getLatestReview() {
+        return latestReview;
+    }
+
+    public void setLatestReview(ApprovalTicketModel latestReview) {
+        this.latestReview = latestReview;
     }
 
     public boolean isUserIsBMApprover() {

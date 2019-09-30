@@ -11,5 +11,8 @@ import java.util.Optional;
 public interface ApprovalForRequestRepository extends JpaRepository<ApprovalForRequest,String> {
 
     @Query(value = "SELECT * FROM approval_for_request a WHERE a.requested_item_id = ?1 and a.is_deleted=false AND a.approval_status=0 AND a.approver_id=?2", nativeQuery = true)
-    Optional<ApprovalForRequest> findPendingTicketByEntityId(String entityId, String approverId);
+    Optional<ApprovalForRequest> findPendingTicketByEntityIdAndApproverId(String entityId, String approverId);
+
+    @Query(value = "SELECT * FROM approval_for_request a WHERE a.requested_item_id=?1 and a.is_deleted=false ORDER BY a.last_modified_date_time",nativeQuery = true)
+    List<ApprovalForRequest> findTicketsByRequestedItemId(String id);
 }
