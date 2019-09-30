@@ -5,13 +5,16 @@ import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ContractLineRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.supplychain.model.ContractModel;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.model.res.GetAllContractsRes;
 import capstone.is4103capstone.supplychain.model.res.GetContractRes;
+import com.sun.tools.javah.Gen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,8 +105,22 @@ public class ContractService {
 
             if(contract == null){
                 return new GetContractRes("There is no contract in the database with id " + id, true, null);
-            }else{
-                return new GetContractRes("Successfullt retrieved the contract with id " + id, false, contract);
+            }
+            else if(contract.getDeleted()){
+                return new GetContractRes("This contract is deleted", true, null);
+            }
+            else{
+                GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
+                GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
+
+                ContractModel contractModel = new ContractModel(
+                        contract.getObjectName(), contract.getCode(), contract.getId(),
+                        contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
+                        contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
+                        vendor, employeeInChargeContract,
+                        contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
+
+                return new GetContractRes("Successfully retrieved the contract with id " + id, false, contractModel);
             }
         }catch(Exception ex){
             ex.printStackTrace();
@@ -114,9 +131,32 @@ public class ContractService {
     public GetAllContractsRes getAllContracts(){
         try {
             logger.info("Getting all contracts");
+            List<ContractModel> returnList = new ArrayList<>();
             List<Contract> contractList = contractRepository.findAll();
 
-            return new GetAllContractsRes("Successfully retrieved all contracts", false, contractList);
+            if(contractList.size() == 0){
+                throw new Exception("No contract available.");
+            }
+
+            for(Contract contract: contractList){
+                if(contract.getDeleted()){
+                    continue;
+                }
+
+                GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
+                GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
+
+                ContractModel contractModel = new ContractModel(
+                        contract.getObjectName(), contract.getCode(), contract.getId(),
+                        contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
+                        contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
+                        vendor, employeeInChargeContract,
+                        contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
+
+                returnList.add(contractModel);
+            }
+
+            return new GetAllContractsRes("Successfully retrieved all contracts", false, returnList);
         }catch(Exception ex){
             ex.printStackTrace();
             return new GetAllContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
