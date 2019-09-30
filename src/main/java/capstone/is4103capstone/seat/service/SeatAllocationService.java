@@ -472,7 +472,7 @@ public class SeatAllocationService {
 
 
     public Seat retrieveSeatWithAllocationsBySeatId(String seatId) throws SeatNotFoundException, SeatAllocationException {
-        Optional<Seat> optionalSeat = seatRepository.findById(seatId);
+        Optional<Seat> optionalSeat = seatRepository.findUndeletedById(seatId);
         if (!optionalSeat.isPresent()) {
             throw new SeatNotFoundException("Seat does not exist!");
         }
@@ -484,7 +484,7 @@ public class SeatAllocationService {
     public void deleteAllocation(String allocationId) throws SeatAllocationException {
 
         System.out.println("******************** Delete Allocation ********************");
-        Optional<SeatAllocation> optionalSeatAllocation = seatAllocationRepository.findById(allocationId);
+        Optional<SeatAllocation> optionalSeatAllocation = seatAllocationRepository.findUndeletedById(allocationId);
         if (!optionalSeatAllocation.isPresent()) {
             throw new SeatAllocationException("Seat allocation with ID " + allocationId + " does not exist!");
         }
@@ -493,6 +493,7 @@ public class SeatAllocationService {
         System.out.println("********** seat allocation (to be deleted) ID: " + seatAllocation.getId() + " **********");
         Seat seat = seatAllocation.getSeat();
         seatAllocation.setDeleted(true);
+        seatAllocationInactivationLogRepository.deleteInactivateLogByAllocationId(allocationId);
         System.out.println("-------------------------------------------");
         if (seatAllocation.isActive()) {
             ListIterator<SeatAllocation> iterator = seat.getActiveSeatAllocations().listIterator();
@@ -617,7 +618,7 @@ public class SeatAllocationService {
 
     // Validate the start date of the allocation.
     private void validateOccupancyStartDateTime(Date startDateTime) throws SeatAllocationException {
-        if (startDateTime.compareTo(new Date()) < 0) {
+        if (startDateTime.compareTo(DateHelper.getDateWithoutTimeUsingCalendar(new Date())) < 0) {
             throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be a historical time!");
         }
         GregorianCalendar oneYearLater = new GregorianCalendar();

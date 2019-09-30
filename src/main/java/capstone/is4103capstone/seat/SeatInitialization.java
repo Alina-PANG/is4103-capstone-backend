@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +25,7 @@ public class SeatInitialization {
 
     @PostConstruct
     public void init() {
-        List<SeatMap> seatMaps = seatMapRepository.findAll();
+        List<SeatMap> seatMaps = seatMapRepository.findAllUndeleted();
         if (seatMaps == null || seatMaps.size() == 0) {
             createSeatmaps();
         }

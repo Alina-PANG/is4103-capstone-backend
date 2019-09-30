@@ -10,19 +10,13 @@ import java.util.Optional;
 
 public interface SeatMapRepository extends JpaRepository<SeatMap, String> {
 
-    @Override
     @Query(value = "SELECT * FROM seat_map s WHERE s.id = ?1 AND s.is_deleted=false", nativeQuery = true)
-    Optional<SeatMap> findById(String id);
+    Optional<SeatMap> findUndeletedById(String id);
 
     @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.office_id=?1 AND s.floor=?2", nativeQuery = true)
     List<SeatMap> findByOfficeIdAndFloor(String officeId, String floor);
 
-    @Override
     @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false", nativeQuery = true)
-    List<SeatMap> findAll();
+    List<SeatMap> findAllUndeleted();
 
-    //Soft delete.
-    @Query(value = "UPDATE seat_map s SET s.is_deleted=true WHERE s.id=?1", nativeQuery = true)
-    @Modifying
-    void softDelete(String id);
 }
