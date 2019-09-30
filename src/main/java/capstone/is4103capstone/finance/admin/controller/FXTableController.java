@@ -7,6 +7,7 @@ import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.general.service.WriteAuditTrail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class FXTableController {
     @PostMapping("/create")
     public @ResponseBody
     ResponseEntity<Object> createFXRecord(@RequestBody CreateFXRequest req) {
-
+        WriteAuditTrail.autoAudit(req.getUsername());
         if(Authentication.authenticateUser(req.getUsername())){
             return new ResponseEntity<Object>(fxService.createFXRecord(req).toString(), HttpStatus.OK);
         }
@@ -40,8 +41,15 @@ public class FXTableController {
     }
 
     @GetMapping("/view")
-    public ResponseEntity<ViewFXRecordRes> viewFxRecords(@RequestBody FXRecordQueryReq req){
-        if(Authentication.authenticateUser(req.getUsername())){
+    public ResponseEntity<ViewFXRecordRes> viewFxRecords(@RequestHeader("Authorization") String authToken,
+                                                         @RequestParam(value = "startDate",required = false) String startDate,
+                                                         @RequestParam(value = "endDate",required = false) String endDate,
+                                                         @RequestParam(value = "baseCurr",required = false) String baseCurr,
+                                                         @RequestParam(value = "priceCurr",required = false) String priceCurr){
+        String username = Authentication.getUsernameFromToken(authToken);
+        WriteAuditTrail.autoAudit(username);
+        if(Authentication.authenticateUser(username)){
+            FXRecordQueryReq req = new FXRecordQueryReq(startDate,endDate,baseCurr,priceCurr,username);
             return ResponseEntity
                     .ok()
                     .body(fxService.viewFXRecordRes(req));

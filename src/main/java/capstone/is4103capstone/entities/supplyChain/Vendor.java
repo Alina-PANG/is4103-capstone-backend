@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities.supplyChain;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.finance.Invoice;
 import capstone.is4103capstone.entities.finance.Merchandise;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -12,8 +13,9 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Vendor extends DBEntityTemplate {
-    private String businessUnit; //vendor company
+    private String businessUnit;
     private String serviceDescription;
     private String relationshipManagerName;
     private String relationshipManagerEmail;
@@ -22,19 +24,15 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactName;
     private String escalationContactEmail;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "vendor")
     private List<Merchandise> merchandises = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "vendor")
     private List<Invoice> invoices = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "vendor")
     private List<Contract> contracts = new ArrayList<>();
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "outsourcedVendor")
     private List<Outsourcing> outsourcingList = new ArrayList<>();
 

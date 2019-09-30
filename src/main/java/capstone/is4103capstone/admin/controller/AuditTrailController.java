@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/at")
+@RequestMapping("/api/audit")
 public class AuditTrailController {
 
     @Autowired

@@ -25,6 +25,8 @@ public class Employee extends DBEntityTemplate {
     private String firstName;
     private String lastName;
     private String middleName;
+    private String email;
+
     @JsonIgnore
     private String password;
 
@@ -137,6 +139,13 @@ public class Employee extends DBEntityTemplate {
 
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
+    }
+
+    public String getFullName() {
+        if (this.middleName == null || this.middleName.trim().length() == 0) {
+            return this.firstName + " " + this.lastName;
+        }
+        return this.firstName + " " + this.middleName + " " + this.lastName;
     }
 
     public String getPassword() {
@@ -278,5 +287,17 @@ public class Employee extends DBEntityTemplate {
 
     public void setMemberOfSecurityGroups(List<SecurityGroup> memberOfSecurityGroups) {
         this.memberOfSecurityGroups = memberOfSecurityGroups;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setSecurityId(String securityId) {
+        this.securityId = securityId;
     }
 }

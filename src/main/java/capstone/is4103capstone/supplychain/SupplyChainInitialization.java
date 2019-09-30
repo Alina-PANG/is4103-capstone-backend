@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
@@ -47,33 +48,44 @@ public class SupplyChainInitialization {
 
     @PostConstruct
     @Transactional
-    public void init(){
-//        if(employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong") == null){
-//            Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
-//            newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-//            newEmployee2.setCode("EMPLOYEE-xuhong");
-//            employeeRepository.save(newEmployee2);
-//
-//            createMechandise();
-//            createVendors();
-//            createContract();
-//            createDispute();
-//            createAction();
-//            createOutsourcingAssessmentLine();
-//            createOutsourcingAssessmentSection();
-//            createOutsourcingAssessment();
-//            createOutsourcing();
-//        }
+
+    public void init() throws ParseException {
+        if(employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong") == null){
+            Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
+            newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+            newEmployee2.setCode("EMPLOYEE-xuhong");
+            employeeRepository.save(newEmployee2);
+
+            createMechandise();
+            createVendors();
+            createContract();
+            createDispute();
+            createAction();
+            createOutsourcingAssessmentLine();
+            createOutsourcingAssessmentSection();
+            createOutsourcingAssessment();
+            createOutsourcing();
+        }
     }
 
-    public void createMechandise(){
-        Merchandise merchandise1 = new Merchandise("Banana", "SG_Banana", "dummy_hierachy","piece",opsUserId);
-        Merchandise merchandise2 = new Merchandise("Mango", "SG_Mango", "dummy_hierachy", "piece",opsUserId);
+    public void createMechandise() {
+        Merchandise merchandise1 = new Merchandise("Banana", "SG_Banana", "dummy_hierachy", "piece", opsUserId);
+        Merchandise merchandise2 = new Merchandise("Mango", "SG_Mango", "dummy_hierachy", "piece", opsUserId);
+
+        merchandise1.setCreatedBy("xuhong");
+        merchandise1.setCreatedDateTime(new Date());
+        merchandise1.setLastModifiedBy("xuhong");
+        merchandise1.setLastModifiedDateTime(new Date());
+
+        merchandise2.setCreatedBy("xuhong");
+        merchandise2.setCreatedDateTime(new Date());
+        merchandise2.setLastModifiedBy("xuhong");
+        merchandise2.setLastModifiedDateTime(new Date());
         merchandiseRepository.save(merchandise1);
         merchandiseRepository.save(merchandise2);
     }
 
-    public void createVendors(){
+    public void createVendors() {
         Vendor vendor1 = new Vendor();
         vendor1.setBusinessUnit("Lenovo");
         vendor1.setServiceDescription("Lenovo will provide PC and harware to NatWest.");
@@ -83,9 +95,11 @@ public class SupplyChainInitialization {
         vendor1.setBillingContactEmail("BillStaff@gmail.com");
         vendor1.setEscalationContactName("EscalationStaff");
         vendor1.setEscalationContactEmail("EscalationStaff@gmail.com");
-        vendor1.setCreatedBy("Admin");
         vendor1.setCode("Vendor-Lenovo");
+        vendor1.setCreatedBy("xuhong");
+        vendor1.setCreatedDateTime(new Date());
         vendor1.setLastModifiedBy("xuhong");
+        vendor1.setLastModifiedDateTime(new Date());
 
         Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana");
         vendor1.getMerchandises().add(merchandise);
@@ -96,13 +110,23 @@ public class SupplyChainInitialization {
     }
 
     @Transactional
-    public void createContract(){
+    public void createContract() throws ParseException {
 
         Merchandise banana = merchandiseRepository.findMerchandiseByCode("SG_Banana");
         Merchandise mango = merchandiseRepository.findMerchandiseByCode("SG_Mango");
 
-        ContractLine contractLine1 = new ContractLine("SG_Banana",BigDecimal.valueOf(2.0),"SGD",opsUserId);
-        ContractLine contractLine2 = new ContractLine("SG_Mango",BigDecimal.valueOf(5.0),"SGD",opsUserId);
+        ContractLine contractLine1 = new ContractLine("SG_Banana", BigDecimal.valueOf(2.0), "SGD", opsUserId);
+        ContractLine contractLine2 = new ContractLine("SG_Mango", BigDecimal.valueOf(5.0), "SGD", opsUserId);
+
+        contractLine1.setCreatedBy("xuhong");
+        contractLine1.setCreatedDateTime(new Date());
+        contractLine1.setLastModifiedBy("xuhong");
+        contractLine1.setLastModifiedDateTime(new Date());
+
+        contractLine2.setCreatedBy("xuhong");
+        contractLine2.setCreatedDateTime(new Date());
+        contractLine2.setLastModifiedBy("xuhong");
+        contractLine2.setLastModifiedDateTime(new Date());
 
         contractLine1 = contractLineRepository.save(contractLine1);
         contractLine2 = contractLineRepository.save(contractLine2);
@@ -117,8 +141,15 @@ public class SupplyChainInitialization {
         contract1.setCode("Contract1");
         contract1.setContractStatus(ContractStatusEnum.ACTIVE);
         contract1.setContractType(ContractTypeEnum.SCHEDULE);
-        contract1.setContractTerm("9 months");
-        contract1.setStartDate(new Date());
+        contract1.setContractTerm("12 months");
+        contract1.setStartDate(new SimpleDateFormat("yyyy-MM-dd").parse("2019-11-15"));
+        contract1.setEndDate(new SimpleDateFormat("yyyy-MM-dd").parse("2020-11-15"));
+
+        contract1.setCreatedBy("xuhong");
+        contract1.setCreatedDateTime(new Date());
+        contract1.setLastModifiedBy("xuhong");
+        contract1.setLastModifiedDateTime(new Date());
+
         contract1 = contractRepository.save(contract1);
 
         banana.setCurrentContractCode("Contract1");
@@ -147,11 +178,15 @@ public class SupplyChainInitialization {
         employeeRepository.saveAndFlush(newEmployee);
     }
 
-    public void createDispute(){
+    public void createDispute() {
         Employee handler = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
         Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
 
         Dispute dispute1 = new Dispute("This is a ... dispute.", DisputeStatusEnum.ACTIVE, handler, creator);
+        dispute1.setCreatedBy("xuhong");
+        dispute1.setCreatedDateTime(new Date());
+        dispute1.setLastModifiedBy("xuhong");
+        dispute1.setLastModifiedDateTime(new Date());
         disputeRepository.save(dispute1);
 
         handler.getDisputesHandling().add(dispute1);
@@ -160,11 +195,15 @@ public class SupplyChainInitialization {
         employeeRepository.saveAndFlush(creator);
     }
 
-    public void createAction(){
+    public void createAction() {
         Employee assignee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
         Employee creator = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
 
         Action action = new Action("This is a ... action.", ActionStatusEnum.ACTIVE, assignee, creator);
+        action.setCreatedBy("xuhong");
+        action.setCreatedDateTime(new Date());
+        action.setLastModifiedBy("xuhong");
+        action.setLastModifiedDateTime(new Date());
         actionRepository.save(action);
 
         assignee.getActionsAssigned().add(action);
@@ -173,25 +212,33 @@ public class SupplyChainInitialization {
         employeeRepository.saveAndFlush(creator);
     }
 
-    public void createOutsourcingAssessmentLine(){
+    public void createOutsourcingAssessmentLine() {
         OutsourcingAssessmentLine outsourcingAssessmentLine = new OutsourcingAssessmentLine("Question1: Can we do it by ourselves?");
         outsourcingAssessmentLine.setCode("Outsourcing_Assessment_Line1");
+        outsourcingAssessmentLine.setCreatedBy("xuhong");
+        outsourcingAssessmentLine.setCreatedDateTime(new Date());
+        outsourcingAssessmentLine.setLastModifiedBy("xuhong");
+        outsourcingAssessmentLine.setLastModifiedDateTime(new Date());
         outsourcingAssessmentLineRepository.save(outsourcingAssessmentLine);
     }
 
-    public void createOutsourcingAssessmentSection(){
+    public void createOutsourcingAssessmentSection() {
         OutsourcingAssessmentLine outsourcingAssessmentLine = outsourcingAssessmentLineRepository.findOutsourcingAssessmentLineByCode("Outsourcing_Assessment_Line1").get(0);
 
         OutsourcingAssessmentSection outsourcingAssessmentSection = new OutsourcingAssessmentSection();
         outsourcingAssessmentSection.setCode("Outsourcing_Assessment_Section1");
         outsourcingAssessmentSection.getOutsourcingAssessmentLines().add(outsourcingAssessmentLine);
+        outsourcingAssessmentSection.setCreatedBy("xuhong");
+        outsourcingAssessmentSection.setCreatedDateTime(new Date());
+        outsourcingAssessmentSection.setLastModifiedBy("xuhong");
+        outsourcingAssessmentSection.setLastModifiedDateTime(new Date());
         outsourcingAssessmentSectionRepository.save(outsourcingAssessmentSection);
 
         outsourcingAssessmentLine.setOutsourcingAssessmentSection(outsourcingAssessmentSection);
         outsourcingAssessmentLineRepository.saveAndFlush(outsourcingAssessmentLine);
     }
 
-    public void createOutsourcingAssessment(){
+    public void createOutsourcingAssessment() {
         OutsourcingAssessmentSection outsourcingAssessmentSection = outsourcingAssessmentSectionRepository.findOutsourcingAssessmentSectionByCode("Outsourcing_Assessment_Section1").get(0);
         Employee employeeAssess = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
 
@@ -199,6 +246,10 @@ public class SupplyChainInitialization {
         outsourcingAssessment.setCode("Outsourcing_Assessment1");
         outsourcingAssessment.setEmployeeAssess(employeeAssess);
         outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.CREATED);
+        outsourcingAssessment.setCreatedBy("xuhong");
+        outsourcingAssessment.setCreatedDateTime(new Date());
+        outsourcingAssessment.setLastModifiedBy("xuhong");
+        outsourcingAssessment.setLastModifiedDateTime(new Date());
         outsourcingAssessmentRepository.save(outsourcingAssessment);
 
         employeeAssess.getOutsourcingAssessmentList().add(outsourcingAssessment);
@@ -207,7 +258,7 @@ public class SupplyChainInitialization {
         outsourcingAssessmentSectionRepository.saveAndFlush(outsourcingAssessmentSection);
     }
 
-    public void createOutsourcing(){
+    public void createOutsourcing() {
         OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findOutsourcingAssessmentByCode("Outsourcing_Assessment1").get(0);
         Employee employeeInCharge = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
@@ -217,6 +268,10 @@ public class SupplyChainInitialization {
         outsourcing.setEmployeeInChargeOutsourcing(employeeInCharge);
         outsourcing.setOutsourcedVendor(vendor);
         outsourcing.getOutsourcingAssessmentList().add(outsourcingAssessment);
+        outsourcing.setCreatedBy("xuhong");
+        outsourcing.setCreatedDateTime(new Date());
+        outsourcing.setLastModifiedBy("xuhong");
+        outsourcing.setLastModifiedDateTime(new Date());
         outsourcingRepository.save(outsourcing);
 
         vendor.getOutsourcingList().add(outsourcing);

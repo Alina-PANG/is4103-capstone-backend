@@ -1,6 +1,8 @@
 package capstone.is4103capstone.finance.admin.model.req;
 
-public class CreateSub1Sub2Request {
+import java.io.Serializable;
+
+public class CreateSub1Sub2Request implements Serializable {
     String upperCategoryCode;
     String name;
     String username;

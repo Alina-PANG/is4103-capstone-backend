@@ -1,48 +1,85 @@
 package capstone.is4103capstone.entities.seat;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.CompanyFunction;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table
-public class Seat extends DBEntityTemplate {
+public class Seat extends DBEntityTemplate implements Comparable<Seat> {
+    // Seat code example: SG-ORQ-26-01
+
     @Enumerated(EnumType.STRING)
     private SeatTypeEnum type = SeatTypeEnum.FIXED;
-    private Point coordinate;
+    @NotNull
+    @Min(0)
+    private Integer xCoordinate;
+    @NotNull
+    @Min(0)
+    private Integer yCoordinate;
+    @NotNull
+    @Min(1)
     private Integer serialNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "function_id")
+    @JsonIgnore
+    private CompanyFunction functionAssigned;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    @JsonIgnore
+    private Team teamAssigned;
 
     @OneToOne
     private SeatAllocation currentOccupancy;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seatmap_id")
     @JsonIgnore
-    @NotNull
     private SeatMap seatMap;
-    @OneToMany(mappedBy = "seat")
-    private List<SeatAllocation> seatAllocations = new ArrayList<>();
+    private String originalSeatMapId;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "seat_activeallocations",
+            joinColumns = @JoinColumn(name = "seat_id"),
+            inverseJoinColumns = @JoinColumn(name = "allocation_id")
+    )
+    private List<SeatAllocation> activeSeatAllocations = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "seat_inactiveallocations",
+            joinColumns = @JoinColumn(name = "seat_id"),
+            inverseJoinColumns = @JoinColumn(name = "allocation_id")
+    )
+    private List<SeatAllocation> inactiveSeatAllocations = new ArrayList<>();
 
     public Seat() {
-
+        this.setCreatedDateTime(new Date());
     }
 
-    public Seat(String objectName, String code, String hierachyPath, Point coordinate, @NotNull SeatMap seatMap) {
+    public Seat(String objectName, String code, String hierachyPath, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap) {
         super(objectName, code, hierachyPath);
-        this.coordinate = coordinate;
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
         this.seatMap = seatMap;
+        this.originalSeatMapId = seatMap.getId();
+        this.setCreatedDateTime(new Date());
     }
 
-    public Seat(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Point coordinate, @NotNull SeatMap seatMap) {
+    public Seat(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap) {
         super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
-        this.coordinate = coordinate;
+        this.xCoordinate = xCoordinate;
+        this.yCoordinate = yCoordinate;
         this.seatMap = seatMap;
+        this.originalSeatMapId = seatMap.getId();
+        this.setCreatedDateTime(new Date());
     }
 
     public SeatTypeEnum getType() {
@@ -51,19 +88,49 @@ public class Seat extends DBEntityTemplate {
 
     public void setType(SeatTypeEnum type) {
         this.type = type;
+        this.setLastModifiedDateTime(new Date());
     }
 
-    public Point getCoordinate() {
-        return coordinate;
+    public Integer getxCoordinate() { return xCoordinate; }
+
+    public void setxCoordinate(Integer xCoordinate) {
+        this.xCoordinate = xCoordinate;
+        this.setLastModifiedDateTime(new Date());
     }
 
-    public void setCoordinate(Point coordinate) {
-        this.coordinate = coordinate;
+    public Integer getyCoordinate() { return yCoordinate; }
+
+    public void setyCoordinate(Integer yCoordinate) {
+        this.yCoordinate = yCoordinate;
+        this.setLastModifiedDateTime(new Date());
     }
 
     public Integer getSerialNumber() { return serialNumber; }
 
-    public void setSerialNumber(Integer serialNumber) { this.serialNumber = serialNumber; }
+    public void setSerialNumber(Integer serialNumber) {
+        this.serialNumber = serialNumber;
+        this.setLastModifiedDateTime(new Date());
+    }
+
+    public CompanyFunction getFunctionAssigned() {
+        return functionAssigned;
+    }
+
+    public void setFunctionAssigned(CompanyFunction functionAssigned) {
+        this.functionAssigned = functionAssigned;
+    }
+
+    public Team getTeamAssigned() {
+        return teamAssigned;
+    }
+
+    public void setTeamAssigned(Team teamAssigned) {
+        this.teamAssigned = teamAssigned;
+    }
+
+    public String getOriginalSeatMapId() {
+        return originalSeatMapId;
+    }
 
     public SeatMap getSeatMap() {
         return seatMap;
@@ -71,6 +138,11 @@ public class Seat extends DBEntityTemplate {
 
     public void setSeatMap(SeatMap seatMap) {
         this.seatMap = seatMap;
+        if (seatMap != null) {
+            this.originalSeatMapId = seatMap.getId();
+        }
+
+        this.setLastModifiedDateTime(new Date());
     }
 
     public SeatAllocation getCurrentOccupancy() {
@@ -79,13 +151,29 @@ public class Seat extends DBEntityTemplate {
 
     public void setCurrentOccupancy(SeatAllocation currentOccupancy) {
         this.currentOccupancy = currentOccupancy;
+        this.setLastModifiedDateTime(new Date());
     }
 
-    public List<SeatAllocation> getSeatAllocations() {
-        return seatAllocations;
+    public List<SeatAllocation> getActiveSeatAllocations() {
+        return activeSeatAllocations;
     }
 
-    public void setSeatAllocations(List<SeatAllocation> seatAllocations) {
-        this.seatAllocations = seatAllocations;
+    public void setActiveSeatAllocations(List<SeatAllocation> activeSeatAllocations) {
+        this.activeSeatAllocations = activeSeatAllocations;
+        this.setLastModifiedDateTime(new Date());
+    }
+
+    public List<SeatAllocation> getInactiveSeatAllocations() {
+        return inactiveSeatAllocations;
+    }
+
+    public void setInactiveSeatAllocations(List<SeatAllocation> inactiveSeatAllocations) {
+        this.inactiveSeatAllocations = inactiveSeatAllocations;
+        this.setLastModifiedDateTime(new Date());
+    }
+
+    @Override
+    public int compareTo(Seat anotherSeat) {
+        return this.serialNumber - anotherSeat.getSerialNumber();
     }
 }

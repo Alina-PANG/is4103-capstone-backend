@@ -7,13 +7,12 @@ import capstone.is4103capstone.finance.admin.model.FXRecordModel;
 import capstone.is4103capstone.finance.admin.model.req.CreateFXRequest;
 import capstone.is4103capstone.finance.admin.model.req.FXRecordQueryReq;
 import capstone.is4103capstone.finance.admin.model.res.ViewFXRecordRes;
-import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.util.resources.ga.LocaleNames_ga;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.text.ParseException;
@@ -43,6 +42,7 @@ public class FXTableService {
         }
     }
 
+    @Transactional
     public JSONObject createFXRecord(CreateFXRequest request){
         JSONObject res = new JSONObject();
 
@@ -50,11 +50,26 @@ public class FXTableService {
             Date effectiveDate = formatter.parse(request.getEffectiveDate());
             FXRecord newRecord = new FXRecord(request.getBaseCurr(),request.getPriceCurr(),request.getRate(),effectiveDate);
             newRecord.setCreatedBy(request.getUsername());
+            newRecord.setExpireDate(MAX_DATE);
+
+            //retrieve and deactive
+            FXRecord latest = fxRecordRepository.findLastActiveRecord(request.getBaseCurr(),request.getPriceCurr());
+            if (latest != null || effectiveDate.after(new Date())){
+                //check whether the new record is newest than the previous ones;
+                if (!effectiveDate.after(latest.getEffectiveDate())){
+                    throw new Exception("New record must be later than the last active record in the fx table");
+                }
+                latest.setHasExpired(true);
+                latest.setExpireDate(effectiveDate);
+            }
+
+
+
             newRecord = fxRecordRepository.save(newRecord);
 
             newRecord.setCode(EntityCodeHPGeneration.getCode(fxRecordRepository,newRecord));
 
-            FXRecordModel model = new FXRecordModel(newRecord.getBaseCurrencyAbbr(), newRecord.getPriceCurrencyAbbr(), formatter.format(newRecord.getEffectiveDate()), newRecord.getExchangeRate(), newRecord.getId(), newRecord.getCode());
+            FXRecordModel model = new FXRecordModel(newRecord.getBaseCurrencyAbbr(), newRecord.getPriceCurrencyAbbr(), formatter.format(newRecord.getEffectiveDate()), false,formatter.format(newRecord.getExpireDate()),newRecord.getExchangeRate(), newRecord.getId(), newRecord.getCode());
 
             res.put("newRecord",new JSONObject(model));
             res.put("hasError",false);
@@ -80,10 +95,15 @@ public class FXTableService {
             List<FXRecordModel> records = new ArrayList<>();
             List<FXRecord> fxUnderContraints = fxRecordRepository.findAllWithConstraints(req.getBaseCurr(),req.getPriceCurr(),startDate,endDate);
 
+            if (fxUnderContraints.size()==0){
+                throw new Exception("No FX exchange records match your search. ");
+            }
+
             FXRecordModel model;
             for (FXRecord fx:fxUnderContraints){
                 String efctStr = formatter.format(fx.getEffectiveDate());
-                model = new FXRecordModel(fx.getBaseCurrencyAbbr(),fx.getPriceCurrencyAbbr(),efctStr,fx.getExchangeRate(),fx.getId(),fx.getCode());
+                String expireDateStr = formatter.format(fx.getExpireDate());
+                model = new FXRecordModel(fx.getBaseCurrencyAbbr(),fx.getPriceCurrencyAbbr(),efctStr,fx.getHasExpired(),expireDateStr,fx.getExchangeRate(),fx.getId(),fx.getCode());
                 records.add(model);
             }
 
@@ -93,8 +113,6 @@ public class FXTableService {
         }
 
     }
-
-
 
 
 }

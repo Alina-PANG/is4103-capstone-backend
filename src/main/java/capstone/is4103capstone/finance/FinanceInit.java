@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class FinanceInit {
@@ -47,7 +48,7 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
-//        String thisUser = "yingshi2502";
+        String thisUser = "yingshi2502";
 //        Country country = countryRepository.findCountryByCode("SG");
 //
 //        List<FXRecord> fxRecords = fxRecordRepository.findAll();
@@ -144,7 +145,7 @@ public class FinanceInit {
         merchandiseRepository.save(m);
 
         BudgetSub2 sub2 = budgetSub2Repository.findBudgetSub2ByCode(sub2Code);
-        System.out.println(sub2.getId());
+//        System.out.println(sub2.getId());
         sub2.getMerchandises().size();
         sub2.getMerchandises().add(m);
         m.setBudgetSub2(sub2);
