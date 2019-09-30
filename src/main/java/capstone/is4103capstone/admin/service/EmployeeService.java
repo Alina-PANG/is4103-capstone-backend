@@ -25,7 +25,7 @@ public class EmployeeService {
             throw new EmployeeNotFoundException("Invalid employee ID given!");
         }
         employeeId = employeeId.trim();
-        Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
+        Optional<Employee> optionalEmployee = employeeRepository.findUndeletedEmployeeById(employeeId);
         if (!optionalEmployee.isPresent()) {
             throw new EmployeeNotFoundException("Employee with ID " + employeeId + " does not exist!");
         }
@@ -57,7 +57,7 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeEntityByUuid(String input) throws Exception {
-        Optional<Employee> employee = employeeRepository.findById(input);
+        Optional<Employee> employee = employeeRepository.findUndeletedEmployeeById(input);
         if (employee.isPresent()) {
             return employee.get();
         } else {

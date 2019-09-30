@@ -14,7 +14,15 @@ public class CostCenterModel implements Serializable {
     private GeneralEntityModel costCenterManager;
     private GeneralEntityModel bmApprover;
     private GeneralEntityModel functionApprover;
+    private GeneralEntityModel country;
 
+    public GeneralEntityModel getCountry() {
+        return country;
+    }
+
+    public void setCountry(GeneralEntityModel country) {
+        this.country = country;
+    }
 
     public CostCenterModel() {
     }
@@ -25,7 +33,7 @@ public class CostCenterModel implements Serializable {
         this.id = id;
     }
 
-    public CostCenterModel(String name, String code, String id, GeneralEntityModel team, GeneralEntityModel costCenterManager, GeneralEntityModel bmApprover, GeneralEntityModel functionApprover) {
+    public CostCenterModel(String name, String code, String id, GeneralEntityModel team, GeneralEntityModel costCenterManager, GeneralEntityModel bmApprover, GeneralEntityModel functionApprover, GeneralEntityModel country) {
         this.name = name;
         this.code = code;
         this.id = id;
@@ -33,6 +41,7 @@ public class CostCenterModel implements Serializable {
         this.costCenterManager = costCenterManager;
         this.bmApprover = bmApprover;
         this.functionApprover = functionApprover;
+        this.country = country;
     }
 
     public String getName() {

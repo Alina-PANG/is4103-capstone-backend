@@ -34,7 +34,6 @@ public class FXTableController {
         if(Authentication.authenticateUser(req.getUsername())){
             return new ResponseEntity<Object>(fxService.createFXRecord(req).toString(), HttpStatus.OK);
         }
-
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
 

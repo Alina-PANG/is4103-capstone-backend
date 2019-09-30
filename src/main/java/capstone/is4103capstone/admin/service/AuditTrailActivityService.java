@@ -8,10 +8,8 @@ import capstone.is4103capstone.entities.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class AuditTrailActivityService {
@@ -20,6 +18,8 @@ public class AuditTrailActivityService {
     AuditTrailActivityRepo auditTrailActivityRepo;
     @Autowired
     EmployeeRepository employeeRepository;
+
+    private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public AuditTrailActivity createNewRecordUsingUserUuid(String activityName, String userUuid) {
         AuditTrailActivity ata;
@@ -88,7 +88,13 @@ public class AuditTrailActivityService {
         input.getId().ifPresent(auditTrailActivity::setId);
         input.getActivity().ifPresent(auditTrailActivity::setActivity);
         input.getUserUuid().ifPresent(auditTrailActivity::setUserUuid);
-        input.getTimeStamp().ifPresent(auditTrailActivity::setTimeStamp);
+        try{
+            auditTrailActivity.setTimeStamp(datetimeFormatter.parse(input.getTimeStamp().get()));
+        }catch (Exception e){
+
+        }
+
+//        input.getTimeStamp().ifPresent(auditTrailActivity::setTimeStamp);
         return auditTrailActivity;
     }
 
@@ -97,7 +103,7 @@ public class AuditTrailActivityService {
         auditTrailActivityDto.setId(Optional.of(input.getId()));
         auditTrailActivityDto.setActivity(Optional.of(input.getActivity()));
         auditTrailActivityDto.setUserUuid(Optional.of(input.getUserUuid()));
-        auditTrailActivityDto.setTimeStamp(Optional.of(input.getTimeStamp()));
+        auditTrailActivityDto.setTimeStamp(Optional.of(datetimeFormatter.format(input.getTimeStamp())));
         return auditTrailActivityDto;
     }
 
