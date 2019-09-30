@@ -39,7 +39,6 @@ public class ApprovalForRequest extends DBEntityTemplate {
 
     private ApprovalStatusEnum approvalStatus = ApprovalStatusEnum.PENDING;
 
-
     public ApprovalForRequest() {
     }
 
