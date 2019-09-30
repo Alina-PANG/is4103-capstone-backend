@@ -1,6 +1,9 @@
 package capstone.is4103capstone.supplychain.service;
 
+import capstone.is4103capstone.admin.repository.TeamRepository;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.model.VendorModel;
@@ -22,12 +25,13 @@ public class VendorService {
 
     @Autowired
     private VendorRepository vendorRepository;
+    @Autowired
+    private TeamRepository teamRepository;
 
     public GeneralRes createNewVendor(CreateVendorReq createVendorReq){
         try{
             Vendor newVendor = new Vendor();
             newVendor.setObjectName(createVendorReq.getVendorName());
-            newVendor.setBusinessUnit(createVendorReq.getBusinessUnit());
             newVendor.setServiceDescription(createVendorReq.getServiceDescription());
             newVendor.setBillingContactName(createVendorReq.getBillingContactName());
             newVendor.setBillingContactEmail(createVendorReq.getBillingContactEmail());
@@ -41,6 +45,14 @@ public class VendorService {
             newVendor.setCreatedDateTime(new Date());
 
             newVendor = vendorRepository.saveAndFlush(newVendor);
+            for(Team t: createVendorReq.getBusinessUnits()){
+                newVendor.getBusinessUnits().add(t);
+                newVendor = vendorRepository.saveAndFlush(newVendor);
+                t.getVendors().add(newVendor);
+                teamRepository.saveAndFlush(t);
+            }
+
+            vendorRepository.saveAndFlush(newVendor);
             logger.info("Successully created a new vendor! -- "+createVendorReq.getUsername()+" "+new Date());
             return new GeneralRes("Successully created a new vendor!", false);
         }catch (Exception ex){
@@ -61,8 +73,14 @@ public class VendorService {
                 return new GetVendorRes("This vendor is deleted.", true, null);
             }
             else {
+                List<GeneralEntityModel> businessUnits = new ArrayList<>();
+                for(Team t: vendor.getBusinessUnits()){
+                    GeneralEntityModel team = new GeneralEntityModel(t);
+                    businessUnits.add(team);
+                }
+
                 VendorModel vendorModel = new VendorModel(
-                        vendor.getId(), vendor.getCode(), vendor.getObjectName(), vendor.getBusinessUnit(),
+                        vendor.getId(), vendor.getCode(), vendor.getObjectName(), businessUnits,
                         vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
                         vendor.getBillingContactName(), vendor.getBillingContactEmail(),
                         vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
@@ -89,8 +107,14 @@ public class VendorService {
                     continue;
                 }
 
+                List<GeneralEntityModel> businessUnits = new ArrayList<>();
+                for(Team t: vendor.getBusinessUnits()){
+                    GeneralEntityModel team = new GeneralEntityModel(t);
+                    businessUnits.add(team);
+                }
+
                 VendorModel vendorModel = new VendorModel(
-                        vendor.getId(), vendor.getCode(), vendor.getObjectName(), vendor.getBusinessUnit(),
+                        vendor.getId(), vendor.getCode(), vendor.getObjectName(), businessUnits,
                         vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
                         vendor.getBillingContactName(), vendor.getBillingContactEmail(),
                         vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
@@ -110,9 +134,6 @@ public class VendorService {
             Vendor vendor = vendorRepository.getOne(id);
             if (updateVendorReq.getVendorName() != null) {
                 vendor.setObjectName(updateVendorReq.getVendorName());
-            }
-            if(updateVendorReq.getBusinessUnit() != null){
-                vendor.setBusinessUnit(updateVendorReq.getBusinessUnit());
             }
             if(updateVendorReq.getBillingContactName() != null){
                 vendor.setBillingContactName(updateVendorReq.getBillingContactName());

@@ -1,20 +1,15 @@
 package capstone.is4103capstone.supplychain.model;
 
-import capstone.is4103capstone.entities.finance.Invoice;
-import capstone.is4103capstone.entities.finance.Merchandise;
-import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.Outsourcing;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
 
-import javax.persistence.OneToMany;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class VendorModel implements Serializable {
     private String id;
     private String code;
     private String vendorName;
-    private String businessUnit;
+    private List<GeneralEntityModel> businessUnits;
     private String serviceDescription;
     private String relationshipManagerName;
     private String relationshipManagerEmail;
@@ -23,11 +18,11 @@ public class VendorModel implements Serializable {
     private String escalationContactName;
     private String escalationContactEmail;
 
-    public VendorModel(String id, String code, String vendorName, String businessUnit, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
+    public VendorModel(String id, String code, String vendorName, List<GeneralEntityModel> businessUnits, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
         this.id = id;
         this.code = code;
         this.vendorName = vendorName;
-        this.businessUnit = businessUnit;
+        this.businessUnits = businessUnits;
         this.serviceDescription = serviceDescription;
         this.relationshipManagerName = relationshipManagerName;
         this.relationshipManagerEmail = relationshipManagerEmail;
@@ -64,12 +59,12 @@ public class VendorModel implements Serializable {
         this.vendorName = vendorName;
     }
 
-    public String getBusinessUnit() {
-        return businessUnit;
+    public List<GeneralEntityModel> getBusinessUnits() {
+        return businessUnits;
     }
 
-    public void setBusinessUnit(String businessUnit) {
-        this.businessUnit = businessUnit;
+    public void setBusinessUnits(List<GeneralEntityModel> businessUnits) {
+        this.businessUnits = businessUnits;
     }
 
     public String getServiceDescription() {

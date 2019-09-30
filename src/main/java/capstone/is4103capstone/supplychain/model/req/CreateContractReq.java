@@ -37,6 +37,9 @@ public class CreateContractReq implements Serializable {
     private String employeeInChargeId;
     private String contractName;
 
+    public CreateContractReq() {
+    }
+
     public String getContractName() {
         return contractName;
     }
