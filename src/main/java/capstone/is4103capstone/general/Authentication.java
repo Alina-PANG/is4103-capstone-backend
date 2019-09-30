@@ -11,4 +11,9 @@ public class Authentication {
     public static void configurePermissionMap(DBEntityTemplate entity){
         entity.getPermissionMap().put(PermissionTypeEnum.GRANT,"all_user");
     }
+
+    //for now;
+    public static String getUsernameFromToken(String token){
+        return token;
+    }
 }
