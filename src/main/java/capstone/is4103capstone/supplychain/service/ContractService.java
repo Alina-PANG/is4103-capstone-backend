@@ -110,16 +110,7 @@ public class ContractService {
                 return new GetContractRes("This contract is deleted", true, null);
             }
             else{
-                GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
-                GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
-
-                ContractModel contractModel = new ContractModel(
-                        contract.getObjectName(), contract.getCode(), contract.getId(),
-                        contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
-                        contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
-                        vendor, employeeInChargeContract,
-                        contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
-
+                ContractModel contractModel = transformToContractModel(contract);
                 return new GetContractRes("Successfully retrieved the contract with id " + id, false, contractModel);
             }
         }catch(Exception ex){
@@ -143,16 +134,7 @@ public class ContractService {
                     continue;
                 }
 
-                GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
-                GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
-
-                ContractModel contractModel = new ContractModel(
-                        contract.getObjectName(), contract.getCode(), contract.getId(),
-                        contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
-                        contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
-                        vendor, employeeInChargeContract,
-                        contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
-
+                ContractModel contractModel = transformToContractModel(contract);
                 returnList.add(contractModel);
             }
 
@@ -259,5 +241,19 @@ public class ContractService {
             updatedContractLineList.add(contractLine);
         }
         return updatedContractLineList;
+    }
+
+    public ContractModel transformToContractModel(Contract contract){
+        GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
+        GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
+
+        ContractModel contractModel = new ContractModel(
+                contract.getObjectName(), contract.getCode(), contract.getId(),
+                contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
+                contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
+                vendor, employeeInChargeContract,
+                contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
+
+        return contractModel;
     }
 }

@@ -34,6 +34,8 @@ public class VendorService {
     private TeamRepository teamRepository;
     @Autowired
     private ContractRepository contractRepository;
+    @Autowired
+    private ContractService contractService;
 
     public GeneralRes createNewVendor(CreateVendorReq createVendorReq){
         try{
@@ -80,17 +82,7 @@ public class VendorService {
                 return new GetVendorRes("This vendor is deleted.", true, null);
             }
             else {
-                List<GeneralEntityModel> businessUnits = new ArrayList<>();
-                for(Team t: vendor.getBusinessUnits()){
-                    GeneralEntityModel team = new GeneralEntityModel(t);
-                    businessUnits.add(team);
-                }
-
-                VendorModel vendorModel = new VendorModel(
-                        vendor.getId(), vendor.getCode(), vendor.getObjectName(), businessUnits,
-                        vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
-                        vendor.getBillingContactName(), vendor.getBillingContactEmail(),
-                        vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
+                VendorModel vendorModel = transformToGeneralEntityModel(vendor);
                 return new GetVendorRes("Successfully retrieved the vendor with id " + id, false, vendorModel);
             }
         }catch(Exception ex){
@@ -114,18 +106,7 @@ public class VendorService {
                     continue;
                 }
 
-                List<GeneralEntityModel> businessUnits = new ArrayList<>();
-                for(Team t: vendor.getBusinessUnits()){
-                    GeneralEntityModel team = new GeneralEntityModel(t);
-                    businessUnits.add(team);
-                }
-
-                VendorModel vendorModel = new VendorModel(
-                        vendor.getId(), vendor.getCode(), vendor.getObjectName(), businessUnits,
-                        vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
-                        vendor.getBillingContactName(), vendor.getBillingContactEmail(),
-                        vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
-
+                VendorModel vendorModel = transformToGeneralEntityModel(vendor);
                 returnList.add(vendorModel);
             }
 
@@ -215,16 +196,7 @@ public class VendorService {
                     continue;
                 }
 
-                GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
-                GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
-
-                ContractModel contractModel = new ContractModel(
-                        contract.getObjectName(), contract.getCode(), contract.getId(),
-                        contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
-                        contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
-                        vendor, employeeInChargeContract,
-                        contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
-
+                ContractModel contractModel = contractService.transformToContractModel(contract);
                 returnList.add(contractModel);
             }
 
@@ -235,7 +207,24 @@ public class VendorService {
         }
     }
 
+    private VendorModel transformToGeneralEntityModel(Vendor vendor){
+        List<GeneralEntityModel> businessUnits = new ArrayList<>();
+        for(Team t: vendor.getBusinessUnits()){
+            GeneralEntityModel team = new GeneralEntityModel(t);
+            businessUnits.add(team);
+        }
+
+        VendorModel vendorModel = new VendorModel(
+                vendor.getId(), vendor.getCode(), vendor.getObjectName(), businessUnits,
+                vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
+                vendor.getBillingContactName(), vendor.getBillingContactEmail(),
+                vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
+
+        return vendorModel;
+    }
+
 //    public GeneralRes removeBusinessUnit(){
 //
 //    }
+
 }
