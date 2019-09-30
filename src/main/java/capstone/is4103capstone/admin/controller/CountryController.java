@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/ce/country")
 public class CountryController {
 
@@ -23,8 +24,9 @@ public class CountryController {
     CountryService cs;
 
     @PostMapping
-    public ResponseEntity<CountryRes> createCountry(@RequestBody CountryDto input) {
+    public ResponseEntity<CountryRes> createCountry(@RequestBody CountryDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
         try {
+            WriteAuditTrail.autoAudit(headerUsername);
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.createCountry(input)))));
@@ -36,8 +38,10 @@ public class CountryController {
     }
 
     @GetMapping
-    public ResponseEntity<CountryRes> getAllCountries() {
+    public ResponseEntity<CountryRes> getAllCountries(@RequestHeader(name = "Authorization", required = false) String headerUsername) {
+        WriteAuditTrail.autoAudit("admin");
         try {
+            WriteAuditTrail.autoAudit(headerUsername);
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(cs.getAllCountries())));
@@ -49,9 +53,9 @@ public class CountryController {
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CountryRes> getCountryByUuid(@PathVariable(name = "uuid") String uuid,@RequestParam(name = "username",required = true) String username) {
+    public ResponseEntity<CountryRes> getCountryByUuid(@PathVariable(name = "uuid") String uuid, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
         try {
-            WriteAuditTrail.auditActivity("View all countries",username);
+            WriteAuditTrail.autoAudit(headerUsername);
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.getCountryByUuid(uuid)))));
@@ -63,9 +67,9 @@ public class CountryController {
     }
 
     @GetMapping("/byRegion/{region}")
-    public ResponseEntity<CountryRes> getCountryDtoByRegion(@PathVariable(name = "region") String region,@RequestParam(name = "username",required = true) String username) throws Exception {
+    public ResponseEntity<CountryRes> getCountryDtoByRegion(@PathVariable(name = "region") String region, @RequestHeader(name = "Authorization", required = false) String headerUsername) throws Exception {
         try {
-            WriteAuditTrail.autoAudit(username);
+            WriteAuditTrail.autoAudit(headerUsername);
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(cs.getCountryEntityByRegion(region))));
@@ -77,8 +81,9 @@ public class CountryController {
     }
 
     @PutMapping
-    public ResponseEntity<CountryRes> updateCountry(@RequestBody CountryDto input) throws Exception {
+    public ResponseEntity<CountryRes> updateCountry(@RequestBody CountryDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
         try {
+            WriteAuditTrail.autoAudit(headerUsername);
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.updateCountry(input)))));
@@ -90,8 +95,9 @@ public class CountryController {
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity deleteCountry(@PathVariable(name = "uuid") String uuid) {
+    public ResponseEntity deleteCountry(@PathVariable(name = "uuid") String uuid, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
         try {
+            WriteAuditTrail.autoAudit(headerUsername);
             cs.deleteCountry(uuid);
             return ResponseEntity
                     .ok()

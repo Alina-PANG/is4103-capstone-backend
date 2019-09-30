@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface AuditTrailActivityRepo extends JpaRepository<AuditTrailActivity, String> {
 
-    public List<AuditTrailActivity> findAuditTrailActivitiesByActivity(String activity);
+    List<AuditTrailActivity> findAuditTrailActivitiesByActivity(String activity);
 
-    public List<AuditTrailActivity> findAuditTrailActivitiesByUserUuid(String userUuid);
+    List<AuditTrailActivity> findAuditTrailActivitiesByUserUuid(String userUuid);
 
 }

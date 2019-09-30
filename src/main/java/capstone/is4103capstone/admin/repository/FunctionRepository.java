@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface FunctionRepository extends JpaRepository<CompanyFunction,String> {
+public interface FunctionRepository extends JpaRepository<CompanyFunction, String> {
 
     @Override
     @Query(value = "SELECT * FROM company_function c WHERE c.id = ?1 AND c.is_deleted=false", nativeQuery = true)

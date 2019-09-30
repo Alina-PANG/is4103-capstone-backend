@@ -1,17 +1,18 @@
 package capstone.is4103capstone.admin.controller;
 
+import capstone.is4103capstone.admin.controller.model.res.RegionRes;
 import capstone.is4103capstone.admin.dto.RegionDto;
 import capstone.is4103capstone.admin.service.RegionService;
-import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
+import capstone.is4103capstone.general.service.WriteAuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Optional;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/ce/region")
 public class RegionController {
 
@@ -19,32 +20,54 @@ public class RegionController {
     RegionService rs;
 
     @PostMapping
-    public RegionDto createRegion(@RequestBody RegionDto input) {
-        return rs.createRegion(input);
-    }
-
-    @GetMapping("/{uuid}")
-    public RegionDto getRegion(@PathVariable(name = "uuid", required = true) String input) {
+    public ResponseEntity<RegionRes> createRegion(@RequestBody RegionDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
         try {
-            return rs.getRegionByUuid(input);
-        } catch (DbObjectNotFoundException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Region with UUID " + input + " was not found.");
+            WriteAuditTrail.autoAudit(headerUsername);
+            return ResponseEntity.ok().body(new RegionRes(null, false, (Optional.of(Arrays.asList(rs.createRegion(input))))));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new RegionRes(ex.getMessage(), true, Optional.empty()));
         }
     }
 
+
     @GetMapping
-    public List<RegionDto> getAllRegions() {
-        return rs.getAllRegions();
+    public ResponseEntity<RegionRes> getAllRegions(@RequestHeader(name = "Authorization", required = false) String headerUsername) {
+        try {
+            WriteAuditTrail.autoAudit(headerUsername);
+            return ResponseEntity.ok().body(new RegionRes(null, false, Optional.of(rs.getAllRegions())));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new RegionRes(ex.getMessage(), true, Optional.empty()));
+        }
+    }
+
+    @GetMapping("/{uuid}")
+    public ResponseEntity<RegionRes> getSingleRegion(@PathVariable(name = "uuid", required = true) String input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+        try {
+            WriteAuditTrail.autoAudit(headerUsername);
+            return ResponseEntity.ok().body(new RegionRes(null, false, Optional.of(Arrays.asList(rs.getRegionByUuid(input)))));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new RegionRes(ex.getMessage(), true, Optional.empty()));
+        }
     }
 
     @PutMapping
-    public RegionDto updateRegion(@RequestBody RegionDto input) {
-        return rs.updateRegion(input);
+    public ResponseEntity<RegionRes> updateRegion(@RequestBody RegionDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+        try {
+            WriteAuditTrail.autoAudit(headerUsername);
+            return ResponseEntity.ok().body(new RegionRes(null, false, (Optional.of(Arrays.asList(rs.updateRegion(input))))));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new RegionRes(ex.getMessage(), true, Optional.empty()));
+        }
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity deleteRegion(@PathVariable(name = "uuid") String uuid) {
-        rs.deleteRegion(uuid);
-        return ResponseEntity.status(HttpStatus.OK).body("Region with UUID " + uuid + " was successfully deleted.");
+    public ResponseEntity<RegionRes> deleteRegion(@PathVariable(name = "uuid") String input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+        try {
+            WriteAuditTrail.autoAudit(headerUsername);
+            rs.deleteRegion(input);
+            return ResponseEntity.ok().body(new RegionRes("Country with UUID " + input + " has been successfully deleted!", false, Optional.empty()));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new RegionRes(ex.getMessage(), true, Optional.empty()));
+        }
     }
 }
