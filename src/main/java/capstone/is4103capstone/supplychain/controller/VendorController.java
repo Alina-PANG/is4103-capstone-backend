@@ -75,11 +75,24 @@ public class VendorController {
     }
 
     @GetMapping("/get-all-vendors")
-    public  ResponseEntity<GeneralRes> getAllVendors(@RequestParam(name = "username", required = true) String username){
+    public ResponseEntity<GeneralRes> getAllVendors(@RequestParam(name = "username", required = true) String username){
         if (Authentication.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(vendorService.getAllVendors());
+        }else{
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
+
+    @GetMapping("/get-contracts-by-vendor/{id}")
+    public ResponseEntity<GeneralRes> getContractsByVendorId(@PathVariable("id") String id, @RequestParam(name = "username", required = true) String username){
+        if (Authentication.authenticateUser(username)) {
+            return ResponseEntity
+                    .ok()
+                    .body(vendorService.getContractsByVendorId(id));
         }else{
             return ResponseEntity
                     .ok()

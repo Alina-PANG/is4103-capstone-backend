@@ -2,14 +2,18 @@ package capstone.is4103capstone.supplychain.service;
 
 import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.supplychain.model.ContractModel;
 import capstone.is4103capstone.supplychain.model.VendorModel;
 import capstone.is4103capstone.supplychain.model.req.AddBusinessUnitReq;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
 import capstone.is4103capstone.supplychain.model.res.GetAllVendorsRes;
+import capstone.is4103capstone.supplychain.model.res.GetContractsByVendorRes;
 import capstone.is4103capstone.supplychain.model.res.GetVendorRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +32,8 @@ public class VendorService {
     private VendorRepository vendorRepository;
     @Autowired
     private TeamRepository teamRepository;
+    @Autowired
+    private ContractRepository contractRepository;
 
     public GeneralRes createNewVendor(CreateVendorReq createVendorReq){
         try{
@@ -172,15 +178,60 @@ public class VendorService {
         try{
             Vendor vendor = vendorRepository.getOne(vendorId);
             Team team = teamRepository.getOne(addBusinessUnitReq.getTeamId());
+
+            if(vendor.getDeleted() || team.getDeleted()){
+                return new GetVendorRes("This vendor or team is deleted.", true, null);
+            }
+
             vendor.getBusinessUnits().add(team);
+            vendor.setLastModifiedBy(addBusinessUnitReq.getUsername());
+            vendor.setLastModifiedDateTime(new Date());
+
             vendor = vendorRepository.saveAndFlush(vendor);
             team.getVendors().add(vendor);
+            team.setLastModifiedBy(addBusinessUnitReq.getUsername());
+            team.setLastModifiedDateTime(new Date());
             teamRepository.saveAndFlush(team);
 
             return new GeneralRes("Successfully add the business unit to vendor!", false);
         }catch(Exception ex){
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+        }
+    }
+
+    public GetContractsByVendorRes getContractsByVendorId(String vendorId){
+        try {
+            logger.info("Getting contracts by vendor ID");
+            List<ContractModel> returnList = new ArrayList<>();
+            List<Contract> contractList = contractRepository.findContractsByVendorId(vendorId);
+
+            if(contractList.size() == 0){
+                throw new Exception("No contract available.");
+            }
+
+            for(Contract contract: contractList){
+                if(contract.getDeleted()){
+                    continue;
+                }
+
+                GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
+                GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
+
+                ContractModel contractModel = new ContractModel(
+                        contract.getObjectName(), contract.getCode(), contract.getId(),
+                        contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
+                        contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
+                        vendor, employeeInChargeContract,
+                        contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
+
+                returnList.add(contractModel);
+            }
+
+            return new GetContractsByVendorRes("Successfully retrieved contracts by vendor ID", false, returnList);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return new GetContractsByVendorRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 
