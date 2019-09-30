@@ -3,6 +3,7 @@ package capstone.is4103capstone.supplychain.controller;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.model.req.AddBusinessUnitReq;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
 import capstone.is4103capstone.supplychain.service.VendorService;
 import org.hibernate.annotations.GeneratorType;
@@ -40,6 +41,19 @@ public class VendorController {
             return ResponseEntity
                     .ok()
                     .body(vendorService.updateVendor(updateVendorReq, id));
+        } else {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
+
+    @PostMapping("/add-business-unit/{id}")
+    public ResponseEntity<GeneralRes> addBusinessUnit(@RequestBody AddBusinessUnitReq addBusinessUnitReq, @PathVariable("id") String id){
+        if (Authentication.authenticateUser(addBusinessUnitReq.getUsername())) {
+            return ResponseEntity
+                    .ok()
+                    .body(vendorService.addBusinessUnit(addBusinessUnitReq, id));
         } else {
             return ResponseEntity
                     .badRequest()

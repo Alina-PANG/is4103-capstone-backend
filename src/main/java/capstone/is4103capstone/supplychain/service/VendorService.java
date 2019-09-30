@@ -7,6 +7,7 @@ import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.model.VendorModel;
+import capstone.is4103capstone.supplychain.model.req.AddBusinessUnitReq;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
 import capstone.is4103capstone.supplychain.model.res.GetAllVendorsRes;
 import capstone.is4103capstone.supplychain.model.res.GetVendorRes;
@@ -166,4 +167,24 @@ public class VendorService {
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
         }
     }
+
+    public GeneralRes addBusinessUnit(AddBusinessUnitReq addBusinessUnitReq, String vendorId){
+        try{
+            Vendor vendor = vendorRepository.getOne(vendorId);
+            Team team = teamRepository.getOne(addBusinessUnitReq.getTeamId());
+            vendor.getBusinessUnits().add(team);
+            vendor = vendorRepository.saveAndFlush(vendor);
+            team.getVendors().add(vendor);
+            teamRepository.saveAndFlush(team);
+
+            return new GeneralRes("Successfully add the business unit to vendor!", false);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+        }
+    }
+
+//    public GeneralRes removeBusinessUnit(){
+//
+//    }
 }
