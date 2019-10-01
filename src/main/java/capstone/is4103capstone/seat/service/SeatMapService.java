@@ -274,6 +274,7 @@ public class SeatMapService {
         }
 
         seatMap.setDeleted(true);
+        seatMap.setCode(null);
         seatMapRepository.save(seatMap);
     }
 
