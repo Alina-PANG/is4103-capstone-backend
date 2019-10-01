@@ -14,7 +14,6 @@ public class Mail implements Serializable {
     @NotNull
     private String to;
     private String subject;
-    private String content;
     private Map<String, Object> model;
 
 
@@ -22,12 +21,11 @@ public class Mail implements Serializable {
     }
 
 
-    public Mail(String from, String to, String subject, String content) {
+    public Mail(@Email @NotNull String from, @Email @NotNull String to, String subject, Map<String, Object> model) {
         this.from = from;
         this.to = to;
         this.subject = subject;
-        this.content = content;
-        this.model = new HashMap<String, Object>();
+        this.model = model;
     }
 
     public Map<String, Object> getModel() {
@@ -62,13 +60,6 @@ public class Mail implements Serializable {
         this.subject = subject;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 
     @Override
     public String toString() {
@@ -76,7 +67,6 @@ public class Mail implements Serializable {
                 "from='" + from + '\'' +
                 ", to='" + to + '\'' +
                 ", subject='" + subject + '\'' +
-                ", content='" + content + '\'' +
                 '}';
     }
 }
