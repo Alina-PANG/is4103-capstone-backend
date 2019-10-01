@@ -1,4 +1,4 @@
-package capstone.is4103capstone.general.service;
+package capstone.is4103capstone.general.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
