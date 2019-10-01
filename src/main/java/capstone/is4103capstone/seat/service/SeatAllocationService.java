@@ -19,6 +19,7 @@ import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import capstone.is4103capstone.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -227,6 +228,8 @@ public class SeatAllocationService {
     // 2. A seat must be pre-assigned to a function and a team in order to be assigned to an employee as a fixed seat.
     // 3. The allocation schedule must have an end date.
     public void assignFixedSeatToTemporaryEmployee(SeatAllocationModelForEmployee seatAllocationModel) throws SeatAllocationException {
+
+        System.out.println("******************** Assign Fixed Seat To Temporary Employee, " + new Date().toString() + " ********************");
         try {
             Seat seat = seatService.retrieveSeatById(seatAllocationModel.getSeatId());
 
@@ -250,8 +253,11 @@ public class SeatAllocationService {
             }
 
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
+            System.out.println("********** Start Date Time: " + startDateTime.toString() + " **********");
             validateOccupancyStartDateTime(startDateTime);
             Date endDateTime = seatAllocationModel.getSchedule().getEndDateTime();
+            System.out.println("********** End Date Time: " + endDateTime.toString() + " **********");
+
             if (endDateTime == null || startDateTime.after(endDateTime)) {
                 throw new SeatAllocationException("Assigning fixed seat failed: invalid end date of the seat allocation!");
             }
@@ -288,6 +294,8 @@ public class SeatAllocationService {
 
             // Create a new seat allocation between the seat and the employee
             Schedule allocationSchedule = new Schedule();
+            allocationSchedule.setStartDateTime(startDateTime);
+            allocationSchedule.setEndDateTime(endDateTime);
             SeatAllocation newSeatAllocation = new SeatAllocation();
             newSeatAllocation.setAllocationType(SeatAllocationTypeEnum.FIXED);
             newSeatAllocation.setSeat(seat);
@@ -493,7 +501,13 @@ public class SeatAllocationService {
         System.out.println("********** seat allocation (to be deleted) ID: " + seatAllocation.getId() + " **********");
         Seat seat = seatAllocation.getSeat();
         seatAllocation.setDeleted(true);
-        seatAllocationInactivationLogRepository.deleteInactivateLogByAllocationId(allocationId);
+        Optional<SeatAllocationInactivationLog> optionalSeatAllocationInactivationLog = seatAllocationInactivationLogRepository.getUncancelledById(allocationId);
+        if (optionalSeatAllocationInactivationLog.isPresent()) {
+            SeatAllocationInactivationLog seatAllocationInactivationLog = optionalSeatAllocationInactivationLog.get();
+            seatAllocationInactivationLog.setCancelled(true);
+            seatAllocationInactivationLogRepository.save(seatAllocationInactivationLog);
+        }
+
         System.out.println("-------------------------------------------");
         if (seatAllocation.isActive()) {
             ListIterator<SeatAllocation> iterator = seat.getActiveSeatAllocations().listIterator();
