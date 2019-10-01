@@ -2,6 +2,8 @@ package capstone.is4103capstone.seat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+
 //        {
 //        “serialNumber”: 1,
 //        “id”: “c8ef5295-f274-47df-bb0f-a98fccad77e5”,
@@ -11,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 //        }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeatModelForSeatMap implements Comparable<SeatModelForSeatMap> {
+public class SeatModelForSeatMap implements Comparable<SeatModelForSeatMap>, Serializable {
     private Integer serialNumber;
     private String id;
     private boolean hasAllocation;

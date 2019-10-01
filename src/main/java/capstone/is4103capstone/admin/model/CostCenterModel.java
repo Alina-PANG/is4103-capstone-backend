@@ -1,5 +1,8 @@
 package capstone.is4103capstone.admin.model;
 
+import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
+
 import java.io.Serializable;
 
 public class CostCenterModel implements Serializable {
@@ -7,19 +10,38 @@ public class CostCenterModel implements Serializable {
     private String name;
     private String code;
     private String id;
-    private String countryCode;
-    private String managerId;
+    private GeneralEntityModel team;
+    private GeneralEntityModel costCenterManager;
+    private GeneralEntityModel bmApprover;
+    private GeneralEntityModel functionApprover;
+    private GeneralEntityModel country;
 
+    public GeneralEntityModel getCountry() {
+        return country;
+    }
+
+    public void setCountry(GeneralEntityModel country) {
+        this.country = country;
+    }
 
     public CostCenterModel() {
     }
 
-    public CostCenterModel(String ccName, String code, String costCenterId, String countryCode, String ccManagerId) {
-        this.name = ccName;
+    public CostCenterModel(String name, String code, String id) {
+        this.name = name;
         this.code = code;
-        this.countryCode = countryCode;
-        this.id = costCenterId;
-        this.managerId = ccManagerId;
+        this.id = id;
+    }
+
+    public CostCenterModel(String name, String code, String id, GeneralEntityModel team, GeneralEntityModel costCenterManager, GeneralEntityModel bmApprover, GeneralEntityModel functionApprover, GeneralEntityModel country) {
+        this.name = name;
+        this.code = code;
+        this.id = id;
+        this.team = team;
+        this.costCenterManager = costCenterManager;
+        this.bmApprover = bmApprover;
+        this.functionApprover = functionApprover;
+        this.country = country;
     }
 
     public String getName() {
@@ -38,14 +60,6 @@ public class CostCenterModel implements Serializable {
         this.code = code;
     }
 
-    public String getCountryCode() {
-        return countryCode;
-    }
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
-
     public String getId() {
         return id;
     }
@@ -54,11 +68,35 @@ public class CostCenterModel implements Serializable {
         this.id = id;
     }
 
-    public String getManagerId() {
-        return managerId;
+    public GeneralEntityModel getTeam() {
+        return team;
     }
 
-    public void setManagerId(String managerId) {
-        this.managerId = managerId;
+    public void setTeam(GeneralEntityModel team) {
+        this.team = team;
+    }
+
+    public GeneralEntityModel getCostCenterManager() {
+        return costCenterManager;
+    }
+
+    public void setCostCenterManager(GeneralEntityModel costCenterManager) {
+        this.costCenterManager = costCenterManager;
+    }
+
+    public GeneralEntityModel getBmApprover() {
+        return bmApprover;
+    }
+
+    public void setBmApprover(GeneralEntityModel bmApprover) {
+        this.bmApprover = bmApprover;
+    }
+
+    public GeneralEntityModel getFunctionApprover() {
+        return functionApprover;
+    }
+
+    public void setFunctionApprover(GeneralEntityModel functionApprover) {
+        this.functionApprover = functionApprover;
     }
 }

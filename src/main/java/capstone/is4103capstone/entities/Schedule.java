@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalTime;
 import java.util.Date;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ public class Schedule extends DBEntityTemplate {
     private List<DayOfWeek> recurringWeekdays = new ArrayList<>();
     @ElementCollection(targetClass=Date.class)
     private List<Date> recurringDates = new ArrayList<>();
-    @ElementCollection(targetClass=Date.class)
-    private List<Date> recurringTimes = new ArrayList<>();
+    private LocalTime recurringStartTime;
+    private LocalTime recurringEndTime;
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;
     @Temporal(TemporalType.TIMESTAMP)
@@ -33,24 +34,26 @@ public class Schedule extends DBEntityTemplate {
 
     }
 
-    public Schedule(String objectName, String code, String hierachyPath, boolean isRecurring, ScheduleRecurringBasisEnum recurringBasis, List<DayOfWeek> recurringWeekdays, List<Date> recurringDates, List<Date> recurringTimes, Date startDateTime, Date endDateTime) {
+    public Schedule(String objectName, String code, String hierachyPath, boolean isRecurring, ScheduleRecurringBasisEnum recurringBasis, List<DayOfWeek> recurringWeekdays, List<Date> recurringDates, LocalTime recurringStartTime, LocalTime recurringEndTime, Date startDateTime, Date endDateTime) {
         super(objectName, code, hierachyPath);
         this.isRecurring = isRecurring;
         this.recurringBasis = recurringBasis;
         this.recurringWeekdays = recurringWeekdays;
         this.recurringDates = recurringDates;
-        this.recurringTimes = recurringTimes;
+        this.recurringStartTime = recurringStartTime;
+        this.recurringEndTime = recurringEndTime;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
     }
 
-    public Schedule(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, boolean isRecurring, ScheduleRecurringBasisEnum recurringBasis, List<DayOfWeek> recurringWeekdays, List<Date> recurringDates, List<Date> recurringTimes, Date startDateTime, Date endDateTime) {
+    public Schedule(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, boolean isRecurring, ScheduleRecurringBasisEnum recurringBasis, List<DayOfWeek> recurringWeekdays, List<Date> recurringDates, LocalTime recurringStartTime, LocalTime recurringEndTime, Date startDateTime, Date endDateTime) {
         super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
         this.isRecurring = isRecurring;
         this.recurringBasis = recurringBasis;
         this.recurringWeekdays = recurringWeekdays;
         this.recurringDates = recurringDates;
-        this.recurringTimes = recurringTimes;
+        this.recurringStartTime = recurringStartTime;
+        this.recurringEndTime = recurringEndTime;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
     }
@@ -87,12 +90,20 @@ public class Schedule extends DBEntityTemplate {
         this.recurringDates = recurringDates;
     }
 
-    public List<Date> getRecurringTimes() {
-        return recurringTimes;
+    public LocalTime getRecurringStartTime() {
+        return recurringStartTime;
     }
 
-    public void setRecurringTimes(List<Date> recurringTimes) {
-        this.recurringTimes = recurringTimes;
+    public void setRecurringStartTime(LocalTime recurringStartTime) {
+        this.recurringStartTime = recurringStartTime;
+    }
+
+    public LocalTime getRecurringEndTime() {
+        return recurringEndTime;
+    }
+
+    public void setRecurringEndTime(LocalTime recurringEndTime) {
+        this.recurringEndTime = recurringEndTime;
     }
 
     public Date getStartDateTime() {
