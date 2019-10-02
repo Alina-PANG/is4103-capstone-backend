@@ -4,7 +4,6 @@ import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
-import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -53,8 +52,6 @@ public class VendorService {
             newVendor.setRelationshipManagerEmail(createVendorReq.getRelationshipManagerEmail());
             newVendor.setCreatedBy(createVendorReq.getUsername());
             newVendor.setLastModifiedBy(createVendorReq.getUsername());
-            newVendor.setLastModifiedDateTime(new Date());
-            newVendor.setCreatedDateTime(new Date());
             Authentication.configurePermissionMap(newVendor);
 
             newVendor = vendorRepository.saveAndFlush(newVendor);
@@ -67,9 +64,12 @@ public class VendorService {
                 }
             }
 
+            if (newVendor.getSeqNo() == null) {
+                newVendor.setSeqNo(new Long(vendorRepository.findAll().size()));
+            }
             newVendor.setCode(SCMEntityCodeHPGeneration.getCode(vendorRepository,newVendor));
             vendorRepository.saveAndFlush(newVendor);
-            logger.info("Successully created a new vendor! -- "+createVendorReq.getUsername()+" "+new Date());
+            logger.info("Successfully created a new vendor! -- "+createVendorReq.getUsername()+" "+new Date());
             return new GeneralRes("Successully created a new vendor!", false);
         }catch (Exception ex){
             ex.printStackTrace();
@@ -104,10 +104,6 @@ public class VendorService {
             List<VendorModel> returnList = new ArrayList<>();
             List<Vendor> vendorList = vendorRepository.findAll();
 
-            if(vendorList.size() == 0){
-                throw new Exception("No vendor available.");
-            }
-
             for(Vendor vendor: vendorList){
                 if(vendor.getDeleted()){
                     continue;
@@ -115,6 +111,10 @@ public class VendorService {
 
                 VendorModel vendorModel = transformToGeneralEntityModel(vendor);
                 returnList.add(vendorModel);
+            }
+
+            if(returnList.size() == 0){
+                throw new Exception("No vendor available.");
             }
 
             return new GetAllVendorsRes("Successfully retrieved all vendors", false, returnList);
@@ -153,7 +153,6 @@ public class VendorService {
             }
 
             vendor.setLastModifiedBy(updateVendorReq.getUsername());
-            vendor.setLastModifiedDateTime(new Date());
             vendorRepository.saveAndFlush(vendor);
             return new GeneralRes("Successfully updated the vendor!", false);
         }catch(Exception ex){
@@ -173,12 +172,10 @@ public class VendorService {
 
             vendor.getBusinessUnits().add(team);
             vendor.setLastModifiedBy(addBusinessUnitReq.getUsername());
-            vendor.setLastModifiedDateTime(new Date());
 
             vendor = vendorRepository.saveAndFlush(vendor);
             team.getVendors().add(vendor);
             team.setLastModifiedBy(addBusinessUnitReq.getUsername());
-            team.setLastModifiedDateTime(new Date());
             teamRepository.saveAndFlush(team);
 
             return new GeneralRes("Successfully add the business unit to vendor!", false);

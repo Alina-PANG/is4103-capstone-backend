@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,6 +27,9 @@ public class Team extends DBEntityTemplate {
 
     @OneToMany(mappedBy = "team")
     private List<CostCenter> costCenters;
+
+    @OneToMany(mappedBy = "team")
+    private List<Contract> contracts = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "team_employee",
@@ -54,6 +58,14 @@ public class Team extends DBEntityTemplate {
 
     public void setVendors(List<Vendor> vendors) {
         this.vendors = vendors;
+    }
+
+    public List<Contract> getContracts() {
+        return contracts;
+    }
+
+    public void setContracts(List<Contract> contracts) {
+        this.contracts = contracts;
     }
 
     public Employee getTeamLeader() {

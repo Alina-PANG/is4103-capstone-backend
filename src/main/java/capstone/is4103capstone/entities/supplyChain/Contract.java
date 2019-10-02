@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
@@ -33,6 +34,7 @@ public class Contract extends DBEntityTemplate {
     //to-do: hierarchy
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
+    private Integer totalContractValue;
 
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
@@ -52,20 +54,38 @@ public class Contract extends DBEntityTemplate {
     @JsonIgnore
     private Employee employeeInChargeContract;
 
-    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, String spendType, Vendor vendor, Employee employeeInChargeContract) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    @JsonIgnore
+    private Team team;
+
+    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, Integer totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ContractLine> contractLines, Employee employeeInChargeContract, Team team) {
         this.purchaseType = purchaseType;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.renewalStartDate = renewalStartDate;
         this.contractTerm = contractTerm;
         this.contractType = contractType;
         this.contractStatus = contractStatus;
         this.noticeDaysToExit = noticeDaysToExit;
+        this.totalContractValue = totalContractValue;
+        this.cpgReviewAlertDate = cpgReviewAlertDate;
         this.spendType = spendType;
         this.vendor = vendor;
+        this.contractLines = contractLines;
         this.employeeInChargeContract = employeeInChargeContract;
+        this.team = team;
     }
 
     public Contract() {
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     public List<ContractLine> getContractLines() {
@@ -82,6 +102,14 @@ public class Contract extends DBEntityTemplate {
 
     public void setEmployeeInChargeContract(Employee employeeInChargeContract) {
         this.employeeInChargeContract = employeeInChargeContract;
+    }
+
+    public Integer getTotalContractValue() {
+        return totalContractValue;
+    }
+
+    public void setTotalContractValue(Integer totalContractValue) {
+        this.totalContractValue = totalContractValue;
     }
 
     public PurchaseTypeEnum getPurchaseType() {

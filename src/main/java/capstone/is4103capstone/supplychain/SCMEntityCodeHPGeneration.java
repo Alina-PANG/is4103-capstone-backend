@@ -12,7 +12,6 @@ public class SCMEntityCodeHPGeneration {
     public static String getCode(JpaRepository repo, DBEntityTemplate entity) {
         try {
             String code = g.generateCode(repo, entity);
-            entity.setCode(code);
             return code;
         } catch (RepositoryEntityMismatchException e) {
             return null;

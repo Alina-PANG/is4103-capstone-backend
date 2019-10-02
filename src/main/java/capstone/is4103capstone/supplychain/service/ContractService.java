@@ -5,7 +5,6 @@ import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
-import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -17,7 +16,6 @@ import capstone.is4103capstone.supplychain.model.ContractModel;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.model.res.GetAllContractsRes;
 import capstone.is4103capstone.supplychain.model.res.GetContractRes;
-import com.sun.tools.javah.Gen;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +54,10 @@ public class ContractService {
             newContract.setObjectName(createContractReq.getContractName());
             newContract.setCreatedBy(createContractReq.getModifierUsername());
             newContract.setLastModifiedBy(createContractReq.getModifierUsername());
-            newContract.setCreatedDateTime(new Date());
-            newContract.setLastModifiedDateTime(new Date());
             newContract.setDeleted(false);
+            if (newContract.getSeqNo() == null) {
+                newContract.setSeqNo(new Long(contractRepository.findAll().size()));
+            }
             Authentication.configurePermissionMap(newContract);
 
             Vendor vendor = vendorRepository.getOne(createContractReq.getVendorId());
@@ -79,8 +78,8 @@ public class ContractService {
             contractRepository.saveAndFlush(newContract);
             vendorRepository.saveAndFlush(vendor);
             employeeRepository.saveAndFlush(employeeInCharge);
-            logger.info("Successully created new contract! -- "+createContractReq.getModifierUsername()+" "+new Date());
-            return new GeneralRes("Succuesfully created new contract!", false);
+            logger.info("Successfully created new contract! -- "+createContractReq.getModifierUsername()+" "+new Date());
+            return new GeneralRes("Successfully created new contract!", false);
         }
         catch(Exception ex){
             ex.printStackTrace();
@@ -93,8 +92,6 @@ public class ContractService {
         for(ContractLine e: contractLineList){
             e.setCreatedBy(createContractReq.getModifierUsername());
             e.setLastModifiedBy(createContractReq.getModifierUsername());
-            e.setCreatedDateTime(new Date());
-            e.setLastModifiedDateTime(new Date());
             e.setContract(contract);
             contractLineRepository.saveAndFlush(e);
             logger.info("Successfully created new contract line!");
@@ -130,10 +127,6 @@ public class ContractService {
             List<ContractModel> returnList = new ArrayList<>();
             List<Contract> contractList = contractRepository.findAll();
 
-            if(contractList.size() == 0){
-                throw new Exception("No contract available.");
-            }
-
             for(Contract contract: contractList){
                 if(contract.getDeleted()){
                     continue;
@@ -141,6 +134,10 @@ public class ContractService {
 
                 ContractModel contractModel = transformToContractModel(contract);
                 returnList.add(contractModel);
+            }
+
+            if(returnList.size() == 0){
+                throw new Exception("No contract available.");
             }
 
             return new GetAllContractsRes("Successfully retrieved all contracts", false, returnList);
@@ -188,7 +185,6 @@ public class ContractService {
             }
 
             contract.setLastModifiedBy(updateContractReq.getModifierUsername());
-            contract.setLastModifiedDateTime(new Date());
 
             if (updateContractReq.getEmployeeInChargeId() != null) {
                 Employee employee = employeeRepository.getOne(updateContractReq.getEmployeeInChargeId());
@@ -239,7 +235,6 @@ public class ContractService {
             if(e.getObjectName() != null){
                 contractLine.setObjectName(e.getObjectName());
             }
-            contractLine.setLastModifiedDateTime(new Date());
             contractLine.setLastModifiedBy(updatedContractReq.getModifierUsername());
 
             contractLine = contractLineRepository.saveAndFlush(contractLine);
