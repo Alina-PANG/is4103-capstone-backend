@@ -213,7 +213,6 @@ public class BudgetService {
     public GetBudgetListRes getBudgetList(String username, String teamId){//, String costcenterId, Integer retrieveType, Integer year){
         //retrieveType: by default: null or 0: all, 1-budget, 2-reforecast
         try{
-
             List<CostCenter> ccList = costCenterRepository.findCostCentersByTeamId(teamId);
             List<BudgetModel> result = new ArrayList<>();
             for (CostCenter c : ccList){
