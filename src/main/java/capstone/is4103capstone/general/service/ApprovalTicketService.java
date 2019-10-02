@@ -6,14 +6,19 @@ import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.finance.Repository.ApprovalForRequestRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
-import capstone.is4103capstone.finance.budget.service.BudgetService;
+import capstone.is4103capstone.general.model.ApprovalTicketModel;
+import capstone.is4103capstone.general.model.Mail;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +29,11 @@ public class ApprovalTicketService {
     EmployeeRepository _employeeRepository;
     @Autowired
     ApprovalForRequestRepository _approvalForRequestRepository;
+    @Autowired
+    private MailSenderService mailSenderService;
+
+    @Value("${spring.mail.username}")
+    private String senderEmailAddr;
 
     static  EmployeeRepository employeeRepo;
     static ApprovalForRequestRepository approvalForRequestRepo;
@@ -70,7 +80,7 @@ public class ApprovalTicketService {
             approvalForRequestRepo.save(ticket);
             requester.getMyRequestTickets().add(ticket.getId());
             receiver.getMyApprovals().add(ticket.getId());
-            sendEmail(ticket);
+//            sendEmail(ticket);
         }catch (Exception e){
             return false;
         }
@@ -85,9 +95,18 @@ public class ApprovalTicketService {
         return modifyRequest(ApprovalStatusEnum.APPROVED, ticket);
     }
 
+    public static List<ApprovalTicketModel> getAllTicketsByRequestedItem(DBEntityTemplate requestedItem){
+        List<ApprovalForRequest> list = approvalForRequestRepo.findTicketsByRequestedItemId(requestedItem.getId());
+        List<ApprovalTicketModel> models = new ArrayList<>();
+        for (ApprovalForRequest a: list){
+            models.add(new ApprovalTicketModel(a.getApprover().getUserName(),a.getCommentByApprover(),a.getCreatedDateTime(),a.getLastModifiedDateTime(),a.getApprovalStatus()));
+        }
+        return models;
+    }
+
     public static boolean approveTicketByEntity(DBEntityTemplate requestedItem, String comment, String approverUsername){
         String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
-        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityId(requestedItem.getId(),approverId);
+        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityIdAndApproverId(requestedItem.getId(),approverId);
         if (!ticketOp.isPresent()) return false;
 
         ApprovalForRequest ticket = ticketOp.get();
@@ -97,7 +116,7 @@ public class ApprovalTicketService {
 
     public static boolean rejectTicketByEntity(DBEntityTemplate requestedItem, String comment, String approverUsername){
         String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
-        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityId(requestedItem.getId(),approverId);
+        Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityIdAndApproverId(requestedItem.getId(),approverId);
         if (!ticketOp.isPresent()) return false;
 
         ApprovalForRequest ticket = ticketOp.get();
@@ -133,8 +152,22 @@ public class ApprovalTicketService {
 
     }
 
-    private static void sendEmail(ApprovalForRequest ticket){
 
+
+    public void sendEmail(ApprovalForRequest ticket){
+        String subject = "Request for Approval: "+ ticket.getCode();
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("requestor_username", ticket.getRequester().getUserName());
+        map.put("requestor_email", ticket.getRequester().getEmail());
+        map.put("requestor_name", ticket.getRequester().getFullName());
+        map.put("requestor_type", ticket.getRequester().getEmployeeType());
+
+        map.put("comment", ticket.getCommentByRequester());
+        map.put("ticket_code", ticket.getCode());
+        map.put("request_item_id", ticket.getRequestedItemId());
+        map.put("created_datetime", ticket.getCreatedDateTime());
+
+        Mail mail = new Mail(senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
+        mailSenderService.sendEmail(mail, "approveBudgetMailTemplate");
     }
-
 }

@@ -16,7 +16,7 @@ public interface OfficeRepository extends JpaRepository<Office, String> {
     @Query(value = "SELECT * FROM Office o WHERE o.object_name = ?1 AND o.is_deleted = false", nativeQuery = true)
     Optional<Office> findByName(String officeName);
 
-    @Override
     @Query(value = "SELECT * FROM office o WHERE o.id = ?1 AND o.is_deleted=false", nativeQuery = true)
-    Optional<Office> findById(String id);
+    Optional<Office> findUndeletedOfficeById(String id);
+
 }

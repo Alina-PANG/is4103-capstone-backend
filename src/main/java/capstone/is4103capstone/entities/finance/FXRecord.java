@@ -17,6 +17,7 @@ public class FXRecord extends DBEntityTemplate {
 
     String priceCurrencyAbbr;
 
+    @Column(precision = 19, scale = 6)
     BigDecimal exchangeRate;
 
     @Temporal(TemporalType.DATE)
