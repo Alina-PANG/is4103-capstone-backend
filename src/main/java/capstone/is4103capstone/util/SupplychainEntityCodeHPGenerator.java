@@ -12,7 +12,7 @@ import java.util.Optional;
 public class SupplychainEntityCodeHPGenerator {
     private static final Logger logger = LoggerFactory.getLogger(SupplychainEntityCodeHPGenerator.class);
     private final String VENDOR_TEMPLATE = "Vendor-%1$s-%2$s";
-    private final String CONTRACT_TEMPLATE = "Contract-%1$s-%2$s";
+    private final String CONTRACT_TEMPLATE = "Contract-%1$s";
 
     public String generateCode(JpaRepository repo, DBEntityTemplate entity) throws Exception {
         Optional<DBEntityTemplate> entityOptional = repo.findById(entity.getId());
@@ -47,8 +47,6 @@ public class SupplychainEntityCodeHPGenerator {
                 throw new Exception("entity have null name");
             }
             code = code.toUpperCase();
-            entity.setCode(code);
-            repo.saveAndFlush(entity);
 
             return code;
         } else {
