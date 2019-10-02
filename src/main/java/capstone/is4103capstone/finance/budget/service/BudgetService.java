@@ -17,6 +17,7 @@ import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
 import capstone.is4103capstone.finance.budget.model.res.BudgetModel;
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetListRes;
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
+import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
@@ -198,13 +199,17 @@ public class BudgetService {
 
             plan.setItems(items);
 
-            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover);
+            List<ApprovalTicketModel> reviews = ApprovalTicketService.getAllTicketsByRequestedItem(p);
+
+            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover,reviews.get(0));
         } catch(Exception ex){
             ex.printStackTrace();
             return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 
+
+    //only get plan with same name for the latest version!!!
     public GetBudgetListRes getBudgetList(String username, String teamId){//, String costcenterId, Integer retrieveType, Integer year){
         //retrieveType: by default: null or 0: all, 1-budget, 2-reforecast
         try{
