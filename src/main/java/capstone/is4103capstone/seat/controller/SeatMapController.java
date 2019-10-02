@@ -4,6 +4,7 @@ import capstone.is4103capstone.admin.repository.OfficeRepository;
 import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatMap;
+import capstone.is4103capstone.finance.budget.controller.BudgetController;
 import capstone.is4103capstone.seat.model.SeatMapModel;
 import capstone.is4103capstone.seat.model.CustomErrorRes;
 import capstone.is4103capstone.seat.model.SeatModelForSeatMap;
@@ -13,6 +14,8 @@ import capstone.is4103capstone.seat.service.SeatMapService;
 import capstone.is4103capstone.util.exception.SeatMapCreationException;
 import capstone.is4103capstone.util.exception.SeatMapNotFoundException;
 import capstone.is4103capstone.util.exception.SeatMapUpdateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,8 @@ import java.util.*;
 @RequestMapping("/api/seatmap")
 @CrossOrigin(origins = "http://localhost:3000")
 public class SeatMapController {
+
+    private static final Logger logger = LoggerFactory.getLogger(BudgetController.class);
 
     @Autowired
     private SeatMapService seatMapService;

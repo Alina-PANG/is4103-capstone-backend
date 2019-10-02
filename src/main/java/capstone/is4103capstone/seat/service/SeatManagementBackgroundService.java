@@ -40,7 +40,7 @@ public class SeatManagementBackgroundService {
     // "0 0 9-17 * * MON-FRI" = on the hour nine-to-five weekdays
     // "0 0 0 25 12 ?" = every Christmas Day at midnight
     // Generation tool at: https://www.freeformatter.com/cron-expression-generator-quartz.html
-    @Scheduled(cron = "* */5 9-18 * * MON-FRI")
+    @Scheduled(cron = "*/5 * 9-18 * * MON-FRI")
     private void inactivateAllocations() {
 
         System.out.println("******************** Seat Management Background Service: inactivate allocations at " + new Date().toString() + " ********************");
@@ -75,7 +75,7 @@ public class SeatManagementBackgroundService {
         }
     }
 
-    @Scheduled(cron = "0/10 * 8-19 ? * MON,TUE,WED,THU,FRI *")
+    @Scheduled(cron = "*/5 * 9-18 * * MON-FRI")
     private void updateCurrentOccupancy() {
 
         System.out.println("******************** Seat Management Background Service: update current occupancy ********************");
