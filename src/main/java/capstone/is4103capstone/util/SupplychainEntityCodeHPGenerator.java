@@ -1,12 +1,16 @@
 package capstone.is4103capstone.util;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.supplychain.service.ContractService;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
 public class SupplychainEntityCodeHPGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(SupplychainEntityCodeHPGenerator.class);
     private final String VENDOR_TEMPLATE = "Vendor-%1$s-%2$s";
     private final String CONTRACT_TEMPLATE = "Contract-%1$s-%2$s";
 
@@ -15,6 +19,7 @@ public class SupplychainEntityCodeHPGenerator {
         String code = "";
         if (entityOptional.isPresent()) {
             entity = entityOptional.get();
+
             if (entity.getSeqNo() == null) {
                 entity.setSeqNo(new Long(repo.findAll().size()));
             }
