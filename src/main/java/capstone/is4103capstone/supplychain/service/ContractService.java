@@ -60,6 +60,7 @@ public class ContractService {
             newContract.setLastModifiedBy(createContractReq.getModifierUsername());
             newContract.setTotalContractValue(createContractReq.getTotalContractValue());
             newContract.setDeleted(false);
+            newContract = contractRepository.saveAndFlush(newContract);
             if (newContract.getSeqNo() == null) {
                 newContract.setSeqNo(new Long(contractRepository.findAll().size()));
             }
@@ -266,9 +267,19 @@ public class ContractService {
     }
 
     public ContractModel transformToContractModel(Contract contract){
-        GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
-        GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
-        GeneralEntityModel team = new GeneralEntityModel(contract.getTeam());
+        GeneralEntityModel vendor = null;
+        GeneralEntityModel employeeInChargeContract = null;
+        GeneralEntityModel team = null;
+
+        if(contract.getVendor() != null){
+            vendor = new GeneralEntityModel(contract.getVendor());
+        }
+        if(contract.getEmployeeInChargeContract() != null){
+            employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
+        }
+        if(contract.getTeam() != null) {
+            team = new GeneralEntityModel(contract.getTeam());
+        }
 
         ContractModel contractModel = new ContractModel(
                 contract.getObjectName(), contract.getCode(), contract.getId(),
