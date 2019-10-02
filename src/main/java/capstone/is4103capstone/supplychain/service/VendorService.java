@@ -4,10 +4,13 @@ import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.model.ContractModel;
 import capstone.is4103capstone.supplychain.model.VendorModel;
 import capstone.is4103capstone.supplychain.model.req.AddBusinessUnitReq;
@@ -52,6 +55,7 @@ public class VendorService {
             newVendor.setLastModifiedBy(createVendorReq.getUsername());
             newVendor.setLastModifiedDateTime(new Date());
             newVendor.setCreatedDateTime(new Date());
+            Authentication.configurePermissionMap(newVendor);
 
             newVendor = vendorRepository.saveAndFlush(newVendor);
             if(createVendorReq.getBusinessUnits() != null && createVendorReq.getBusinessUnits().size() != 0) {
@@ -63,6 +67,7 @@ public class VendorService {
                 }
             }
 
+            newVendor.setCode(SCMEntityCodeHPGeneration.getCode(vendorRepository,newVendor));
             vendorRepository.saveAndFlush(newVendor);
             logger.info("Successully created a new vendor! -- "+createVendorReq.getUsername()+" "+new Date());
             return new GeneralRes("Successully created a new vendor!", false);

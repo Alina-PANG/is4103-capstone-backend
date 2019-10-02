@@ -5,11 +5,14 @@ import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ContractLineRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.model.ContractModel;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.model.res.GetAllContractsRes;
@@ -56,6 +59,7 @@ public class ContractService {
             newContract.setCreatedDateTime(new Date());
             newContract.setLastModifiedDateTime(new Date());
             newContract.setDeleted(false);
+            Authentication.configurePermissionMap(newContract);
 
             Vendor vendor = vendorRepository.getOne(createContractReq.getVendorId());
             newContract.setVendor(vendor);
@@ -71,6 +75,7 @@ public class ContractService {
                 newContract.setContractLines(savedContractLineList);
             }
 
+            newContract.setCode(SCMEntityCodeHPGeneration.getCode(contractRepository,newContract));
             contractRepository.saveAndFlush(newContract);
             vendorRepository.saveAndFlush(vendor);
             employeeRepository.saveAndFlush(employeeInCharge);

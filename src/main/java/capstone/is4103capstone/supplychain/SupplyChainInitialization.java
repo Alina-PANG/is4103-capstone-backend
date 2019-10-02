@@ -7,7 +7,6 @@ import capstone.is4103capstone.entities.supplyChain.*;
 import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
 import capstone.is4103capstone.supplychain.Repository.*;
 import capstone.is4103capstone.util.enums.*;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,15 +55,15 @@ public class SupplyChainInitialization {
             newEmployee2.setCode("EMPLOYEE-xuhong");
             employeeRepository.save(newEmployee2);
 
-            createMechandise();
-            createVendors();
-            createContract();
-            createDispute();
-            createAction();
-            createOutsourcingAssessmentLine();
-            createOutsourcingAssessmentSection();
-            createOutsourcingAssessment();
-            createOutsourcing();
+//            createMechandise();
+//            createVendors();
+//            createContract();
+//            createDispute();
+//            createAction();
+//            createOutsourcingAssessmentLine();
+//            createOutsourcingAssessmentSection();
+//            createOutsourcingAssessment();
+//            createOutsourcing();
         }
     }
 
