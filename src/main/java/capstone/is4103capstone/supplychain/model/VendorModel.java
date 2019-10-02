@@ -1,21 +1,15 @@
-package capstone.is4103capstone.entities.supplyChain;
+package capstone.is4103capstone.supplychain.model;
 
-import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.Team;
-import capstone.is4103capstone.entities.finance.Invoice;
-import capstone.is4103capstone.entities.finance.Merchandise;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
 
-@Entity
-@Table
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Vendor extends DBEntityTemplate {
+public class VendorModel implements Serializable {
+    private String id;
+    private String code;
+    private String vendorName;
+    private List<GeneralEntityModel> businessUnits;
     private String serviceDescription;
     private String relationshipManagerName;
     private String relationshipManagerEmail;
@@ -24,22 +18,11 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactName;
     private String escalationContactEmail;
 
-    @ManyToMany(mappedBy = "vendors", fetch = FetchType.EAGER)
-    private List<Team> businessUnits = new ArrayList<>();
-
-    @OneToMany(mappedBy = "vendor")
-    private List<Merchandise> merchandises = new ArrayList<>();
-
-    @OneToMany(mappedBy = "vendor")
-    private List<Invoice> invoices = new ArrayList<>();
-
-    @OneToMany(mappedBy = "vendor")
-    private List<Contract> contracts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "outsourcedVendor")
-    private List<Outsourcing> outsourcingList = new ArrayList<>();
-
-    public Vendor(String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
+    public VendorModel(String id, String code, String vendorName, List<GeneralEntityModel> businessUnits, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
+        this.id = id;
+        this.code = code;
+        this.vendorName = vendorName;
+        this.businessUnits = businessUnits;
         this.serviceDescription = serviceDescription;
         this.relationshipManagerName = relationshipManagerName;
         this.relationshipManagerEmail = relationshipManagerEmail;
@@ -49,38 +32,38 @@ public class Vendor extends DBEntityTemplate {
         this.escalationContactEmail = escalationContactEmail;
     }
 
-    public Vendor() {
+    public VendorModel() {
     }
 
-    public List<Merchandise> getMerchandises() {
-        return merchandises;
+    public String getId() {
+        return id;
     }
 
-    public void setMerchandises(List<Merchandise> merchandises) {
-        this.merchandises = merchandises;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public List<Invoice> getInvoices() {
-        return invoices;
+    public String getCode() {
+        return code;
     }
 
-    public void setInvoices(List<Invoice> invoices) {
-        this.invoices = invoices;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public List<Outsourcing> getOutsourcingList() {
-        return outsourcingList;
+    public String getVendorName() {
+        return vendorName;
     }
 
-    public void setOutsourcingList(List<Outsourcing> outsourcingList) {
-        this.outsourcingList = outsourcingList;
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
 
-    public List<Team> getBusinessUnits() {
+    public List<GeneralEntityModel> getBusinessUnits() {
         return businessUnits;
     }
 
-    public void setBusinessUnits(List<Team> businessUnits) {
+    public void setBusinessUnits(List<GeneralEntityModel> businessUnits) {
         this.businessUnits = businessUnits;
     }
 
@@ -138,13 +121,5 @@ public class Vendor extends DBEntityTemplate {
 
     public void setEscalationContactEmail(String escalationContactEmail) {
         this.escalationContactEmail = escalationContactEmail;
-    }
-
-    public List<Contract> getContracts() {
-        return contracts;
-    }
-
-    public void setContracts(List<Contract> contracts) {
-        this.contracts = contracts;
     }
 }
