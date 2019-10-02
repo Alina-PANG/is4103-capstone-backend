@@ -87,7 +87,6 @@ public class SupplyChainInitialization {
 
     public void createVendors() {
         Vendor vendor1 = new Vendor();
-        vendor1.setBusinessUnit("Lenovo");
         vendor1.setServiceDescription("Lenovo will provide PC and harware to NatWest.");
         vendor1.setRelationshipManagerName("Manager1");
         vendor1.setRelationshipManagerEmail("Manager1@gmail.com");

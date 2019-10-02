@@ -54,11 +54,13 @@ public class VendorService {
             newVendor.setCreatedDateTime(new Date());
 
             newVendor = vendorRepository.saveAndFlush(newVendor);
-            for(Team t: createVendorReq.getBusinessUnits()){
-                newVendor.getBusinessUnits().add(t);
-                newVendor = vendorRepository.saveAndFlush(newVendor);
-                t.getVendors().add(newVendor);
-                teamRepository.saveAndFlush(t);
+            if(createVendorReq.getBusinessUnits() != null && createVendorReq.getBusinessUnits().size() != 0) {
+                for (Team t : createVendorReq.getBusinessUnits()) {
+                    newVendor.getBusinessUnits().add(t);
+                    newVendor = vendorRepository.saveAndFlush(newVendor);
+                    t.getVendors().add(newVendor);
+                    teamRepository.saveAndFlush(t);
+                }
             }
 
             vendorRepository.saveAndFlush(newVendor);
