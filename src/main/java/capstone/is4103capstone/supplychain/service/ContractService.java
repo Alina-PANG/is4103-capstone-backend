@@ -1,7 +1,9 @@
 package capstone.is4103capstone.supplychain.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
@@ -36,6 +38,8 @@ public class ContractService {
     VendorRepository vendorRepository;
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    TeamRepository teamRepository;
 
     //contract and contractLine will be created together.
     public GeneralRes CreateContract(CreateContractReq createContractReq){
@@ -54,6 +58,7 @@ public class ContractService {
             newContract.setObjectName(createContractReq.getContractName());
             newContract.setCreatedBy(createContractReq.getModifierUsername());
             newContract.setLastModifiedBy(createContractReq.getModifierUsername());
+            newContract.setTotalContractValue(createContractReq.getTotalContractValue());
             newContract.setDeleted(false);
             if (newContract.getSeqNo() == null) {
                 newContract.setSeqNo(new Long(contractRepository.findAll().size()));
@@ -68,7 +73,12 @@ public class ContractService {
             newContract.setEmployeeInChargeContract(employeeInCharge);
             employeeInCharge.getContractInCharged().add(newContract);
 
+            Team team  = teamRepository.getOne(createContractReq.getTeamId());
+            newContract.setTeam(team);
+            team.getContracts().add(newContract);
+
             newContract = contractRepository.saveAndFlush(newContract);
+
             if(createContractReq.getContractLineList() != null && createContractReq.getContractLineList().size() != 0){
                 List<ContractLine> savedContractLineList = createContractLine(newContract, createContractReq.getContractLineList(), createContractReq);
                 newContract.setContractLines(savedContractLineList);
@@ -78,6 +88,7 @@ public class ContractService {
             contractRepository.saveAndFlush(newContract);
             vendorRepository.saveAndFlush(vendor);
             employeeRepository.saveAndFlush(employeeInCharge);
+            teamRepository.saveAndFlush(team);
             logger.info("Successfully created new contract! -- "+createContractReq.getModifierUsername()+" "+new Date());
             return new GeneralRes("Successfully created new contract!", false);
         }
@@ -183,6 +194,9 @@ public class ContractService {
             if (updateContractReq.getSpendType() != null) {
                 contract.setSpendType(updateContractReq.getSpendType());
             }
+            if(updateContractReq.getTotalContractValue() != null){
+                contract.setTotalContractValue(updateContractReq.getTotalContractValue());
+            }
 
             contract.setLastModifiedBy(updateContractReq.getModifierUsername());
 
@@ -201,6 +215,14 @@ public class ContractService {
                 contract = contractRepository.saveAndFlush(contract);
                 vendor.getContracts().add(contract);
                 vendorRepository.saveAndFlush(vendor);
+            }
+            if(updateContractReq.getTeamId() != null){
+                Team team = teamRepository.getOne(updateContractReq.getTeamId());
+                contract.setTeam(team);
+
+                contract = contractRepository.saveAndFlush(contract);
+                team.getContracts().add(contract);
+                teamRepository.saveAndFlush(team);
             }
 
             if (updateContractReq.getContractLineList() != null && updateContractReq.getContractLineList().size() != 0) {
@@ -246,12 +268,13 @@ public class ContractService {
     public ContractModel transformToContractModel(Contract contract){
         GeneralEntityModel vendor = new GeneralEntityModel(contract.getVendor());
         GeneralEntityModel employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
+        GeneralEntityModel team = new GeneralEntityModel(contract.getTeam());
 
         ContractModel contractModel = new ContractModel(
                 contract.getObjectName(), contract.getCode(), contract.getId(),
                 contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
                 contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
-                vendor, employeeInChargeContract,
+                vendor, employeeInChargeContract, team, contract.getTotalContractValue(),
                 contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
 
         return contractModel;

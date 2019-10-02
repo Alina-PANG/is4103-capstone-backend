@@ -21,6 +21,8 @@ public class ContractModel implements Serializable {
     private Integer noticeDaysToExit;
     private GeneralEntityModel vendor;
     private GeneralEntityModel employeeInChargeContract;
+    private GeneralEntityModel team;
+    private Integer totalContractValue;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -34,7 +36,7 @@ public class ContractModel implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
-    public ContractModel(String name, String code, String id, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, GeneralEntityModel employeeInChargeContract, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
+    public ContractModel(String name, String code, String id, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, GeneralEntityModel employeeInChargeContract, GeneralEntityModel team, Integer totalContractValue, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
         this.name = name;
         this.code = code;
         this.id = id;
@@ -46,6 +48,8 @@ public class ContractModel implements Serializable {
         this.noticeDaysToExit = noticeDaysToExit;
         this.vendor = vendor;
         this.employeeInChargeContract = employeeInChargeContract;
+        this.team = team;
+        this.totalContractValue = totalContractValue;
         this.startDate = startDate;
         this.endDate = endDate;
         this.renewalStartDate = renewalStartDate;
@@ -53,6 +57,22 @@ public class ContractModel implements Serializable {
     }
 
     public ContractModel() {
+    }
+
+    public Integer getTotalContractValue() {
+        return totalContractValue;
+    }
+
+    public void setTotalContractValue(Integer totalContractValue) {
+        this.totalContractValue = totalContractValue;
+    }
+
+    public GeneralEntityModel getTeam() {
+        return team;
+    }
+
+    public void setTeam(GeneralEntityModel team) {
+        this.team = team;
     }
 
     public String getName() {
