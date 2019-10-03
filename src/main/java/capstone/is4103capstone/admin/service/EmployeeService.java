@@ -38,7 +38,9 @@ public class EmployeeService {
     @Transactional
     public Employee createNewEmployeeEntity(Employee input) {
         Employee newE = employeeRepository.save(input);
+        newE = employeeRepository.findEmployeeById(newE.getId());
         newE.setCode("EMP-"+newE.getSeqNo());
+        employeeRepository.save(newE);
         return newE;
     }
 

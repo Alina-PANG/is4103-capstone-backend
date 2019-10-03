@@ -54,7 +54,7 @@ public class CurrencyService {
     public Currency updateCurrencyEntity(Currency input) throws Exception {
         Currency toUpdate = getCurrencyEntityByUuid(input.getId());
         toUpdate.setObjectName(input.getObjectName());
-        toUpdate.setCurrencyCode(input.getCurrencyCode());
+        toUpdate.setCountryCode(input.getCountryCode());
         return toUpdate;
     }
 
@@ -64,7 +64,7 @@ public class CurrencyService {
         if (toUpdate.getDeleted())
             throw new Exception("Currency with UUID " + input.getId().get() + " has already been deleted and cannot be modified!");
         input.getObjectName().ifPresent(toUpdate::setObjectName);
-        input.getCurrencyCode().ifPresent(toUpdate::setCurrencyCode);
+        input.getCountryCode().ifPresent(toUpdate::setCountryCode);
         return entityToDto(toUpdate);
     }
 
@@ -82,7 +82,7 @@ public class CurrencyService {
         Currency currency = new Currency();
         input.getId().ifPresent(id -> currency.setId(id));
         input.getCode().ifPresent(code -> currency.setCode(code));
-        input.getCurrencyCode().ifPresent(code -> currency.setCurrencyCode(code));
+        input.getCountryCode().ifPresent(code -> currency.setCountryCode(code));
         input.getObjectName().ifPresent(name -> currency.setObjectName(name));
         return currency;
     }
@@ -99,7 +99,7 @@ public class CurrencyService {
         CurrencyDto currencyDto = new CurrencyDto();
         currencyDto.setId(Optional.of(input.getId()));
         currencyDto.setCode(Optional.of(input.getCode()));
-        currencyDto.setCurrencyCode(Optional.of(input.getCurrencyCode()));
+        currencyDto.setCountryCode(Optional.of(input.getCountryCode()));
         currencyDto.setObjectName(Optional.of(input.getObjectName()));
         return currencyDto;
     }
