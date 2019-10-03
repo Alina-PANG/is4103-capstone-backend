@@ -219,7 +219,7 @@ public class VendorService {
         }
 
         VendorModel vendorModel = new VendorModel(
-                vendor.getId(), vendor.getCode(), vendor.getObjectName(), businessUnits,
+                vendor.getId(), vendor.getCode(), vendor.getObjectName(), vendor.getSeqNo(), businessUnits,
                 vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
                 vendor.getBillingContactName(), vendor.getBillingContactEmail(),
                 vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
