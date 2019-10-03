@@ -3,6 +3,7 @@ package capstone.is4103capstone.admin.service;
 import capstone.is4103capstone.admin.dto.EmployeeDto;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private TeamService teamService;
 
     // TODO: refactor - same as getEmployeeEntityByUuid
     public Employee retrieveEmployeeById(String employeeId) throws EmployeeNotFoundException {
@@ -77,6 +81,16 @@ public class EmployeeService {
 
     public EmployeeDto getEmployeeBySid(String input) throws Exception {
         return entityToDto(getEmployeeEntityBySid(input));
+    }
+
+    public List<EmployeeDto> getEmployeeByTeamUuid(String teamUuid) throws Exception {
+        // lookup the team
+        Team team = teamService.getTeamEntityByUuid(teamUuid);
+        List<EmployeeDto> employeeDtos = new ArrayList<>();
+        for (Employee employee : team.getMembers()) {
+            employeeDtos.add(entityToDto(employee));
+        }
+        return employeeDtos;
     }
 
     // === UPDATE ===
