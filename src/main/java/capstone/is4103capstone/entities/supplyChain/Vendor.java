@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.finance.Invoice;
 import capstone.is4103capstone.entities.finance.Merchandise;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,7 +16,6 @@ import java.util.List;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Vendor extends DBEntityTemplate {
-    private String businessUnit;
     private String serviceDescription;
     private String relationshipManagerName;
     private String relationshipManagerEmail;
@@ -23,6 +23,9 @@ public class Vendor extends DBEntityTemplate {
     private String billingContactEmail;
     private String escalationContactName;
     private String escalationContactEmail;
+
+    @ManyToMany(mappedBy = "vendors", fetch = FetchType.EAGER)
+    private List<Team> businessUnits = new ArrayList<>();
 
     @OneToMany(mappedBy = "vendor")
     private List<Merchandise> merchandises = new ArrayList<>();
@@ -36,8 +39,7 @@ public class Vendor extends DBEntityTemplate {
     @OneToMany(mappedBy = "outsourcedVendor")
     private List<Outsourcing> outsourcingList = new ArrayList<>();
 
-    public Vendor(String businessUnit, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
-        this.businessUnit = businessUnit;
+    public Vendor(String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
         this.serviceDescription = serviceDescription;
         this.relationshipManagerName = relationshipManagerName;
         this.relationshipManagerEmail = relationshipManagerEmail;
@@ -74,12 +76,12 @@ public class Vendor extends DBEntityTemplate {
         this.outsourcingList = outsourcingList;
     }
 
-    public String getBusinessUnit() {
-        return businessUnit;
+    public List<Team> getBusinessUnits() {
+        return businessUnits;
     }
 
-    public void setBusinessUnit(String businessUnit) {
-        this.businessUnit = businessUnit;
+    public void setBusinessUnits(List<Team> businessUnits) {
+        this.businessUnits = businessUnits;
     }
 
     public String getServiceDescription() {

@@ -14,7 +14,7 @@ public class AuditTrailActivityDto implements Serializable {
     private Optional<Integer> id = Optional.empty();
     private Optional<String> userUuid = Optional.empty();
     private Optional<String> activity = Optional.empty();
-    private Optional<Date> timeStamp = Optional.empty();
+    private Optional<String> timeStamp = Optional.empty();
 
     public Optional<Integer> getId() {
         return id;
@@ -40,11 +40,11 @@ public class AuditTrailActivityDto implements Serializable {
         this.activity = activity;
     }
 
-    public Optional<Date> getTimeStamp() {
+    public Optional<String> getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(Optional<Date> timeStamp) {
+    public void setTimeStamp(Optional<String> timeStamp) {
         this.timeStamp = timeStamp;
     }
 }
