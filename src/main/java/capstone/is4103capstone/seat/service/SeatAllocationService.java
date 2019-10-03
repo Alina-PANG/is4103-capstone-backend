@@ -207,11 +207,6 @@ public class SeatAllocationService {
             scheduleRepository.save(allocationSchedule);
             seatAllocationRepository.save(newSeatAllocation);
             seatRepository.save(seat);
-
-            SeatAllocationInactivationLog log = new SeatAllocationInactivationLog();
-            log.setAllocation_id(newSeatAllocation.getId());
-            // No inactivation_time will be set
-            seatAllocationInactivationLogRepository.save(log);
         } catch (SeatNotFoundException | EmployeeNotFoundException | TeamNotFoundException ex) {
             throw new SeatAllocationException("Assigning fixed seat failed: " + ex.getMessage());
         }

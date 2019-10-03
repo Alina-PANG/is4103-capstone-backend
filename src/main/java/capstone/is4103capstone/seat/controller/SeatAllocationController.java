@@ -8,15 +8,17 @@ import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.finance.budget.controller.BudgetController;
 import capstone.is4103capstone.seat.model.*;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
+import capstone.is4103capstone.seat.service.SeatManagementBackgroundService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -28,6 +30,10 @@ public class SeatAllocationController {
 
     @Autowired
     private SeatAllocationService seatAllocationService;
+    @Autowired
+    private SeatManagementBackgroundService seatManagementBackgroundService;
+    @Autowired
+    TaskScheduler taskScheduler;
 
     public SeatAllocationController() {
     }
@@ -178,6 +184,18 @@ public class SeatAllocationController {
             seatModelForAllocation.getAllocations().add(allocationModelForEmployee);
         }
         return ResponseEntity.ok(seatModelForAllocation);
+    }
+
+    @GetMapping("/service/inactivate")
+    public ResponseEntity triggerAllocationInactivationBackgroundService() {
+        taskScheduler.scheduleAtFixedRate(seatManagementBackgroundService.runInactivateAllocations(), new Date(), 5000 );
+        return ResponseEntity.ok("Services triggered successfully");
+    }
+
+    @GetMapping("/service/currentOccupancy")
+    public ResponseEntity triggerCurrentOccupancyUpdateBackgroundService() {
+        taskScheduler.scheduleAtFixedRate(seatManagementBackgroundService.runUpdateCurrentOccupancy(), new Date(), 5000 );
+        return ResponseEntity.ok("Services triggered successfully");
     }
 
     // ---------------------------------- DELETE: Delete ----------------------------------
