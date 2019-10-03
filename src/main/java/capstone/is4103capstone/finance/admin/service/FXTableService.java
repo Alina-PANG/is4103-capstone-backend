@@ -7,6 +7,7 @@ import capstone.is4103capstone.finance.admin.model.FXRecordModel;
 import capstone.is4103capstone.finance.admin.model.req.CreateFXRequest;
 import capstone.is4103capstone.finance.admin.model.req.FXRecordQueryReq;
 import capstone.is4103capstone.finance.admin.model.res.ViewFXRecordRes;
+import capstone.is4103capstone.general.service.WriteAuditTrail;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

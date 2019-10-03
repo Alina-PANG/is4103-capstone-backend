@@ -20,6 +20,7 @@ public class EmployeeDto implements Serializable {
     private Optional<String> middleName = Optional.empty();
     private Optional<String> securityId = Optional.empty();
     private Optional<String> password = Optional.empty();
+    private Optional<String> email = Optional.empty();
 
     public Optional<String> getId() {
         return id;
@@ -83,5 +84,13 @@ public class EmployeeDto implements Serializable {
 
     public void setPassword(Optional<String> password) {
         this.password = password;
+    }
+
+    public Optional<String> getEmail() {
+        return email;
+    }
+
+    public void setEmail(Optional<String> email) {
+        this.email = email;
     }
 }
