@@ -19,7 +19,6 @@ import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import capstone.is4103capstone.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -162,7 +161,7 @@ public class SeatAllocationService {
             }
 
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
-            validateOccupancyStartDateTime(startDateTime);
+            validateOccupancyDateTimeUsingToday(startDateTime, true);
 
             // Check whether there is any clash of allocation schedule
             // For both fixed & shared seats allocation:
@@ -254,8 +253,9 @@ public class SeatAllocationService {
 
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
             System.out.println("********** Start Date Time: " + startDateTime.toString() + " **********");
-            validateOccupancyStartDateTime(startDateTime);
+            validateOccupancyDateTimeUsingToday(startDateTime, true);
             Date endDateTime = seatAllocationModel.getSchedule().getEndDateTime();
+            validateOccupancyDateTimeUsingToday(endDateTime, false);
             System.out.println("********** End Date Time: " + endDateTime.toString() + " **********");
 
             if (endDateTime == null || startDateTime.after(endDateTime)) {
@@ -344,8 +344,9 @@ public class SeatAllocationService {
             }
 
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
-            validateOccupancyStartDateTime(startDateTime);
+            validateOccupancyDateTimeUsingToday(startDateTime, true);
             Date endDateTime = seatAllocationModel.getSchedule().getEndDateTime();
+            validateOccupancyDateTimeUsingToday(endDateTime, false);
             if (endDateTime != null && startDateTime.after(endDateTime)) {
                 throw new SeatAllocationException("Assigning shared seat failed: invalid end date of the seat allocation!");
             }
@@ -631,16 +632,22 @@ public class SeatAllocationService {
 
 
     // Validate the start date of the allocation.
-    private void validateOccupancyStartDateTime(Date startDateTime) throws SeatAllocationException {
-        if (startDateTime.compareTo(DateHelper.getDateWithoutTimeUsingCalendar(new Date())) < 0) {
-            throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be a historical time!");
-        }
-        GregorianCalendar oneYearLater = new GregorianCalendar();
-        oneYearLater.roll(Calendar.YEAR,1);
-        Date oneYearLaterDate = oneYearLater.getTime();
-        if (startDateTime.after(oneYearLaterDate)) {
-            throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be later than 1 year " +
-                    "after the current date!");
+    private void validateOccupancyDateTimeUsingToday(Date dateTime, boolean isStartDateTime) throws SeatAllocationException {
+        if (isStartDateTime) {
+            if (dateTime.compareTo(DateHelper.getDateWithoutTimeUsingCalendar(new Date())) < 0) {
+                throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be a historical time!");
+            }
+            GregorianCalendar oneYearLater = new GregorianCalendar();
+            oneYearLater.roll(Calendar.YEAR,1);
+            Date oneYearLaterDate = oneYearLater.getTime();
+            if (dateTime.after(oneYearLaterDate)) {
+                throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be later than 1 year " +
+                        "after the current date!");
+            }
+        } else {
+            if (dateTime.compareTo(new Date()) < 0) {
+                throw new SeatAllocationException("Assigning seat failed: the end date time of the occupancy cannot be a historical time!");
+            }
         }
     }
 

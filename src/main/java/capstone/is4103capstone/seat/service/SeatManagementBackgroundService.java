@@ -69,6 +69,7 @@ public class SeatManagementBackgroundService {
                             seatAllocationInactivationLogRepository.save(allocationToInactivate);
                         }
                     }
+                    seat.setType(SeatTypeEnum.HOTDESK);
                     seatRepository.save(seat);
                 }
             }

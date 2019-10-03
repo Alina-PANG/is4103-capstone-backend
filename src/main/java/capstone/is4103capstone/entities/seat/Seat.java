@@ -20,7 +20,7 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     // Seat code example: SG-ORQ-26-01
 
     @Enumerated(EnumType.STRING)
-    private SeatTypeEnum type = SeatTypeEnum.FIXED;
+    private SeatTypeEnum type = SeatTypeEnum.HOTDESK;
     @NotNull
     @Min(0)
     private Integer xCoordinate;
