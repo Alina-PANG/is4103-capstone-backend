@@ -3,6 +3,7 @@ package capstone.is4103capstone.admin.service;
 import capstone.is4103capstone.admin.dto.CountryDto;
 import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.admin.repository.RegionRepository;
+import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
@@ -50,6 +51,8 @@ public class CountryService {
     public Country getCountryEntityByUuid(String uuid) throws Exception {
         try {
             Country result = countryRepository.findById(uuid).get();
+            result.getFunctions().size();
+            List<CompanyFunction> fs = result.getFunctions();
             return result;
         } catch (NoSuchElementException ex) {
             throw new Exception("No country with UUID " + uuid + " found in the database.");
