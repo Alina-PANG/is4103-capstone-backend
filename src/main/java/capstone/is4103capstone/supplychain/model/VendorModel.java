@@ -9,6 +9,7 @@ public class VendorModel implements Serializable {
     private String id;
     private String code;
     private String vendorName;
+    private Long seqNo;
     private List<GeneralEntityModel> businessUnits;
     private String serviceDescription;
     private String relationshipManagerName;
@@ -18,10 +19,11 @@ public class VendorModel implements Serializable {
     private String escalationContactName;
     private String escalationContactEmail;
 
-    public VendorModel(String id, String code, String vendorName, List<GeneralEntityModel> businessUnits, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
+    public VendorModel(String id, String code, String vendorName, Long seqNo, List<GeneralEntityModel> businessUnits, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
         this.id = id;
         this.code = code;
         this.vendorName = vendorName;
+        this.seqNo = seqNo;
         this.businessUnits = businessUnits;
         this.serviceDescription = serviceDescription;
         this.relationshipManagerName = relationshipManagerName;
@@ -33,6 +35,14 @@ public class VendorModel implements Serializable {
     }
 
     public VendorModel() {
+    }
+
+    public Long getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(Long seqNo) {
+        this.seqNo = seqNo;
     }
 
     public String getId() {
