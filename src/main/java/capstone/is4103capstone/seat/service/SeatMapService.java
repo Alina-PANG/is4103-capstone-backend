@@ -17,7 +17,6 @@ import capstone.is4103capstone.util.exception.SeatMapUpdateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 
 @Service
@@ -116,7 +115,7 @@ public class SeatMapService {
 
     public SeatMap getSeatMapById(String id) throws SeatMapNotFoundException {
 
-        Optional<SeatMap> optionalSeatMap = seatMapRepository.findById(id);
+        Optional<SeatMap> optionalSeatMap = seatMapRepository.findUndeletedById(id);
         if (!optionalSeatMap.isPresent()) {
             throw new SeatMapNotFoundException("Seat map required does not exist.");
         } else {
@@ -125,6 +124,12 @@ public class SeatMapService {
             seatMap.getSeats().size();
             return seatMap;
         }
+    }
+
+
+    public List<SeatMap> getAllSeatMaps() {
+        List<SeatMap> seatMaps = seatMapRepository.findAllUndeleted();
+        return seatMaps;
     }
 
 
@@ -269,8 +274,11 @@ public class SeatMapService {
         }
 
         seatMap.setDeleted(true);
+        seatMap.setCode(null);
         seatMapRepository.save(seatMap);
     }
+
+    // -----------------------------------------------Helper methods-----------------------------------------------
 
     private boolean hasDuplicateSeatModelIdOrSerialNumber(SeatMapModel seatMap) {
         List<String> ids = new ArrayList<>();
@@ -291,6 +299,7 @@ public class SeatMapService {
         return false;
     }
 
+
     private boolean hasDuplicateOrInconsecutiveSerialNumber(SeatMap seatMap) {
 
         for (int count = 0; count < seatMap.getSeats().size() - 1; count++ ) {
@@ -301,6 +310,7 @@ public class SeatMapService {
         }
         return false;
     }
+
 
     private void deleteExtraSeats(List<Seat> extraSeats) {
         for (Seat seat :
@@ -323,6 +333,7 @@ public class SeatMapService {
             seatRepository.save(seat);
         }
     }
+
 
     private void refreshSeatCode(SeatMap seatMap) {
         for (Seat seat: seatMap.getSeats()) {

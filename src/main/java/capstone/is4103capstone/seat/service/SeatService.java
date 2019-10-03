@@ -1,7 +1,6 @@
 package capstone.is4103capstone.seat.service;
 
 import capstone.is4103capstone.entities.seat.Seat;
-import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.seat.model.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
@@ -10,7 +9,6 @@ import capstone.is4103capstone.util.exception.SeatNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.Optional;
 
 @Service
@@ -50,7 +48,7 @@ public class SeatService {
         }
 
         seatId = seatId.trim();
-        Optional<Seat> optionalSeat = seatRepository.findById(seatId);
+        Optional<Seat> optionalSeat = seatRepository.findUndeletedById(seatId);
         if(!optionalSeat.isPresent()) {
             throw new SeatNotFoundException("Seat with ID " + seatId + " does not exist!");
         } else {
