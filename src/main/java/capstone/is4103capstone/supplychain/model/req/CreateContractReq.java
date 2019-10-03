@@ -1,5 +1,6 @@
 package capstone.is4103capstone.supplychain.model.req;
 
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
@@ -36,6 +37,27 @@ public class CreateContractReq implements Serializable {
     private String modifierUsername;
     private String employeeInChargeId;
     private String contractName;
+    private Integer totalContractValue;
+    private String teamId;
+
+    public CreateContractReq() {
+    }
+
+    public Integer getTotalContractValue() {
+        return totalContractValue;
+    }
+
+    public void setTotalContractValue(Integer totalContractValue) {
+        this.totalContractValue = totalContractValue;
+    }
+
+    public String getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(String teamId) {
+        this.teamId = teamId;
+    }
 
     public String getContractName() {
         return contractName;
