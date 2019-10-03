@@ -25,6 +25,7 @@ public class SeatAllocationInactivationLog {
     @Temporal(TemporalType.TIMESTAMP)
     private Date completion_time;
     private boolean isDone = false;
+    private boolean isCancelled = false;
 
     public SeatAllocationInactivationLog () {
         created_time = new Date();
@@ -76,5 +77,13 @@ public class SeatAllocationInactivationLog {
 
     public void setDone(boolean done) {
         isDone = done;
+    }
+
+    public boolean isCancelled() {
+        return isCancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        isCancelled = cancelled;
     }
 }
