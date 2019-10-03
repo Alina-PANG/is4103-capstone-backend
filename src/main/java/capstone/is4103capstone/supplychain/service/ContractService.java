@@ -282,7 +282,7 @@ public class ContractService {
         }
 
         ContractModel contractModel = new ContractModel(
-                contract.getObjectName(), contract.getCode(), contract.getId(),
+                contract.getObjectName(), contract.getCode(), contract.getId(), contract.getSeqNo(),
                 contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
                 contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
                 vendor, employeeInChargeContract, team, contract.getTotalContractValue(),

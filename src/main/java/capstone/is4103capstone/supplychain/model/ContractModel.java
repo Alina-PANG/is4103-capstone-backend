@@ -13,6 +13,7 @@ public class ContractModel implements Serializable {
     private String name;
     private String code;
     private String id;
+    private Long seqNo;
     private PurchaseTypeEnum purchaseType;
     private String spendType;
     private String contractTerm;
@@ -36,10 +37,11 @@ public class ContractModel implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
-    public ContractModel(String name, String code, String id, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, GeneralEntityModel employeeInChargeContract, GeneralEntityModel team, Integer totalContractValue, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
+    public ContractModel(String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, GeneralEntityModel employeeInChargeContract, GeneralEntityModel team, Integer totalContractValue, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
         this.name = name;
         this.code = code;
         this.id = id;
+        this.seqNo = seqNo;
         this.purchaseType = purchaseType;
         this.spendType = spendType;
         this.contractTerm = contractTerm;
@@ -65,6 +67,14 @@ public class ContractModel implements Serializable {
 
     public void setTotalContractValue(Integer totalContractValue) {
         this.totalContractValue = totalContractValue;
+    }
+
+    public Long getSeqNo() {
+        return seqNo;
+    }
+
+    public void setSeqNo(Long seqNo) {
+        this.seqNo = seqNo;
     }
 
     public GeneralEntityModel getTeam() {
