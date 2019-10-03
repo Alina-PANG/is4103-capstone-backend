@@ -13,8 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         FileStorageProperties.class
 })
 public class Is4103CapstoneApplication {
-
     public static void main(String[] args) {
-        SpringApplication.run(Is4103CapstoneApplication.class, args);
+    	SpringApplication.run(Is4103CapstoneApplication.class, args);
     }
 }
