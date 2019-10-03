@@ -161,7 +161,7 @@ public class SeatAllocationService {
             }
 
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
-            validateOccupancyStartDateTime(startDateTime);
+            validateOccupancyDateTimeUsingToday(startDateTime, true);
 
             // Check whether there is any clash of allocation schedule
             // For both fixed & shared seats allocation:
@@ -207,11 +207,6 @@ public class SeatAllocationService {
             scheduleRepository.save(allocationSchedule);
             seatAllocationRepository.save(newSeatAllocation);
             seatRepository.save(seat);
-
-            SeatAllocationInactivationLog log = new SeatAllocationInactivationLog();
-            log.setAllocation_id(newSeatAllocation.getId());
-            // No inactivation_time will be set
-            seatAllocationInactivationLogRepository.save(log);
         } catch (SeatNotFoundException | EmployeeNotFoundException | TeamNotFoundException ex) {
             throw new SeatAllocationException("Assigning fixed seat failed: " + ex.getMessage());
         }
@@ -227,6 +222,8 @@ public class SeatAllocationService {
     // 2. A seat must be pre-assigned to a function and a team in order to be assigned to an employee as a fixed seat.
     // 3. The allocation schedule must have an end date.
     public void assignFixedSeatToTemporaryEmployee(SeatAllocationModelForEmployee seatAllocationModel) throws SeatAllocationException {
+
+        System.out.println("******************** Assign Fixed Seat To Temporary Employee, " + new Date().toString() + " ********************");
         try {
             Seat seat = seatService.retrieveSeatById(seatAllocationModel.getSeatId());
 
@@ -250,8 +247,12 @@ public class SeatAllocationService {
             }
 
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
-            validateOccupancyStartDateTime(startDateTime);
+            System.out.println("********** Start Date Time: " + startDateTime.toString() + " **********");
+            validateOccupancyDateTimeUsingToday(startDateTime, true);
             Date endDateTime = seatAllocationModel.getSchedule().getEndDateTime();
+            validateOccupancyDateTimeUsingToday(endDateTime, false);
+            System.out.println("********** End Date Time: " + endDateTime.toString() + " **********");
+
             if (endDateTime == null || startDateTime.after(endDateTime)) {
                 throw new SeatAllocationException("Assigning fixed seat failed: invalid end date of the seat allocation!");
             }
@@ -288,6 +289,8 @@ public class SeatAllocationService {
 
             // Create a new seat allocation between the seat and the employee
             Schedule allocationSchedule = new Schedule();
+            allocationSchedule.setStartDateTime(startDateTime);
+            allocationSchedule.setEndDateTime(endDateTime);
             SeatAllocation newSeatAllocation = new SeatAllocation();
             newSeatAllocation.setAllocationType(SeatAllocationTypeEnum.FIXED);
             newSeatAllocation.setSeat(seat);
@@ -336,8 +339,9 @@ public class SeatAllocationService {
             }
 
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
-            validateOccupancyStartDateTime(startDateTime);
+            validateOccupancyDateTimeUsingToday(startDateTime, true);
             Date endDateTime = seatAllocationModel.getSchedule().getEndDateTime();
+            validateOccupancyDateTimeUsingToday(endDateTime, false);
             if (endDateTime != null && startDateTime.after(endDateTime)) {
                 throw new SeatAllocationException("Assigning shared seat failed: invalid end date of the seat allocation!");
             }
@@ -472,7 +476,7 @@ public class SeatAllocationService {
 
 
     public Seat retrieveSeatWithAllocationsBySeatId(String seatId) throws SeatNotFoundException, SeatAllocationException {
-        Optional<Seat> optionalSeat = seatRepository.findById(seatId);
+        Optional<Seat> optionalSeat = seatRepository.findUndeletedById(seatId);
         if (!optionalSeat.isPresent()) {
             throw new SeatNotFoundException("Seat does not exist!");
         }
@@ -484,7 +488,7 @@ public class SeatAllocationService {
     public void deleteAllocation(String allocationId) throws SeatAllocationException {
 
         System.out.println("******************** Delete Allocation ********************");
-        Optional<SeatAllocation> optionalSeatAllocation = seatAllocationRepository.findById(allocationId);
+        Optional<SeatAllocation> optionalSeatAllocation = seatAllocationRepository.findUndeletedById(allocationId);
         if (!optionalSeatAllocation.isPresent()) {
             throw new SeatAllocationException("Seat allocation with ID " + allocationId + " does not exist!");
         }
@@ -493,6 +497,13 @@ public class SeatAllocationService {
         System.out.println("********** seat allocation (to be deleted) ID: " + seatAllocation.getId() + " **********");
         Seat seat = seatAllocation.getSeat();
         seatAllocation.setDeleted(true);
+        Optional<SeatAllocationInactivationLog> optionalSeatAllocationInactivationLog = seatAllocationInactivationLogRepository.getUncancelledById(allocationId);
+        if (optionalSeatAllocationInactivationLog.isPresent()) {
+            SeatAllocationInactivationLog seatAllocationInactivationLog = optionalSeatAllocationInactivationLog.get();
+            seatAllocationInactivationLog.setCancelled(true);
+            seatAllocationInactivationLogRepository.save(seatAllocationInactivationLog);
+        }
+
         System.out.println("-------------------------------------------");
         if (seatAllocation.isActive()) {
             ListIterator<SeatAllocation> iterator = seat.getActiveSeatAllocations().listIterator();
@@ -616,16 +627,22 @@ public class SeatAllocationService {
 
 
     // Validate the start date of the allocation.
-    private void validateOccupancyStartDateTime(Date startDateTime) throws SeatAllocationException {
-        if (startDateTime.compareTo(new Date()) < 0) {
-            throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be a historical time!");
-        }
-        GregorianCalendar oneYearLater = new GregorianCalendar();
-        oneYearLater.roll(Calendar.YEAR,1);
-        Date oneYearLaterDate = oneYearLater.getTime();
-        if (startDateTime.after(oneYearLaterDate)) {
-            throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be later than 1 year " +
-                    "after the current date!");
+    private void validateOccupancyDateTimeUsingToday(Date dateTime, boolean isStartDateTime) throws SeatAllocationException {
+        if (isStartDateTime) {
+            if (dateTime.compareTo(DateHelper.getDateWithoutTimeUsingCalendar(new Date())) < 0) {
+                throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be a historical time!");
+            }
+            GregorianCalendar oneYearLater = new GregorianCalendar();
+            oneYearLater.roll(Calendar.YEAR,1);
+            Date oneYearLaterDate = oneYearLater.getTime();
+            if (dateTime.after(oneYearLaterDate)) {
+                throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be later than 1 year " +
+                        "after the current date!");
+            }
+        } else {
+            if (dateTime.compareTo(new Date()) < 0) {
+                throw new SeatAllocationException("Assigning seat failed: the end date time of the occupancy cannot be a historical time!");
+            }
         }
     }
 

@@ -8,12 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface SeatAllocationRepository extends JpaRepository<SeatAllocation, String> {
-    @Override
-    @Query(value = "SELECT * From seat_allocation s WHERE s.is_deleted=false AND s.id=?1", nativeQuery = true)
-    Optional<SeatAllocation> findById(String allocationId);
 
-    //Soft delete.
-    @Query(value = "UPDATE seat_allocation s SET s.is_deleted=true WHERE s.id=?1", nativeQuery = true)
-    @Modifying
-    void softDelete(String id);
+    @Query(value = "SELECT * From seat_allocation s WHERE s.is_deleted=false AND s.id=?1", nativeQuery = true)
+    Optional<SeatAllocation> findUndeletedById(String allocationId);
 }
