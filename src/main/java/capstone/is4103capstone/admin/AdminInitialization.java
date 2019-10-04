@@ -33,17 +33,17 @@ public class AdminInitialization {
     @PostConstruct
     public void init() {
 
-//        List<Currency> currencyList = currencyRepository.findAll();
-//        if (currencyList == null || currencyList.size() == 0) {
-//            createCurrency();
-//            createGeo();
-//            System.out.println("-----Created Geographies-----");
-//            createEmployee();
-//        }
-//        List<CostCenter> costCenterList = costCenterRepository.findAll();
-//        if (costCenterList == null || costCenterList.size() == 0) {
-//            createCostCenter();
-//        }
+        List<Currency> currencyList = currencyRepository.findAll();
+        if (currencyList == null || currencyList.size() == 0) {
+            createCurrency();
+            createGeo();
+            System.out.println("-----Created Geographies-----");
+            createEmployee();
+        }
+        List<CostCenter> costCenterList = costCenterRepository.findAll();
+        if (costCenterList == null || costCenterList.size() == 0) {
+            createCostCenter();
+        }
     }
 
     public void createCurrency() {
