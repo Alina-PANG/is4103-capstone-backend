@@ -1,6 +1,8 @@
 package capstone.is4103capstone.admin.service;
 
+import capstone.is4103capstone.admin.controller.model.res.AuditTrailRes;
 import capstone.is4103capstone.admin.dto.AuditTrailActivityDto;
+import capstone.is4103capstone.admin.model.AuditTrailModel;
 import capstone.is4103capstone.admin.repository.AuditTrailActivityRepo;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.AuditTrailActivity;
@@ -58,6 +60,16 @@ public class AuditTrailActivityService {
         List<AuditTrailActivity> result = auditTrailActivityRepo.findAll();
         if (result.isEmpty()) throw new Exception("There are no audit trail events in the database.");
         return result;
+    }
+
+    //!!using Spring JPA Projection
+    public AuditTrailRes getAllAuditTrailWithUsername(){
+        try {
+            List<AuditTrailModel> models = auditTrailActivityRepo.findAuditTailsWithUsername();
+            return new AuditTrailRes("Retrieved " +models.size()+" records.",false,models);
+        }catch (Exception e){
+            return new AuditTrailRes(e.getMessage(),true);
+        }
     }
 
     public List<AuditTrailActivity> getAuditTrailRecordsByActivity(String activity) throws Exception {

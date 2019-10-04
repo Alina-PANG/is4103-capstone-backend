@@ -31,6 +31,20 @@ public class AuditTrailController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<AuditTrailRes> getAllAuditTrailRecordsWithUsername(@RequestHeader(name = "Authorization", required = false) String headerUsername) {
+        try {
+            WriteAuditTrail.autoAudit(headerUsername);
+            return ResponseEntity
+                    .ok()
+                    .body(atas.getAllAuditTrailWithUsername());
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new AuditTrailRes(ex.getMessage(), true, Optional.empty()));
+        }
+    }
+
     @GetMapping("/byActivity/{activityName}")
     public ResponseEntity<AuditTrailRes> getAuditTrailActivitiesByActivityName(@PathVariable(name = "activityName") String activityName, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
         try {
