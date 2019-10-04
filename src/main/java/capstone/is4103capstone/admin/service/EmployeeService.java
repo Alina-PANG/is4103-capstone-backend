@@ -167,4 +167,9 @@ public class EmployeeService {
         return employees;
     }
 
+    public String getUsernameByUuid(String uuid){
+        Employee e = employeeRepository.findEmployeeById(uuid);
+        return e == null? null :e.getUserName();
+    }
+
 }

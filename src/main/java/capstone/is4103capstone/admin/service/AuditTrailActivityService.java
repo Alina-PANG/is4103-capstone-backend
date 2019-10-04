@@ -18,6 +18,8 @@ public class AuditTrailActivityService {
     AuditTrailActivityRepo auditTrailActivityRepo;
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    EmployeeService es;
 
     private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -104,6 +106,9 @@ public class AuditTrailActivityService {
         auditTrailActivityDto.setActivity(Optional.of(input.getActivity()));
         auditTrailActivityDto.setUserUuid(Optional.of(input.getUserUuid()));
         auditTrailActivityDto.setTimeStamp(Optional.of(datetimeFormatter.format(input.getTimeStamp())));
+
+        String username = es.getUsernameByUuid(input.getUserUuid());
+        auditTrailActivityDto.setUsername(Optional.of(username));
         return auditTrailActivityDto;
     }
 
