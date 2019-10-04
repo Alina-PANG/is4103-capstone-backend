@@ -6,7 +6,9 @@ import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.FilePathReq;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.general.model.UploadFileResponse;
 import capstone.is4103capstone.general.service.ExportToFileService;
+import capstone.is4103capstone.general.service.FileStorageService;
 import capstone.is4103capstone.general.service.ReadFromFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +17,11 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.ByteArrayInputStream;
+import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -30,6 +35,23 @@ public class BudgetDataAnalysisController {
 
     @Autowired
     ExportToFileService exportToFileService;
+
+    @Autowired
+    FileStorageService fileStorageService;
+
+    @PostMapping("/uploadFile/{username}")
+    public ResponseEntity<GeneralRes> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable("username") String username) {
+        if(Authentication.authenticateUser(username)){
+            Path p = fileStorageService.storeFileAndReturnPath(file);
+            return ResponseEntity
+                    .ok()
+                    .body(budgetDataAnalysisService.readUploadedFile(p));
+        }
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
 
 
     @PostMapping(value = "/upload")

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +46,18 @@ public class BudgetDataAnalysisService {
             return new GeneralRes("An unexpected error happened when trying to export the file!", true);
         }
     }
+
+    public GeneralRes readUploadedFile(Path filePath){
+        try{
+            List<List<String>> content = readFromFileService.readFromExcel(filePath.toAbsolutePath().toString());
+            List<PlanLineItem> items = budgetLineItemService.convertListToPlanLineItem(content);
+            return new GetPlanLineItemRes("Successfully Read the File!", false, items);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new GeneralRes("An unexpected error happened when trying to export the file!", true);
+        }
+    }
+
 
     public Object exportToBudgetFile(String filename, String id){
         try{
