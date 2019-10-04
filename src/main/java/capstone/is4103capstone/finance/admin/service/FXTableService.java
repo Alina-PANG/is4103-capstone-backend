@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,7 +67,6 @@ public class FXTableService {
             }
 
 
-
             newRecord = fxRecordRepository.save(newRecord);
 
             newRecord.setCode(EntityCodeHPGeneration.getCode(fxRecordRepository,newRecord));
@@ -95,16 +96,26 @@ public class FXTableService {
 
             List<FXRecordModel> records = new ArrayList<>();
             List<FXRecord> fxUnderContraints = fxRecordRepository.findAllWithConstraints(req.getBaseCurr(),req.getPriceCurr(),startDate,endDate);
-
+            boolean useReverse = false;
             if (fxUnderContraints.size()==0){
-                throw new Exception("No FX exchange records match your search. ");
+                fxUnderContraints = fxRecordRepository.findAllWithConstraints(req.getPriceCurr(),req.getBaseCurr(),startDate,endDate);
+                if (fxUnderContraints.size()==0){
+                    throw new Exception("No FX exchange records match your search. ");
+                }else
+                    useReverse = true;
+
+
             }
 
             FXRecordModel model;
             for (FXRecord fx:fxUnderContraints){
                 String efctStr = formatter.format(fx.getEffectiveDate());
                 String expireDateStr = formatter.format(fx.getExpireDate());
-                model = new FXRecordModel(fx.getBaseCurrencyAbbr(),fx.getPriceCurrencyAbbr(),efctStr,fx.getHasExpired(),expireDateStr,fx.getExchangeRate(),fx.getId(),fx.getCode());
+                BigDecimal rate = fx.getExchangeRate();
+                if (useReverse){
+                    rate = BigDecimal.ONE.divide(rate,6, RoundingMode.CEILING);
+                }
+                model = new FXRecordModel(fx.getBaseCurrencyAbbr(),fx.getPriceCurrencyAbbr(),efctStr,fx.getHasExpired(),expireDateStr,rate,fx.getId(),fx.getCode());
                 records.add(model);
             }
 
