@@ -144,6 +144,8 @@ public class AdminInitialization {
         Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG");
         office.setAddress(orqAddress);
         office.setNumOfFloors(2);
+        office.getFloors().add("23");
+        office.getFloors().add("24");
 
         office.setCreatedBy("admin");
         office.setLastModifiedBy("admin");
