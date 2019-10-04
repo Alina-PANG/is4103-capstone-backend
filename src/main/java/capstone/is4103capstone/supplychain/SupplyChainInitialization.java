@@ -50,10 +50,10 @@ public class SupplyChainInitialization {
 
     public void init() throws ParseException {
         if(employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong") == null){
-            Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
-            newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-            newEmployee2.setCode("EMPLOYEE-xuhong");
-            employeeRepository.save(newEmployee2);
+//            Employee newEmployee2 = new Employee("xuhong","hong","xu","","password");
+//            newEmployee2.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+//            newEmployee2.setCode("EMPLOYEE-xuhong");
+//            employeeRepository.save(newEmployee2);
 
 //            createMechandise();
 //            createVendors();

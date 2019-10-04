@@ -14,8 +14,8 @@ import capstone.is4103capstone.supplychain.model.ContractModel;
 import capstone.is4103capstone.supplychain.model.VendorModel;
 import capstone.is4103capstone.supplychain.model.req.AddBusinessUnitReq;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
-import capstone.is4103capstone.supplychain.model.res.GetAllVendorsRes;
-import capstone.is4103capstone.supplychain.model.res.GetContractsByVendorRes;
+import capstone.is4103capstone.supplychain.model.res.GetContractsRes;
+import capstone.is4103capstone.supplychain.model.res.GetVendorsRes;
 import capstone.is4103capstone.supplychain.model.res.GetVendorRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +98,7 @@ public class VendorService {
         }
     }
 
-    public GetAllVendorsRes getAllVendors(){
+    public GetVendorsRes getAllVendors(){
         try {
             logger.info("Getting all vendors");
             List<VendorModel> returnList = new ArrayList<>();
@@ -117,10 +117,10 @@ public class VendorService {
                 throw new Exception("No vendor available.");
             }
 
-            return new GetAllVendorsRes("Successfully retrieved all vendors", false, returnList);
+            return new GetVendorsRes("Successfully retrieved all vendors", false, returnList);
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetAllVendorsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetVendorsRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 
@@ -182,32 +182,6 @@ public class VendorService {
         }catch(Exception ex){
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
-        }
-    }
-
-    public GetContractsByVendorRes getContractsByVendorId(String vendorId){
-        try {
-            logger.info("Getting contracts by vendor ID");
-            List<ContractModel> returnList = new ArrayList<>();
-            List<Contract> contractList = contractRepository.findContractsByVendorId(vendorId);
-
-            if(contractList.size() == 0){
-                throw new Exception("No contract available.");
-            }
-
-            for(Contract contract: contractList){
-                if(contract.getDeleted()){
-                    continue;
-                }
-
-                ContractModel contractModel = contractService.transformToContractModel(contract);
-                returnList.add(contractModel);
-            }
-
-            return new GetContractsByVendorRes("Successfully retrieved contracts by vendor ID", false, returnList);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return new GetContractsByVendorRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 
