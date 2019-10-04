@@ -114,7 +114,7 @@ public class BudgetService {
             if(createBudgetReq.isBudget()){
                 List<Plan> plansOfCC = cc.getPlans();
                 for (Plan p:plansOfCC){
-                    if (p.getForYear().equals(createBudgetReq.getYear()) && p.getPlanType().equals(BudgetPlanEnum.BUDGET) && (!p.getDeleted() || !p.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.REJECTED))){
+                    if (p.getForYear().equals(createBudgetReq.getYear()) && p.getPlanType().equals(BudgetPlanEnum.BUDGET) && (!p.getDeleted() && !p.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.REJECTED))){
                         throw new Exception("Budget plan for year "+createBudgetReq.getYear()+" of cost center ["+cc.getCode()+"] already exists!");
                     }
                 }
@@ -124,7 +124,7 @@ public class BudgetService {
             else{//reforecast
                 List<Plan> plansOfCC = cc.getPlans();
                 for (Plan p:plansOfCC){
-                    if (p.getForYear().equals(createBudgetReq.getYear()) && p.getPlanType().equals(BudgetPlanEnum.REFORECAST) && (!p.getDeleted() || !p.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.REJECTED))){
+                    if (p.getForYear().equals(createBudgetReq.getYear()) && p.getPlanType().equals(BudgetPlanEnum.REFORECAST) && (!p.getDeleted() && !p.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.REJECTED))){
                         throw new Exception("Reforecast plan for year "+createBudgetReq.getYear()+", month "+p.getForMonth()+" of cost center ["+cc.getCode()+"] already exists!");
                     }
                 }
