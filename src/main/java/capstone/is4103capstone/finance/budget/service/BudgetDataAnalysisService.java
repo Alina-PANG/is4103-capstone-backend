@@ -5,8 +5,11 @@ import capstone.is4103capstone.entities.finance.PlanLineItem;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.budget.model.req.BudgetDataAnalysisReq;
+import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
+import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
 import capstone.is4103capstone.finance.budget.model.res.GetPlanLineItemRes;
 import capstone.is4103capstone.finance.budget.model.res.GetPlanLineItemResNotTested;
+import capstone.is4103capstone.finance.budget.model.res.GetUploadedFileDataRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ExportToFileService;
 import capstone.is4103capstone.general.service.ReadFromFileService;
@@ -32,15 +35,17 @@ public class BudgetDataAnalysisService {
     BudgetLineItemService budgetLineItemService;
     @Autowired
     ReadFromFileService readFromFileService;
+    @Autowired
+    BudgetService budgetService;
 
 
-    private static final String[] cols = {"Merchandise_Code", "Amount", "Currency", "Comment"};
+    private static final String[] cols = {"Category, Sub1, Sub2, Merchandise_Code", "Amount", "Currency", "Comment"};
 
     public GeneralRes readUploadedFile(String filePath){
         try{
             List<List<String>> content = readFromFileService.readFromExcel(filePath);
-            List<PlanLineItem> items = budgetLineItemService.convertListToPlanLineItem(content);
-            return new GetPlanLineItemRes("Successfully Read the File!", false, items);
+            List<BudgetLineItemModel> items = budgetLineItemService.convertListToPlanLineItem(content);
+            return new GetUploadedFileDataRes("Successfully Read the File!", false, items);
         }catch (Exception ex){
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happened when trying to export the file!", true);
@@ -49,9 +54,10 @@ public class BudgetDataAnalysisService {
 
     public GeneralRes readUploadedFile(Path filePath){
         try{
+            logger.info("Reading the Uploaded File...");
             List<List<String>> content = readFromFileService.readFromExcel(filePath.toAbsolutePath().toString());
-            List<PlanLineItem> items = budgetLineItemService.convertListToPlanLineItem(content);
-            return new GetPlanLineItemRes("Successfully Read the File!", false, items);
+            List<BudgetLineItemModel> items = budgetLineItemService.convertListToPlanLineItem(content);
+            return new GetUploadedFileDataRes("Successfully Read the File!", false, items);
         }catch (Exception ex){
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happened when trying to export the file!", true);
@@ -61,6 +67,7 @@ public class BudgetDataAnalysisService {
 
     public Object exportToBudgetFile(String filename, String id){
         try{
+            logger.info("Exporting the Budget File...");
             List<ArrayList<String>> content = retrieveContentFromDb(id);
             return exportToFileService.exportToExcel(filename, cols, content);
         } catch(Exception ex){

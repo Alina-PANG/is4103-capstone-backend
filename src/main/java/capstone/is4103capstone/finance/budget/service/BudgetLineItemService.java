@@ -1,10 +1,11 @@
 package capstone.is4103capstone.finance.budget.service;
 
-import capstone.is4103capstone.entities.finance.Plan;
-import capstone.is4103capstone.entities.finance.PlanLineItem;
+import capstone.is4103capstone.entities.finance.*;
+import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.budget.model.req.ColsToShow;
+import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class BudgetLineItemService {
@@ -24,12 +22,21 @@ public class BudgetLineItemService {
     PlanLineItemRepository planLineItemRepository;
     @Autowired
     PlanRepository planRepository;
+    @Autowired
+    MerchandiseRepository merchandiseRepository;
 
     public List<ArrayList<String>> convertPlanLineItemToList(List<PlanLineItem> planLineItems) throws Exception{
         List<ArrayList<String>> content = new ArrayList<>();
         for(PlanLineItem i: planLineItems){
             ArrayList<String> list = new ArrayList<>();
-            // {"Merchandise_Code", "Amount", "Currency", "Comment"};
+            // {"Category, Sub1, Sub2, Merchandise_Code", "Amount", "Currency", "Comment"};
+            String mcode = i.getMerchandiseCode();
+            Merchandise merchandise = merchandiseRepository.findMerchandiseByCode(mcode);
+            BudgetSub2 budgetSub2 = merchandise.getBudgetSub2();
+            BudgetSub1 budgetSub1 = budgetSub2.getBudgetSub1();
+            list.add(budgetSub1.getBudgetCategory().getObjectName());
+            list.add(budgetSub1.getObjectName());
+            list.add(budgetSub2.getObjectName());
             list.add(i.getMerchandiseCode());
             list.add(i.getBudgetAmount().toString());
             list.add(i.getCurrencyAbbr());
@@ -39,15 +46,27 @@ public class BudgetLineItemService {
         return content;
     }
 
-    public List<PlanLineItem> convertListToPlanLineItem(List<List<String>> content) throws Exception{
-        List<PlanLineItem> list = new ArrayList<>();
+    public List<BudgetLineItemModel> convertListToPlanLineItem(List<List<String>> content) throws Exception{
+        List<BudgetLineItemModel> list = new ArrayList<>();
         for(int i = 1; i < content.size(); i ++){
-            PlanLineItem item = new PlanLineItem();
+            BudgetLineItemModel item = new BudgetLineItemModel();
             List<String> c = content.get(i);
-            item.setMerchandiseCode(c.get(0));
-            item.setBudgetAmount(new BigDecimal(c.get(1)));
-            item.setCurrencyAbbr(c.get(2));
-            item.setComment(c.get(3));
+            Merchandise m = merchandiseRepository.findMerchandiseByCode(c.get(3));
+            BudgetSub2 budgetSub2 = m.getBudgetSub2();
+            BudgetSub1 budgetSub1 = budgetSub2.getBudgetSub1();
+            BudgetCategory budgetCategory = budgetSub1.getBudgetCategory();
+
+            item.setCategoryCode(budgetCategory.getCode());
+            item.setCategoryName(budgetCategory.getObjectName());
+            item.setSub1Code(budgetSub1.getCode());
+            item.setSub1Name(budgetSub1.getObjectName());
+            item.setSub2Code(budgetSub2.getCode());
+            item.setSub2Name(budgetSub2.getObjectName());
+            item.setMerchandiseName(m.getObjectName());
+            item.setMerchandiseCode(c.get(3));
+            item.setAmount(new BigDecimal(c.get(4)));
+            item.setCurrency(c.get(5));
+            item.setComment(c.get(6));
             list.add(item);
         }
         return list;
