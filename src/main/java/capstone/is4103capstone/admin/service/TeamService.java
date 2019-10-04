@@ -1,14 +1,13 @@
 package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.repository.TeamRepository;
-import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.util.exception.TeamNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import capstone.is4103capstone.entities.Team;
+
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,7 +1,5 @@
 package capstone.is4103capstone.supplychain.model.req;
 
-import capstone.is4103capstone.entities.Team;
-import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
