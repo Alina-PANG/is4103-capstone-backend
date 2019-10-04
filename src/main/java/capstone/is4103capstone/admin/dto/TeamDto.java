@@ -5,17 +5,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
 
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL) // don't serialize nulls since there are optional classes
-public class CountryDto implements Serializable {
+public class TeamDto implements Serializable {
 
     private Optional<String> id = Optional.empty();
     private Optional<String> objectName = Optional.empty();
     private Optional<String> code = Optional.empty();
-    private Optional<String> regionId = Optional.empty();
-    private Optional<List<String>> functions = Optional.empty();
+    private Optional<String> companyFunction = Optional.empty();
+    private Optional<String> country = Optional.empty();
 }

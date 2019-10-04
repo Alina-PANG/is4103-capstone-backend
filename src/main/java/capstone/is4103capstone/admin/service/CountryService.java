@@ -3,9 +3,9 @@ package capstone.is4103capstone.admin.service;
 import capstone.is4103capstone.admin.dto.CountryDto;
 import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.admin.repository.RegionRepository;
+import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Region;
-import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,6 +133,13 @@ public class CountryService {
         countryDto.setCode(Optional.of(input.getCode()));
         countryDto.setObjectName(Optional.of(input.getObjectName()));
         if (!Objects.isNull(input.getRegion())) countryDto.setRegionId(Optional.of(input.getRegion().getId()));
+        if (!Objects.isNull(input.getFunctions()) && !input.getFunctions().isEmpty()) {
+            List<String> functionIds = new ArrayList<>();
+            for (CompanyFunction function : input.getFunctions()) {
+                functionIds.add(function.getId());
+            }
+            countryDto.setFunctions(Optional.of(functionIds));
+        }
         return countryDto;
     }
 
