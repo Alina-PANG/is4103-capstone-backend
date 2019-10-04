@@ -50,6 +50,8 @@ public class CountryService {
     public Country getCountryEntityByUuid(String uuid) throws Exception {
         try {
             Country result = countryRepository.findById(uuid).get();
+            result.getFunctions().size();
+            List<CompanyFunction> fs = result.getFunctions();
             return result;
         } catch (NoSuchElementException ex) {
             throw new Exception("No country with UUID " + uuid + " found in the database.");

@@ -32,6 +32,7 @@ public class AdminInitialization {
 
     @PostConstruct
     public void init() {
+
         List<Currency> currencyList = currencyRepository.findAll();
         if (currencyList == null || currencyList.size() == 0) {
             createCurrency();

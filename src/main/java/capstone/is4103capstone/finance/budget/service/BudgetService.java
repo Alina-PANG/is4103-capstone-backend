@@ -199,9 +199,9 @@ public class BudgetService {
 
             plan.setItems(items);
 
-            List<ApprovalTicketModel> reviews = ApprovalTicketService.getAllTicketsByRequestedItem(p);
+            List<ApprovalTicketModel> reviews = ApprovalTicketService.getAllNonPendingTicketsByRequestItem(p);
 
-            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover,reviews.get(0));
+            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover,reviews.isEmpty()? null : reviews.get(0));
         } catch(Exception ex){
             ex.printStackTrace();
             return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);

@@ -9,22 +9,22 @@ import javax.persistence.Entity;
 public class Currency extends DBEntityTemplate {
 
 
-    private String currencyCode;
+    private String countryCode;
 
 
     public Currency() {
     }
 
-    public Currency(String currencyName, String currencyCode) {
-        super(currencyName, currencyCode);
-        this.currencyCode = currencyCode;
+    public Currency(String currencyName, String countryCode) {
+        super(currencyName, countryCode);
+        this.countryCode = countryCode;
     }
 
-    public String getCurrencyCode() {
-        return currencyCode;
+    public String getCountryCode() {
+        return countryCode;
     }
 
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 }

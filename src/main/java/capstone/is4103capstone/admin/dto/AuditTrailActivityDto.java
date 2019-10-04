@@ -13,8 +13,17 @@ public class AuditTrailActivityDto implements Serializable {
 
     private Optional<Integer> id = Optional.empty();
     private Optional<String> userUuid = Optional.empty();
+    private Optional<String> username = Optional.empty();
     private Optional<String> activity = Optional.empty();
     private Optional<String> timeStamp = Optional.empty();
+
+    public Optional<String> getUsername() {
+        return username;
+    }
+
+    public void setUsername(Optional<String> username) {
+        this.username = username;
+    }
 
     public Optional<Integer> getId() {
         return id;

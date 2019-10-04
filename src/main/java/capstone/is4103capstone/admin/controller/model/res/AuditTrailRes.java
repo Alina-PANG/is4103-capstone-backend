@@ -1,6 +1,7 @@
 package capstone.is4103capstone.admin.controller.model.res;
 
 import capstone.is4103capstone.admin.dto.AuditTrailActivityDto;
+import capstone.is4103capstone.admin.model.AuditTrailModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class AuditTrailRes extends GeneralRes {
 
     public Integer totalRecords;
     private Optional<List<AuditTrailActivityDto>> results;
-
+    private List<AuditTrailModel> trails;
     public AuditTrailRes() {
     }
 
@@ -26,5 +27,14 @@ public class AuditTrailRes extends GeneralRes {
         results.ifPresent(obj -> {
             totalRecords = obj.size();
         });
+    }
+
+    public AuditTrailRes(String message, Boolean hasError, List<AuditTrailModel> trails) {
+        super(message, hasError);
+        this.trails = trails;
+    }
+
+    public AuditTrailRes(String message, Boolean hasError) {
+        super(message, hasError);
     }
 }

@@ -1,6 +1,7 @@
 package capstone.is4103capstone.general.service;
 
 import capstone.is4103capstone.admin.service.AuditTrailActivityService;
+import capstone.is4103capstone.configuration.DBEntityTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class WriteAuditTrail {
             logger.error("Audit function error, username given from the internal controller is not correct. ");
         }
     }
+
+
     public static void autoAuditRecordByUserId(String uuid){
         try {
             audit.createNewRecordUsingUserUuid(AUTO_DETECT_FLAG,uuid);

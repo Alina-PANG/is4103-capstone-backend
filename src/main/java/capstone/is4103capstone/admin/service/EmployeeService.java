@@ -39,8 +39,13 @@ public class EmployeeService {
 
     // ===== CRUD METHODS =====
     // === CREATE ===
+    @Transactional
     public Employee createNewEmployeeEntity(Employee input) {
-        return employeeRepository.save(input);
+        Employee newE = employeeRepository.save(input);
+        newE = employeeRepository.findEmployeeById(newE.getId());
+        newE.setCode("EMP-"+newE.getSeqNo());
+        employeeRepository.save(newE);
+        return newE;
     }
 
     public EmployeeDto createNewEmployee(EmployeeDto input) {
@@ -101,6 +106,7 @@ public class EmployeeService {
         working.setMiddleName(input.getMiddleName());
         working.setLastName(input.getLastName());
         working.setUserName(input.getUserName());
+        working.setEmail(input.getEmail());
         return working;
     }
 
@@ -114,6 +120,7 @@ public class EmployeeService {
         input.getLastName().ifPresent(working::setLastName);
         input.getUserName().ifPresent(working::setUserName);
         input.getPassword().ifPresent(working::setPassword);
+        input.getEmail().ifPresent(working::setEmail);
         return entityToDto(working);
     }
 
@@ -137,6 +144,7 @@ public class EmployeeService {
         employeeDto.setLastName(Optional.of(input.getLastName()));
         employeeDto.setUserName(Optional.of(input.getUserName()));
         employeeDto.setSecurityId(Optional.of(input.getSecurityId()));
+        employeeDto.setEmail(Optional.of(input.getEmail()));
         return employeeDto;
     }
 
@@ -160,7 +168,8 @@ public class EmployeeService {
         input.getLastName().ifPresent(name -> employee.setLastName(name));
         input.getUserName().ifPresent(name -> employee.setUserName(name));
         input.getPassword().ifPresent(employee::setPassword);
-        employee.setCode("EMP-" + input.getUserName());
+        input.getEmail().ifPresent(employee::setEmail);
+//        employee.setCode("EMP-" + input.getUserName());
         return employee;
     }
 
@@ -170,6 +179,11 @@ public class EmployeeService {
             employees.add(dtoToEntity(employeeDto));
         }
         return employees;
+    }
+
+    public String getUsernameByUuid(String uuid){
+        Employee e = employeeRepository.findEmployeeById(uuid);
+        return e == null? null :e.getUserName();
     }
 
 }
