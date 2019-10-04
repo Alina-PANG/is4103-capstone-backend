@@ -94,6 +94,9 @@ public class BudgetService {
         logger.info("Item Size: "+createBudgetReq.getItems().size());
         try{
             int version = 1;
+            CostCenter cc = costCenterRepository.findCostCenterByCode(createBudgetReq.getCostCenterCode());
+
+
             if(id != null){
                 Plan existingPlan = planRepository.getOne(id);
                 existingPlan.setDeleted(true);
@@ -109,17 +112,30 @@ public class BudgetService {
                 newPlan.setBudgetPlanStatus(BudgetPlanStatusEnum.DRAFT);
             }
             if(createBudgetReq.isBudget()){
+                List<Plan> plansOfCC = cc.getPlans();
+                for (Plan p:plansOfCC){
+                    if (p.getForYear().equals(createBudgetReq.getYear()) && p.getPlanType().equals(BudgetPlanEnum.BUDGET) && (!p.getDeleted() || !p.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.REJECTED))){
+                        throw new Exception("Budget plan for year "+createBudgetReq.getYear()+" of cost center ["+cc.getCode()+"] already exists!");
+                    }
+                }
                 newPlan.setPlanType(BudgetPlanEnum.BUDGET);
                 newPlan.setObjectName(createBudgetReq.getYear()+"-BUDGET");
             }
-            else{
-                newPlan.setPlanType(BudgetPlanEnum.REFORECAST);
-                if (createBudgetReq.getMonth() == null){
-                    throw new Exception("You must select the month of reforecast!");
+            else{//reforecast
+                List<Plan> plansOfCC = cc.getPlans();
+                for (Plan p:plansOfCC){
+                    if (p.getForYear().equals(createBudgetReq.getYear()) && p.getPlanType().equals(BudgetPlanEnum.REFORECAST) && (!p.getDeleted() || !p.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.REJECTED))){
+                        throw new Exception("Reforecast plan for year "+createBudgetReq.getYear()+", month "+p.getForMonth()+" of cost center ["+cc.getCode()+"] already exists!");
+                    }
                 }
-                newPlan.setObjectName(createBudgetReq.getYear()+"-"+createBudgetReq.getMonth()+"-REFORECAST");
+                newPlan.setPlanType(BudgetPlanEnum.REFORECAST);
+//                if (createBudgetReq.getMonth() == null){
+//                    throw new Exception("You must select the month of reforecast!");
+//                }
+                createBudgetReq.setMonth((new Date()).getMonth()+1);
+                newPlan.setObjectName(createBudgetReq.getYear()+"-"+new SimpleDateFormat("MMM").format(new Date())+"-REFORECAST");
             }
-            CostCenter cc = costCenterRepository.findCostCenterByCode(createBudgetReq.getCostCenterCode());
+
 
             newPlan.setCostCenter(cc);
             newPlan.setPlanDescription(createBudgetReq.getDescription());
@@ -201,7 +217,7 @@ public class BudgetService {
 
             List<ApprovalTicketModel> reviews = ApprovalTicketService.getAllNonPendingTicketsByRequestItem(p);
 
-            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover,reviews.isEmpty()? null : reviews.get(0));
+            return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover,reviews.isEmpty()? null : reviews.get(reviews.size()-1));
         } catch(Exception ex){
             ex.printStackTrace();
             return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
@@ -224,9 +240,9 @@ public class BudgetService {
 
                     BudgetModel thisPlan = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), p.getId(), p.getBudgetPlanStatus(), p.getPlanType());
                     thisPlan.setCostCenterCode(c.getCode());
-//                    thisPlan.setTeamCode(c.getTeam().getCode());
-//                    thisPlan.setFunctionCode(c.getTeam().getFunction().getCode());
-//                    thisPlan.setCountryCode(c.getTeam().getCountry().getCode());
+//                  thisPlan.setTeamCode(c.getTeam().getCode());
+//                  thisPlan.setFunctionCode(c.getTeam().getFunction().getCode());
+//                  thisPlan.setCountryCode(c.getTeam().getCountry().getCode());
                     thisPlan.setCreateBy(p.getCreatedBy());
                     thisPlan.setLastModifiedTime(datetimeFormatter.format(p.getLastModifiedDateTime() == null ? p.getCreatedDateTime() : p.getLastModifiedDateTime()));
                     result.add(thisPlan);
@@ -308,8 +324,7 @@ public class BudgetService {
         else{
             plan.setBudgetPlanStatus(BudgetPlanStatusEnum.PENDING_FUNCTION_APPROVAL);
             ApprovalTicketService.approveTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
-            createApprovalTicket(approveBudgetReq.getUsername(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.");
-
+            createApprovalTicket(plan.getCreatedBy(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.");
         }
 
         planRepository.saveAndFlush(plan);
@@ -325,6 +340,7 @@ public class BudgetService {
         else{
             plan.setBudgetPlanStatus(BudgetPlanStatusEnum.APPROVED);
             ApprovalTicketService.approveTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
+
         }
 
         planRepository.saveAndFlush(plan);
@@ -375,8 +391,6 @@ public class BudgetService {
         else a[1] = false;
 
         return a;
-
-
     }
 
 
