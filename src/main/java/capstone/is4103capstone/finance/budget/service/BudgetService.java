@@ -286,6 +286,9 @@ public class BudgetService {
                 logger.error("Internal error, a non-pending budget plan goes into approve function");
                 throw new Exception("Internal error, a non-pending budget plan goes into approve function");
             }
+
+
+
             if (approveBudgetReq.getApprovalType() == 0) { //0:bm
                 return BMApproval(approveBudgetReq, plan);
             } else {

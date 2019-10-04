@@ -119,6 +119,7 @@ public class OfficeService {
         officeDto.setPostalCode(Optional.of(input.getAddress().getPostalCode()));
         officeDto.setCountryCode(Optional.of(input.getAddress().getCountryCode()));
         officeDto.setCountryId(Optional.of(input.getCountry().getId()));
+        officeDto.setFloors(Optional.of(input.getFloors()));
         return officeDto;
     }
 

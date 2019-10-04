@@ -19,6 +19,7 @@ public class Office extends DBEntityTemplate {
     private Address address;
 
     private Integer numOfFloors;
+
     @ElementCollection(targetClass= String.class)
     private List<String> floors = new ArrayList<>();
 
