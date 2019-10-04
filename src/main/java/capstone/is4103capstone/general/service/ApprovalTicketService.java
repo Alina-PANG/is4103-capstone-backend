@@ -213,6 +213,9 @@ public class ApprovalTicketService {
         map.put("ticket_code", ticket.getCode());
         map.put("request_item_id", ticket.getRequestedItemId());
         map.put("created_datetime", ticket.getCreatedDateTime());
+
+        map.put("url", "http://localhost:3000/ticket/id/"+ticket.getId());
+
         Mail mail = new Mail(senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
         mailSenderService.sendEmail(mail, "approveBudgetMailTemplate");
     }
