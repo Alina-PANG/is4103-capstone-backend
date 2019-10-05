@@ -54,7 +54,7 @@ public class Sub2Service {
                 throw new Exception("Sub2 category with name '"+request.getName()+"' already exists in the sub1 category");
             }
 
-            BudgetSub2 sub2 = new BudgetSub2(request.getName());
+            BudgetSub2 sub2 = new BudgetSub2(request.getName().trim());
             sub2.setCreatedBy(request.getUsername());
             sub2.setLastModifiedBy(request.getUsername());
             EntityCodeHPGeneration.setHP(sub1,sub2);
@@ -88,7 +88,7 @@ public class Sub2Service {
 
 
 
-            sub2ToUpdate.setObjectName(updateCategoryReq.getNewName());
+            sub2ToUpdate.setObjectName(updateCategoryReq.getNewName().trim());
             sub2ToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
             EntityCodeHPGeneration.setHP(sub2ToUpdate.getBudgetSub1(),sub2ToUpdate);
 
@@ -162,7 +162,7 @@ public class Sub2Service {
     }
 
     private boolean hasRepeatName(String name, String sub1Id){
-        Integer numOfThisName = sub2Repository.countByNameAndSub1(sub1Id,name);
+        Integer numOfThisName = sub2Repository.countByNameAndSub1(sub1Id,name.trim());
         if (numOfThisName > 0){
             return true;
         }
