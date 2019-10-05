@@ -52,6 +52,15 @@ public class BudgetLineItemService {
             BudgetLineItemModel item = new BudgetLineItemModel();
             List<String> c = content.get(i);
             Merchandise m = merchandiseRepository.findMerchandiseByCode(c.get(3));
+            if (m == null || m.getDeleted())
+                throw new Exception("Merchandise Code given at line["+i+"] is not valid.");
+
+            //TODO: use JPA projection -> for faster processing.
+            /*
+            select cat.code,sub1.code, sub2.code,m.code from merchandise m join budget_sub2 sub2 join budget_sub1 sub1
+                join budget_category cat
+                on m.budget_sub2_id = sub2.id and sub1.id = sub2.budget_sub1_id  and cat.id=sub1.budget_category_id;
+             */
             BudgetSub2 budgetSub2 = m.getBudgetSub2();
             BudgetSub1 budgetSub1 = budgetSub2.getBudgetSub1();
             BudgetCategory budgetCategory = budgetSub1.getBudgetCategory();
