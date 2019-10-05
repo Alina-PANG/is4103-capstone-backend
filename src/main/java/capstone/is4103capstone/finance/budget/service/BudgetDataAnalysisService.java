@@ -48,7 +48,7 @@ public class BudgetDataAnalysisService {
             return new GetUploadedFileDataRes("Successfully Read the File!", false, items);
         }catch (Exception ex){
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happened when trying to export the file!", true);
+            return new GeneralRes("Error happened when trying to export the file! " + ex.getMessage(), true);
         }
     }
 
@@ -60,7 +60,7 @@ public class BudgetDataAnalysisService {
             return new GetUploadedFileDataRes("Successfully Read the File!", false, items);
         }catch (Exception ex){
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happened when trying to export the file!", true);
+            return new GeneralRes("Error happened when trying to export the file! "+ex.getMessage(), true);
         }
     }
 

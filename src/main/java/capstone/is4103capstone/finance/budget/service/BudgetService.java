@@ -34,10 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.GenerationType;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class BudgetService {
@@ -79,7 +76,6 @@ public class BudgetService {
         return newItems;
     }
 
-
     private void deletePlanItem(List<PlanLineItem> items) throws Exception{
         for(PlanLineItem i: items){
             i.setDeleted(true);
@@ -94,6 +90,8 @@ public class BudgetService {
         logger.info("Item Size: "+createBudgetReq.getItems().size());
         try{
             int version = 1;
+            if (!isValidPlan(createBudgetReq.getItems()))
+                throw new Exception("Submitted budget plan not valid, duplicate merchandise fields!");
             CostCenter cc = costCenterRepository.findCostCenterByCode(createBudgetReq.getCostCenterCode());
 
 
@@ -146,8 +144,8 @@ public class BudgetService {
 
             newPlan = planRepository.saveAndFlush(newPlan);
             if(createBudgetReq.getItems() != null && createBudgetReq.getItems().size() != 0){
-                List<PlanLineItem> newItems = saveLineItem(createBudgetReq.getItems(), newPlan);
-                newPlan.setLineItems(newItems);
+                    List<PlanLineItem> newItems = saveLineItem(createBudgetReq.getItems(), newPlan);
+                    newPlan.setLineItems(newItems);
             }
 
 
@@ -170,7 +168,7 @@ public class BudgetService {
             return new GeneralRes("Successully "+(createBudgetReq.getToSubmit()?"submit":"save")+" the plan!", false);
         }catch (Exception ex){
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+            return new GeneralRes(ex.getMessage(), true);
         }
     }
 
@@ -220,7 +218,7 @@ public class BudgetService {
             return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover,reviews.isEmpty()? null : reviews.get(reviews.size()-1));
         } catch(Exception ex){
             ex.printStackTrace();
-            return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetBudgetRes(ex.getMessage(), true, null);
         }
     }
 
@@ -253,7 +251,7 @@ public class BudgetService {
             return new GetBudgetListRes("Successsfully retrieved plans under the cost center!",false, result);
 
         }catch (Exception ex){
-            return new GetBudgetListRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetBudgetListRes(ex.getMessage(), true, null);
 
         }
 //
@@ -313,9 +311,24 @@ public class BudgetService {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
+            return new GeneralRes( ex.getMessage(), true);
         }
     }
+
+    //validate the plan items submitted by the user, whether there're any repeatative;
+    private boolean isValidPlan(List<PlanLineItem> items){
+        Set<String> submittedMerchandiseCodes = new HashSet<String>();
+        for (PlanLineItem item: items){
+            if (item.getCode() == null){
+                return false;
+            }
+            if (!submittedMerchandiseCodes.add(item.getCode()))
+                return false;
+        }
+        return true;
+    }
+
+
     private GeneralRes BMApproval(ApproveBudgetReq approveBudgetReq, Plan plan) throws Exception{
         if (!approveBudgetReq.getApproved()){
             plan.setBudgetPlanStatus(BudgetPlanStatusEnum.REJECTED);
@@ -324,7 +337,7 @@ public class BudgetService {
         else{
             plan.setBudgetPlanStatus(BudgetPlanStatusEnum.PENDING_FUNCTION_APPROVAL);
             ApprovalTicketService.approveTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
-            createApprovalTicket(plan.getCreatedBy(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.");
+            createApprovalTicket(approveBudgetReq.getUsername(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.");
         }
 
         planRepository.saveAndFlush(plan);

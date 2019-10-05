@@ -21,6 +21,9 @@ public class ReadFromFileService {
                 String line;
                 while ((line = br.readLine()) != null) {
                     String[] values = line.split(",");
+                    for (int i=0;i<values.length;i++){
+                        values[i] = values[i].trim();
+                    }
                     records.add(Arrays.asList(values));
                 }
             }
