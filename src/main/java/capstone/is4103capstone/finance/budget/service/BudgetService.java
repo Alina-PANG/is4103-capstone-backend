@@ -168,7 +168,7 @@ public class BudgetService {
             return new GeneralRes("Successully "+(createBudgetReq.getToSubmit()?"submit":"save")+" the plan!", false);
         }catch (Exception ex){
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+            return new GeneralRes(ex.getMessage(), true);
         }
     }
 
@@ -218,7 +218,7 @@ public class BudgetService {
             return new GetBudgetRes("Successsfully retrieved the plan with id: "+id,false, plan,bmApprover,functionApprover,reviews.isEmpty()? null : reviews.get(reviews.size()-1));
         } catch(Exception ex){
             ex.printStackTrace();
-            return new GetBudgetRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetBudgetRes(ex.getMessage(), true, null);
         }
     }
 
@@ -251,7 +251,7 @@ public class BudgetService {
             return new GetBudgetListRes("Successsfully retrieved plans under the cost center!",false, result);
 
         }catch (Exception ex){
-            return new GetBudgetListRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetBudgetListRes(ex.getMessage(), true, null);
 
         }
 //
@@ -311,7 +311,7 @@ public class BudgetService {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
+            return new GeneralRes( ex.getMessage(), true);
         }
     }
 
