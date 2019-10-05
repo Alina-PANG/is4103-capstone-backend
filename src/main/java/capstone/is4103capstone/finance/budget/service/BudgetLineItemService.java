@@ -75,7 +75,8 @@ public class BudgetLineItemService {
             item.setMerchandiseCode(c.get(3));
             item.setAmount(new BigDecimal(c.get(4)));
             item.setCurrency(c.get(5));
-            item.setComment(c.get(6));
+            if(c.size() >= 7)
+                item.setComment(c.get(6));
             list.add(item);
         }
         return list;
