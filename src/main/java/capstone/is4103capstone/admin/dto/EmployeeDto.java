@@ -7,8 +7,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Optional;
 
-@Getter
-@Setter
+
 @JsonInclude(JsonInclude.Include.NON_NULL) // don't serialize nulls since there are optional classes
 public class EmployeeDto implements Serializable {
 
@@ -21,6 +20,7 @@ public class EmployeeDto implements Serializable {
     private Optional<String> securityId = Optional.empty();
     private Optional<String> password = Optional.empty();
     private Optional<String> email = Optional.empty();
+
 
     public Optional<String> getId() {
         return id;

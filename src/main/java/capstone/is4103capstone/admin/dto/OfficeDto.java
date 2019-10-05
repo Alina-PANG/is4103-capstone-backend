@@ -8,8 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-@Getter
-@Setter
+
 @JsonInclude(JsonInclude.Include.NON_NULL) // don't serialize nulls since there are optional classes
 public class OfficeDto implements Serializable {
 
@@ -23,6 +22,7 @@ public class OfficeDto implements Serializable {
     private Optional<String> countryCode = Optional.empty();
     private Optional<String> countryId = Optional.empty();
     private Optional<List<String>> floors = Optional.empty();
+
 
     public Optional<String> getId() {
         return id;
