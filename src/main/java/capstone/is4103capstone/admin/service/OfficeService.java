@@ -127,7 +127,9 @@ public class OfficeService {
         List<OfficeDto> officeDtos = new ArrayList<>();
         for (Office office : offices) {
             if (suppressDeleted) {
-                if (!office.getDeleted()) officeDtos.add(entityToDto(office));
+                if (!office.getDeleted()) {
+                    officeDtos.add(entityToDto(office));
+                }
             } else {
                 officeDtos.add(entityToDto(office));
             }

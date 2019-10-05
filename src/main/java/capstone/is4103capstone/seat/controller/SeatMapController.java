@@ -1,6 +1,7 @@
 package capstone.is4103capstone.seat.controller;
 
 import capstone.is4103capstone.admin.repository.OfficeRepository;
+import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatMap;
@@ -58,9 +59,9 @@ public class SeatMapController {
     public ResponseEntity getSeatMapById(@PathVariable String id) {
         SeatMap seatMap = seatMapService.getSeatMapById(id);
         Office office = seatMap.getOffice();
-        String country = office.getCountry().getObjectName();
+        Country country = office.getCountry();
         String region = office.getCountry().getRegion().getObjectName();
-        SeatMapModel response = new SeatMapModel(seatMap.getId(), region, country, office.getObjectName(), seatMap.getFloor(), new ArrayList<>());
+        SeatMapModel response = new SeatMapModel(seatMap.getId(), region, country.getObjectName(), country.getId(), office.getObjectName(), seatMap.getFloor(), new ArrayList<>());
 
         for (Seat seat:
                 seatMap.getSeats()) {
@@ -81,9 +82,9 @@ public class SeatMapController {
         for (SeatMap seatMap :
                 seatmaps) {
             Office office = seatMap.getOffice();
-            String country = office.getCountry().getObjectName();
+            Country country = office.getCountry();
             String region = office.getCountry().getRegion().getObjectName();
-            SeatMapModel seatMapModel = new SeatMapModel(seatMap.getId(), region, country, office.getObjectName(), seatMap.getFloor(), new ArrayList<>());
+            SeatMapModel seatMapModel = new SeatMapModel(seatMap.getId(), region, country.getObjectName(), country.getId(), office.getObjectName(), seatMap.getFloor(), new ArrayList<>());
 
             for (Seat seat:
                     seatMap.getSeats()) {
