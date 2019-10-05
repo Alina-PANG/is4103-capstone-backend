@@ -73,9 +73,9 @@ public class SeatAllocationService {
 
     // Pre-conditions:
     // 1. A seat can only be deallocated from a function when it is not assigned to a team / does not have any active employee allocation.
-    public void deallocateSeatsFromFunction(List<String> seatIds) throws SeatAllocationException {
+    public void deallocateSeatsFromFunction(BulkDeallocationModel bulkDeallocationModel) throws SeatAllocationException {
 
-        List<Seat> seats = validateSeatsInformationForDeallocation(seatIds, true);
+        List<Seat> seats = validateSeatsInformationForDeallocation(bulkDeallocationModel.getSeatIds(), true);
 
         for (Seat seat :
                 seats) {
@@ -102,9 +102,9 @@ public class SeatAllocationService {
 
     // Pre-conditions:
     // 1. A seat can only be deallocated from a team when it does not have any active employee allocation.
-    public void deallocateSeatsFromTeam(List<String> seatIds) throws SeatAllocationException {
+    public void deallocateSeatsFromTeam(BulkDeallocationModel bulkDeallocationModel) throws SeatAllocationException {
 
-        List<Seat> seats = validateSeatsInformationForDeallocation(seatIds, false);
+        List<Seat> seats = validateSeatsInformationForDeallocation(bulkDeallocationModel.getSeatIds(), false);
 
         for (Seat seat :
                 seats) {

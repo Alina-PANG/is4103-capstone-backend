@@ -201,14 +201,14 @@ public class SeatAllocationController {
     // ---------------------------------- DELETE: Delete ----------------------------------
 
     @DeleteMapping("/function")
-    public ResponseEntity deallocateSeatsFromFunction(@RequestBody List<String> seatIds) {
-        seatAllocationService.deallocateSeatsFromFunction(seatIds);
+    public ResponseEntity deallocateSeatsFromFunction(@RequestBody BulkDeallocationModel bulkDeallocationModel) {
+        seatAllocationService.deallocateSeatsFromFunction(bulkDeallocationModel);
         return ResponseEntity.ok("Deallocated seats from the function successfully");
     }
 
     @DeleteMapping("/team")
-    public ResponseEntity deallocateSeatsFromTeam(@RequestBody List<String> seatIds) {
-        seatAllocationService.deallocateSeatsFromTeam(seatIds);
+    public ResponseEntity deallocateSeatsFromTeam(@RequestBody BulkDeallocationModel bulkDeallocationModel) {
+        seatAllocationService.deallocateSeatsFromTeam(bulkDeallocationModel);
         return ResponseEntity.ok("Deallocated seats from the team successfully");
     }
 
