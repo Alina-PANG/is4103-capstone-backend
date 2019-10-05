@@ -319,10 +319,10 @@ public class BudgetService {
     private boolean isValidPlan(List<PlanLineItem> items){
         Set<String> submittedMerchandiseCodes = new HashSet<String>();
         for (PlanLineItem item: items){
-            if (item.getCode() == null){
+            if (item.getMerchandiseCode() == null){
                 return false;
             }
-            if (!submittedMerchandiseCodes.add(item.getCode()))
+            if (!submittedMerchandiseCodes.add(item.getMerchandiseCode()))
                 return false;
         }
         return true;

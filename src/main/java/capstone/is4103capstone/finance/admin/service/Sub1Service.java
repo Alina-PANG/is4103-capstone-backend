@@ -57,7 +57,7 @@ public class Sub1Service {
             }
 
 
-            BudgetSub1 sub1 = new BudgetSub1(request.getName());
+            BudgetSub1 sub1 = new BudgetSub1(request.getName().trim());
             sub1.setCreatedBy(request.getUsername());
             sub1.setLastModifiedBy(request.getUsername());
             EntityCodeHPGeneration.setHP(cat,sub1);
@@ -81,12 +81,12 @@ public class Sub1Service {
             if (sub1ToUpdate == null || sub1ToUpdate.getDeleted()){
                 throw new Exception("Wrong sub1 budget category code!");
             }
-            boolean hasRepeatedName = checkWhetherSub1NameAlreadyExist(updateCategoryReq.getNewName(),sub1ToUpdate.getBudgetCategory().getId());
+            boolean hasRepeatedName = checkWhetherSub1NameAlreadyExist(updateCategoryReq.getNewName().trim(),sub1ToUpdate.getBudgetCategory().getId());
             if (hasRepeatedName){
                 throw new Exception("Sub1 category '"+updateCategoryReq.getNewName()+"' already exits under CAT["+sub1ToUpdate.getBudgetCategory().getObjectName()+"]");
             }
 
-            sub1ToUpdate.setObjectName(updateCategoryReq.getNewName());
+            sub1ToUpdate.setObjectName(updateCategoryReq.getNewName().trim());
             sub1ToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
 
             EntityCodeHPGeneration.setHP(sub1ToUpdate.getBudgetCategory(),sub1ToUpdate);
@@ -165,7 +165,7 @@ public class Sub1Service {
     }
 
     private boolean checkWhetherSub1NameAlreadyExist(String name, String catId){
-        Integer numOfThisName = sub1Repository.countBudgetSub1NameByCategoryId(catId,name);
+        Integer numOfThisName = sub1Repository.countBudgetSub1NameByCategoryId(catId,name.trim());
         if (numOfThisName > 0){
             return true;
         }

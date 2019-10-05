@@ -54,10 +54,10 @@ public class CategoryService {
             if (country == null || country.getDeleted()) {
                 return new BudgetCategoryRes("Country Code does not exist!", true, null);
             }
-            if (hasRepeatName(categoryRequest.getCategoryName(),country.getId())){
+            if (hasRepeatName(categoryRequest.getCategoryName().trim(),country.getId())){
                 throw new Exception("Repeated category name under country["+country.getObjectName()+"]!");
             }
-            BudgetCategory newCat = new BudgetCategory(categoryRequest.getCategoryName());
+            BudgetCategory newCat = new BudgetCategory(categoryRequest.getCategoryName().trim());
             newCat.setCreatedBy(categoryRequest.getUsername());
             EntityCodeHPGeneration.setHP(country,newCat);
 
@@ -83,12 +83,12 @@ public class CategoryService {
                 throw new Exception("Wrong budget category code!");
             }
 
-            if (hasRepeatName(updateCategoryReq.getNewName(),catToUpdate.getCountry().getId())){
+            if (hasRepeatName(updateCategoryReq.getNewName().trim(),catToUpdate.getCountry().getId())){
                 throw new Exception("Repeated category name under country["+catToUpdate.getCountry().getObjectName()+"]!");
             }
 
 
-            catToUpdate.setObjectName(updateCategoryReq.getNewName());
+            catToUpdate.setObjectName(updateCategoryReq.getNewName().trim());
             catToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
             EntityCodeHPGeneration.setHP(catToUpdate.getCountry(),catToUpdate);
             catToUpdate.setLastModifiedBy(updateCategoryReq.getUsername());
@@ -230,7 +230,7 @@ public class CategoryService {
 
 
     private boolean hasRepeatName(String name, String countryId){
-        Integer numOfThisName = budgetCategoryRepository.countCategoryNameByCountryId(countryId,name);
+        Integer numOfThisName = budgetCategoryRepository.countCategoryNameByCountryId(countryId,name.trim());
         if (numOfThisName > 0){
             return true;
         }
