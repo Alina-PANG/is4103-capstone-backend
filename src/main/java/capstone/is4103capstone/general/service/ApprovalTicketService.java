@@ -1,5 +1,6 @@
 package capstone.is4103capstone.general.service;
 
+import capstone.is4103capstone.admin.model.TicketDetailsModel;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.ApprovalForRequest;
@@ -10,12 +11,15 @@ import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.model.Mail;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,13 +34,14 @@ public class ApprovalTicketService {
     @Autowired
     ApprovalForRequestRepository _approvalForRequestRepository;
     @Autowired
-    private MailSenderService mailSenderService;
+    private MailSenderService _mailSenderService;
 
     @Value("${spring.mail.username}")
-    private String senderEmailAddr;
+    private static String senderEmailAddr;
 
     static  EmployeeRepository employeeRepo;
     static ApprovalForRequestRepository approvalForRequestRepo;
+    static MailSenderService mailSenderService;
 
     @Autowired
     public void setEmployeeRepo(EmployeeRepository repo){
@@ -46,6 +51,42 @@ public class ApprovalTicketService {
     public void setApprovalRepo(ApprovalForRequestRepository repo){
         ApprovalTicketService.approvalForRequestRepo = repo;
     }
+    @Autowired
+    public void setMailSenderService(MailSenderService service){
+        ApprovalTicketService.mailSenderService = service;
+    }
+
+    private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    public JSONObject getTicketById(String ticketId, String requesterUsername){
+        JSONObject res = new JSONObject();
+        try{
+
+            Optional<ApprovalForRequest> ticketOp = _approvalForRequestRepository.findById(ticketId);
+            if (!ticketOp.isPresent())
+                throw new Exception("Ticket with id ["+ticketId+"] not found.");
+
+            ApprovalForRequest ticket = ticketOp.get();
+            TicketDetailsModel model = new TicketDetailsModel(ticketId,ticket.getRequester().getUserName(),ticket.getRequester().getEmail(),ticket.getCommentByRequester(),ticket.getCommentByApprover(),ticket.getApprover().getUserName(),ticket.getApprover().getEmail());                    ;
+            model.setCreatedDateTime(datetimeFormatter.format(ticket.getCreatedDateTime()));
+            model.setReviewDateTime(datetimeFormatter.format(ticket.getLastModifiedDateTime()));
+            model.setApprovalStatus(ticket.getApprovalStatus().name());
+            JSONObject requestItem = new JSONObject();
+            requestItem.put("id",ticket.getRequestedItemId());
+            requestItem.put("itemType",ticket.getApprovalType());//need to change to the entity object name; for generalization purpose
+            model.setRequestedItem(requestItem);
+            res.put("ticketDetails",new JSONObject(model));
+            res.put("hasError",false);
+            res.put("message","Retrieved ticket.");
+        }catch (Exception e){
+            res.put("hasError",true);
+            res.put("message",e.getMessage());
+        }
+        return res;
+
+    }
+
+
 
     public static boolean createTicketAndSendEmail(String requesterUsername, String approverUsername, DBEntityTemplate requestedItem, String content,ApprovalTypeEnum approvalType){
         try{
@@ -80,7 +121,7 @@ public class ApprovalTicketService {
             approvalForRequestRepo.save(ticket);
             requester.getMyRequestTickets().add(ticket.getId());
             receiver.getMyApprovals().add(ticket.getId());
-//            sendEmail(ticket);
+            sendEmail(ticket);
         }catch (Exception e){
             return false;
         }
@@ -165,7 +206,7 @@ public class ApprovalTicketService {
 
 
 
-    public void sendEmail(ApprovalForRequest ticket){
+    public static void sendEmail(ApprovalForRequest ticket){
         String subject = "Request for Approval: "+ ticket.getCode();
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("requestor_username", ticket.getRequester().getUserName());
@@ -178,7 +219,9 @@ public class ApprovalTicketService {
         map.put("request_item_id", ticket.getRequestedItemId());
         map.put("created_datetime", ticket.getCreatedDateTime());
 
-        Mail mail = new Mail(senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
+        map.put("url", "http://localhost:3000/ticket/id/"+ticket.getId());
+
+        Mail mail = new Mail(senderEmailAddr == null? "is4103.capstone@gmail.com":senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
         mailSenderService.sendEmail(mail, "approveBudgetMailTemplate");
     }
 }

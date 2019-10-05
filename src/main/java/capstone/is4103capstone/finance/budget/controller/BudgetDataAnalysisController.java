@@ -72,7 +72,7 @@ public class BudgetDataAnalysisController {
         // return IOUtils.toByteArray(in);
         if(in instanceof ByteArrayInputStream){
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename="+filename+".xlsx");
+            headers.add("Content-Disposition", "attachment; filename="+filename+".csv");
 
             return ResponseEntity
                     .ok()
