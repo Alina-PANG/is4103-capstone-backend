@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-//Merchandise must have vendor, may not have contract.
-//I can just create the "Headset"-"Sony"
-//so it just connect sub2 with vendor?
 @Service
 public class MerchandiseService {
     private static final Logger logger = LoggerFactory.getLogger(MerchandiseService.class);
@@ -82,7 +79,7 @@ public class MerchandiseService {
                 throw new Exception("Measure Unit field cannot be null!");
             }
 
-            Merchandise newItem = new Merchandise(req.getItemName(),req.getMeasureUnit());
+            Merchandise newItem = new Merchandise(req.getItemName().trim(),req.getMeasureUnit());
             newItem.setCreatedBy(req.getUsername());
             newItem.setHierachyPath(EntityCodeHPGeneration.setHP(sub2,newItem));
             Authentication.configurePermissionMap(newItem);
@@ -190,7 +187,7 @@ public class MerchandiseService {
     }
 
     private void checkRepeatedName(String sub2Id, String vendorId, String name) throws Exception {
-        boolean result = merchandiseRepository.countMerchandisesByVendor(sub2Id,vendorId,name) > 0;
+        boolean result = merchandiseRepository.countMerchandisesByVendor(sub2Id,vendorId,name.trim()) > 0;
         if (result){
             throw new Exception("This item already exists for the vendor and sub2 category");
         }
