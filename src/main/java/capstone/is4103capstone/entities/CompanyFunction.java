@@ -25,8 +25,8 @@ public class CompanyFunction extends DBEntityTemplate {
     public CompanyFunction() {
     }
 
-    public CompanyFunction(String functionName, String functionCode, String hierachyPath) {
-        super(functionName, functionCode, hierachyPath);
+    public CompanyFunction(String functionName, String functionCode, String hierarchyPath) {
+        super(functionName, functionCode, hierarchyPath);
     }
 
     public List<Country> getCountries() {

@@ -22,6 +22,8 @@ public class AdminInitialization {
     @Autowired
     FunctionRepository functionRepository;
     @Autowired
+    BusinessUnitRepository businessUnitRepository;
+    @Autowired
     TeamRepository teamRepository;
     @Autowired
     OfficeRepository officeRepository;
@@ -92,14 +94,14 @@ public class AdminInitialization {
         employeeRepository.save(newEmployee2);
         employeeRepository.save(admin);
 
-        Team team = teamRepository.findTeamByCode("APP");
+        Team team = teamRepository.findTeamByCode("GCP-T1");
 
         newEmployee.getMemberOfTeams().add(team);
         newEmployee2.getMemberOfTeams().add(team);
         team.getMembers().add(newEmployee);
         team.getMembers().add(newEmployee2);
-        newEmployee.setHierachyPath("APAC-SG-TECH-APP-yingshi2502");
-        newEmployee2.setHierachyPath("APAC-SG-TECH-APP-caiyuqian");
+        newEmployee.setHierachyPath("APAC-SG-TECH-GCP-T1-yingshi2502");
+        newEmployee2.setHierachyPath("APAC-SG-TECH-GCP-T1-caiyuqian");
 
         newEmployee2.setManager(newEmployee);
         newEmployee.getSubordinates().add(newEmployee2);
@@ -140,6 +142,15 @@ public class AdminInitialization {
         countryHK.getFunctions().add(function);
         countrySG.getFunctions().add(function);
 
+        CompanyFunction function2 = new CompanyFunction("Human Resource", "HR", "HR");
+        function2.setCreatedBy("admin");
+        function2.setLastModifiedBy("admin");
+        function2 = functionRepository.save(function2);
+        function2.getCountries().add(countryHK);
+        function2.getCountries().add(countrySG);
+        countryHK.getFunctions().add(function2);
+        countrySG.getFunctions().add(function2);
+
         Office office = new Office("One Raffles Quay", "ORQ", "APAC-SG-ORQ");
         Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG");
         office.setAddress(orqAddress);
@@ -151,33 +162,61 @@ public class AdminInitialization {
         office.setCountry(countrySG);
         countrySG.getOffices().add(office);
 
-        function.getOfficesCodeOfFunction().add("ORQ");
-        office.getFunctionsCodeInOffice().add("Tech");
+        BusinessUnit businessUnit = new BusinessUnit("Google Cloud Platform", "GCP", "Tech-GCP");
+        businessUnit.setCreatedBy("admin");
+        businessUnit.setLastModifiedBy("admin");
+        businessUnit = businessUnitRepository.save(businessUnit);
+        businessUnit.setFunction(function);
 
-        Team team = new Team("Data Security", "DTS", "Tech-DTS");
+        BusinessUnit businessUnit2 = new BusinessUnit("App Development", "APP", "Tech-APP");
+        businessUnit2.setCreatedBy("admin");
+        businessUnit2.setLastModifiedBy("admin");
+        businessUnit2 = businessUnitRepository.save(businessUnit2);
+        businessUnit2.setFunction(function);
+
+        Team team = new Team("GCP team 1", "GCP-T1", "Tech-GCP-T1");
         team.setCreatedBy("admin");
         team.setLastModifiedBy("admin");
         team = teamRepository.save(team);
+        team.setBusinessUnit(businessUnit);
         team.setFunction(function);
 
-        Team team2 = new Team("App Development", "APP", "Tech-APP");
+        Team team2 = new Team("GCP team 2", "GCP-T2", "Tech-GCP-T1");
         team2.setCreatedBy("admin");
         team2.setLastModifiedBy("admin");
         team2 = teamRepository.save(team2);
+        team2.setBusinessUnit(businessUnit);
         team2.setFunction(function);
+
+        Team team3 = new Team("HR Team 1", "HR-T1", "HR-T1");
+        team3.setCreatedBy("admin");
+        team3.setLastModifiedBy("admin");
+        team3 = teamRepository.save(team3);
+        team3.setFunction(function2);
 
         //last update
         regionRepository.saveAndFlush(region);
         countryRepository.saveAndFlush(countryHK);
         countryRepository.saveAndFlush(countrySG);
         functionRepository.saveAndFlush(function);
+        functionRepository.saveAndFlush(function2);
         officeRepository.saveAndFlush(office);
+        businessUnitRepository.saveAndFlush(businessUnit);
+        businessUnitRepository.saveAndFlush(businessUnit2);
         teamRepository.saveAndFlush(team);
         teamRepository.saveAndFlush(team2);
+        teamRepository.saveAndFlush(team3);
 
         office.getFunctionsCodeInOffice().add("Tech");
+        office.getFunctionsCodeInOffice().add("HR");
+        office.getBusinessUnitsCodeInOffice().add("GCP");
+        office.getBusinessUnitsCodeInOffice().add("APP");
+        businessUnit.getOfficesCodeOfBusinessUnit().add("ORQ");
+        businessUnit2.getOfficesCodeOfBusinessUnit().add("ORQ");
         function.getOfficesCodeOfFunction().add("ORQ");
+        function2.getOfficesCodeOfFunction().add("ORQ");
         officeRepository.save(office);
         functionRepository.save(function);
+        functionRepository.save(function2);
     }
 }

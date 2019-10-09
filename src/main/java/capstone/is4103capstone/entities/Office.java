@@ -32,6 +32,9 @@ public class Office extends DBEntityTemplate {
     @Convert(converter = StringListConverter.class)
     private List<String> functionsCodeInOffice = new ArrayList<>();
 
+    @Convert(converter = StringListConverter.class)
+    private List<String> businessUnitsCodeInOffice = new ArrayList<>();
+
     public Office() {
     }
 
@@ -75,6 +78,14 @@ public class Office extends DBEntityTemplate {
 
     public void setFunctionsCodeInOffice(List<String> functionsCodeInOffice) {
         this.functionsCodeInOffice = functionsCodeInOffice;
+    }
+
+    public List<String> getBusinessUnitsCodeInOffice() {
+        return businessUnitsCodeInOffice;
+    }
+
+    public void setBusinessUnitsCodeInOffice(List<String> businessUnitsCodeInOffice) {
+        this.businessUnitsCodeInOffice = businessUnitsCodeInOffice;
     }
 
     public List<String> getFloors() {

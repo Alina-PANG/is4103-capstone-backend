@@ -21,6 +21,11 @@ public class Team extends DBEntityTemplate {
     private CompanyFunction function;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "business_unit_id")
+    @JsonIgnore
+    private BusinessUnit businessUnit;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")
     @JsonIgnore
     private Country country;
@@ -50,6 +55,10 @@ public class Team extends DBEntityTemplate {
     private Employee teamLeader;
 
     public Team() {
+    }
+
+    public Team(String teamName, String teamCode, String hierarchyPath) {
+        super(teamName, teamCode, hierarchyPath);
     }
 
     public List<Vendor> getVendors() {
@@ -92,10 +101,6 @@ public class Team extends DBEntityTemplate {
         this.costCenters = costCenters;
     }
 
-    public Team(String teamName, String teamCode, String hierachyPath) {
-        super(teamName, teamCode, hierachyPath);
-    }
-
     public CompanyFunction getFunction() {
         return function;
     }
@@ -103,6 +108,10 @@ public class Team extends DBEntityTemplate {
     public void setFunction(CompanyFunction function) {
         this.function = function;
     }
+
+    public BusinessUnit getBusinessUnit() { return businessUnit; }
+
+    public void setBusinessUnit(BusinessUnit businessUnit) { this.businessUnit = businessUnit; }
 
     public List<Employee> getMembers() {
         return members;
