@@ -71,4 +71,30 @@ public class ContractController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
+
+    @GetMapping("/get-contracts-by-team/{teamId}")
+    public ResponseEntity<GeneralRes> getContractsByTeamId(@PathVariable("teamId") String teamId, @RequestParam(name = "username", required = true) String username){
+        if (Authentication.authenticateUser(username)) {
+            return ResponseEntity
+                    .ok()
+                    .body(contractService.getContractsByTeamId(teamId));
+        }else{
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
+
+    @GetMapping("/get-contracts-by-vendor/{vendorId}")
+    public ResponseEntity<GeneralRes> getContractsByVendorId(@PathVariable("vendorId") String vendorId, @RequestParam(name = "username", required = true) String username){
+        if (Authentication.authenticateUser(username)) {
+            return ResponseEntity
+                    .ok()
+                    .body(contractService.getContractsByVendorId(vendorId));
+        }else{
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
 }

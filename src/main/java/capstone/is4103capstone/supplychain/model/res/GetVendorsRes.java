@@ -7,18 +7,18 @@ import capstone.is4103capstone.supplychain.model.VendorModel;
 import java.io.Serializable;
 import java.util.List;
 
-public class GetAllVendorsRes extends GeneralRes implements Serializable{
+public class GetVendorsRes extends GeneralRes implements Serializable{
     List<VendorModel> vendorModelList;
 
-    public GetAllVendorsRes() {
+    public GetVendorsRes() {
     }
 
-    public GetAllVendorsRes(String message, Boolean hasError, List<VendorModel> vendorModelList) {
+    public GetVendorsRes(String message, Boolean hasError, List<VendorModel> vendorModelList) {
         super(message, hasError);
         this.vendorModelList = vendorModelList;
     }
 
-    public GetAllVendorsRes(String message, Boolean hasError) {
+    public GetVendorsRes(String message, Boolean hasError) {
         super(message, hasError);
     }
 

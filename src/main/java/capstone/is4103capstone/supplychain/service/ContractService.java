@@ -16,7 +16,7 @@ import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.model.ContractModel;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
-import capstone.is4103capstone.supplychain.model.res.GetAllContractsRes;
+import capstone.is4103capstone.supplychain.model.res.GetContractsRes;
 import capstone.is4103capstone.supplychain.model.res.GetContractRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,7 +133,7 @@ public class ContractService {
         }
     }
 
-    public GetAllContractsRes getAllContracts(){
+    public GetContractsRes getAllContracts(){
         try {
             logger.info("Getting all contracts");
             List<ContractModel> returnList = new ArrayList<>();
@@ -152,10 +152,10 @@ public class ContractService {
                 throw new Exception("No contract available.");
             }
 
-            return new GetAllContractsRes("Successfully retrieved all contracts", false, returnList);
+            return new GetContractsRes("Successfully retrieved all contracts", false, returnList);
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetAllContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 
@@ -289,5 +289,57 @@ public class ContractService {
                 contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
 
         return contractModel;
+    }
+
+
+    public GetContractsRes getContractsByTeamId(String teamId){
+        try {
+            List<ContractModel> returnList = new ArrayList<>();
+            List<Contract> contractList = contractRepository.findContractsByTeamId(teamId);
+
+            for(Contract contract: contractList){
+                if(contract.getDeleted()){
+                    continue;
+                }
+
+                ContractModel contractModel = transformToContractModel(contract);
+                returnList.add(contractModel);
+            }
+
+            if(returnList.size() == 0){
+                throw new Exception("No contracts available.");
+            }
+
+            return new GetContractsRes("Successfully retrieved contracts by vendor ID", false, returnList);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return new GetContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+        }
+    }
+
+    public GetContractsRes getContractsByVendorId(String vendorId){
+        try {
+            logger.info("Getting contracts by vendor ID");
+            List<ContractModel> returnList = new ArrayList<>();
+            List<Contract> contractList = contractRepository.findContractsByVendorId(vendorId);
+
+            for(Contract contract: contractList){
+                if(contract.getDeleted()){
+                    continue;
+                }
+
+                ContractModel contractModel = transformToContractModel(contract);
+                returnList.add(contractModel);
+            }
+
+            if(returnList.size() == 0){
+                throw new Exception("No contracts available.");
+            }
+
+            return new GetContractsRes("Successfully retrieved contracts by vendor ID", false, returnList);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return new GetContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+        }
     }
 }
