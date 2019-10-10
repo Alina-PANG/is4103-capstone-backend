@@ -1,8 +1,6 @@
 package capstone.is4103capstone.supplychain.model.req;
 
-import capstone.is4103capstone.entities.Team;
-import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.ContractLine;
+import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
@@ -33,7 +31,6 @@ public class CreateContractReq implements Serializable {
     private Date cpgReviewAlertDate;
 
     private String vendorId;
-    private List<ContractLine> contractLineList;
     private String modifierUsername;
     private String employeeInChargeId;
     private String contractName;
@@ -153,14 +150,6 @@ public class CreateContractReq implements Serializable {
 
     public void setVendorId(String vendorId) {
         this.vendorId = vendorId;
-    }
-
-    public List<ContractLine> getContractLineList() {
-        return contractLineList;
-    }
-
-    public void setContractLineList(List<ContractLine> contractLineList) {
-        this.contractLineList = contractLineList;
     }
 
     public String getModifierUsername() {

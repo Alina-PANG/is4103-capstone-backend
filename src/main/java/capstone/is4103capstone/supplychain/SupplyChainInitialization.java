@@ -40,8 +40,6 @@ public class SupplyChainInitialization {
     OutsourcingRepository outsourcingRepository;
     @Autowired
     EmployeeRepository employeeRepository;
-    @Autowired
-    ContractLineRepository contractLineRepository;
 
     private final String opsUserId = "yingshi2502";
 
@@ -113,26 +111,6 @@ public class SupplyChainInitialization {
         Merchandise banana = merchandiseRepository.findMerchandiseByCode("SG_Banana");
         Merchandise mango = merchandiseRepository.findMerchandiseByCode("SG_Mango");
 
-        ContractLine contractLine1 = new ContractLine("SG_Banana", BigDecimal.valueOf(2.0), "SGD", opsUserId);
-        ContractLine contractLine2 = new ContractLine("SG_Mango", BigDecimal.valueOf(5.0), "SGD", opsUserId);
-
-        contractLine1.setCreatedBy("xuhong");
-        contractLine1.setCreatedDateTime(new Date());
-        contractLine1.setLastModifiedBy("xuhong");
-        contractLine1.setLastModifiedDateTime(new Date());
-
-        contractLine2.setCreatedBy("xuhong");
-        contractLine2.setCreatedDateTime(new Date());
-        contractLine2.setLastModifiedBy("xuhong");
-        contractLine2.setLastModifiedDateTime(new Date());
-
-        contractLine1 = contractLineRepository.save(contractLine1);
-        contractLine2 = contractLineRepository.save(contractLine2);
-
-        contractLine1.setMerchandiseCode("SG_Banana");
-        contractLine2.setMerchandiseCode("SG_Mango");
-
-
         Contract contract1 = new Contract();
         contract1.setPurchaseType(PurchaseTypeEnum.TERMLICENSE);
         contract1.setSpendType("DummyType");
@@ -152,13 +130,6 @@ public class SupplyChainInitialization {
 
         banana.setCurrentContractCode("Contract1");
         mango.setCurrentContractCode("Contract1");
-
-        contract1.getContractLines().add(contractLine1);
-        contract1.getContractLines().add(contractLine2);
-        contractLine1.setContract(contract1);
-        contractLine2.setContract(contract1);
-        contractLineRepository.saveAndFlush(contractLine1);
-        contractLineRepository.saveAndFlush(contractLine2);
 
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
         Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");

@@ -47,7 +47,7 @@ public class Contract extends DBEntityTemplate {
     private Vendor vendor;
 
     @OneToMany(mappedBy = "contract",fetch = FetchType.EAGER)
-    private List<ContractLine> contractLines = new ArrayList<>();
+    private List<ChildContract> childContractList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_incharge")
@@ -59,7 +59,7 @@ public class Contract extends DBEntityTemplate {
     @JsonIgnore
     private Team team;
 
-    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, Integer totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ContractLine> contractLines, Employee employeeInChargeContract, Team team) {
+    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, Integer totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ChildContract> childContractList, Employee employeeInChargeContract, Team team) {
         this.purchaseType = purchaseType;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -72,7 +72,7 @@ public class Contract extends DBEntityTemplate {
         this.cpgReviewAlertDate = cpgReviewAlertDate;
         this.spendType = spendType;
         this.vendor = vendor;
-        this.contractLines = contractLines;
+        this.childContractList = childContractList;
         this.employeeInChargeContract = employeeInChargeContract;
         this.team = team;
     }
@@ -88,12 +88,12 @@ public class Contract extends DBEntityTemplate {
         this.team = team;
     }
 
-    public List<ContractLine> getContractLines() {
-        return contractLines;
+    public List<ChildContract> getChildContractList() {
+        return childContractList;
     }
 
-    public void setContractLines(List<ContractLine> contractLines) {
-        this.contractLines = contractLines;
+    public void setChildContractList(List<ChildContract> childContractList) {
+        this.childContractList = childContractList;
     }
 
     public Employee getEmployeeInChargeContract() {

@@ -3,7 +3,7 @@ package capstone.is4103capstone.finance.admin.service;
 import capstone.is4103capstone.entities.finance.BudgetSub2;
 import capstone.is4103capstone.entities.finance.Merchandise;
 import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.ContractLine;
+import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
 import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
@@ -15,7 +15,6 @@ import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.supplychain.Repository.ContractLineRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.rmi.MarshalledObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -154,13 +152,13 @@ public class MerchandiseService {
             return basicModel;
         }
 
-        Optional<ContractLine> clOptional = contractLineRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
+        Optional<ChildContract> clOptional = contractLineRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
         if (!clOptional.isPresent()){
             logProblem("[Internal Error]No such merchandise in the contract");
             basicModel.setHasActiveContract(false);
             return basicModel;
         }
-        ContractLine cl = clOptional.get();
+        ChildContract cl = clOptional.get();
 
         if (!cl.getPrice().equals(m.getCurrentPrice())){
             logProblem("[Internal Error]Price doesn't equalize, some problem, will take the price in contract line.");

@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class ContractLine extends DBEntityTemplate{
+public class ChildContract extends DBEntityTemplate{
 
     @NotNull
     private String merchandiseCode;
@@ -27,7 +27,7 @@ public class ContractLine extends DBEntityTemplate{
     @JsonIgnore
     private Contract contract;
 
-    public ContractLine(String merchandiseCode, BigDecimal price, String currencyCode,String createdUser) {
+    public ChildContract(String merchandiseCode, BigDecimal price, String currencyCode, String createdUser) {
         this.merchandiseCode = merchandiseCode;
         this.price = price;
         this.currencyCode = currencyCode;
@@ -52,7 +52,7 @@ public class ContractLine extends DBEntityTemplate{
         this.merchandiseCode = merchandiseCode;
     }
 
-    public ContractLine() {
+    public ChildContract() {
     }
 
     public BigDecimal getPrice() {

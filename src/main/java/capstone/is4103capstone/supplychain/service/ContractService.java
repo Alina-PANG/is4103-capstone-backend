@@ -5,12 +5,11 @@ import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.ContractLine;
+import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
-import capstone.is4103capstone.supplychain.Repository.ContractLineRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
@@ -33,15 +32,12 @@ public class ContractService {
     @Autowired
     ContractRepository contractRepository;
     @Autowired
-    ContractLineRepository contractLineRepository;
-    @Autowired
     VendorRepository vendorRepository;
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
     TeamRepository teamRepository;
 
-    //contract and contractLine will be created together.
     public GeneralRes CreateContract(CreateContractReq createContractReq){
         try{
             Contract newContract = new Contract();
@@ -79,12 +75,6 @@ public class ContractService {
             team.getContracts().add(newContract);
 
             newContract = contractRepository.saveAndFlush(newContract);
-
-            if(createContractReq.getContractLineList() != null && createContractReq.getContractLineList().size() != 0){
-                List<ContractLine> savedContractLineList = createContractLine(newContract, createContractReq.getContractLineList(), createContractReq);
-                newContract.setContractLines(savedContractLineList);
-            }
-
             newContract.setCode(SCMEntityCodeHPGeneration.getCode(contractRepository,newContract));
             contractRepository.saveAndFlush(newContract);
             vendorRepository.saveAndFlush(vendor);
@@ -97,19 +87,6 @@ public class ContractService {
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
         }
-    }
-
-    private List<ContractLine> createContractLine(Contract contract, List<ContractLine> contractLineList, CreateContractReq createContractReq){
-        List<ContractLine> newContractLineList = new ArrayList<>();
-        for(ContractLine e: contractLineList){
-            e.setCreatedBy(createContractReq.getModifierUsername());
-            e.setLastModifiedBy(createContractReq.getModifierUsername());
-            e.setContract(contract);
-            contractLineRepository.saveAndFlush(e);
-            logger.info("Successfully created new contract line!");
-            newContractLineList.add(e);
-        }
-        return newContractLineList;
     }
 
     public GetContractRes getContract(String id){
@@ -226,14 +203,6 @@ public class ContractService {
                 teamRepository.saveAndFlush(team);
             }
 
-            if (updateContractReq.getContractLineList() != null && updateContractReq.getContractLineList().size() != 0) {
-                contract = contractRepository.saveAndFlush(contract);
-                List<ContractLine> updatedContractLineList = updateContractLine(updateContractReq);
-
-                contract.setContractLines(updatedContractLineList);
-                contract = contractRepository.saveAndFlush(contract);
-            }
-
             contractRepository.saveAndFlush(contract);
             return new GeneralRes("Successfully updated the contract!", false);
         } catch (Exception ex) {
@@ -242,29 +211,6 @@ public class ContractService {
         }
     }
 
-    private List<ContractLine> updateContractLine(CreateContractReq updatedContractReq){
-        List<ContractLine> updatedContractLineList = new ArrayList<>();
-        for(ContractLine e: updatedContractReq.getContractLineList()){
-            ContractLine contractLine = contractLineRepository.getOne(e.getId());
-            if(e.getPrice() != null){
-                contractLine.setPrice(e.getPrice());
-            }
-            if(e.getCurrencyCode() != null){
-                contractLine.setCurrencyCode(e.getCurrencyCode());
-            }
-            if(e.getMerchandiseCode() != null){
-                contractLine.setMerchandiseCode(e.getMerchandiseCode());
-            }
-            if(e.getObjectName() != null){
-                contractLine.setObjectName(e.getObjectName());
-            }
-            contractLine.setLastModifiedBy(updatedContractReq.getModifierUsername());
-
-            contractLine = contractLineRepository.saveAndFlush(contractLine);
-            updatedContractLineList.add(contractLine);
-        }
-        return updatedContractLineList;
-    }
 
     public ContractModel transformToContractModel(Contract contract){
         GeneralEntityModel vendor = null;
