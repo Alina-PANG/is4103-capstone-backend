@@ -22,18 +22,16 @@ public interface PlanRepository extends JpaRepository<Plan,String> {
 
 
     //should be able to compare reforecast with reforecast, reforecast with budget
-    @Query(value = "",nativeQuery = true)
-    List<Plan> getCorrespondBudgetPlanByAnotherId(String id);
+//    @Query(value = "",nativeQuery = true)
+//    List<Plan> getCorrespondBudgetPlanByAnotherId(String id);
 
-    @Query(value = "select * from plan where cost_center_id = ?1" +
-            "and for_year = ?2 and is_deleted=0 and plan_type=?4 and budget_plan_status=?3;",nativeQuery = true)
-    Optional<Plan> findBudgetByCCAndYear(String ccId, int year, BudgetPlanStatusEnum status, BudgetPlanEnum planType);
+    @Query(value = "select * from plan where cost_center_id=?1 and for_year=?2 and is_deleted=0 and plan_type=?4 and budget_plan_status=?3",nativeQuery = true)
+    Optional<Plan> findBudgetByCCAndYear(String ccId, int year, int status, int planType);
 
 
-    @Query(value = "select a.activity,a.time_stamp,a.user_uuid,e.user_name " +
-            "from audit_trail_activity a join employee e on a.user_uuid=e.id"
+    @Query(value = "select m.code,m.object_name,i.budget_amount,i.currency_abbr,i.comment from plan_line_item i join merchandise m on i.merchandise_code=m.code where i.in_plan=?1"
             ,nativeQuery = true)
-    List<CompareLineItemModel> findPlanLineItemsWithPlanId(String id);
+    List<CompareLineItemModel> findPlanLineItemsWithPlanId(String planId);
 
 
 }

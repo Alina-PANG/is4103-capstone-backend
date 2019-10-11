@@ -84,13 +84,14 @@ public class BudgetController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @GetMapping("/view-all-levels")
-    public @ResponseBody ResponseEntity<Object> viewAllLevelsByCountry(@RequestParam(name = "reforecastId",required = true) String reforecastPlanId){
+    @GetMapping("/diff")
+    public @ResponseBody ResponseEntity<Object> compareReforecast(@RequestParam(name = "reforecastId",required = true) String reforecastPlanId){
         try{
             return ResponseEntity
                     .ok()
                     .body(comparisonService.getPlanComparisonResult(reforecastPlanId).toString());
         }catch (Exception ex){
+            ex.printStackTrace();
             return ResponseEntity.badRequest()
                     .body(new GeneralRes(ex.getMessage(), true));
         }

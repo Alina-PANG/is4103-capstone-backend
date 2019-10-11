@@ -29,9 +29,10 @@ public class PlansComparisonService {
                 throw new Exception("Reforecast plan with id not found");
 
             Plan after = afterOps.get();
-
-            Optional<Plan> budgetOps = planRepository.findBudgetByCCAndYear(after.getCostCenter().getId(),after.getForYear(), BudgetPlanStatusEnum.APPROVED,
-                    BudgetPlanEnum.BUDGET);
+            System.out.println(BudgetPlanStatusEnum.APPROVED.ordinal() + " " +  BudgetPlanEnum.BUDGET.ordinal());
+            Optional<Plan> budgetOps = planRepository.findBudgetByCCAndYear(
+                    after.getCostCenter().getId(),after.getForYear(), BudgetPlanStatusEnum.APPROVED.ordinal(),
+                    BudgetPlanEnum.BUDGET.ordinal());
 
             if (!budgetOps.isPresent())
                 throw new Exception("Corresponding budget plan not found");
@@ -66,23 +67,11 @@ public class PlansComparisonService {
 //            throw new Exception(ex.getMessage());
 //        }
 //    }
-    class CompareLineItem{
-        String service;
-        BigDecimal amount;
-        String currency;
-        String comment;
 
-    public CompareLineItem(String service, BigDecimal amount, String currency, String comment) {
-        this.service = service;
-        this.amount = amount;
-        this.currency = currency;
-        this.comment = comment;
-    }
-}
     private JSONObject comparePlans(Plan before, Plan after) throws Exception{
         JSONObject res = new JSONObject();
 
-        List<CompareLineItemModel[]> change = new ArrayList<>();
+        List<CompareLineItemModel[]> changed = new ArrayList<>();
         List<CompareLineItemModel> insertion = new ArrayList<>();
 
         HashMap<String, CompareLineItemModel> beforeMap = new HashMap<>();
@@ -91,13 +80,18 @@ public class PlansComparisonService {
         List<CompareLineItemModel> afterItems = planRepository.findPlanLineItemsWithPlanId(after.getId());
 
         for (CompareLineItemModel item: beforeItems){
-            beforeMap.put(item.getMerchandiseCode(),item);
+            beforeMap.put(item.getServiceCode(),item);
         }
 
         for (CompareLineItemModel item: afterItems){
-            if (beforeMap.containsKey(item.getMerchandiseCode())){
-                //change
-                beforeMap.remove(item.getMerchandiseCode());
+            if (beforeMap.containsKey(item.getServiceCode()) ){
+                CompareLineItemModel[] tuple = new CompareLineItemModel[2];
+                tuple[0] = beforeMap.get(item.getServiceCode());
+                tuple[1] = item;
+                if (lineItemSameServiceIsEqual(tuple[0],tuple[1]))
+                    changed.add(tuple);
+                    //change
+                beforeMap.remove(item.getServiceCode());
             }else{
                 insertion.add(item);
             }
@@ -105,17 +99,25 @@ public class PlansComparisonService {
 
         List<CompareLineItemModel> deletion = new ArrayList<>(beforeMap.values());
 
-
-        //then combine deletion&insertion together
-
-
-
-
-
-
-
-
+        res.put("insertion",new JSONObject(insertion));
+        res.put("change",new JSONObject(changed));
+        res.put("deletion",new JSONObject(deletion));
         return res;
+
+    }
+
+
+    private boolean lineItemSameServiceIsEqual(CompareLineItemModel a, CompareLineItemModel b){
+        if (!a.getAmount().equals(b.getAmount()))
+            return true;
+        if ((a.getComment() == null || b.getComment()==null ) && !(a.getComment() == null && b.getComment()==null ))
+            return true;
+        if (!a.getComment().equals(b.getComment()))
+            return true;
+        if (!a.getCurrency().equals(b.getCurrency()))
+            return true;
+
+        return false;
     }
 
 }
