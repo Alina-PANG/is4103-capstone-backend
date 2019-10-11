@@ -1,7 +1,5 @@
-package capstone.is4103capstone.seat.model.seat;
+package capstone.is4103capstone.seat.model;
 
-import capstone.is4103capstone.seat.model.GroupModel;
-import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
@@ -15,7 +13,6 @@ public class SeatModelForAllocation implements Serializable {
     private String type;
 
     private GroupModel functionAssigned;
-    private GroupModel businessUnitAssigned;
     private GroupModel teamAssigned;
 
     private SeatAllocationModelForEmployee currentOccupancy;
@@ -24,13 +21,12 @@ public class SeatModelForAllocation implements Serializable {
     public SeatModelForAllocation() {
     }
 
-    public SeatModelForAllocation(String id, String code, String type, GroupModel functionAssigned, GroupModel businessUnitAssigned, GroupModel teamAssigned,
+    public SeatModelForAllocation(String id, String code, String type, GroupModel functionAssigned, GroupModel teamAssigned,
                                   SeatAllocationModelForEmployee currentOccupancy, List<SeatAllocationModelForEmployee> allocations) {
         this.id = id;
         this.code = code;
         this.type = type;
         this.functionAssigned = functionAssigned;
-        this.businessUnitAssigned = businessUnitAssigned;
         this.teamAssigned = teamAssigned;
         this.currentOccupancy = currentOccupancy;
         this.allocations = allocations;
@@ -67,10 +63,6 @@ public class SeatModelForAllocation implements Serializable {
     public void setFunctionAssigned(GroupModel functionAssigned) {
         this.functionAssigned = functionAssigned;
     }
-
-    public GroupModel getBusinessUnitAssigned() { return businessUnitAssigned; }
-
-    public void setBusinessUnitAssigned(GroupModel businessUnitAssigned) { this.businessUnitAssigned = businessUnitAssigned; }
 
     public GroupModel getTeamAssigned() {
         return teamAssigned;

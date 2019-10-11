@@ -204,15 +204,7 @@ public class SeatManagementBackgroundService {
                         seatRepository.save(seat);
                         break;
                     }
-                } else if (activeAllocation.getAllocationType() == SeatAllocationTypeEnum.HOTDESK) {
-                    if (activeAllocation.getSchedule().getStartDateTime().compareTo(new Date()) <= 0 &&
-                            (seat.getCurrentOccupancy() == null || !seat.getCurrentOccupancy().getId().equals(activeAllocation.getId())) ) {
-                        seat.setCurrentOccupancy(activeAllocation);
-                        seat.setType(SeatTypeEnum.HOTDESK);
-                        seatRepository.save(seat);
-                        break;
-                    }
-                } else if (activeAllocation.getAllocationType() == SeatAllocationTypeEnum.SHARED) { // Shared seat allocation
+                } else { // Shared seat allocation
                     if (activeAllocation.getSchedule().getStartDateTime().compareTo(new Date()) <= 0) {
                         if (activeAllocation.getSchedule().getRecurringBasis() == ScheduleRecurringBasisEnum.EVERYDAY) {
                             if (activeAllocation.getSchedule().getRecurringStartTime().compareTo(LocalDateTime.now().toLocalTime()) <= 0) {

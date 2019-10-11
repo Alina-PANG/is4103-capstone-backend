@@ -1,4 +1,4 @@
-package capstone.is4103capstone.seat.model.seatAllocation;
+package capstone.is4103capstone.seat.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
