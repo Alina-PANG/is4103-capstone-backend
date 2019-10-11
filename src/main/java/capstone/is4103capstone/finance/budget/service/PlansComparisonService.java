@@ -4,6 +4,7 @@ import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.finance.PlanLineItem;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.budget.model.CompareLineItemModel;
+import capstone.is4103capstone.finance.budget.model.res.PlanCompareRes;
 import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import org.json.JSONObject;
@@ -22,7 +23,7 @@ public class PlansComparisonService {
     @Autowired
     PlanRepository planRepository;
 
-    public JSONObject getPlanComparisonResult(String reforecastId) throws Exception{
+    public PlanCompareRes getPlanComparisonResult(String reforecastId) throws Exception{
         try{
             Optional<Plan> afterOps = planRepository.findUndeletedPlanById(reforecastId);
             if (!afterOps.isPresent())
@@ -68,8 +69,7 @@ public class PlansComparisonService {
 //        }
 //    }
 
-    private JSONObject comparePlans(Plan before, Plan after) throws Exception{
-        JSONObject res = new JSONObject();
+    private PlanCompareRes comparePlans(Plan before, Plan after) throws Exception{
 
         List<CompareLineItemModel[]> changed = new ArrayList<>();
         List<CompareLineItemModel> insertion = new ArrayList<>();
@@ -88,7 +88,7 @@ public class PlansComparisonService {
                 CompareLineItemModel[] tuple = new CompareLineItemModel[2];
                 tuple[0] = beforeMap.get(item.getServiceCode());
                 tuple[1] = item;
-                if (lineItemSameServiceIsEqual(tuple[0],tuple[1]))
+                if (!lineItemSameServiceIsEqual(tuple[0],tuple[1]))
                     changed.add(tuple);
                     //change
                 beforeMap.remove(item.getServiceCode());
@@ -98,26 +98,30 @@ public class PlansComparisonService {
         }
 
         List<CompareLineItemModel> deletion = new ArrayList<>(beforeMap.values());
+        for (CompareLineItemModel[] m:changed){
+            System.out.println(m[0].getServiceName()+ " "+m[1].getServiceName());
+        }
 
-        res.put("insertion",new JSONObject(insertion));
-        res.put("change",new JSONObject(changed));
-        res.put("deletion",new JSONObject(deletion));
-        return res;
+
+        return new PlanCompareRes("Successfully Retrieved", false, insertion,deletion,changed,
+                before.calculateTotalValue(), after.calculateTotalValue());
 
     }
 
 
     private boolean lineItemSameServiceIsEqual(CompareLineItemModel a, CompareLineItemModel b){
         if (!a.getAmount().equals(b.getAmount()))
-            return true;
+            return false;
         if ((a.getComment() == null || b.getComment()==null ) && !(a.getComment() == null && b.getComment()==null ))
-            return true;
+            return false;
         if (!a.getComment().equals(b.getComment()))
-            return true;
+            return false;
         if (!a.getCurrency().equals(b.getCurrency()))
-            return true;
+            return false;
 
-        return false;
+
+
+        return true;
     }
 
 }

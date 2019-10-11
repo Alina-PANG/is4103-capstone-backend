@@ -1,6 +1,7 @@
 package capstone.is4103capstone.finance.budget.controller;
 
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
+import capstone.is4103capstone.finance.budget.model.res.PlanCompareRes;
 import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
@@ -85,11 +86,11 @@ public class BudgetController {
     }
 
     @GetMapping("/diff")
-    public @ResponseBody ResponseEntity<Object> compareReforecast(@RequestParam(name = "reforecastId",required = true) String reforecastPlanId){
+    public ResponseEntity<GeneralRes> compareReforecast(@RequestParam(name = "reforecastId",required = true) String reforecastPlanId){
         try{
             return ResponseEntity
                     .ok()
-                    .body(comparisonService.getPlanComparisonResult(reforecastPlanId).toString());
+                    .body(comparisonService.getPlanComparisonResult(reforecastPlanId));
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest()
