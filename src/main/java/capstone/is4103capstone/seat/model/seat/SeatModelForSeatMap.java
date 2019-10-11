@@ -1,16 +1,8 @@
-package capstone.is4103capstone.seat.model;
+package capstone.is4103capstone.seat.model.seat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
-
-//        {
-//        “serialNumber”: 1,
-//        “id”: “c8ef5295-f274-47df-bb0f-a98fccad77e5”,
-//        “hasAllocation”: false,
-//        “x”: 0,
-//        “y”: 0
-//        }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SeatModelForSeatMap implements Comparable<SeatModelForSeatMap>, Serializable {
@@ -19,16 +11,20 @@ public class SeatModelForSeatMap implements Comparable<SeatModelForSeatMap>, Ser
     private boolean hasAllocation;
     private Integer x;
     private Integer y;
+    private boolean underOffice;
+    private Integer adjacentSeatSeqNum;
 
     public SeatModelForSeatMap() {
     }
 
-    public SeatModelForSeatMap(Integer serialNumber, String id, boolean hasAllocation, Integer x, Integer y) {
+    public SeatModelForSeatMap(Integer serialNumber, String id, boolean hasAllocation, Integer x, Integer y, boolean underOffice, Integer adjacentSeatSeqNum) {
         this.serialNumber = serialNumber;
         this.id = id;
         this.hasAllocation = hasAllocation;
         this.x = x;
         this.y = y;
+        this.underOffice = underOffice;
+        this.adjacentSeatSeqNum = adjacentSeatSeqNum;
     }
 
     public Integer getSerialNumber() {
@@ -70,6 +66,14 @@ public class SeatModelForSeatMap implements Comparable<SeatModelForSeatMap>, Ser
     public void setY(Integer y) {
         this.y = y;
     }
+
+    public boolean isUnderOffice() { return underOffice; }
+
+    public void setUnderOffice(boolean underOffice) { this.underOffice = underOffice; }
+
+    public Integer getAdjacentSeatSeqNum() { return adjacentSeatSeqNum; }
+
+    public void setAdjacentSeatSeqNum(Integer adjacentSeatSeqNum) { this.adjacentSeatSeqNum = adjacentSeatSeqNum; }
 
     @Override
     public int compareTo(SeatModelForSeatMap anotherSeat) {
