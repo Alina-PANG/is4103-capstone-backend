@@ -116,11 +116,9 @@ public class SeatAllocationService {
 
 
     // Pre-conditions:
-    // 1. Only when a seat has been allocated to a particular function can it be allocated to a team under that function
-    //    Case A: Function -> Business Unit -> Team
-    //    Case B: Function -> Team
+    // 1. Only when a seat has been allocated to a particular business unit can it be allocated to a team under that business unit
     public void allocateSeatsToTeam(SeatAllocationModelForTeam seatAllocationModelForTeam) {
-        // Check whether the seats have already been allocated to the function of the team required
+        // Check whether the seats have already been allocated to the business unit of the team required
         List<Seat> seats = validateSeatsInformationForAllocation(seatAllocationModelForTeam.getSeatIds(),"TEAM");
         Team team = validateTeamInformation(seatAllocationModelForTeam.getTeamId(), seats);
 
@@ -735,7 +733,7 @@ public class SeatAllocationService {
     // Check whether the seats to be allocated:
     // 1. exist
     // 2. belong to the same seat map
-    // 3. have already been allocated to any function/team
+    // 3. have already been allocated to any function/business unit
     private List<Seat> validateSeatsInformationForDeallocation(List<String> seatIds, String targetUnit) throws SeatAllocationException {
 
         List<Seat> seats = new ArrayList<>();
@@ -790,6 +788,7 @@ public class SeatAllocationService {
 
     // Check whether the office where the seats belong has the business unit required
     private BusinessUnit validateBusinessUnitInformation(String businessUnitId, List<Seat> seats) throws SeatAllocationException {
+
         Optional<BusinessUnit> optionalBusinessUnit = businessUnitRepository.findById(businessUnitId);
         if(!optionalBusinessUnit.isPresent()) {
             throw new SeatAllocationException("Allocation of seats failed: business unit does not exist!");
@@ -818,8 +817,7 @@ public class SeatAllocationService {
 
 
     // Check whether the office where the seats belong has the function required and the team belongs to that function
-    //    Case A: Function -> Business Unit -> Team
-    //    Case B: Function -> Team
+    // Function -> Business Unit -> Team
     private Team validateTeamInformation(String teamId, List<Seat> seats) throws SeatAllocationException {
 
         Optional<Team> optionalTeam = teamRepository.findById(teamId);
@@ -828,29 +826,15 @@ public class SeatAllocationService {
         }
 
         Team team = optionalTeam.get();
-        CompanyFunction function = validateFunctionInformation(team.getFunction().getId(), seats);
-        // It has been confirmed that the office has the function, need to check whether the seats have already been allocated to the function/business unit above
-        if (team.getBusinessUnit() != null) {
-            BusinessUnit businessUnit = team.getBusinessUnit();
-            for (Seat seat :
-                    seats) {
-                if (seat.getBusinessUnitAssigned() == null) {
-                    throw new SeatAllocationException("Allocation of seats failed: seat must be allocated to the business unit before being allocated to a team!");
-                } else if (!seat.getBusinessUnitAssigned().getCode().equals(businessUnit.getCode())) {
-                    throw new SeatAllocationException("Allocation of seats failed: some seat has already been allocated to another business unit!");
-                }
-            }
-        } else { // the team is directly under a function
-            for (Seat seat :
-                    seats) {
-                if (seat.getFunctionAssigned() == null) {
-                    throw new SeatAllocationException("Allocation of seats failed: seat must be allocated to the function before being allocated to a team!");
-                } else if (!seat.getFunctionAssigned().getCode().equals(function.getCode())) {
-                    throw new SeatAllocationException("Allocation of seats failed: some seat has already been allocated to another function!");
-                }
+        BusinessUnit businessUnit = validateBusinessUnitInformation(team.getBusinessUnit().getId(), seats);
+        for (Seat seat :
+                seats) {
+            if (seat.getBusinessUnitAssigned() == null) {
+                throw new SeatAllocationException("Allocation of seats failed: seat must be allocated to the business unit before being allocated to a team!");
+            } else if (!seat.getBusinessUnitAssigned().getCode().equals(businessUnit.getCode())) {
+                throw new SeatAllocationException("Allocation of seats failed: some seat has already been allocated to another business unit!");
             }
         }
-
 
         return team;
     }

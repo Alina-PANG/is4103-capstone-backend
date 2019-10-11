@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -13,11 +14,10 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CompanyFunction extends DBEntityTemplate {
 
-    @ManyToMany(mappedBy = "functions")
-    private List<Country> countries = new ArrayList<>();
-
-    @OneToMany(mappedBy = "function")
-    private List<Team> teams = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "country_id")
+    @JsonIgnore
+    private Country country;
 
     @Convert(converter = StringListConverter.class)
     private List<String> officesCodeOfFunction = new ArrayList<>();
@@ -29,21 +29,9 @@ public class CompanyFunction extends DBEntityTemplate {
         super(functionName, functionCode, hierarchyPath);
     }
 
-    public List<Country> getCountries() {
-        return countries;
-    }
+    public Country getCountry() { return country; }
 
-    public void setCountries(List<Country> countries) {
-        this.countries = countries;
-    }
-
-    public List<Team> getTeams() {
-        return teams;
-    }
-
-    public void setTeams(List<Team> teams) {
-        this.teams = teams;
-    }
+    public void setCountry(Country country) { this.country = country; }
 
     public List<String> getOfficesCodeOfFunction() {
         return officesCodeOfFunction;

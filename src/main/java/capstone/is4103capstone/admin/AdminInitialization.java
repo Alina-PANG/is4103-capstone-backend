@@ -90,11 +90,11 @@ public class AdminInitialization {
         restApiTestUser.setLastModifiedBy("admin");
         */
 
-        employeeRepository.save(newEmployee);
-        employeeRepository.save(newEmployee2);
-        employeeRepository.save(admin);
+        newEmployee = employeeRepository.save(newEmployee);
+        newEmployee2 = employeeRepository.save(newEmployee2);
+        admin = employeeRepository.save(admin);
 
-        Team team = teamRepository.findTeamByCode("GCP-T1");
+        Team team = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
 
         newEmployee.getMemberOfTeams().add(team);
         newEmployee2.getMemberOfTeams().add(team);
@@ -113,10 +113,25 @@ public class AdminInitialization {
     }
 
     public void createGeo() {
+
+        // ---------------------------------- Region ----------------------------------
+
         Region region = new Region("Asia-Pacific", "APAC", "APAC");
         region.setCreatedBy("admin");
         region.setLastModifiedBy("admin");
         region = regionRepository.save(region);
+
+        Region region2 = new Region("The United Kingdom", "UK", "UK");
+        region2.setCreatedBy("admin");
+        region2.setLastModifiedBy("admin");
+        region2 = regionRepository.save(region2);
+
+        Region region3 = new Region("Europe", "EUR", "EUR");
+        region3.setCreatedBy("admin");
+        region3.setLastModifiedBy("admin");
+        region3 = regionRepository.save(region3);
+
+        // ---------------------------------- Country ----------------------------------
 
         Country countrySG = new Country("Singapore", "SG", "APAC-SG");
         countrySG.setCreatedBy("admin");
@@ -130,26 +145,41 @@ public class AdminInitialization {
         countryHK = countryRepository.save(countryHK);
         countryHK.setRegion(region);
 
+        Country countryIND = new Country("India", "IND", "APAC-IND");
+        countryIND.setCreatedBy("admin");
+        countryIND.setLastModifiedBy("admin");
+        countryIND = countryRepository.save(countryIND);
+        countryIND.setRegion(region);
+
         region.getCountries().add(countrySG);
         region.getCountries().add(countryHK);
+        region.getCountries().add(countryIND);
 
-        CompanyFunction function = new CompanyFunction("Technology", "Tech", "Tech");
-        function.setCreatedBy("admin");
-        function.setLastModifiedBy("admin");
-        function = functionRepository.save(function);
-        function.getCountries().add(countryHK);
-        function.getCountries().add(countrySG);
-        countryHK.getFunctions().add(function);
-        countrySG.getFunctions().add(function);
+        // ---------------------------------- Function ----------------------------------
 
-        CompanyFunction function2 = new CompanyFunction("Human Resource", "HR", "HR");
-        function2.setCreatedBy("admin");
-        function2.setLastModifiedBy("admin");
-        function2 = functionRepository.save(function2);
-        function2.getCountries().add(countryHK);
-        function2.getCountries().add(countrySG);
-        countryHK.getFunctions().add(function2);
-        countrySG.getFunctions().add(function2);
+        CompanyFunction techFunctionSG = new CompanyFunction("Technology", "SG-Tech", "SG-Tech");
+        techFunctionSG.setCreatedBy("admin");
+        techFunctionSG.setLastModifiedBy("admin");
+        techFunctionSG = functionRepository.save(techFunctionSG);
+        techFunctionSG.setCountry(countrySG);
+        countrySG.getFunctions().add(techFunctionSG);
+
+        CompanyFunction hrFunctionSG = new CompanyFunction("Human Resource", "SG-HR", "SG-HR");
+        hrFunctionSG.setCreatedBy("admin");
+        hrFunctionSG.setLastModifiedBy("admin");
+        hrFunctionSG = functionRepository.save(hrFunctionSG);
+        hrFunctionSG.setCountry(countrySG);
+        countrySG.getFunctions().add(hrFunctionSG);
+
+        CompanyFunction salesFunctionSG = new CompanyFunction("Sales", "SG-Sales", "SG-Sales");
+        salesFunctionSG.setCreatedBy("admin");
+        salesFunctionSG.setLastModifiedBy("admin");
+        salesFunctionSG = functionRepository.save(hrFunctionSG);
+        salesFunctionSG.setCountry(countrySG);
+        countrySG.getFunctions().add(salesFunctionSG);
+
+
+        // ---------------------------------- Office ----------------------------------
 
         Office office = new Office("One Raffles Quay", "ORQ", "APAC-SG-ORQ");
         Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG");
@@ -162,61 +192,96 @@ public class AdminInitialization {
         office.setCountry(countrySG);
         countrySG.getOffices().add(office);
 
-        BusinessUnit businessUnit = new BusinessUnit("Google Cloud Platform", "GCP", "Tech-GCP");
-        businessUnit.setCreatedBy("admin");
-        businessUnit.setLastModifiedBy("admin");
-        businessUnit = businessUnitRepository.save(businessUnit);
-        businessUnit.setFunction(function);
+        // ---------------------------------- Business Unit ----------------------------------
 
-        BusinessUnit businessUnit2 = new BusinessUnit("App Development", "APP", "Tech-APP");
-        businessUnit2.setCreatedBy("admin");
-        businessUnit2.setLastModifiedBy("admin");
-        businessUnit2 = businessUnitRepository.save(businessUnit2);
-        businessUnit2.setFunction(function);
+        BusinessUnit businessUnitInfraTech = new BusinessUnit("Infrastructure Tech", "InfraTech", "SG-Tech-InfraTech");
+        businessUnitInfraTech.setCreatedBy("admin");
+        businessUnitInfraTech.setLastModifiedBy("admin");
+        businessUnitInfraTech = businessUnitRepository.save(businessUnitInfraTech);
+        businessUnitInfraTech.setFunction(techFunctionSG);
 
-        Team team = new Team("GCP team 1", "GCP-T1", "Tech-GCP-T1");
-        team.setCreatedBy("admin");
-        team.setLastModifiedBy("admin");
-        team = teamRepository.save(team);
-        team.setBusinessUnit(businessUnit);
-        team.setFunction(function);
+        BusinessUnit businessUnitCurrencyTech = new BusinessUnit("Currency Tech", "CurrTech", "SG-Tech-CurrTech");
+        businessUnitCurrencyTech.setCreatedBy("admin");
+        businessUnitCurrencyTech.setLastModifiedBy("admin");
+        businessUnitCurrencyTech = businessUnitRepository.save(businessUnitCurrencyTech);
+        businessUnitCurrencyTech.setFunction(techFunctionSG);
 
-        Team team2 = new Team("GCP team 2", "GCP-T2", "Tech-GCP-T1");
-        team2.setCreatedBy("admin");
-        team2.setLastModifiedBy("admin");
-        team2 = teamRepository.save(team2);
-        team2.setBusinessUnit(businessUnit);
-        team2.setFunction(function);
+        BusinessUnit businessUnitFixIncomeTech = new BusinessUnit("Fix Income Tech", "FixIncTech", "SG-Tech-FixIncTech");
+        businessUnitFixIncomeTech.setCreatedBy("admin");
+        businessUnitFixIncomeTech.setLastModifiedBy("admin");
+        businessUnitFixIncomeTech = businessUnitRepository.save(businessUnitFixIncomeTech);
+        businessUnitFixIncomeTech.setFunction(techFunctionSG);
 
-        Team team3 = new Team("HR Team 1", "HR-T1", "HR-T1");
-        team3.setCreatedBy("admin");
-        team3.setLastModifiedBy("admin");
-        team3 = teamRepository.save(team3);
-        team3.setFunction(function2);
+        // ---------------------------------- Team ----------------------------------
+
+        Team endUserComputingTeam = new Team("End User Computing", "EndUserCom", "SG-Tech-InfraTech-EndUserCom");
+        endUserComputingTeam.setCreatedBy("admin");
+        endUserComputingTeam.setLastModifiedBy("admin");
+        endUserComputingTeam = teamRepository.save(endUserComputingTeam);
+        endUserComputingTeam.setBusinessUnit(businessUnitInfraTech);
+
+        Team dataCenterOpeTeam = new Team("Data Center Operation", "DataCenOpr", "SG-Tech-InfraTech-DataCenOpr");
+        dataCenterOpeTeam.setCreatedBy("admin");
+        dataCenterOpeTeam.setLastModifiedBy("admin");
+        dataCenterOpeTeam = teamRepository.save(dataCenterOpeTeam);
+        dataCenterOpeTeam.setBusinessUnit(businessUnitInfraTech);
+
+        Team databaseAdminTeam = new Team("Database Admin", "DBAdmin", "SG-Tech-InfraTech-DBAdmin");
+        databaseAdminTeam.setCreatedBy("admin");
+        databaseAdminTeam.setLastModifiedBy("admin");
+        databaseAdminTeam = teamRepository.save(databaseAdminTeam);
+        databaseAdminTeam.setBusinessUnit(businessUnitInfraTech);
+
+        Team networkTeam = new Team("Networks", "Networks", "SG-Tech-InfraTech-Networks");
+        networkTeam.setCreatedBy("admin");
+        networkTeam.setLastModifiedBy("admin");
+        networkTeam = teamRepository.save(networkTeam);
+        networkTeam.setBusinessUnit(businessUnitInfraTech);
+
+        Team productionSupportTeam = new Team("Production Support", "ProdSupp", "SG-Tech-FixIncTech-ProdSupp");
+        productionSupportTeam.setCreatedBy("admin");
+        productionSupportTeam.setLastModifiedBy("admin");
+        productionSupportTeam = teamRepository.save(productionSupportTeam);
+        productionSupportTeam.setBusinessUnit(businessUnitFixIncomeTech);
+
+        Team developmentTeam = new Team("Development", "Dev", "SG-Tech-FixIncTech-Dev");
+        developmentTeam.setCreatedBy("admin");
+        developmentTeam.setLastModifiedBy("admin");
+        developmentTeam = teamRepository.save(developmentTeam);
+        developmentTeam.setBusinessUnit(businessUnitFixIncomeTech);
 
         //last update
         regionRepository.saveAndFlush(region);
+        regionRepository.saveAndFlush(region2);
+        regionRepository.saveAndFlush(region3);
         countryRepository.saveAndFlush(countryHK);
         countryRepository.saveAndFlush(countrySG);
-        functionRepository.saveAndFlush(function);
-        functionRepository.saveAndFlush(function2);
+        countryRepository.saveAndFlush(countryIND);
+        functionRepository.saveAndFlush(techFunctionSG);
+        functionRepository.saveAndFlush(hrFunctionSG);
         officeRepository.saveAndFlush(office);
-        businessUnitRepository.saveAndFlush(businessUnit);
-        businessUnitRepository.saveAndFlush(businessUnit2);
-        teamRepository.saveAndFlush(team);
-        teamRepository.saveAndFlush(team2);
-        teamRepository.saveAndFlush(team3);
+        businessUnitRepository.saveAndFlush(businessUnitInfraTech);
+        businessUnitRepository.saveAndFlush(businessUnitCurrencyTech);
+        businessUnitRepository.saveAndFlush(businessUnitFixIncomeTech);
+        teamRepository.saveAndFlush(endUserComputingTeam);
+        teamRepository.saveAndFlush(dataCenterOpeTeam);
+        teamRepository.saveAndFlush(databaseAdminTeam);
+        teamRepository.saveAndFlush(networkTeam);
+        teamRepository.saveAndFlush(productionSupportTeam);
+        teamRepository.saveAndFlush(developmentTeam);
 
-        office.getFunctionsCodeInOffice().add("Tech");
-        office.getFunctionsCodeInOffice().add("HR");
-        office.getBusinessUnitsCodeInOffice().add("GCP");
-        office.getBusinessUnitsCodeInOffice().add("APP");
-        businessUnit.getOfficesCodeOfBusinessUnit().add("ORQ");
-        businessUnit2.getOfficesCodeOfBusinessUnit().add("ORQ");
-        function.getOfficesCodeOfFunction().add("ORQ");
-        function2.getOfficesCodeOfFunction().add("ORQ");
+        office.getFunctionsCodeInOffice().add("SG-Tech");
+        office.getFunctionsCodeInOffice().add("SG-HR");
+        office.getFunctionsCodeInOffice().add("SG-Sales");
+        office.getBusinessUnitsCodeInOffice().add("SG-Tech-InfraTech");
+        office.getBusinessUnitsCodeInOffice().add("SG-Tech-CurrTech");
+        office.getBusinessUnitsCodeInOffice().add("SG-Tech-FixIncTech");
+        techFunctionSG.getOfficesCodeOfFunction().add("ORQ");
+        hrFunctionSG.getOfficesCodeOfFunction().add("ORQ");
+        salesFunctionSG.getOfficesCodeOfFunction().add("ORQ");
         officeRepository.save(office);
-        functionRepository.save(function);
-        functionRepository.save(function2);
+        functionRepository.save(techFunctionSG);
+        functionRepository.save(hrFunctionSG);
+        functionRepository.save(salesFunctionSG);
     }
 }

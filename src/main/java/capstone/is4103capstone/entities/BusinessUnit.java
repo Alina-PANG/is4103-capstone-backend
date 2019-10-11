@@ -24,8 +24,6 @@ public class BusinessUnit extends DBEntityTemplate {
     @OneToMany(mappedBy = "businessUnit")
     private List<Team> teams = new ArrayList<>();
 
-    @Convert(converter = StringListConverter.class)
-    private List<String> officesCodeOfBusinessUnit = new ArrayList<>();
 
     public BusinessUnit() {
     }
@@ -48,13 +46,5 @@ public class BusinessUnit extends DBEntityTemplate {
 
     public void setTeams(List<Team> teams) {
         this.teams = teams;
-    }
-
-    public List<String> getOfficesCodeOfBusinessUnit() {
-        return officesCodeOfBusinessUnit;
-    }
-
-    public void setOfficesCodeOfBusinessUnit(List<String> officesCodeOfBusinessUnit) {
-        this.officesCodeOfBusinessUnit = officesCodeOfBusinessUnit;
     }
 }
