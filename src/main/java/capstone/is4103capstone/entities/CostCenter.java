@@ -33,7 +33,7 @@ public class CostCenter extends DBEntityTemplate {
 //    @JoinColumn(name = "country_id")
 //    private Country country;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
 

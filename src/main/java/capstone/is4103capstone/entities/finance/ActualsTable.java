@@ -2,7 +2,6 @@ package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.CostCenter;
-import capstone.is4103capstone.entities.helper.SpendingRecord;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -21,7 +20,7 @@ public class ActualsTable extends DBEntityTemplate {
 
     private Integer forYear;
 
-    @Embedded
+    @OneToMany(mappedBy = "actuals")
     private List<SpendingRecord> spendings = new ArrayList<>();
 
 
@@ -56,4 +55,6 @@ public class ActualsTable extends DBEntityTemplate {
     public void setSpendings(List<SpendingRecord> spendings) {
         this.spendings = spendings;
     }
+
+
 }

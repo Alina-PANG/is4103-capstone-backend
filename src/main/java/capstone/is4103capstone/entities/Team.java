@@ -26,8 +26,8 @@ public class Team extends DBEntityTemplate {
     @JsonIgnore
     private Office office;
 
-    @OneToMany(mappedBy = "team")
-    private List<CostCenter> costCenters;
+    @OneToOne(mappedBy = "team")
+    private CostCenter costCenter;
 
     @OneToMany(mappedBy = "team")
     private List<Contract> contracts = new ArrayList<>();
@@ -81,12 +81,12 @@ public class Team extends DBEntityTemplate {
         this.teamLeader = teamLeader;
     }
 
-    public List<CostCenter> getCostCenters() {
-        return costCenters;
+    public CostCenter getCostCenter() {
+        return costCenter;
     }
 
-    public void setCostCenters(List<CostCenter> costCenters) {
-        this.costCenters = costCenters;
+    public void setCostCenter(CostCenter costCenter) {
+        this.costCenter = costCenter;
     }
 
     public BusinessUnit getBusinessUnit() { return businessUnit; }
