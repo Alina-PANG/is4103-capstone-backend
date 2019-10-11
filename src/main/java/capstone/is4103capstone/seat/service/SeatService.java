@@ -1,7 +1,7 @@
 package capstone.is4103capstone.seat.service;
 
 import capstone.is4103capstone.entities.seat.Seat;
-import capstone.is4103capstone.seat.model.SeatModelForSeatMap;
+import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
 import capstone.is4103capstone.util.exception.SeatCreationException;
@@ -34,10 +34,20 @@ public class SeatService {
             throw new SeatCreationException("Creation of seat failed: invalid seat coordinate.");
         }
 
+        System.out.println("******************** Create New Seat ********************");
+        System.out.println("********** serial number: " + newSeatModel.getSerialNumber() + " **********");
+        System.out.println("********** is office? " + newSeatModel.isUnderOffice() + " **********");
         Seat newSeat = new Seat();
         newSeat.setxCoordinate(newSeatModel.getX());
         newSeat.setyCoordinate(newSeatModel.getY());
         newSeat.setSerialNumber(newSeatModel.getSerialNumber());
+        if (newSeatModel.isUnderOffice()) {
+            newSeat.setUnderOffice(true);
+            if (newSeatModel.getAdjacentSeatSeqNum() != null) {
+                newSeat.setAdjacentSeatSeqNum(newSeatModel.getAdjacentSeatSeqNum());
+            }
+        }
+
         return newSeat;
     }
 
