@@ -2,12 +2,20 @@ package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import java.math.BigDecimal;
 
+@MappedSuperclass
 public class RequestFormTemplate extends DBEntityTemplate {
 
+    @ManyToOne
+    @JoinColumn(name = "requester_id")
     private Employee requester;
 
+    @ManyToOne
+    @JoinColumn(name = "cost_center_id")
     private CostCenter costCenter;
 
     private String requestDescription;//can include purpose, training time, etc.

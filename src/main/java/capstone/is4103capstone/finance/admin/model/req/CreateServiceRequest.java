@@ -2,7 +2,7 @@ package capstone.is4103capstone.finance.admin.model.req;
 
 import java.io.Serializable;
 
-public class CreateMerchandiseRequest implements Serializable {
+public class CreateServiceRequest implements Serializable {
 
     private String vendorCode;
     private String itemName;
@@ -11,10 +11,10 @@ public class CreateMerchandiseRequest implements Serializable {
 
     private String username;
 
-    public CreateMerchandiseRequest() {
+    public CreateServiceRequest() {
     }
 
-    public CreateMerchandiseRequest(String vendorCode, String itemName, String sub2Code, String measureUnit, String username) {
+    public CreateServiceRequest(String vendorCode, String itemName, String sub2Code, String measureUnit, String username) {
         this.vendorCode = vendorCode;
         this.itemName = itemName;
         this.sub2Code = sub2Code;

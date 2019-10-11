@@ -15,7 +15,7 @@ public class PlanLineItem extends DBEntityTemplate {
     BigDecimal budgetAmount;
     String currencyAbbr;
     String comment;
-    String merchandiseCode;
+    String serviceCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "in_plan")
@@ -29,11 +29,11 @@ public class PlanLineItem extends DBEntityTemplate {
     }
 
 
-    public PlanLineItem(BigDecimal budgetAmount, String currencyAbbr, String comment, String merchandiseCode) {
+    public PlanLineItem(BigDecimal budgetAmount, String currencyAbbr, String comment, String serviceCode) {
         this.budgetAmount = budgetAmount;
         this.currencyAbbr = currencyAbbr;
         this.comment = comment;
-        this.merchandiseCode = merchandiseCode;
+        this.serviceCode = serviceCode;
     }
 
     public BigDecimal getBudgetAmount() {
@@ -60,12 +60,12 @@ public class PlanLineItem extends DBEntityTemplate {
         this.comment = comment;
     }
 
-    public String getMerchandiseCode() {
-        return merchandiseCode;
+    public String getserviceCode() {
+        return serviceCode;
     }
 
-    public void setMerchandiseCode(String merchandiseCode) {
-        this.merchandiseCode = merchandiseCode;
+    public void setserviceCode(String serviceCode) {
+        this.serviceCode = serviceCode;
     }
 
     public BudgetPlanEnum getItemType() {

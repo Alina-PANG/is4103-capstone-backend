@@ -37,7 +37,7 @@ public class CostCenter extends DBEntityTemplate {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    @OneToMany(mappedBy = "costCenter",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "costCenter")
     private List<ActualsTable> actuals = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
