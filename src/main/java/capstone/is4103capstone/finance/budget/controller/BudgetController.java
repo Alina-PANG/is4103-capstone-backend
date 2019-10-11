@@ -1,15 +1,18 @@
 package capstone.is4103capstone.finance.budget.controller;
 
 import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
+import capstone.is4103capstone.finance.budget.model.res.PlanCompareRes;
 import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
+import capstone.is4103capstone.finance.budget.service.PlansComparisonService;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +24,8 @@ public class BudgetController {
 
     @Autowired
     private BudgetService budgetService;
+    @Autowired
+    private PlansComparisonService comparisonService;
 
     @PostMapping("/createBudget")
     public ResponseEntity<GeneralRes> createBudget(@RequestBody CreateBudgetReq createBudgetReq) {
@@ -78,5 +83,18 @@ public class BudgetController {
             return ResponseEntity
                     .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @GetMapping("/diff")
+    public ResponseEntity<GeneralRes> compareReforecast(@RequestParam(name = "reforecastId",required = true) String reforecastPlanId){
+        try{
+            return ResponseEntity
+                    .ok()
+                    .body(comparisonService.getPlanComparisonResult(reforecastPlanId));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body(new GeneralRes(ex.getMessage(), true));
+        }
     }
 }

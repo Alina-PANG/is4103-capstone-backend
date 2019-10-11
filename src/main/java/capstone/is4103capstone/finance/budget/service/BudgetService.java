@@ -254,39 +254,7 @@ public class BudgetService {
             return new GetBudgetListRes(ex.getMessage(), true, null);
 
         }
-//
-//
-//
-//        try{
-//            if (retrieveType != null && (retrieveType > 2 || retrieveType < 0))
-//                throw new Exception("Retrieve Type can only take value 0,1,2");
-//
-//            CostCenter ccThis = costCenterRepository.getOne(costcenterId);
-//
-//            List<Plan> plans = planRepository.findByCostCenterId(costcenterId);
-//            List<BudgetModel> result = new ArrayList<>();
-//
-//
-//            logger.info("Req: username: "+username+" plan type: "+retrieveType);
-//            for(Plan p: plans){
-//                if(p.getDeleted() || p.getCreatedBy() == null || p.getBudgetPlanStatus() == null || p.getPlanType() == null) continue;
-//                if(checkPlanTypeAndYear(p,retrieveType,year)){
-//                    BudgetModel thisPlan = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), p.getId(), p.getBudgetPlanStatus(),p.getPlanType());
-//                    thisPlan.setCostCenterCode(ccThis.getCode());
-//
-//                    thisPlan.setCreateBy(p.getCreatedBy());
-//                    thisPlan.setLastModifiedTime(datetimeFormatter.format(p.getLastModifiedDateTime() == null ? p.getCreatedDateTime() : p.getLastModifiedDateTime()));
-//                    result.add(thisPlan);
-//                }
-//            }
-//            if(result.size() == 0){
-//                return new GetBudgetListRes("There is no plan to view according to the search type!", true, null);
-//            }
-//            return new GetBudgetListRes("Successsfully retrieved plans under the cost center!",false, result);
-//        } catch(Exception ex){
-//            ex.printStackTrace();
-//            return new GetBudgetListRes("An unexpected error happens: "+ex.getMessage(), true, null);
-//        }
+
     }
 
     public GeneralRes approveBudget(ApproveBudgetReq approveBudgetReq) {

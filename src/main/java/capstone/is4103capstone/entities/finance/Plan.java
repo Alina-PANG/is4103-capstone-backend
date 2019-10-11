@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,4 +113,14 @@ public class Plan extends DBEntityTemplate {
     public void setPlanDescription(String planDescription) {
         this.planDescription = planDescription;
     }
+
+    public BigDecimal calculateTotalValue(){
+        BigDecimal total = BigDecimal.ZERO;
+        for (PlanLineItem item: getLineItems()){
+            total = total.add(item.getBudgetAmount());
+        }
+        return total;
+    }
+
+
 }
