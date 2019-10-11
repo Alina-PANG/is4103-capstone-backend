@@ -193,8 +193,8 @@ public class BudgetService {
             plan.setDescription(p.getPlanDescription());
             plan.setCostCenterCode(p.getCostCenter().getCode());
             plan.setTeamCode(p.getCostCenter().getTeam().getCode());
-            plan.setCountryCode(p.getCostCenter().getTeam().getCountry().getCode());
-            plan.setFunctionCode(p.getCostCenter().getTeam().getFunction().getCode());
+            plan.setCountryCode(p.getCostCenter().getTeam().getBusinessUnit().getFunction().getCountry().getCode());
+            plan.setFunctionCode(p.getCostCenter().getTeam().getBusinessUnit().getFunction().getCode());
 
             plan.setLastModifiedTime(datetimeFormatter.format(p.getLastModifiedDateTime() == null ? p.getCreatedDateTime() : p.getLastModifiedDateTime()));
 

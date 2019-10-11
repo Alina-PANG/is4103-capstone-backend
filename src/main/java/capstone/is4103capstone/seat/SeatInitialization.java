@@ -56,6 +56,7 @@ public class SeatInitialization {
                 newSeatMap = seatMapRepository.save(newSeatMap);
 
                 for (Seat seat: newSeatMap.getSeats()) {
+                    seat.setOriginalSeatMapId(newSeatMap.getId());
                     seatRepository.save(seat);
                 }
             } catch (Exception ex) {

@@ -15,15 +15,16 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Team extends DBEntityTemplate {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "function_id")
-    @JsonIgnore
-    private CompanyFunction function;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "business_unit_id")
     @JsonIgnore
-    private Country country;
+    private BusinessUnit businessUnit;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "office_id")
+    @JsonIgnore
+    private Office office;
 
     @OneToMany(mappedBy = "team")
     private List<CostCenter> costCenters;
@@ -31,7 +32,7 @@ public class Team extends DBEntityTemplate {
     @OneToMany(mappedBy = "team")
     private List<Contract> contracts = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "team_employee",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id")
@@ -50,6 +51,10 @@ public class Team extends DBEntityTemplate {
     private Employee teamLeader;
 
     public Team() {
+    }
+
+    public Team(String teamName, String teamCode, String hierarchyPath) {
+        super(teamName, teamCode, hierarchyPath);
     }
 
     public List<Vendor> getVendors() {
@@ -76,14 +81,6 @@ public class Team extends DBEntityTemplate {
         this.teamLeader = teamLeader;
     }
 
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
-    }
-
     public List<CostCenter> getCostCenters() {
         return costCenters;
     }
@@ -92,17 +89,13 @@ public class Team extends DBEntityTemplate {
         this.costCenters = costCenters;
     }
 
-    public Team(String teamName, String teamCode, String hierachyPath) {
-        super(teamName, teamCode, hierachyPath);
-    }
+    public BusinessUnit getBusinessUnit() { return businessUnit; }
 
-    public CompanyFunction getFunction() {
-        return function;
-    }
+    public void setBusinessUnit(BusinessUnit businessUnit) { this.businessUnit = businessUnit; }
 
-    public void setFunction(CompanyFunction function) {
-        this.function = function;
-    }
+    public Office getOffice() { return office; }
+
+    public void setOffice(Office office) { this.office = office; }
 
     public List<Employee> getMembers() {
         return members;
