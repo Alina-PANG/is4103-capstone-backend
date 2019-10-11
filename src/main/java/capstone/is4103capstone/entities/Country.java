@@ -18,7 +18,11 @@ public class Country extends DBEntityTemplate {
     @JsonIgnore
     private Region region;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "country")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "country_function",
+            joinColumns = @JoinColumn(name = "country_id"),
+            inverseJoinColumns = @JoinColumn(name = "function_id")
+    )
     private List<CompanyFunction> functions = new ArrayList<>();
 
     @OneToMany(mappedBy = "country")

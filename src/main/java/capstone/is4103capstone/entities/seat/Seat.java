@@ -1,7 +1,6 @@
 package capstone.is4103capstone.entities.seat;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.util.enums.SeatTypeEnum;
@@ -10,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +17,6 @@ import java.util.List;
 @Entity
 @Table
 public class Seat extends DBEntityTemplate implements Comparable<Seat> {
-
     // Seat code example: SG-ORQ-26-01
 
     @Enumerated(EnumType.STRING)
@@ -32,18 +31,10 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     @Min(1)
     private Integer serialNumber;
 
-    @NotNull
-    private boolean underOffice = false;
-    private Integer adjacentSeatSeqNum; // the sequence number of the adjacent seat in the same office; can be null (only one seat in an office)
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "function_id")
     @JsonIgnore
     private CompanyFunction functionAssigned;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "business_unit_id")
-    @JsonIgnore
-    private BusinessUnit businessUnitAssigned;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     @JsonIgnore
@@ -121,37 +112,12 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
         this.setLastModifiedDateTime(new Date());
     }
 
-    public boolean isUnderOffice() {
-        return underOffice;
-    }
-
-    public void setUnderOffice(boolean underOffice) {
-        this.underOffice = underOffice;
-    }
-
-    public Integer getAdjacentSeatSeqNum() {
-        return adjacentSeatSeqNum;
-    }
-
-    public void setAdjacentSeatSeqNum(Integer adjacentSeatSeqNum) {
-        this.adjacentSeatSeqNum = adjacentSeatSeqNum;
-        this.setLastModifiedDateTime(new Date());
-    }
-
     public CompanyFunction getFunctionAssigned() {
         return functionAssigned;
     }
 
     public void setFunctionAssigned(CompanyFunction functionAssigned) {
         this.functionAssigned = functionAssigned;
-        this.setLastModifiedDateTime(new Date());
-    }
-
-    public BusinessUnit getBusinessUnitAssigned() { return businessUnitAssigned; }
-
-    public void setBusinessUnitAssigned(BusinessUnit businessUnitAssigned) {
-        this.businessUnitAssigned = businessUnitAssigned;
-        this.setLastModifiedDateTime(new Date());
     }
 
     public Team getTeamAssigned() {
@@ -160,16 +126,10 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     public void setTeamAssigned(Team teamAssigned) {
         this.teamAssigned = teamAssigned;
-        this.setLastModifiedDateTime(new Date());
     }
 
     public String getOriginalSeatMapId() {
         return originalSeatMapId;
-    }
-
-    public void setOriginalSeatMapId(String originalSeatMapId) {
-        this.originalSeatMapId = originalSeatMapId;
-        this.setLastModifiedDateTime(new Date());
     }
 
     public SeatMap getSeatMap() {
