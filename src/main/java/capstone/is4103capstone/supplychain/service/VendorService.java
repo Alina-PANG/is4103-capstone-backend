@@ -1,6 +1,8 @@
 package capstone.is4103capstone.supplychain.service;
 
+import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.admin.repository.TeamRepository;
+import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.Authentication;
@@ -35,6 +37,8 @@ public class VendorService {
     private ContractRepository contractRepository;
     @Autowired
     private ContractService contractService;
+    @Autowired
+    private BusinessUnitRepository businessUnitRepository;
 
     public GeneralRes createNewVendor(CreateVendorReq createVendorReq){
         try{
@@ -53,11 +57,11 @@ public class VendorService {
 
             newVendor = vendorRepository.saveAndFlush(newVendor);
             if(createVendorReq.getBusinessUnits() != null && createVendorReq.getBusinessUnits().size() != 0) {
-                for (Team t : createVendorReq.getBusinessUnits()) {
-                    newVendor.getBusinessUnits().add(t);
+                for (BusinessUnit businessUnit : createVendorReq.getBusinessUnits()) {
+                    newVendor.getBusinessUnits().add(businessUnit);
                     newVendor = vendorRepository.saveAndFlush(newVendor);
-                    t.getVendors().add(newVendor);
-                    teamRepository.saveAndFlush(t);
+                    businessUnit.getVendors().add(newVendor);
+                    businessUnitRepository.saveAndFlush(businessUnit);
                 }
             }
 
@@ -161,19 +165,19 @@ public class VendorService {
     public GeneralRes addBusinessUnit(AddBusinessUnitReq addBusinessUnitReq, String vendorId){
         try{
             Vendor vendor = vendorRepository.getOne(vendorId);
-            Team team = teamRepository.getOne(addBusinessUnitReq.getTeamId());
+            BusinessUnit businessUnit = businessUnitRepository.getOne(addBusinessUnitReq.getBusinessUnitId());
 
-            if(vendor.getDeleted() || team.getDeleted()){
-                return new GetVendorRes("This vendor or team is deleted.", true, null);
+            if(vendor.getDeleted() || businessUnit.getDeleted()){
+                return new GetVendorRes("This vendor or business unit is deleted.", true, null);
             }
 
-            vendor.getBusinessUnits().add(team);
+            vendor.getBusinessUnits().add(businessUnit);
             vendor.setLastModifiedBy(addBusinessUnitReq.getUsername());
 
             vendor = vendorRepository.saveAndFlush(vendor);
-            team.getVendors().add(vendor);
-            team.setLastModifiedBy(addBusinessUnitReq.getUsername());
-            teamRepository.saveAndFlush(team);
+            businessUnit.getVendors().add(vendor);
+            businessUnit.setLastModifiedBy(addBusinessUnitReq.getUsername());
+            businessUnitRepository.saveAndFlush(businessUnit);
 
             return new GeneralRes("Successfully add the business unit to vendor!", false);
         }catch(Exception ex){
@@ -184,9 +188,9 @@ public class VendorService {
 
     private VendorModel transformToGeneralEntityModel(Vendor vendor){
         List<GeneralEntityModel> businessUnits = new ArrayList<>();
-        for(Team t: vendor.getBusinessUnits()){
-            GeneralEntityModel team = new GeneralEntityModel(t);
-            businessUnits.add(team);
+        for(BusinessUnit b: vendor.getBusinessUnits()){
+            GeneralEntityModel businessUnit = new GeneralEntityModel(b);
+            businessUnits.add(businessUnit);
         }
 
         VendorModel vendorModel = new VendorModel(
