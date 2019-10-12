@@ -49,7 +49,7 @@ public class Contract extends DBEntityTemplate {
     @JsonIgnore
     private Vendor vendor;
 
-    @OneToMany(mappedBy = "master_contract",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "masterContract",fetch = FetchType.LAZY)
     private List<ChildContract> childContractList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

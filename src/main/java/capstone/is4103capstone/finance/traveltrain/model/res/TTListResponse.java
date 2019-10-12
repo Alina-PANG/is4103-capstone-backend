@@ -2,12 +2,12 @@ package capstone.is4103capstone.finance.traveltrain.model.res;
 
 import capstone.is4103capstone.general.model.GeneralRes;
 
-public class TTFormResponse extends GeneralRes {
+public class TTListResponse extends GeneralRes {
 
-    public TTFormResponse() {
+    public TTListResponse() {
     }
 
-    public TTFormResponse(String message, Boolean hasError) {
+    public TTListResponse(String message, Boolean hasError) {
         super(message, hasError);
     }
 }

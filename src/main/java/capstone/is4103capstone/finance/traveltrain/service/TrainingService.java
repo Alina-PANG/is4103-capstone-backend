@@ -1,26 +1,26 @@
 package capstone.is4103capstone.finance.traveltrain.service;
 
+import capstone.is4103capstone.finance.traveltrain.model.req.CreateTrainingRequest;
 import capstone.is4103capstone.finance.traveltrain.model.req.CreateTravelRequest;
 import capstone.is4103capstone.finance.traveltrain.model.res.TTFormResponse;
 import capstone.is4103capstone.finance.traveltrain.model.res.TTListResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 
 @Service
-public class TravelService {
+public class TrainingService {
 
-
-    public TTFormResponse createTravelPlan(CreateTravelRequest req){
+    public TTFormResponse createTrainingPlan(CreateTrainingRequest req){
 
         return new TTFormResponse();
     }
 
-    public TTListResponse retrieveTravelPlansByUser(String username){
+    public TTListResponse retrieveTrainingPlansByUser(String username){
 
         return new TTListResponse();
     }
 
-    public TTFormResponse getTravelPlanDetails(String planId){
+    public TTFormResponse getTrainingPlanDetails(String planId){
         return new TTFormResponse();
     }
+
 }

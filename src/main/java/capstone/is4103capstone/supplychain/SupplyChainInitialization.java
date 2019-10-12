@@ -96,7 +96,7 @@ public class SupplyChainInitialization {
         vendor1.setLastModifiedDateTime(new Date());
 
         Service service = serviceRepository.findServiceByCode("SG_Banana");
-        vendor1.getservices().add(service);
+//        vendor1.getservices().add(service);
 
         vendorRepository.save(vendor1);
         service.setVendor(vendor1);

@@ -1,11 +1,82 @@
 package capstone.is4103capstone.finance.traveltrain.controller;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import capstone.is4103capstone.finance.traveltrain.model.req.CreateTrainingRequest;
+import capstone.is4103capstone.finance.traveltrain.model.req.CreateTravelRequest;
+import capstone.is4103capstone.finance.traveltrain.model.res.TTFormResponse;
+import capstone.is4103capstone.finance.traveltrain.model.res.TTListResponse;
+import capstone.is4103capstone.finance.traveltrain.service.TrainingService;
+import capstone.is4103capstone.finance.traveltrain.service.TravelService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/tt")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class TravelTrainController {
+
+    @Autowired
+    TravelService travelService;
+    @Autowired
+    TrainingService trainingService;
+
+    @PostMapping("/travel")
+    public ResponseEntity<TTFormResponse> createTrainingRequest(@RequestBody CreateTrainingRequest req){
+        try{
+            return ResponseEntity.badRequest().body(trainingService.createTrainingPlan(req));
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
+        }
+
+    }
+
+    @PostMapping("/train")
+    public ResponseEntity<TTFormResponse> createTravelRequest(@RequestBody CreateTravelRequest req){
+        try{
+            return ResponseEntity.badRequest().body(travelService.createTravelPlan(req));
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
+        }
+
+    }
+
+    @GetMapping("/travel/view-my")
+    public ResponseEntity<TTListResponse> getTrainingPlansByUser(){
+        String username="";//get from
+        try{
+            return ResponseEntity.badRequest().body(trainingService.retrieveTrainingPlansByUser(username));
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(new TTListResponse(ex.getMessage(),true));
+        }
+
+    }
+
+    @GetMapping("/train/view-my")
+    public ResponseEntity<TTListResponse> getTravelPlansByUser(){
+        String username = "";
+        try{
+            return ResponseEntity.badRequest().body(travelService.retrieveTravelPlansByUser(username));
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(new TTListResponse(ex.getMessage(),true));
+        }
+    }
+
+    @GetMapping("/travel/{id}")
+    public ResponseEntity<TTFormResponse> getTrainingPlanDetails(@PathVariable(name = "id") String planId){
+        try{
+            return ResponseEntity.badRequest().body(trainingService.getTrainingPlanDetails(planId));
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
+        }
+
+    }
+    @GetMapping("/train/{id}")
+    public ResponseEntity<TTFormResponse> getTravelPlanDetails(@PathVariable(name = "id") String planId){
+        try{
+            return ResponseEntity.badRequest().body(travelService.getTravelPlanDetails(planId));
+        }catch (Exception ex){
+            return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
+        }
+    }
+
 }
