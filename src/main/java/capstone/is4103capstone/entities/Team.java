@@ -39,13 +39,6 @@ public class Team extends DBEntityTemplate {
     )
     private List<Employee> members = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "team_vendor",
-            joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "vendor_id")
-    )
-    private List<Vendor> vendors = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="team_leader_id")
     private Employee teamLeader;
@@ -55,14 +48,6 @@ public class Team extends DBEntityTemplate {
 
     public Team(String teamName, String teamCode, String hierarchyPath) {
         super(teamName, teamCode, hierarchyPath);
-    }
-
-    public List<Vendor> getVendors() {
-        return vendors;
-    }
-
-    public void setVendors(List<Vendor> vendors) {
-        this.vendors = vendors;
     }
 
     public List<Contract> getContracts() {

@@ -7,9 +7,11 @@ import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class ContractModel implements Serializable {
+    private String contractDescription;
     private String name;
     private String code;
     private String id;
@@ -23,7 +25,8 @@ public class ContractModel implements Serializable {
     private GeneralEntityModel vendor;
     private GeneralEntityModel employeeInChargeContract;
     private GeneralEntityModel team;
-    private Integer totalContractValue;
+    private BigDecimal totalContractValue;
+    private String currencyCode;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -37,7 +40,8 @@ public class ContractModel implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
-    public ContractModel(String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, GeneralEntityModel employeeInChargeContract, GeneralEntityModel team, Integer totalContractValue, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
+    public ContractModel(String contractDescription, String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, GeneralEntityModel employeeInChargeContract, GeneralEntityModel team, BigDecimal totalContractValue, String currencyCode, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
+        this.contractDescription = contractDescription;
         this.name = name;
         this.code = code;
         this.id = id;
@@ -52,6 +56,7 @@ public class ContractModel implements Serializable {
         this.employeeInChargeContract = employeeInChargeContract;
         this.team = team;
         this.totalContractValue = totalContractValue;
+        this.currencyCode = currencyCode;
         this.startDate = startDate;
         this.endDate = endDate;
         this.renewalStartDate = renewalStartDate;
@@ -61,12 +66,28 @@ public class ContractModel implements Serializable {
     public ContractModel() {
     }
 
-    public Integer getTotalContractValue() {
+    public String getContractDescription() {
+        return contractDescription;
+    }
+
+    public void setContractDescription(String contractDescription) {
+        this.contractDescription = contractDescription;
+    }
+
+    public BigDecimal getTotalContractValue() {
         return totalContractValue;
     }
 
-    public void setTotalContractValue(Integer totalContractValue) {
+    public void setTotalContractValue(BigDecimal totalContractValue) {
         this.totalContractValue = totalContractValue;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public Long getSeqNo() {
