@@ -37,7 +37,7 @@ public class ContractService {
     @Autowired
     TeamRepository teamRepository;
 
-    public GeneralRes CreateContract(CreateContractReq createContractReq){
+    public GeneralRes createContract(CreateContractReq createContractReq){
         try{
             Contract newContract = new Contract();
             newContract.setContractDescription(createContractReq.getContractDescription());
@@ -137,7 +137,7 @@ public class ContractService {
         }
     }
 
-    public GeneralRes UpdateContract (CreateContractReq updateContractReq, String id) {
+    public GeneralRes updateContract(CreateContractReq updateContractReq, String id) {
         try {
             Contract contract = contractRepository.getOne(id);
             if (updateContractReq.getContractDescription()!= null) {

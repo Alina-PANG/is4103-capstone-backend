@@ -25,7 +25,7 @@ public class ContractController {
         if (Authentication.authenticateUser(createContractReq.getModifierUsername())) {
             return ResponseEntity
                     .ok()
-                    .body(contractService.CreateContract(createContractReq));
+                    .body(contractService.createContract(createContractReq));
         } else {
             return ResponseEntity
                     .ok()
@@ -51,7 +51,7 @@ public class ContractController {
         if (Authentication.authenticateUser(updateContractReq.getModifierUsername())) {
             return ResponseEntity
                     .ok()
-                    .body(contractService.UpdateContract(updateContractReq, id));
+                    .body(contractService.updateContract(updateContractReq, id));
         } else {
             return ResponseEntity
                     .badRequest()
