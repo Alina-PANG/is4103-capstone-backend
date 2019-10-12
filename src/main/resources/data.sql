@@ -8,7 +8,6 @@ DROP TRIGGER IF EXISTS seq_no_generation_budget_sub2 ^;
 DROP TRIGGER IF EXISTS seq_no_generation_business_unit ^;
 DROP TRIGGER IF EXISTS seq_no_generation_company_function ^;
 DROP TRIGGER IF EXISTS seq_no_generation_contract ^;
-DROP TRIGGER IF EXISTS seq_no_generation_contract_line ^;
 DROP TRIGGER IF EXISTS seq_no_generation_cost_center ^;
 DROP TRIGGER IF EXISTS seq_no_generation_country ^;
 DROP TRIGGER IF EXISTS seq_no_generation_currency ^;
