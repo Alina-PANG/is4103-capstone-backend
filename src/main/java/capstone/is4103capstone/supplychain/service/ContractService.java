@@ -252,8 +252,8 @@ public class ContractService {
             if(e.getCurrencyCode() != null){
                 contractLine.setCurrencyCode(e.getCurrencyCode());
             }
-            if(e.getMerchandiseCode() != null){
-                contractLine.setMerchandiseCode(e.getMerchandiseCode());
+            if(e.getserviceCode() != null){
+                contractLine.setserviceCode(e.getserviceCode());
             }
             if(e.getObjectName() != null){
                 contractLine.setObjectName(e.getObjectName());

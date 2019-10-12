@@ -1,16 +1,15 @@
 package capstone.is4103capstone.finance.admin.service;
 
 import capstone.is4103capstone.admin.repository.CountryRepository;
-import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.finance.BudgetCategory;
 import capstone.is4103capstone.entities.finance.BudgetSub1;
 import capstone.is4103capstone.entities.finance.BudgetSub2;
-import capstone.is4103capstone.entities.finance.Merchandise;
+import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.finance.Repository.BudgetCategoryRepository;
 import capstone.is4103capstone.finance.Repository.BudgetSub1Repository;
 import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
-import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
+import capstone.is4103capstone.finance.Repository.ServiceRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.model.CategoryModel;
 import capstone.is4103capstone.finance.admin.model.Sub1Model;
@@ -18,21 +17,17 @@ import capstone.is4103capstone.finance.admin.model.req.CreateBudgetCategoryReque
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
 import capstone.is4103capstone.general.Authentication;
-import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
-import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@org.springframework.stereotype.Service
 public class CategoryService {
     private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
@@ -45,7 +40,7 @@ public class CategoryService {
     @Autowired
     BudgetSub2Repository sub2Repository;
     @Autowired
-    MerchandiseRepository merchandiseRepository;
+    ServiceRepository serviceRepository;
 
 
     public BudgetCategoryRes createCategory(CreateBudgetCategoryRequest categoryRequest){
@@ -139,15 +134,15 @@ public class CategoryService {
                         thisSub2.put("code",sub2.getCode());
 
                         JSONArray mList = new JSONArray();
-                        List<Merchandise> ms = merchandiseRepository.findMerchandiseByBudgetSub2Id(sub2.getId());
-                        for (Merchandise m: ms){
+                        List<Service> ms = serviceRepository.findServiceByBudgetSub2Id(sub2.getId());
+                        for (Service m: ms){
                             JSONObject thisM = new JSONObject();
                             thisM.put("name",m.getObjectName());
                             thisM.put("code",m.getCode());
                             thisM.put("vendorCode",m.getVendor().getCode());
                             mList.put(thisM);
                         }
-                        thisSub2.put("merchandises",mList);
+                        thisSub2.put("services",mList);
                         sub2List.put(thisSub2);
                     }
                     thisSub1.put("sub2List",sub2List);

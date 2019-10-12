@@ -8,7 +8,7 @@ public class Sub2Model implements Serializable {
     private String name;
     private String code;
     private String sub1BelongsTo;
-    List<MerchandiseModel> merchandiselList = new ArrayList<>();
+    List<ServiceModel> servicelList = new ArrayList<>();
 
 
     public Sub2Model(String name, String code, String sub1BelongsTo) {
@@ -17,11 +17,11 @@ public class Sub2Model implements Serializable {
         this.sub1BelongsTo = sub1BelongsTo;
     }
 
-    public Sub2Model(String name, String code, String sub1BelongsTo, List<MerchandiseModel> merchandiselList) {
+    public Sub2Model(String name, String code, String sub1BelongsTo, List<ServiceModel> servicelList) {
         this.name = name;
         this.code = code;
         this.sub1BelongsTo = sub1BelongsTo;
-        this.merchandiselList = merchandiselList;
+        this.servicelList = servicelList;
     }
 
     public Sub2Model() {
@@ -51,11 +51,11 @@ public class Sub2Model implements Serializable {
         this.code = code;
     }
 
-    public List<MerchandiseModel> getMerchandiselList() {
-        return merchandiselList;
+    public List<ServiceModel> getservicelList() {
+        return servicelList;
     }
 
-    public void setMerchandiselList(List<MerchandiseModel> merchandiselList) {
-        this.merchandiselList = merchandiselList;
+    public void setservicelList(List<ServiceModel> servicelList) {
+        this.servicelList = servicelList;
     }
 }

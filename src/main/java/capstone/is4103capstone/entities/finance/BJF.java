@@ -1,7 +1,6 @@
 package capstone.is4103capstone.entities.finance;
 
-import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.RequestFormTemplate;
 import capstone.is4103capstone.util.enums.BjfTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,17 +11,12 @@ import java.math.BigDecimal;
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class BJF extends DBEntityTemplate {
+public class BJF extends RequestFormTemplate {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "merchandise_id")
+    @JoinColumn(name = "service_id")
     @JsonIgnore
-    private Merchandise merchandise;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id")
-    @JsonIgnore
-    private Employee requester;
+    private Service service;
 
     private BjfTypeEnum BjfType;
 
@@ -33,8 +27,6 @@ public class BJF extends DBEntityTemplate {
     private BigDecimal ongoingCost;
 
     private BigDecimal totalAmt;
-
-    private String costCenterCode;
 
     private BigDecimal projectCost = null; // if type == project
 
@@ -53,23 +45,22 @@ public class BJF extends DBEntityTemplate {
 
 
 
-    public BJF(BjfTypeEnum bjfType, String justification, String currencyCode, BigDecimal ongoingCost, BigDecimal totalAmt, String costCenterCode, BigDecimal projectCost, String projectCode) {
+    public BJF(BjfTypeEnum bjfType, String justification, String currencyCode, BigDecimal ongoingCost, BigDecimal totalAmt, BigDecimal projectCost, String projectCode) {
         this.BjfType = bjfType;
         this.justification = justification;
         this.currencyCode = currencyCode;
         this.ongoingCost = ongoingCost;
         this.totalAmt = totalAmt;
-        this.costCenterCode = costCenterCode;
         this.projectCost = projectCost;
         this.projectCode = projectCode;
     }
 
-    public Merchandise getMerchandise() {
-        return merchandise;
+    public Service getService() {
+        return service;
     }
 
-    public void setMerchandise(Merchandise merchandise) {
-        this.merchandise = merchandise;
+    public void setService(Service service) {
+        this.service = service;
     }
 
     public BjfTypeEnum getBjfType() {
@@ -104,13 +95,6 @@ public class BJF extends DBEntityTemplate {
         this.totalAmt = totalAmt;
     }
 
-    public String getCostCenterCode() {
-        return costCenterCode;
-    }
-
-    public void setCostCenterCode(String costCenterCode) {
-        this.costCenterCode = costCenterCode;
-    }
 
     public BigDecimal getProjectCost() {
         return projectCost;
@@ -152,13 +136,6 @@ public class BJF extends DBEntityTemplate {
         this.budgetApprovalTicketCode = budgetApprovalTicketCode;
     }
 
-    public Employee getRequester() {
-        return requester;
-    }
-
-    public void setRequester(Employee requester) {
-        this.requester = requester;
-    }
 
     public String getJustification() {
         return justification;

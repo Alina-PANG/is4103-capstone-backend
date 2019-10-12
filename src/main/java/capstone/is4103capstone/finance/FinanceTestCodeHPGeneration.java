@@ -25,7 +25,7 @@ public class FinanceTestCodeHPGeneration {
     @Autowired
     BudgetSub2Repository budgetSub2Repository;
     @Autowired
-    MerchandiseRepository merchandiseRepository;
+    ServiceRepository serviceRepository;
     @Autowired
     PlanRepository planRepository;
     @Autowired

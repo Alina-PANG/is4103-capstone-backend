@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Merchandise extends DBEntityTemplate {
+public class Service extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budgetSub2_id")
     @JsonIgnore
@@ -27,12 +27,12 @@ public class Merchandise extends DBEntityTemplate {
     @NotNull
     private String measureUnit;
 
-//  We don't need to view purchase orders under merchandise right, no this use case.
+//  We don't need to view purchase orders under service right, no this use case.
     // only know from po who are the items, which shows in the purchaseOrderLineItem
 //    @ManyToMany
-//    @JoinTable(name = "po_merchandise",
+//    @JoinTable(name = "po_service",
 //            joinColumns = @JoinColumn(name = "po_id"),
-//            inverseJoinColumns = @JoinColumn(name = "merchandise_id")
+//            inverseJoinColumns = @JoinColumn(name = "service_id")
 //    )
 //    private List<PurchaseOrder> purchaseOrders;
 
@@ -43,10 +43,10 @@ public class Merchandise extends DBEntityTemplate {
     private String currencyCode;
 
 
-    public Merchandise() {
+    public Service() {
     }
 
-    public Merchandise(String itemName, @NotNull String measureUnit) {
+    public Service(String itemName, @NotNull String measureUnit) {
         super(itemName);
         this.measureUnit = measureUnit;
     }
@@ -59,7 +59,7 @@ public class Merchandise extends DBEntityTemplate {
         this.currentContractCode = currentContractCode;
     }
 
-    public Merchandise(String objectName, String code, String hierachyPath, String measureUnit, String opsUser) {
+    public Service(String objectName, String code, String hierachyPath, String measureUnit, String opsUser) {
         super(objectName, code,hierachyPath);
         this.setCreatedBy(opsUser);
         this.setLastModifiedBy(opsUser);
@@ -76,8 +76,8 @@ public class Merchandise extends DBEntityTemplate {
         this.measureUnit = measureUnit;
     }
 
-    public Merchandise(String merchandiseName, String merchandiseCode, String hierachyPath) {
-        super(merchandiseName, merchandiseCode, hierachyPath);
+    public Service(String serviceName, String serviceCode, String hierachyPath) {
+        super(serviceName, serviceCode, hierachyPath);
     }
 
     public BudgetSub2 getBudgetSub2() {
