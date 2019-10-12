@@ -151,7 +151,7 @@ public class ServiceServ {
 //            return basicModel;
 //        }
 //
-//        Optional<ChildContract> clOptional = childContractRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
+//        Optional<ChildContract> clOptional = childContractRepository.findChildContractByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
 //        if (!clOptional.isPresent()){
 //            logProblem("[Internal Error]No such service in the contract");
 //            basicModel.setHasActiveContract(false);
