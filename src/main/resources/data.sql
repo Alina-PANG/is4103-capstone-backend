@@ -8,7 +8,7 @@ DROP TRIGGER IF EXISTS seq_no_generation_budget_sub2 ^;
 DROP TRIGGER IF EXISTS seq_no_generation_business_unit ^;
 DROP TRIGGER IF EXISTS seq_no_generation_company_function ^;
 DROP TRIGGER IF EXISTS seq_no_generation_contract ^;
-DROP TRIGGER IF EXISTS seq_no_generation_contract_line ^;
+DROP TRIGGER IF EXISTS seq_no_generation_child_contract ^;
 DROP TRIGGER IF EXISTS seq_no_generation_cost_center ^;
 DROP TRIGGER IF EXISTS seq_no_generation_country ^;
 DROP TRIGGER IF EXISTS seq_no_generation_currency ^;
@@ -99,10 +99,10 @@ BEGIN
    SET NEW.seq_no = (SELECT COUNT(*)+1 FROM contract);
 END ^;
 
-Create Trigger `seq_no_generation_contract_line`
-BEFORE INSERT ON `contract_line` FOR EACH ROW
+Create Trigger `seq_no_generation_child_contract`
+BEFORE INSERT ON `child_contract` FOR EACH ROW
 BEGIN
-   SET NEW.seq_no = (SELECT COUNT(*)+1 FROM contract_line);
+   SET NEW.seq_no = (SELECT COUNT(*)+1 FROM child_contract);
 END ^;
 
 Create Trigger `seq_no_generation_cost_center`

@@ -8,7 +8,6 @@ import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.commons.collections4.bidimap.AbstractBidiMapDecorator;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -29,27 +28,33 @@ public class Contract extends DBEntityTemplate {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
+    //not necessary to have
     @Temporal(TemporalType.DATE)
     private Date renewalStartDate;
 
-    private String contractTerm; //no of months, evergreen, perpetual
+    //no of months, evergreen, perpetual
+    private String contractTerm;
     private ContractTypeEnum contractType;
-    //to-do: hierarchy
     private ContractStatusEnum contractStatus;
+
+    //just inform people that if you want to early terminate this contract, you should inform others before how many days
+    //system does not need to do anything
     private Integer noticeDaysToExit;
     private BigDecimal totalContractValue;
 
+    //Before the contract expires, on this cpgReviewAlertDate, system will auto send email to remind people
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
-    private String spendType; //not very sure
+    //budget or non-budget etc. free text
+    private String spendType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vendor_id")
     @JsonIgnore
     private Vendor vendor;
 
-    @OneToMany(mappedBy = "master_contract",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "masterContract",fetch = FetchType.EAGER)
     private List<ChildContract> childContractList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

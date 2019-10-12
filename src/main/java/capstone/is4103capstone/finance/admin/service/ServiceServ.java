@@ -85,10 +85,10 @@ public class ServiceServ {
             newItem.setCode(EntityCodeHPGeneration.getCode(serviceRepository,newItem));
             newItem.setVendor(vendor);
             newItem.setBudgetSub2(sub2);
-            vendor.getservices().size();
-            sub2.getservices().size();
-            vendor.getservices().add(newItem);
-            sub2.getservices().add(newItem);
+//            vendor.getservices().size();
+//            sub2.getservices().size();
+//            vendor.getservices().add(newItem);
+//            sub2.getservices().add(newItem);
 
 
             JSONObject res = new JSONObject();

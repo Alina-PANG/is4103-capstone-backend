@@ -29,7 +29,7 @@ public interface PlanRepository extends JpaRepository<Plan,String> {
     Optional<Plan> findBudgetByCCAndYear(String ccId, int year, int status, int planType);
 
 
-    @Query(value = "select m.code,m.object_name,i.budget_amount,i.currency_abbr,i.comment from plan_line_item i join service m on i.service_code=m.code where i.in_plan=?1"
+    @Query(value = "select m.code,m.object_name as service_name,i.object_name as plan_name, i.budget_amount,i.currency_abbr,i.comment from plan_line_item i join service m on i.service_code=m.code where i.in_plan=?1"
             ,nativeQuery = true)
     List<CompareLineItemModel> findPlanLineItemsWithPlanId(String planId);
 
