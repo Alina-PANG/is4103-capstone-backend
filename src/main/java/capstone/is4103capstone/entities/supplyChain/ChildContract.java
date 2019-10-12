@@ -17,7 +17,6 @@ public class ChildContract extends DBEntityTemplate{
     @NotNull
     private String merchandiseCode;
 
-
     private BigDecimal price;
 
     private String currencyCode;

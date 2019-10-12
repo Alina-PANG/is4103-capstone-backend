@@ -12,7 +12,7 @@ import capstone.is4103capstone.finance.admin.model.MerchandiseModel;
 import capstone.is4103capstone.finance.admin.model.req.CreateMerchandiseRequest;
 import capstone.is4103capstone.finance.admin.model.res.MerchandiseListRes;
 import capstone.is4103capstone.general.Authentication;
-import capstone.is4103capstone.supplychain.Repository.ContractLineRepository;
+import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import org.json.JSONObject;
@@ -43,7 +43,7 @@ public class MerchandiseService {
     @Autowired
     ContractRepository contractRepository;
     @Autowired
-    ContractLineRepository contractLineRepository;
+    ChildContractRepository childContractRepository;
 
 
     //assume you can give either vendor code or id?
@@ -152,7 +152,7 @@ public class MerchandiseService {
             return basicModel;
         }
 
-        Optional<ChildContract> clOptional = contractLineRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
+        Optional<ChildContract> clOptional = childContractRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
         if (!clOptional.isPresent()){
             logProblem("[Internal Error]No such merchandise in the contract");
             basicModel.setHasActiveContract(false);
