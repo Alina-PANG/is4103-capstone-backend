@@ -100,8 +100,8 @@ public class AdminInitialization {
         newEmployee2.getMemberOfTeams().add(team);
         team.getMembers().add(newEmployee);
         team.getMembers().add(newEmployee2);
-        newEmployee.setHierachyPath("APAC-SG-TECH-GCP-T1-yingshi2502");
-        newEmployee2.setHierachyPath("APAC-SG-TECH-GCP-T1-caiyuqian");
+        newEmployee.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-yingshi2502");
+        newEmployee2.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-caiyuqian");
 
         newEmployee2.setManager(newEmployee);
         newEmployee.getSubordinates().add(newEmployee2);
@@ -194,19 +194,19 @@ public class AdminInitialization {
 
         // ---------------------------------- Business Unit ----------------------------------
 
-        BusinessUnit businessUnitInfraTech = new BusinessUnit("Infrastructure Tech", "InfraTech", "SG-Tech-InfraTech");
+        BusinessUnit businessUnitInfraTech = new BusinessUnit("Infrastructure Tech", "SG-Tech-InfraTech", "SG-Tech-InfraTech");
         businessUnitInfraTech.setCreatedBy("admin");
         businessUnitInfraTech.setLastModifiedBy("admin");
         businessUnitInfraTech = businessUnitRepository.save(businessUnitInfraTech);
         businessUnitInfraTech.setFunction(techFunctionSG);
 
-        BusinessUnit businessUnitCurrencyTech = new BusinessUnit("Currency Tech", "CurrTech", "SG-Tech-CurrTech");
+        BusinessUnit businessUnitCurrencyTech = new BusinessUnit("Currency Tech", "SG-Tech-CurrTech", "SG-Tech-CurrTech");
         businessUnitCurrencyTech.setCreatedBy("admin");
         businessUnitCurrencyTech.setLastModifiedBy("admin");
         businessUnitCurrencyTech = businessUnitRepository.save(businessUnitCurrencyTech);
         businessUnitCurrencyTech.setFunction(techFunctionSG);
 
-        BusinessUnit businessUnitFixIncomeTech = new BusinessUnit("Fix Income Tech", "FixIncTech", "SG-Tech-FixIncTech");
+        BusinessUnit businessUnitFixIncomeTech = new BusinessUnit("Fix Income Tech", "SG-Tech-FixIncTech", "SG-Tech-FixIncTech");
         businessUnitFixIncomeTech.setCreatedBy("admin");
         businessUnitFixIncomeTech.setLastModifiedBy("admin");
         businessUnitFixIncomeTech = businessUnitRepository.save(businessUnitFixIncomeTech);
@@ -214,37 +214,37 @@ public class AdminInitialization {
 
         // ---------------------------------- Team ----------------------------------
 
-        Team endUserComputingTeam = new Team("End User Computing", "EndUserCom", "SG-Tech-InfraTech-EndUserCom");
+        Team endUserComputingTeam = new Team("End User Computing", "SG-Tech-InfraTech-EndUserCom", "SG-Tech-InfraTech-EndUserCom");
         endUserComputingTeam.setCreatedBy("admin");
         endUserComputingTeam.setLastModifiedBy("admin");
         endUserComputingTeam = teamRepository.save(endUserComputingTeam);
         endUserComputingTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team dataCenterOpeTeam = new Team("Data Center Operation", "DataCenOpr", "SG-Tech-InfraTech-DataCenOpr");
+        Team dataCenterOpeTeam = new Team("Data Center Operation", "SG-Tech-InfraTech-DataCenOpr", "SG-Tech-InfraTech-DataCenOpr");
         dataCenterOpeTeam.setCreatedBy("admin");
         dataCenterOpeTeam.setLastModifiedBy("admin");
         dataCenterOpeTeam = teamRepository.save(dataCenterOpeTeam);
         dataCenterOpeTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team databaseAdminTeam = new Team("Database Admin", "DBAdmin", "SG-Tech-InfraTech-DBAdmin");
+        Team databaseAdminTeam = new Team("Database Admin", "SG-Tech-InfraTech-DBAdmin", "SG-Tech-InfraTech-DBAdmin");
         databaseAdminTeam.setCreatedBy("admin");
         databaseAdminTeam.setLastModifiedBy("admin");
         databaseAdminTeam = teamRepository.save(databaseAdminTeam);
         databaseAdminTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team networkTeam = new Team("Networks", "Networks", "SG-Tech-InfraTech-Networks");
+        Team networkTeam = new Team("Networks", "SG-Tech-InfraTech-Networks", "SG-Tech-InfraTech-Networks");
         networkTeam.setCreatedBy("admin");
         networkTeam.setLastModifiedBy("admin");
         networkTeam = teamRepository.save(networkTeam);
         networkTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team productionSupportTeam = new Team("Production Support", "ProdSupp", "SG-Tech-FixIncTech-ProdSupp");
+        Team productionSupportTeam = new Team("Production Support", "SG-Tech-FixIncTech-ProdSupp", "SG-Tech-FixIncTech-ProdSupp");
         productionSupportTeam.setCreatedBy("admin");
         productionSupportTeam.setLastModifiedBy("admin");
         productionSupportTeam = teamRepository.save(productionSupportTeam);
         productionSupportTeam.setBusinessUnit(businessUnitFixIncomeTech);
 
-        Team developmentTeam = new Team("Development", "Dev", "SG-Tech-FixIncTech-Dev");
+        Team developmentTeam = new Team("Development", "SG-Tech-FixIncTech-Dev", "SG-Tech-FixIncTech-Dev");
         developmentTeam.setCreatedBy("admin");
         developmentTeam.setLastModifiedBy("admin");
         developmentTeam = teamRepository.save(developmentTeam);

@@ -31,10 +31,10 @@ public class Office extends DBEntityTemplate {
     @OneToMany(mappedBy = "office")
     private List<Team> teams = new ArrayList<>();
 
-    @Convert(converter = StringListConverter.class)
+    @ElementCollection(targetClass= String.class)
     private List<String> functionsCodeInOffice = new ArrayList<>();
 
-    @Convert(converter = StringListConverter.class)
+    @ElementCollection(targetClass= String.class)
     private List<String> businessUnitsCodeInOffice = new ArrayList<>();
 
     public Office() {
