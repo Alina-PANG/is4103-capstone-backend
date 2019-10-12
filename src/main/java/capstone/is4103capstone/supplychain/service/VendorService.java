@@ -2,7 +2,6 @@ package capstone.is4103capstone.supplychain.service;
 
 import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.Team;
-import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
@@ -10,7 +9,6 @@ import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
-import capstone.is4103capstone.supplychain.model.ContractModel;
 import capstone.is4103capstone.supplychain.model.VendorModel;
 import capstone.is4103capstone.supplychain.model.req.AddBusinessUnitReq;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;

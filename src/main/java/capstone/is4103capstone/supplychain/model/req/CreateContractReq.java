@@ -7,10 +7,12 @@ import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 public class CreateContractReq implements Serializable {
+    private String contractDescription;
     private PurchaseTypeEnum purchaseType;
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
@@ -34,18 +36,35 @@ public class CreateContractReq implements Serializable {
     private String modifierUsername;
     private String employeeInChargeId;
     private String contractName;
-    private Integer totalContractValue;
+    private BigDecimal totalContractValue;
+    private String currencyCode;
     private String teamId;
 
     public CreateContractReq() {
     }
 
-    public Integer getTotalContractValue() {
+    public BigDecimal getTotalContractValue() {
         return totalContractValue;
     }
 
-    public void setTotalContractValue(Integer totalContractValue) {
+    public void setTotalContractValue(BigDecimal totalContractValue) {
         this.totalContractValue = totalContractValue;
+    }
+
+    public String getContractDescription() {
+        return contractDescription;
+    }
+
+    public void setContractDescription(String contractDescription) {
+        this.contractDescription = contractDescription;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public String getTeamId() {

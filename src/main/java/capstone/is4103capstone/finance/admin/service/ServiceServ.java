@@ -128,7 +128,7 @@ public class ServiceServ {
             ServiceModel model;
             for (Service m : services){
                 model = new ServiceModel(m.getObjectName(),m.getCode(),m.getVendor().getCode(),m.getVendor().getObjectName(),m.getMeasureUnit());
-                model = retrieveContractInformation(m,model);
+                //model = retrieveContractInformation(m,model);
                 mlist.add(model);
             }
             return new ServiceListRes("Successfully retrieved services under sub2["+sub2.getCode()+"]",false,mlist,mlist.size());
@@ -138,42 +138,42 @@ public class ServiceServ {
 
     }
 
-    private ServiceModel retrieveContractInformation(Service m, ServiceModel basicModel){
-        //check active contract;
-        if (m.getCurrentContractCode() == null || m.getCurrentContractCode().isEmpty()){
-            basicModel.setHasActiveContract(false);
-            return basicModel;
-        }
-        Contract contract = contractRepository.findContractByCode(m.getCurrentContractCode());
-        if (contract == null || contractHasExpired(contract) || contract.getDeleted()){
-            logProblem("[Internal Error]Contract has problem, either incorrect code or expired contract, or contract is deleted");
-            basicModel.setHasActiveContract(false);
-            return basicModel;
-        }
-
-        Optional<ChildContract> clOptional = childContractRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
-        if (!clOptional.isPresent()){
-            logProblem("[Internal Error]No such service in the contract");
-            basicModel.setHasActiveContract(false);
-            return basicModel;
-        }
-        ChildContract cl = clOptional.get();
-
-        if (!cl.getPrice().equals(m.getCurrentPrice())){
-            logProblem("[Internal Error]Price doesn't equalize, some problem, will take the price in contract line.");
-        }
-
-        basicModel.setCurrentPrice(cl.getPrice());
-        basicModel.setHasActiveContract(true);
-        basicModel.setCurrentContractCode(m.getCurrentContractCode());
-        basicModel.setContractStartDate(formatter.format(contract.getStartDate()));
-        basicModel.setContractEndDate(formatter.format(contract.getEndDate()));
-
-        return basicModel;
-
-
-
-    }
+//    private ServiceModel retrieveContractInformation(Service m, ServiceModel basicModel){
+//        //check active contract;
+//        if (m.getCurrentContractCode() == null || m.getCurrentContractCode().isEmpty()){
+//            basicModel.setHasActiveContract(false);
+//            return basicModel;
+//        }
+//        Contract contract = contractRepository.findContractByCode(m.getCurrentContractCode());
+//        if (contract == null || contractHasExpired(contract) || contract.getDeleted()){
+//            logProblem("[Internal Error]Contract has problem, either incorrect code or expired contract, or contract is deleted");
+//            basicModel.setHasActiveContract(false);
+//            return basicModel;
+//        }
+//
+//        Optional<ChildContract> clOptional = childContractRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
+//        if (!clOptional.isPresent()){
+//            logProblem("[Internal Error]No such service in the contract");
+//            basicModel.setHasActiveContract(false);
+//            return basicModel;
+//        }
+//        ChildContract cl = clOptional.get();
+//
+//        if (!cl.getPrice().equals(m.getCurrentPrice())){
+//            logProblem("[Internal Error]Price doesn't equalize, some problem, will take the price in contract line.");
+//        }
+//
+//        basicModel.setCurrentPrice(cl.getPrice());
+//        basicModel.setHasActiveContract(true);
+//        basicModel.setCurrentContractCode(m.getCurrentContractCode());
+//        basicModel.setContractStartDate(formatter.format(contract.getStartDate()));
+//        basicModel.setContractEndDate(formatter.format(contract.getEndDate()));
+//
+//        return basicModel;
+//
+//
+//
+//    }
 
     private boolean contractHasExpired(Contract c){
         Date today = new Date();

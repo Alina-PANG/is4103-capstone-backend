@@ -8,8 +8,10 @@ import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.collections4.bidimap.AbstractBidiMapDecorator;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Contract extends DBEntityTemplate {
+    private String contractDescription;
     private PurchaseTypeEnum purchaseType;
 
     @Temporal(TemporalType.DATE)
@@ -34,7 +37,7 @@ public class Contract extends DBEntityTemplate {
     //to-do: hierarchy
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
-    private Integer totalContractValue;
+    private BigDecimal totalContractValue;
 
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
@@ -46,7 +49,7 @@ public class Contract extends DBEntityTemplate {
     @JsonIgnore
     private Vendor vendor;
 
-    @OneToMany(mappedBy = "contract",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "master_contract",fetch = FetchType.EAGER)
     private List<ChildContract> childContractList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,7 +62,9 @@ public class Contract extends DBEntityTemplate {
     @JsonIgnore
     private Team team;
 
-    public Contract(PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, Integer totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ChildContract> childContractList, Employee employeeInChargeContract, Team team) {
+    private String currencyCode;
+
+    public Contract(String contractDescription, PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, BigDecimal totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ChildContract> childContractList, Employee employeeInChargeContract, Team team, String currencyCode) {
         this.purchaseType = purchaseType;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -75,9 +80,27 @@ public class Contract extends DBEntityTemplate {
         this.childContractList = childContractList;
         this.employeeInChargeContract = employeeInChargeContract;
         this.team = team;
+        this.currencyCode = currencyCode;
+        this.contractDescription = contractDescription;
     }
 
     public Contract() {
+    }
+
+    public String getContractDescription() {
+        return contractDescription;
+    }
+
+    public void setContractDescription(String contractDescription) {
+        this.contractDescription = contractDescription;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public Team getTeam() {
@@ -104,11 +127,11 @@ public class Contract extends DBEntityTemplate {
         this.employeeInChargeContract = employeeInChargeContract;
     }
 
-    public Integer getTotalContractValue() {
+    public BigDecimal getTotalContractValue() {
         return totalContractValue;
     }
 
-    public void setTotalContractValue(Integer totalContractValue) {
+    public void setTotalContractValue(BigDecimal totalContractValue) {
         this.totalContractValue = totalContractValue;
     }
 

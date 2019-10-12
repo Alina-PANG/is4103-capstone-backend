@@ -5,7 +5,6 @@ import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
@@ -41,6 +40,7 @@ public class ContractService {
     public GeneralRes CreateContract(CreateContractReq createContractReq){
         try{
             Contract newContract = new Contract();
+            newContract.setContractDescription(createContractReq.getContractDescription());
             newContract.setContractStatus(createContractReq.getContractStatus());
             newContract.setContractTerm(createContractReq.getContractTerm());
             newContract.setContractType(createContractReq.getContractType());
@@ -55,6 +55,7 @@ public class ContractService {
             newContract.setCreatedBy(createContractReq.getModifierUsername());
             newContract.setLastModifiedBy(createContractReq.getModifierUsername());
             newContract.setTotalContractValue(createContractReq.getTotalContractValue());
+            newContract.setCurrencyCode(createContractReq.getCurrencyCode());
             newContract.setDeleted(false);
             newContract = contractRepository.saveAndFlush(newContract);
             if (newContract.getSeqNo() == null) {
@@ -139,6 +140,9 @@ public class ContractService {
     public GeneralRes UpdateContract (CreateContractReq updateContractReq, String id) {
         try {
             Contract contract = contractRepository.getOne(id);
+            if (updateContractReq.getContractDescription()!= null) {
+                contract.setContractDescription(updateContractReq.getContractDescription());
+            }
             if (updateContractReq.getRenewalStartDate() != null) {
                 contract.setRenewalStartDate(updateContractReq.getRenewalStartDate());
             }
@@ -174,6 +178,9 @@ public class ContractService {
             }
             if(updateContractReq.getTotalContractValue() != null){
                 contract.setTotalContractValue(updateContractReq.getTotalContractValue());
+            }
+            if (updateContractReq.getCurrencyCode() != null) {
+                contract.setCurrencyCode(updateContractReq.getCurrencyCode());
             }
 
             contract.setLastModifiedBy(updateContractReq.getModifierUsername());
@@ -227,10 +234,10 @@ public class ContractService {
         }
 
         ContractModel contractModel = new ContractModel(
-                contract.getObjectName(), contract.getCode(), contract.getId(), contract.getSeqNo(),
+                contract.getContractDescription(), contract.getObjectName(), contract.getCode(), contract.getId(), contract.getSeqNo(),
                 contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
                 contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
-                vendor, employeeInChargeContract, team, contract.getTotalContractValue(),
+                vendor, employeeInChargeContract, team, contract.getTotalContractValue(), contract.getCurrencyCode(),
                 contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
 
         return contractModel;
