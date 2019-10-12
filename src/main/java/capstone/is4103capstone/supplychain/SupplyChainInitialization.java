@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -39,8 +38,6 @@ public class SupplyChainInitialization {
     OutsourcingRepository outsourcingRepository;
     @Autowired
     EmployeeRepository employeeRepository;
-    @Autowired
-    ContractLineRepository contractLineRepository;
 
     private final String opsUserId = "yingshi2502";
 
@@ -54,15 +51,15 @@ public class SupplyChainInitialization {
 //            newEmployee2.setCode("EMPLOYEE-xuhong");
 //            employeeRepository.save(newEmployee2);
 //
-////            createMechandise();
-////            createVendors();
-////            createContract();
-////            createDispute();
-////            createAction();
-////            createOutsourcingAssessmentLine();
-////            createOutsourcingAssessmentSection();
-////            createOutsourcingAssessment();
-////            createOutsourcing();
+//            createMechandise();
+//            createVendors();
+//            createContract();
+//            createDispute();
+//            createAction();
+//            createOutsourcingAssessmentLine();
+//            createOutsourcingAssessmentSection();
+//            createOutsourcingAssessment();
+//            createOutsourcing();
 //        }
     }
 
@@ -112,26 +109,6 @@ public class SupplyChainInitialization {
         Service banana = serviceRepository.findServiceByCode("SG_Banana");
         Service mango = serviceRepository.findServiceByCode("SG_Mango");
 
-        ContractLine contractLine1 = new ContractLine("SG_Banana", BigDecimal.valueOf(2.0), "SGD", opsUserId);
-        ContractLine contractLine2 = new ContractLine("SG_Mango", BigDecimal.valueOf(5.0), "SGD", opsUserId);
-
-        contractLine1.setCreatedBy("xuhong");
-        contractLine1.setCreatedDateTime(new Date());
-        contractLine1.setLastModifiedBy("xuhong");
-        contractLine1.setLastModifiedDateTime(new Date());
-
-        contractLine2.setCreatedBy("xuhong");
-        contractLine2.setCreatedDateTime(new Date());
-        contractLine2.setLastModifiedBy("xuhong");
-        contractLine2.setLastModifiedDateTime(new Date());
-
-        contractLine1 = contractLineRepository.save(contractLine1);
-        contractLine2 = contractLineRepository.save(contractLine2);
-
-        contractLine1.setserviceCode("SG_Banana");
-        contractLine2.setserviceCode("SG_Mango");
-
-
         Contract contract1 = new Contract();
         contract1.setPurchaseType(PurchaseTypeEnum.TERMLICENSE);
         contract1.setSpendType("DummyType");
@@ -151,13 +128,6 @@ public class SupplyChainInitialization {
 
         banana.setCurrentContractCode("Contract1");
         mango.setCurrentContractCode("Contract1");
-
-        contract1.getContractLines().add(contractLine1);
-        contract1.getContractLines().add(contractLine2);
-        contractLine1.setContract(contract1);
-        contractLine2.setContract(contract1);
-        contractLineRepository.saveAndFlush(contractLine1);
-        contractLineRepository.saveAndFlush(contractLine2);
 
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
         Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
