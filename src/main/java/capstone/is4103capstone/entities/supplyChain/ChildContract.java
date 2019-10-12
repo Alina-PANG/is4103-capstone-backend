@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class ChildContract extends Contract {
+public class ChildContract extends DBEntityTemplate {
 
     @NotNull
     private String serviceCode;
@@ -33,8 +33,8 @@ public class ChildContract extends Contract {
     public ChildContract() {
     }
 
-    public ChildContract(String contractDescription, PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, BigDecimal totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ChildContract> childContractList, Employee employeeInChargeContract, Team team, String currencyCode, @NotNull String serviceCode, BigDecimal contractValue,  Contract masterContract) {
-        super(contractDescription, purchaseType, startDate, endDate, renewalStartDate, contractTerm, contractType, contractStatus, noticeDaysToExit, totalContractValue, cpgReviewAlertDate, spendType, vendor, childContractList, employeeInChargeContract, team, currencyCode);
+    public ChildContract(String objectName, String code, @NotNull String serviceCode, BigDecimal contractValue, Contract masterContract) {
+        super(objectName, code);
         this.serviceCode = serviceCode;
         this.contractValue = contractValue;
         this.masterContract = masterContract;

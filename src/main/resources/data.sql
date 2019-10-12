@@ -99,12 +99,6 @@ BEGIN
    SET NEW.seq_no = (SELECT COUNT(*)+1 FROM contract);
 END ^;
 
-Create Trigger `seq_no_generation_contract_line`
-BEFORE INSERT ON `contract_line` FOR EACH ROW
-BEGIN
-   SET NEW.seq_no = (SELECT COUNT(*)+1 FROM contract_line);
-END ^;
-
 Create Trigger `seq_no_generation_cost_center`
 BEFORE INSERT ON `cost_center` FOR EACH ROW
 BEGIN
