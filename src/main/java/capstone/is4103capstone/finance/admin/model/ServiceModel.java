@@ -3,9 +3,9 @@ package capstone.is4103capstone.finance.admin.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class MerchandiseModel implements Serializable {
-    String merchandiseName;
-    String merchandiseCode;
+public class ServiceModel implements Serializable {
+    String serviceName;
+    String serviceCode;
     String vendorCode;
     String vendorName;
     String measureUnit;
@@ -17,17 +17,17 @@ public class MerchandiseModel implements Serializable {
     String contractEndDate;
     String comment;
 
-    public MerchandiseModel() {
+    public ServiceModel() {
     }
 
-    public MerchandiseModel(String merchandiseName, String merchandiseCode) {
-        this.merchandiseName = merchandiseName;
-        this.merchandiseCode = merchandiseCode;
+    public ServiceModel(String serviceName, String serviceCode) {
+        this.serviceName = serviceName;
+        this.serviceCode = serviceCode;
     }
 
-    public MerchandiseModel(String merchandiseName, String merchandiseCode, String vendorCode, String vendorName, String measureUnit) {
-        this.merchandiseName = merchandiseName;
-        this.merchandiseCode = merchandiseCode;
+    public ServiceModel(String serviceName, String serviceCode, String vendorCode, String vendorName, String measureUnit) {
+        this.serviceName = serviceName;
+        this.serviceCode = serviceCode;
         this.vendorCode = vendorCode;
         this.vendorName = vendorName;
         this.measureUnit = measureUnit;
@@ -49,20 +49,20 @@ public class MerchandiseModel implements Serializable {
         this.hasActiveContract = hasActiveContract;
     }
 
-    public String getMerchandiseName() {
-        return merchandiseName;
+    public String getserviceName() {
+        return serviceName;
     }
 
-    public void setMerchandiseName(String merchandiseName) {
-        this.merchandiseName = merchandiseName;
+    public void setserviceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
-    public String getMerchandiseCode() {
-        return merchandiseCode;
+    public String getserviceCode() {
+        return serviceCode;
     }
 
-    public void setMerchandiseCode(String merchandiseCode) {
-        this.merchandiseCode = merchandiseCode;
+    public void setserviceCode(String serviceCode) {
+        this.serviceCode = serviceCode;
     }
 
     public String getVendorCode() {

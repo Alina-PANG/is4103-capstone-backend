@@ -15,23 +15,24 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Team extends DBEntityTemplate {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "function_id")
-    @JsonIgnore
-    private CompanyFunction function;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "country_id")
+    @JoinColumn(name = "business_unit_id")
     @JsonIgnore
-    private Country country;
+    private BusinessUnit businessUnit;
 
-    @OneToMany(mappedBy = "team")
-    private List<CostCenter> costCenters;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "office_id")
+    @JsonIgnore
+    private Office office;
+
+    @OneToOne(mappedBy = "team")
+    private CostCenter costCenter;
 
     @OneToMany(mappedBy = "team")
     private List<Contract> contracts = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "team_employee",
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id")
@@ -50,6 +51,10 @@ public class Team extends DBEntityTemplate {
     private Employee teamLeader;
 
     public Team() {
+    }
+
+    public Team(String teamName, String teamCode, String hierarchyPath) {
+        super(teamName, teamCode, hierarchyPath);
     }
 
     public List<Vendor> getVendors() {
@@ -76,33 +81,21 @@ public class Team extends DBEntityTemplate {
         this.teamLeader = teamLeader;
     }
 
-    public Country getCountry() {
-        return country;
+    public CostCenter getCostCenter() {
+        return costCenter;
     }
 
-    public void setCountry(Country country) {
-        this.country = country;
+    public void setCostCenter(CostCenter costCenter) {
+        this.costCenter = costCenter;
     }
 
-    public List<CostCenter> getCostCenters() {
-        return costCenters;
-    }
+    public BusinessUnit getBusinessUnit() { return businessUnit; }
 
-    public void setCostCenters(List<CostCenter> costCenters) {
-        this.costCenters = costCenters;
-    }
+    public void setBusinessUnit(BusinessUnit businessUnit) { this.businessUnit = businessUnit; }
 
-    public Team(String teamName, String teamCode, String hierachyPath) {
-        super(teamName, teamCode, hierachyPath);
-    }
+    public Office getOffice() { return office; }
 
-    public CompanyFunction getFunction() {
-        return function;
-    }
-
-    public void setFunction(CompanyFunction function) {
-        this.function = function;
-    }
+    public void setOffice(Office office) { this.office = office; }
 
     public List<Employee> getMembers() {
         return members;

@@ -1,7 +1,6 @@
 package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.finance.Merchandise;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -15,7 +14,7 @@ import java.math.BigDecimal;
 public class ChildContract extends DBEntityTemplate{
 
     @NotNull
-    private String merchandiseCode;
+    private String serviceCode;
 
     private BigDecimal price;
 
@@ -26,8 +25,8 @@ public class ChildContract extends DBEntityTemplate{
     @JsonIgnore
     private Contract contract;
 
-    public ChildContract(String merchandiseCode, BigDecimal price, String currencyCode, String createdUser) {
-        this.merchandiseCode = merchandiseCode;
+    public ChildContract(String serviceCode, BigDecimal price, String currencyCode,String createdUser) {
+        this.serviceCode = serviceCode;
         this.price = price;
         this.currencyCode = currencyCode;
         this.setCreatedBy(createdUser);
@@ -43,12 +42,12 @@ public class ChildContract extends DBEntityTemplate{
         this.currencyCode = currencyCode;
     }
 
-    public String getMerchandiseCode() {
-        return merchandiseCode;
+    public String getserviceCode() {
+        return serviceCode;
     }
 
-    public void setMerchandiseCode(String merchandiseCode) {
-        this.merchandiseCode = merchandiseCode;
+    public void setserviceCode(String serviceCode) {
+        this.serviceCode = serviceCode;
     }
 
     public ChildContract() {

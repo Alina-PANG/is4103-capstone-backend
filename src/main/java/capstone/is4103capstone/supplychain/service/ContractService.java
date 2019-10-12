@@ -211,7 +211,6 @@ public class ContractService {
         }
     }
 
-
     public ContractModel transformToContractModel(Contract contract){
         GeneralEntityModel vendor = null;
         GeneralEntityModel employeeInChargeContract = null;

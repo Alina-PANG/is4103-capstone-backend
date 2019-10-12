@@ -1,16 +1,16 @@
 package capstone.is4103capstone.finance.admin.service;
 
 import capstone.is4103capstone.entities.finance.BudgetSub2;
-import capstone.is4103capstone.entities.finance.Merchandise;
+import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
-import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
+import capstone.is4103capstone.finance.Repository.ServiceRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
-import capstone.is4103capstone.finance.admin.model.MerchandiseModel;
-import capstone.is4103capstone.finance.admin.model.req.CreateMerchandiseRequest;
-import capstone.is4103capstone.finance.admin.model.res.MerchandiseListRes;
+import capstone.is4103capstone.finance.admin.model.ServiceModel;
+import capstone.is4103capstone.finance.admin.model.req.CreateServiceRequest;
+import capstone.is4103capstone.finance.admin.model.res.ServiceListRes;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
@@ -19,7 +19,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
@@ -29,13 +28,13 @@ import java.util.List;
 import java.util.Optional;
 
 
-@Service
-public class MerchandiseService {
-    private static final Logger logger = LoggerFactory.getLogger(MerchandiseService.class);
+@org.springframework.stereotype.Service
+public class ServiceServ {
+    private static final Logger logger = LoggerFactory.getLogger(ServiceServ.class);
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
-    MerchandiseRepository merchandiseRepository;
+    ServiceRepository serviceRepository;
     @Autowired
     BudgetSub2Repository sub2Repository;
     @Autowired
@@ -48,7 +47,7 @@ public class MerchandiseService {
 
     //assume you can give either vendor code or id?
     @Transactional
-    public JSONObject createMerchandise(CreateMerchandiseRequest req){
+    public JSONObject createservice(CreateServiceRequest req){
         try{
             Vendor vendor = vendorRepository.findVendorByCode(req.getVendorCode());
             if (vendor == null || vendor.getDeleted()){
@@ -77,24 +76,24 @@ public class MerchandiseService {
                 throw new Exception("Measure Unit field cannot be null!");
             }
 
-            Merchandise newItem = new Merchandise(req.getItemName().trim(),req.getMeasureUnit());
+            Service newItem = new Service(req.getItemName().trim(),req.getMeasureUnit());
             newItem.setCreatedBy(req.getUsername());
             newItem.setHierachyPath(EntityCodeHPGeneration.setHP(sub2,newItem));
             Authentication.configurePermissionMap(newItem);
-            newItem = merchandiseRepository.save(newItem);
+            newItem = serviceRepository.save(newItem);
 
-            newItem.setCode(EntityCodeHPGeneration.getCode(merchandiseRepository,newItem));
+            newItem.setCode(EntityCodeHPGeneration.getCode(serviceRepository,newItem));
             newItem.setVendor(vendor);
             newItem.setBudgetSub2(sub2);
-            vendor.getMerchandises().size();
-            sub2.getMerchandises().size();
-            vendor.getMerchandises().add(newItem);
-            sub2.getMerchandises().add(newItem);
+            vendor.getservices().size();
+            sub2.getservices().size();
+            vendor.getservices().add(newItem);
+            sub2.getservices().add(newItem);
 
 
             JSONObject res = new JSONObject();
 
-            MerchandiseModel newItemModel = new MerchandiseModel(newItem.getObjectName(),newItem.getCode(),vendor.getCode(),vendor.getObjectName(),newItem.getMeasureUnit());
+            ServiceModel newItemModel = new ServiceModel(newItem.getObjectName(),newItem.getCode(),vendor.getCode(),vendor.getObjectName(),newItem.getMeasureUnit());
 
             res.put("newItem", new JSONObject(newItemModel));
 
@@ -111,7 +110,7 @@ public class MerchandiseService {
     }
 
     //sub2 can be either code or id will take as code by default and double check id;
-    public MerchandiseListRes viewMerchandiseItemsBySub2(String sub2Id){
+    public ServiceListRes viewserviceItemsBySub2(String sub2Id){
         try{
             BudgetSub2 sub2 = sub2Repository.findBudgetSub2ByCode(sub2Id);
             if (sub2 == null || sub2.getDeleted()){
@@ -124,22 +123,22 @@ public class MerchandiseService {
             }
 
 
-            List<Merchandise> merchandises = merchandiseRepository.findMerchandiseByBudgetSub2Id(sub2.getId());
-            List<MerchandiseModel> mlist = new ArrayList<>();
-            MerchandiseModel model;
-            for (Merchandise m : merchandises){
-                model = new MerchandiseModel(m.getObjectName(),m.getCode(),m.getVendor().getCode(),m.getVendor().getObjectName(),m.getMeasureUnit());
+            List<Service> services = serviceRepository.findServiceByBudgetSub2Id(sub2.getId());
+            List<ServiceModel> mlist = new ArrayList<>();
+            ServiceModel model;
+            for (Service m : services){
+                model = new ServiceModel(m.getObjectName(),m.getCode(),m.getVendor().getCode(),m.getVendor().getObjectName(),m.getMeasureUnit());
                 model = retrieveContractInformation(m,model);
                 mlist.add(model);
             }
-            return new MerchandiseListRes("Successfully retrieved merchandises under sub2["+sub2.getCode()+"]",false,mlist,mlist.size());
+            return new ServiceListRes("Successfully retrieved services under sub2["+sub2.getCode()+"]",false,mlist,mlist.size());
         }catch (Exception e){
-            return new MerchandiseListRes(e.getMessage(),true);
+            return new ServiceListRes(e.getMessage(),true);
         }
 
     }
 
-    private MerchandiseModel retrieveContractInformation(Merchandise m, MerchandiseModel basicModel){
+    private ServiceModel retrieveContractInformation(Service m, ServiceModel basicModel){
         //check active contract;
         if (m.getCurrentContractCode() == null || m.getCurrentContractCode().isEmpty()){
             basicModel.setHasActiveContract(false);
@@ -154,7 +153,7 @@ public class MerchandiseService {
 
         Optional<ChildContract> clOptional = childContractRepository.findContractLineByMerchandiseCodeAndContractId(m.getCode(),contract.getId());
         if (!clOptional.isPresent()){
-            logProblem("[Internal Error]No such merchandise in the contract");
+            logProblem("[Internal Error]No such service in the contract");
             basicModel.setHasActiveContract(false);
             return basicModel;
         }
@@ -185,7 +184,7 @@ public class MerchandiseService {
     }
 
     private void checkRepeatedName(String sub2Id, String vendorId, String name) throws Exception {
-        boolean result = merchandiseRepository.countMerchandisesByVendor(sub2Id,vendorId,name.trim()) > 0;
+        boolean result = serviceRepository.countServicesByVendor(sub2Id,vendorId,name.trim()) > 0;
         if (result){
             throw new Exception("This item already exists for the vendor and sub2 category");
         }
