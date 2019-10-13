@@ -99,7 +99,8 @@ public class ProjectService {
     }
 
     public List<ProjectModel> retrieveProjectsByOwner(String ownerId) throws Exception{
-        List<Project> projects = projectRepository.getProjectsByProjectOwnerId(ownerId);
+        Employee owner = validateUser(ownerId);
+        List<Project> projects = projectRepository.getProjectsByProjectOwnerId(owner.getId());
         if (projects.isEmpty())
             throw new Exception("No projects owned by the user.");
         List<ProjectModel> projectModels = new ArrayList<>();
@@ -109,13 +110,14 @@ public class ProjectService {
         return projectModels;
     }
 
-    private Employee validateUser(String idOrUsername){
+    private Employee validateUser(String idOrUsername) throws Exception{
         Optional<Employee> employee = employeeRepository.findUndeletedEmployeeById(idOrUsername);
         if (employee.isPresent())
             return employee.get();
         Employee e = employeeRepository.findEmployeeByUserName(idOrUsername);
         if (e != null)
             return e;
-        return null;
+
+        throw new Exception("username or id not valid");
     }
 }
