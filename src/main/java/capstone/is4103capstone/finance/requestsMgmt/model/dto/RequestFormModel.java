@@ -1,42 +1,61 @@
-package capstone.is4103capstone.finance.requestsMgmt.model;
+package capstone.is4103capstone.finance.requestsMgmt.model.dto;
 
 import capstone.is4103capstone.entities.RequestFormTemplate;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 
 import java.math.BigDecimal;
 
 public class RequestFormModel {
 
-    private String requesterUsername;
-    private String requesterName;
+    private EmployeeModel requester;
     private String costCenterCode;
     private String description;
     private String additionalInfo;
     private BigDecimal estimatedBudget;
     private String currencyCode;
     private String approvalStatus;
+    private String id;
 
     public RequestFormModel() {
     }
 
+
     public RequestFormModel(RequestFormTemplate e) {
         setAdditionalInfo(e.getAdditionalInfo());
-        setCostCenterCode(e.getCostCenter().getCode());
+        setCostCenterCode(e.getCostCenter() == null? null:e.getCostCenter().getCode());
         setDescription(e.getRequestDescription());
         setEstimatedBudget(e.getEstimatedBudget());
         setCurrencyCode(e.getCurrency());
-        setRequesterName(e.getRequester().getFullName());
-        setRequesterUsername(e.getRequester().getUserName());
         setApprovalStatus(e.getStatus().name());
+        setRequester(new EmployeeModel(e.getRequester()));
+        setId(e.getId());
     }
 
-    public RequestFormModel(String requesterUsername, String requesterName, String costCenterCode, String description, String additionalInfo, BigDecimal estimatedBudget, String currencyCode) {
-        this.requesterUsername = requesterUsername;
-        this.requesterName = requesterName;
+    public RequestFormModel(EmployeeModel requester, String costCenterCode, String description, String additionalInfo, BigDecimal estimatedBudget, String currencyCode, String approvalStatus, String id) {
+        this.requester = requester;
         this.costCenterCode = costCenterCode;
         this.description = description;
         this.additionalInfo = additionalInfo;
         this.estimatedBudget = estimatedBudget;
         this.currencyCode = currencyCode;
+        this.approvalStatus = approvalStatus;
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public EmployeeModel getRequester() {
+        return requester;
+    }
+
+    public void setRequester(EmployeeModel requester) {
+        this.requester = requester;
     }
 
     public String getApprovalStatus() {
@@ -45,22 +64,6 @@ public class RequestFormModel {
 
     public void setApprovalStatus(String approvalStatus) {
         this.approvalStatus = approvalStatus;
-    }
-
-    public String getRequesterUsername() {
-        return requesterUsername;
-    }
-
-    public void setRequesterUsername(String requesterUsername) {
-        this.requesterUsername = requesterUsername;
-    }
-
-    public String getRequesterName() {
-        return requesterName;
-    }
-
-    public void setRequesterName(String requesterName) {
-        this.requesterName = requesterName;
     }
 
     public String getCostCenterCode() {

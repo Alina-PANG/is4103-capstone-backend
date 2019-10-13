@@ -5,6 +5,7 @@ import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.RequestFormTemplate;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.util.enums.ProjectStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -24,13 +25,15 @@ public class Project extends RequestFormTemplate {
     private Date endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "projectOwner_Id")
+    @JoinColumn(name = "project_owner_id")
     private Employee projectOwner;
 
     @Convert(converter = StringListConverter.class)
     private List<String> members = new ArrayList<>();
 
     private String projectTitle;
+
+    private ProjectStatus projectLifeCycleStatus = ProjectStatus.PENDING_APPROVAL;
 
     public Project() {
     }
@@ -42,6 +45,14 @@ public class Project extends RequestFormTemplate {
         this.projectOwner = projectOwner;
         this.members = members;
         this.projectTitle = projectTitle;
+    }
+
+    public ProjectStatus getProjectLifeCycleStatus() {
+        return projectLifeCycleStatus;
+    }
+
+    public void setProjectLifeCycleStatus(ProjectStatus projectLifeCycleStatus) {
+        this.projectLifeCycleStatus = projectLifeCycleStatus;
     }
 
     public Date getStartDate() {

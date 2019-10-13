@@ -1,4 +1,4 @@
-package capstone.is4103capstone.finance.requestsMgmt.model;
+package capstone.is4103capstone.finance.requestsMgmt.model.dto;
 
 import capstone.is4103capstone.entities.finance.TravelForm;
 import capstone.is4103capstone.util.Tools;
