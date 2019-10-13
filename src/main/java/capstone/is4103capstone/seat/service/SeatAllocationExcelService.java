@@ -64,6 +64,7 @@ public class SeatAllocationExcelService {
                 employeeModelWithValidityChecking.setName(employee.getFullName());
                 employeeModelWithValidityChecking.setHasValidEmployeeId(true);
             } catch (EmployeeNotFoundException ex) {
+                employeeModelWithValidityChecking.setId(employeeId);
                 employeeModelWithValidityChecking.setHasValidEmployeeId(false);
             }
             employeeModelsWithValidityChecking.add(employeeModelWithValidityChecking);
