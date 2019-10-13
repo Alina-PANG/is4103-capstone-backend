@@ -1,17 +1,22 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.RequestFormTemplate;
+import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Project extends DBEntityTemplate {
+public class Project extends RequestFormTemplate {
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -22,32 +27,21 @@ public class Project extends DBEntityTemplate {
     @JoinColumn(name = "projectOwner_Id")
     private Employee projectOwner;
 
-    private String description;
+    @Convert(converter = StringListConverter.class)
+    private List<String> members = new ArrayList<>();
 
-    private BigDecimal budgetAmt;
-
-    private String costCenterCode;
+    private String projectTitle;
 
     public Project() {
     }
 
-    public Project(String projectName, String projectCode, Date startDate, Date endDate, String description, BigDecimal budgetAmt,String costCenterCode) {
-        super(projectName, projectCode);
+    public Project(String objectName, Employee requester, CostCenter costCenter, String requestDescription, String additionalInfo, BigDecimal estimatedBudget, String currency, Date startDate, Date endDate, Employee projectOwner, List<String> members, String projectTitle) {
+        super(objectName, requester, costCenter, requestDescription, additionalInfo, estimatedBudget, currency);
         this.startDate = startDate;
         this.endDate = endDate;
-        this.description = description;
-        this.budgetAmt = budgetAmt;
-        this.costCenterCode = costCenterCode;
-    }
-
-
-
-    public String getCostCenterCode() {
-        return costCenterCode;
-    }
-
-    public void setCostCenterCode(String costCenterCode) {
-        this.costCenterCode = costCenterCode;
+        this.projectOwner = projectOwner;
+        this.members = members;
+        this.projectTitle = projectTitle;
     }
 
     public Date getStartDate() {
@@ -74,19 +68,19 @@ public class Project extends DBEntityTemplate {
         this.projectOwner = projectOwner;
     }
 
-    public String getDescription() {
-        return description;
+    public List<String> getMembers() {
+        return members;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setMembers(List<String> members) {
+        this.members = members;
     }
 
-    public BigDecimal getBudgetAmt() {
-        return budgetAmt;
+    public String getProjectTitle() {
+        return projectTitle;
     }
 
-    public void setBudgetAmt(BigDecimal budgetAmt) {
-        this.budgetAmt = budgetAmt;
+    public void setProjectTitle(String projectTitle) {
+        this.projectTitle = projectTitle;
     }
 }

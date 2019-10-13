@@ -76,14 +76,14 @@ public class ServiceServ {
                 throw new Exception("Measure Unit field cannot be null!");
             }
 
-            Service newItem = new Service(req.getItemName().trim(),req.getMeasureUnit());
+            Service newItem = new Service(req.getItemName().trim(),req.getMeasureUnit(),req.getReferencePrice(),req.getCurrency());
             newItem.setCreatedBy(req.getUsername());
             newItem.setHierachyPath(EntityCodeHPGeneration.setHP(sub2,newItem));
             Authentication.configurePermissionMap(newItem);
             newItem = serviceRepository.save(newItem);
 
             newItem.setCode(EntityCodeHPGeneration.getCode(serviceRepository,newItem));
-            newItem.setVendor(vendor);
+//            newItem.setVendor(vendor);
             newItem.setBudgetSub2(sub2);
 //            vendor.getservices().size();
 //            sub2.getservices().size();
@@ -93,7 +93,7 @@ public class ServiceServ {
 
             JSONObject res = new JSONObject();
 
-            ServiceModel newItemModel = new ServiceModel(newItem.getObjectName(),newItem.getCode(),vendor.getCode(),vendor.getObjectName(),newItem.getMeasureUnit());
+            ServiceModel newItemModel = new ServiceModel(newItem.getObjectName(),newItem.getCode(),newItem.getMeasureUnit(),newItem.getReferencePrice(),newItem.getCurrencyCode());
 
             res.put("newItem", new JSONObject(newItemModel));
 
@@ -127,7 +127,7 @@ public class ServiceServ {
             List<ServiceModel> mlist = new ArrayList<>();
             ServiceModel model;
             for (Service m : services){
-                model = new ServiceModel(m.getObjectName(),m.getCode(),m.getVendor().getCode(),m.getVendor().getObjectName(),m.getMeasureUnit());
+                model = new ServiceModel(m.getObjectName(),m.getCode(),m.getMeasureUnit(),m.getReferencePrice(),m.getCurrencyCode());
                 //model = retrieveContractInformation(m,model);
                 mlist.add(model);
             }

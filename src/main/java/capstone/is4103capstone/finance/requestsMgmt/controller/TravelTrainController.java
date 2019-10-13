@@ -1,11 +1,11 @@
-package capstone.is4103capstone.finance.traveltrain.controller;
+package capstone.is4103capstone.finance.requestsMgmt.controller;
 
-import capstone.is4103capstone.finance.traveltrain.model.req.CreateTrainingRequest;
-import capstone.is4103capstone.finance.traveltrain.model.req.CreateTravelRequest;
-import capstone.is4103capstone.finance.traveltrain.model.res.TTFormResponse;
-import capstone.is4103capstone.finance.traveltrain.model.res.TTListResponse;
-import capstone.is4103capstone.finance.traveltrain.service.TrainingService;
-import capstone.is4103capstone.finance.traveltrain.service.TravelService;
+import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateTrainingRequest;
+import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateTravelRequest;
+import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
+import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
+import capstone.is4103capstone.finance.requestsMgmt.service.TrainingService;
+import capstone.is4103capstone.finance.requestsMgmt.service.TravelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

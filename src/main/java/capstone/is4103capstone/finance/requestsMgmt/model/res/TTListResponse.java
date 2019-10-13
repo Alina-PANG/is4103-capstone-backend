@@ -1,4 +1,4 @@
-package capstone.is4103capstone.finance.traveltrain.model.res;
+package capstone.is4103capstone.finance.requestsMgmt.model.res;
 
 import capstone.is4103capstone.general.model.GeneralRes;
 

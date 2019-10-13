@@ -6,16 +6,43 @@ import java.math.BigDecimal;
 public class ServiceModel implements Serializable {
     String serviceName;
     String serviceCode;
-    String vendorCode;
-    String vendorName;
+//    String vendorCode;
+//    String vendorName;
     String measureUnit;
     boolean hasActiveContract;
 
-    BigDecimal currentPrice;
-    String currentContractCode;
-    String contractStartDate;
-    String contractEndDate;
-    String comment;
+
+    BigDecimal referencePrice;
+    String currency;
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getServiceCode() {
+        return serviceCode;
+    }
+
+    public void setServiceCode(String serviceCode) {
+        this.serviceCode = serviceCode;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+//
+//    String currentContractCode;
+//    String contractStartDate;
+//    String contractEndDate;
+//    String comment;
 
     public ServiceModel() {
     }
@@ -25,21 +52,29 @@ public class ServiceModel implements Serializable {
         this.serviceCode = serviceCode;
     }
 
-    public ServiceModel(String serviceName, String serviceCode, String vendorCode, String vendorName, String measureUnit) {
+    public ServiceModel(String serviceName, String serviceCode, String measureUnit) {
         this.serviceName = serviceName;
         this.serviceCode = serviceCode;
-        this.vendorCode = vendorCode;
-        this.vendorName = vendorName;
+//        this.vendorCode = vendorCode;
+//        this.vendorName = vendorName;
         this.measureUnit = measureUnit;
     }
 
-    public String getComment() {
-        return comment;
+    public ServiceModel(String serviceName, String serviceCode, String measureUnit, BigDecimal referencePrice, String currency) {
+        this.serviceName = serviceName;
+        this.serviceCode = serviceCode;
+        this.measureUnit = measureUnit;
+        this.hasActiveContract = hasActiveContract;
+        this.referencePrice = referencePrice;
+        this.currency = currency;
     }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
+    //    public String getComment() {
+//        return comment;
+//    }
+//
+//    public void setComment(String comment) {
+//        this.comment = comment;
+//    }
 
     public boolean isHasActiveContract() {
         return hasActiveContract;
@@ -65,21 +100,21 @@ public class ServiceModel implements Serializable {
         this.serviceCode = serviceCode;
     }
 
-    public String getVendorCode() {
-        return vendorCode;
-    }
+//    public String getVendorCode() {
+//        return vendorCode;
+//    }
+//
+//    public void setVendorCode(String vendorCode) {
+//        this.vendorCode = vendorCode;
+//    }
 
-    public void setVendorCode(String vendorCode) {
-        this.vendorCode = vendorCode;
-    }
-
-    public String getVendorName() {
-        return vendorName;
-    }
-
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
-    }
+//    public String getVendorName() {
+//        return vendorName;
+//    }
+//
+//    public void setVendorName(String vendorName) {
+//        this.vendorName = vendorName;
+//    }
 
     public String getMeasureUnit() {
         return measureUnit;
@@ -89,35 +124,35 @@ public class ServiceModel implements Serializable {
         this.measureUnit = measureUnit;
     }
 
-    public BigDecimal getCurrentPrice() {
-        return currentPrice;
+    public BigDecimal getReferencePrice() {
+        return referencePrice;
     }
 
-    public void setCurrentPrice(BigDecimal currentPrice) {
-        this.currentPrice = currentPrice;
+    public void setReferencePrice(BigDecimal referencePrice) {
+        this.referencePrice = referencePrice;
     }
 
-    public String getCurrentContractCode() {
-        return currentContractCode;
-    }
-
-    public void setCurrentContractCode(String currentContractCode) {
-        this.currentContractCode = currentContractCode;
-    }
-
-    public String getContractStartDate() {
-        return contractStartDate;
-    }
-
-    public void setContractStartDate(String contractStartDate) {
-        this.contractStartDate = contractStartDate;
-    }
-
-    public String getContractEndDate() {
-        return contractEndDate;
-    }
-
-    public void setContractEndDate(String contractEndDate) {
-        this.contractEndDate = contractEndDate;
-    }
+//    public String getCurrentContractCode() {
+//        return currentContractCode;
+//    }
+//
+//    public void setCurrentContractCode(String currentContractCode) {
+//        this.currentContractCode = currentContractCode;
+//    }
+//
+//    public String getContractStartDate() {
+//        return contractStartDate;
+//    }
+//
+//    public void setContractStartDate(String contractStartDate) {
+//        this.contractStartDate = contractStartDate;
+//    }
+//
+//    public String getContractEndDate() {
+//        return contractEndDate;
+//    }
+//
+//    public void setContractEndDate(String contractEndDate) {
+//        this.contractEndDate = contractEndDate;
+//    }
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table
@@ -18,12 +19,13 @@ public class Service extends DBEntityTemplate {
     @JsonIgnore
     private BudgetSub2 budgetSub2;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vendor_id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "service_vendor",
+            joinColumns = @JoinColumn(name = "service_id"),
+            inverseJoinColumns = @JoinColumn(name = "vendor_id"))
     @JsonIgnore
-    private Vendor vendor;
+    private List<Vendor> vendor;
 
-    @NotNull
     private String measureUnit;
 
 //  We don't need to view purchase orders under service right, no this use case.
@@ -35,27 +37,26 @@ public class Service extends DBEntityTemplate {
 //    )
 //    private List<PurchaseOrder> purchaseOrders;
 
-    private BigDecimal currentPrice;
-
-    private String currentContractCode;
-
+    private BigDecimal referencePrice;
     private String currencyCode;
-
 
     public Service() {
     }
 
-    public Service(String itemName, @NotNull String measureUnit) {
-        super(itemName);
+    public Service(String objectName, String measureUnit, BigDecimal referencePrice, String currencyCode) {
+        super(objectName);
         this.measureUnit = measureUnit;
+        this.referencePrice = referencePrice;
+        this.currencyCode = currencyCode;
     }
 
-    public String getCurrentContractCode() {
-        return currentContractCode;
-    }
-
-    public void setCurrentContractCode(String currentContractCode) {
-        this.currentContractCode = currentContractCode;
+    public Service(String objectName, BudgetSub2 budgetSub2, List<Vendor> vendor, String measureUnit, BigDecimal referencePrice, String currencyCode) {
+        super(objectName);
+        this.budgetSub2 = budgetSub2;
+        this.vendor = vendor;
+        this.measureUnit = measureUnit;
+        this.referencePrice = referencePrice;
+        this.currencyCode = currencyCode;
     }
 
     public Service(String objectName, String code, String hierachyPath, String measureUnit, String opsUser) {
@@ -65,6 +66,7 @@ public class Service extends DBEntityTemplate {
         this.measureUnit = measureUnit;
 
     }
+
 
 
     public String getMeasureUnit() {
@@ -95,21 +97,21 @@ public class Service extends DBEntityTemplate {
 //        this.purchaseOrders = purchaseOrders;
 //    }
 
-    public Vendor getVendor() {
+
+    public List<Vendor> getVendor() {
         return vendor;
     }
 
-    public void setVendor(Vendor vendor) {
+    public void setVendor(List<Vendor> vendor) {
         this.vendor = vendor;
     }
 
-
-    public BigDecimal getCurrentPrice() {
-        return currentPrice;
+    public BigDecimal getReferencePrice() {
+        return referencePrice;
     }
 
-    public void setCurrentPrice(BigDecimal currentPrice) {
-        this.currentPrice = currentPrice;
+    public void setReferencePrice(BigDecimal referencePrice) {
+        this.referencePrice = referencePrice;
     }
 
     public String getCurrencyCode() {
