@@ -139,7 +139,7 @@ public class CategoryService {
                             JSONObject thisM = new JSONObject();
                             thisM.put("name",m.getObjectName());
                             thisM.put("code",m.getCode());
-                            thisM.put("vendorCode",m.getVendor().getCode());
+//                            thisM.put("vendorCode",m.getVendor().getCode());
                             mList.put(thisM);
                         }
                         thisSub2.put("services",mList);

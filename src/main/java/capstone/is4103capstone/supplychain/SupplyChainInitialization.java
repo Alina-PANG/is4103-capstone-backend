@@ -99,7 +99,7 @@ public class SupplyChainInitialization {
         //vendor1.getservices().add(service);
 
         vendorRepository.save(vendor1);
-        service.setVendor(vendor1);
+//        service.setVendor(vendor1);
         serviceRepository.saveAndFlush(service);
     }
 
@@ -126,8 +126,8 @@ public class SupplyChainInitialization {
 
         contract1 = contractRepository.save(contract1);
 
-        banana.setCurrentContractCode("Contract1");
-        mango.setCurrentContractCode("Contract1");
+//        banana.setCurrentContractCode("Contract1");
+//        mango.setCurrentContractCode("Contract1");
 
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
         Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");

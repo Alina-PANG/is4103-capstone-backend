@@ -1,6 +1,7 @@
 package capstone.is4103capstone.entities;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -25,6 +26,8 @@ public class RequestFormTemplate extends DBEntityTemplate {
 
     private String currency;
 
+    private ApprovalStatusEnum status = ApprovalStatusEnum.PENDING;
+
     public RequestFormTemplate() {
     }
 
@@ -36,6 +39,14 @@ public class RequestFormTemplate extends DBEntityTemplate {
         this.additionalInfo = additionalInfo;
         this.estimatedBudget = estimatedBudget;
         this.currency = currency;
+    }
+
+    public ApprovalStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(ApprovalStatusEnum status) {
+        this.status = status;
     }
 
     public Employee getRequester() {

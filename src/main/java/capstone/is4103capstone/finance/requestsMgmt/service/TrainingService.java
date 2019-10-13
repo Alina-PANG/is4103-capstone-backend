@@ -1,9 +1,8 @@
-package capstone.is4103capstone.finance.traveltrain.service;
+package capstone.is4103capstone.finance.requestsMgmt.service;
 
-import capstone.is4103capstone.finance.traveltrain.model.req.CreateTrainingRequest;
-import capstone.is4103capstone.finance.traveltrain.model.req.CreateTravelRequest;
-import capstone.is4103capstone.finance.traveltrain.model.res.TTFormResponse;
-import capstone.is4103capstone.finance.traveltrain.model.res.TTListResponse;
+import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateTrainingRequest;
+import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
+import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
 import org.springframework.stereotype.Service;
 
 @Service
