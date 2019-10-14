@@ -1,10 +1,14 @@
-package capstone.is4103capstone.finance.finPurchaseOrder;
+package capstone.is4103capstone.finance.finPurchaseOrder.controller;
 
+import capstone.is4103capstone.finance.budget.service.BudgetService;
+import capstone.is4103capstone.finance.finPurchaseOrder.service.PurchaseOrderService;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreatePOReq;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
-import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
+import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/purchaseOrder")
 @CrossOrigin(origins = "http://localhost:3000")
 public class PurchaseOrderController {
+    private static final Logger logger = LoggerFactory.getLogger(PurchaseOrderController.class);
     @Autowired
     PurchaseOrderService purchaseOrderService;
 
@@ -48,7 +53,7 @@ public class PurchaseOrderController {
     }
 
     @GetMapping("/getListPO/{status}")
-    public ResponseEntity<GeneralRes> getListPO(@PathVariable("status") BudgetPlanStatusEnum status, @RequestParam(name="username", required=true) String username){
+    public ResponseEntity<GeneralRes> getListPO(@PathVariable("status") ApprovalStatusEnum status, @RequestParam(name="username", required=true) String username){
         if(Authentication.authenticateUser(username))
             return purchaseOrderService.getListPO(status);
         else
@@ -58,15 +63,13 @@ public class PurchaseOrderController {
     }
 
 
-//    @PostMapping("/approveBudget")
-//    public ResponseEntity approveBudget(@RequestBody ApproveBudgetReq approveBudgetReq){
-//        if(Authentication.authenticateUser(approveBudgetReq.getUsername()))
-//            return ResponseEntity
-//                    .ok()
-//                    .body(budgetService.approveBudget(approveBudgetReq));
-//        else
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-//    }
+    @PostMapping("/approvePO/{id}")
+    public ResponseEntity<GeneralRes> getListPO(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, @RequestParam(name="approved", required=true) Boolean approved){
+        if(Authentication.authenticateUser(username))
+            return purchaseOrderService.approvePO(id, approved);
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
 }
