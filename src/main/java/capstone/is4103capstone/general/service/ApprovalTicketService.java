@@ -34,13 +34,14 @@ public class ApprovalTicketService {
     @Autowired
     ApprovalForRequestRepository _approvalForRequestRepository;
     @Autowired
-    private MailSenderService mailSenderService;
+    private MailSenderService _mailSenderService;
 
     @Value("${spring.mail.username}")
-    private String senderEmailAddr;
+    private static String senderEmailAddr;
 
     static  EmployeeRepository employeeRepo;
     static ApprovalForRequestRepository approvalForRequestRepo;
+    static MailSenderService mailSenderService;
 
     @Autowired
     public void setEmployeeRepo(EmployeeRepository repo){
@@ -49,6 +50,10 @@ public class ApprovalTicketService {
     @Autowired
     public void setApprovalRepo(ApprovalForRequestRepository repo){
         ApprovalTicketService.approvalForRequestRepo = repo;
+    }
+    @Autowired
+    public void setMailSenderService(MailSenderService service){
+        ApprovalTicketService.mailSenderService = service;
     }
 
     private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -116,7 +121,7 @@ public class ApprovalTicketService {
             approvalForRequestRepo.save(ticket);
             requester.getMyRequestTickets().add(ticket.getId());
             receiver.getMyApprovals().add(ticket.getId());
-//            sendEmail(ticket);
+            sendEmail(ticket);
         }catch (Exception e){
             return false;
         }
@@ -201,7 +206,7 @@ public class ApprovalTicketService {
 
 
 
-    public void sendEmail(ApprovalForRequest ticket){
+    public static void sendEmail(ApprovalForRequest ticket){
         String subject = "Request for Approval: "+ ticket.getCode();
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("requestor_username", ticket.getRequester().getUserName());
@@ -216,7 +221,7 @@ public class ApprovalTicketService {
 
         map.put("url", "http://localhost:3000/ticket/id/"+ticket.getId());
 
-        Mail mail = new Mail(senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
+        Mail mail = new Mail(senderEmailAddr == null? "is4103.capstone@gmail.com":senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
         mailSenderService.sendEmail(mail, "approveBudgetMailTemplate");
     }
 }

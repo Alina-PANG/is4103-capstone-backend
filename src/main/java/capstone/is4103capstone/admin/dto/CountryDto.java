@@ -1,5 +1,6 @@
 package capstone.is4103capstone.admin.dto;
 
+import capstone.is4103capstone.general.model.GeneralEntityModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ public class CountryDto implements Serializable {
     private Optional<String> objectName = Optional.empty();
     private Optional<String> code = Optional.empty();
     private Optional<String> regionId = Optional.empty();
-    private Optional<List<String>> functions = Optional.empty();
+    private Optional<List<GeneralEntityModel>> functions = Optional.empty();
 
     public Optional<String> getId() {
         return id;
@@ -50,11 +51,11 @@ public class CountryDto implements Serializable {
         this.regionId = regionId;
     }
 
-    public Optional<List<String>> getFunctions() {
+    public Optional<List<GeneralEntityModel>> getFunctions() {
         return functions;
     }
 
-    public void setFunctions(Optional<List<String>> functions) {
+    public void setFunctions(Optional<List<GeneralEntityModel>> functions) {
         this.functions = functions;
     }
 }

@@ -6,6 +6,7 @@ import capstone.is4103capstone.admin.repository.RegionRepository;
 import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Region;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -139,11 +140,13 @@ public class CountryService {
             countryDto.setRegionId(Optional.of(input.getRegion().getId()));
         input.getFunctions().size();
         if (!Objects.isNull(input.getFunctions()) && !input.getFunctions().isEmpty()) {
-            List<String> functionIds = new ArrayList<>();
+//            List<String> functionIds = new ArrayList<>();
+            List<GeneralEntityModel> functions = new ArrayList<>();
             for (CompanyFunction function : input.getFunctions()) {
-                functionIds.add(function.getId());
+                functions.add(new GeneralEntityModel(function));
+//                functionIds.add(function.getId());
             }
-            countryDto.setFunctions(Optional.of(functionIds));
+            countryDto.setFunctions(Optional.of(functions));
         }
         return countryDto;
     }

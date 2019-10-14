@@ -67,6 +67,7 @@ public class SeatMapModel implements Serializable {
     private String id;
     private String region;
     private String country;
+    private String countryId;
     private String office;
     private String floor;
     private List<SeatModelForSeatMap> seats = new ArrayList<>();
@@ -74,10 +75,11 @@ public class SeatMapModel implements Serializable {
     public SeatMapModel() {
     }
 
-    public SeatMapModel(String id, String region, String country, String office, String floor, List<SeatModelForSeatMap> seats) {
+    public SeatMapModel(String id, String region, String country, String countryId, String office, String floor, List<SeatModelForSeatMap> seats) {
         this.id = id;
         this.region = region;
         this.country = country;
+        this.countryId = countryId;
         this.office = office;
         this.floor = floor;
         this.seats = seats;
@@ -101,6 +103,14 @@ public class SeatMapModel implements Serializable {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(String countryId) {
+        this.countryId = countryId;
     }
 
     public String getOffice() {
