@@ -11,5 +11,5 @@ import java.util.List;
 
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder,String> {
     @Query(value = "SELECT * FROM purchase_order p WHERE p.is_deleted=false AND p.status=?1",nativeQuery = true)
-    public List<PurchaseOrder> findPurchaseOrderByStatus(ApprovalStatusEnum approvalStatusEnum);
+    public List<PurchaseOrder> findPurchaseOrderByStatus(int status);
 }

@@ -48,9 +48,10 @@ public class PurchaseOrderService {
             purchaseOrder.setCurrencyCode(createPOReq.getCurrencyCode());
             purchaseOrder.setCreatedBy(createPOReq.getUsername());
             purchaseOrder.setCreatedDateTime(new Date());
-            purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
             purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
+            purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
 
+            logger.info("Creating purchase order with related BJF: "+createPOReq.getRelatedBJF());
             purchaseOrderRepository.saveAndFlush(purchaseOrder);
 
             return ResponseEntity
@@ -79,9 +80,10 @@ public class PurchaseOrderService {
         }
     }
 
-    public ResponseEntity<GeneralRes> getListPO(ApprovalStatusEnum approvalStatusEnum){
+    public ResponseEntity<GeneralRes> getListPO(int status){
         try{
-            List<PurchaseOrder> list = purchaseOrderRepository.findPurchaseOrderByStatus(approvalStatusEnum);
+            logger.info("Getting all purchase orders with status "+status);
+            List<PurchaseOrder> list = purchaseOrderRepository.findPurchaseOrderByStatus(status);
             if(list == null) return ResponseEntity
                     .notFound().build();
             else return ResponseEntity.ok().body(new GetPurchaseOrderListRes("Successfully retrieved the purchase orders!", true, list));
@@ -95,15 +97,17 @@ public class PurchaseOrderService {
 
     }
 
-    private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content){
+    private void createApprovalTicket(String requesterUsername, Employee receiver, PurchaseOrder purchaseOrder, String content){
         Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
-        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, ApprovalTypeEnum.BUDGETPLAN);
+        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,purchaseOrder,content, ApprovalTypeEnum.PURCHASEORDER);
     }
 
-    public ResponseEntity<GeneralRes> approvePO(String id, Boolean approved){
+    public ResponseEntity<GeneralRes> approvePO(String id, Boolean approved, String username){
         try{
+            logger.info("Getting purchase order with id "+id);
             Optional<PurchaseOrder> poOptional = purchaseOrderRepository.findById(id);
             if (!poOptional.isPresent()) {
+                logger.info("Purchase Order Not Found!");
                 return ResponseEntity
                         .notFound().build();
             }
@@ -112,6 +116,10 @@ public class PurchaseOrderService {
                     .notFound().build();
             if(approved)  po.setStatus(ApprovalStatusEnum.APPROVED);
             else po.setStatus(ApprovalStatusEnum.REJECTED);
+            purchaseOrderRepository.saveAndFlush(po);
+            logger.info("Approving/Rejecting the purchase order created by "+po.getCreatedBy());
+//            Employee creater = employeeRepository.findEmployeeByUserName(po.getCreatedBy());
+//            createApprovalTicket(username, creater, po, "Your purchase order has been approved!");
             return ResponseEntity.ok().body(new GeneralRes("Successfully approved/rejected the purchase orders!", true));
         }catch(Exception ex){
             ex.printStackTrace();

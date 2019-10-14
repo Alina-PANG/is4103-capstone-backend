@@ -53,7 +53,9 @@ public class PurchaseOrderController {
     }
 
     @GetMapping("/getListPO/{status}")
-    public ResponseEntity<GeneralRes> getListPO(@PathVariable("status") ApprovalStatusEnum status, @RequestParam(name="username", required=true) String username){
+    public ResponseEntity<GeneralRes> getListPO(@PathVariable("status") int status, @RequestParam(name="username", required=true) String username){
+        ApprovalStatusEnum inputStatus;
+        logger.info("Controller: request for pos in status "+ status);
         if(Authentication.authenticateUser(username))
             return purchaseOrderService.getListPO(status);
         else
@@ -66,7 +68,7 @@ public class PurchaseOrderController {
     @PostMapping("/approvePO/{id}")
     public ResponseEntity<GeneralRes> getListPO(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, @RequestParam(name="approved", required=true) Boolean approved){
         if(Authentication.authenticateUser(username))
-            return purchaseOrderService.approvePO(id, approved);
+            return purchaseOrderService.approvePO(id, approved, username);
         else
             return ResponseEntity
                     .badRequest()
