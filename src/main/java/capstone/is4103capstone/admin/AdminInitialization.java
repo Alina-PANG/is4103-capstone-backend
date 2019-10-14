@@ -6,9 +6,11 @@ import capstone.is4103capstone.entities.helper.Address;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 public class AdminInitialization {
@@ -30,20 +32,31 @@ public class AdminInitialization {
     @Autowired
     CostCenterRepository costCenterRepository;
 
+    @Transactional
     @PostConstruct
     public void init() {
+//        List<Country> countries = countryRepository.findAll();
+//        List<CompanyFunction> functions = functionRepository.findAll();
+//        for (Country c:countries){
+//            for (CompanyFunction f:functions){
+//                c.getFunctions().add(f);
+//                f.getCountries().add(c);
+//                countryRepository.saveAndFlush(c);
+//                functionRepository.saveAndFlush(f);
+//            }
+//        }
 
-        List<Currency> currencyList = currencyRepository.findAll();
-        if (currencyList == null || currencyList.size() == 0) {
-            createCurrency();
-            createGeo();
-            System.out.println("-----Created Geographies-----");
-            createEmployee();
-        }
-        List<CostCenter> costCenterList = costCenterRepository.findAll();
-        if (costCenterList == null || costCenterList.size() == 0) {
-            createCostCenter();
-        }
+//        List<Currency> currencyList = currencyRepository.findAll();
+//        if (currencyList == null || currencyList.size() == 0) {
+//            createCurrency();
+//            createGeo();
+//            System.out.println("-----Created Geographies-----");
+//            createEmployee();
+//        }
+//        List<CostCenter> costCenterList = costCenterRepository.findAll();
+//        if (costCenterList == null || costCenterList.size() == 0) {
+//            createCostCenter();
+//        }
     }
 
     public void createCurrency() {
