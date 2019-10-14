@@ -24,6 +24,13 @@ public class Invoice extends DBEntityTemplate {
 
     private BigDecimal paymentAmount;
 
+    private String fileType;
+
+    private String fileName;
+
+    @Lob
+    private byte[] data;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vendor_id")
     @JsonIgnore
@@ -43,6 +50,30 @@ public class Invoice extends DBEntityTemplate {
         super(objectName, code);
         this.description = description;
         this.paymentAmount = paymentAmount;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
     }
 
     public String getCurrencyCode() {

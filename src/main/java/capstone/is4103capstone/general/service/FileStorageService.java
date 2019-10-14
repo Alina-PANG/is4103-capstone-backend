@@ -1,8 +1,10 @@
 package capstone.is4103capstone.general.service;
 
 import capstone.is4103capstone.general.properties.FileStorageProperties;
+import capstone.is4103capstone.general.repository.FileRepository;
 import capstone.is4103capstone.util.exception.FileNotFoundException;
 import capstone.is4103capstone.util.exception.FileStorageException;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -21,6 +23,9 @@ import java.nio.file.StandardCopyOption;
 public class FileStorageService {
 
     private final Path fileStorageLocation;
+
+    @Autowired
+    FileRepository fileRepository;
 
     @Autowired
     public FileStorageService(FileStorageProperties fileStorageProperties) {
