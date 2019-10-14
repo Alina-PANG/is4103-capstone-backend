@@ -1,6 +1,6 @@
 package capstone.is4103capstone.admin.service;
 
-import capstone.is4103capstone.admin.controller.model.res.AuditTrailRes;
+import capstone.is4103capstone.admin.model.res.AuditTrailRes;
 import capstone.is4103capstone.admin.dto.AuditTrailActivityDto;
 import capstone.is4103capstone.admin.model.AuditTrailModel;
 import capstone.is4103capstone.admin.repository.AuditTrailActivityRepo;
