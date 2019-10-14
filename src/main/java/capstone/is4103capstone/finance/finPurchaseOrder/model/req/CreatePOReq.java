@@ -10,11 +10,20 @@ public class CreatePOReq implements Serializable {
     private List<PurchaseOrderLineItem> purchaseOrderLineItemList;
     private String currencyCode;
     private List<String> relatedBJF;
+    private Boolean toSubmit; // submit or draft
     String username;
 
 
 
     public CreatePOReq() {
+    }
+
+    public Boolean getToSubmit() {
+        return toSubmit;
+    }
+
+    public void setToSubmit(Boolean toSubmit) {
+        this.toSubmit = toSubmit;
     }
 
     public CreatePOReq(String vendorId, List<PurchaseOrderLineItem> purchaseOrderLineItemList, String currencyCode, List<String> relatedBJF, String username) {

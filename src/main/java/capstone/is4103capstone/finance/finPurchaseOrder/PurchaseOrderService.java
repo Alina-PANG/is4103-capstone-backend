@@ -1,5 +1,8 @@
 package capstone.is4103capstone.finance.finPurchaseOrder;
 
+import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.finance.PurchaseOrderLineItem;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
@@ -8,24 +11,31 @@ import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreatePOReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderRes;
+import capstone.is4103capstone.finance.purchaseOrder;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Service
 public class PurchaseOrderService {
     private static final Logger logger = LoggerFactory.getLogger(PurchaseOrderService.class);
     @Autowired
     PurchaseOrderRepository purchaseOrderRepository;
     @Autowired
     PurchaseOrderLineItemRepository purchaseOrderLineItemRepository;
+    @Autowired
+    EmployeeRepository employeeRepository;
     @Autowired
     VendorRepository vendorRepository;
 
@@ -39,6 +49,7 @@ public class PurchaseOrderService {
     public ResponseEntity<GeneralRes> createPO(CreatePOReq createPOReq, String id){
         logger.info("Creating new purchase order...");
         try{
+            PurchaseOrder purchaseOrder = new PurchaseOrder();
             if(id != null){
                 PurchaseOrder temp = purchaseOrderRepository.getOne(id);
                 if(temp != null){
@@ -47,7 +58,14 @@ public class PurchaseOrderService {
                 }
                 deleteItem(temp.getPurchaseOrderLineItems());
             }
-            PurchaseOrder purchaseOrder = new PurchaseOrder();
+
+            if(createPOReq.getToSubmit()){
+                purchaseOrder.setStatus(BudgetPlanStatusEnum.PENDING_BM_APPROVAL);
+            }
+            else{
+                purchaseOrder.setStatus(BudgetPlanStatusEnum.DRAFT);
+            }
+
             purchaseOrder.setCurrencyCode(createPOReq.getCurrencyCode());
             Vendor v = vendorRepository.findById(createPOReq.getVendorId()).get();
 
@@ -112,6 +130,9 @@ public class PurchaseOrderService {
 
     }
 
-
+    private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content){
+        Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
+        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, ApprovalTypeEnum.BUDGETPLAN);
+    }
 
 }

@@ -47,7 +47,13 @@ public class PurchaseOrder extends DBEntityTemplate {
     public PurchaseOrder() {
     }
 
+    public BudgetPlanStatusEnum getStatus() {
+        return status;
+    }
 
+    public void setStatus(BudgetPlanStatusEnum status) {
+        this.status = status;
+    }
 
     public PurchaseOrder(String poCode, String hierachyPath) {
         super(poCode, hierachyPath);
