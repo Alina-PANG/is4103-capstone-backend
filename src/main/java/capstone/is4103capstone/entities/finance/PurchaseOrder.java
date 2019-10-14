@@ -4,6 +4,7 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -30,6 +31,9 @@ public class PurchaseOrder extends DBEntityTemplate {
     @OneToMany(mappedBy = "purchaseOrder")
     private List<StatementOfAcctLineItem> statementOfAccount = new ArrayList<>();
 
+    @Column(name = "status")
+    private BudgetPlanStatusEnum status;
+
     private String currencyCode;
 
     public String getCurrencyCode() {
@@ -42,6 +46,8 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public PurchaseOrder() {
     }
+
+
 
     public PurchaseOrder(String poCode, String hierachyPath) {
         super(poCode, hierachyPath);

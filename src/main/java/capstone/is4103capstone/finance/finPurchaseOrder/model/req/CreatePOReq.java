@@ -1,21 +1,44 @@
-package capstone.is4103capstone.finance.finPurchaseOrder.model;
+package capstone.is4103capstone.finance.finPurchaseOrder.model.req;
 
 import capstone.is4103capstone.entities.finance.PurchaseOrderLineItem;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class createPOReq {
+public class CreatePOReq implements Serializable {
     private String vendorId;
     private List<PurchaseOrderLineItem> purchaseOrderLineItemList;
     private String currencyCode;
+    private List<String> relatedBJF;
+    String username;
 
-    public createPOReq() {
+
+
+    public CreatePOReq() {
     }
 
-    public createPOReq(String vendorId, List<PurchaseOrderLineItem> purchaseOrderLineItemList, String currencyCode) {
+    public CreatePOReq(String vendorId, List<PurchaseOrderLineItem> purchaseOrderLineItemList, String currencyCode, List<String> relatedBJF, String username) {
         this.vendorId = vendorId;
         this.purchaseOrderLineItemList = purchaseOrderLineItemList;
         this.currencyCode = currencyCode;
+        this.relatedBJF = relatedBJF;
+        this.username = username;
+    }
+
+    public List<String> getRelatedBJF() {
+        return relatedBJF;
+    }
+
+    public void setRelatedBJF(List<String> relatedBJF) {
+        this.relatedBJF = relatedBJF;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getVendorId() {
