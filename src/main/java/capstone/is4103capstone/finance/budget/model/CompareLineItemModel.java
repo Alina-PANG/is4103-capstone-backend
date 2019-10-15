@@ -8,7 +8,7 @@ public interface CompareLineItemModel {
 
     @Value("#{target.code}")
     String getServiceCode();
-    @Value("#{target.object_name}")
+    @Value("#{target.service_name}")
     String getServiceName();
     @Value("#{target.budget_amount}")
     BigDecimal getAmount();
@@ -16,6 +16,6 @@ public interface CompareLineItemModel {
     String getCurrency();
     @Value("#{target.comment}")
     String getComment();
-
-
+    @Value("#{target.plan_name}")
+    String getPlanName();
 }

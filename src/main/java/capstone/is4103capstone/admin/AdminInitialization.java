@@ -96,8 +96,8 @@ public class AdminInitialization {
 
         Team team = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
 
-        newEmployee.getMemberOfTeams().add(team);
-        newEmployee2.getMemberOfTeams().add(team);
+        newEmployee.setTeam(team);
+        newEmployee2.setTeam(team);
         team.getMembers().add(newEmployee);
         team.getMembers().add(newEmployee2);
         newEmployee.setHierachyPath("APAC-SG-TECH-GCP-T1-yingshi2502");

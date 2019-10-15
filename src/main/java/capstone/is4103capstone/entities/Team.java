@@ -32,11 +32,7 @@ public class Team extends DBEntityTemplate {
     @OneToMany(mappedBy = "team")
     private List<Contract> contracts = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "team_employee",
-            joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "employee_id")
-    )
+    @OneToMany(mappedBy = "team")
     private List<Employee> members = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

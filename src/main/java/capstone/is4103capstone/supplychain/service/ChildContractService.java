@@ -102,7 +102,7 @@ public class ChildContractService {
             }
 
             if(returnList.size() == 0){
-                throw new Exception("No child contracts under this master contract.");
+                throw new Exception("No child contracts under this master contract with ID: " + masterContractId);
             }
 
             return new GetChildContractsRes("Successfully retrieved child contracts by master contract ID", false, returnList);
