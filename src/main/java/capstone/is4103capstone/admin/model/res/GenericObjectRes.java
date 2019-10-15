@@ -15,12 +15,12 @@ import java.util.Optional;
 public class GenericObjectRes extends GeneralRes {
 
     public Integer totalRecords;
-    private Optional<List<Object>> results;
+    private Optional<List<?>> results;
 
     public GenericObjectRes() {
     }
 
-    public GenericObjectRes(String message, Boolean hasError, Optional<List<Object>> results) {
+    public GenericObjectRes(String message, Boolean hasError, Optional<List<?>> results) {
         super(message, hasError);
         this.results = results;
         results.ifPresent(obj -> {
