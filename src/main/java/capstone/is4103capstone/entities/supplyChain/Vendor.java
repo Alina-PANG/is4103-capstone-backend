@@ -1,12 +1,11 @@
 package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.finance.Invoice;
-import capstone.is4103capstone.entities.finance.Merchandise;
+import capstone.is4103capstone.entities.finance.Service;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -25,10 +24,7 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactEmail;
 
     @ManyToMany(mappedBy = "vendors", fetch = FetchType.EAGER)
-    private List<Team> businessUnits = new ArrayList<>();
-
-    @OneToMany(mappedBy = "vendor")
-    private List<Merchandise> merchandises = new ArrayList<>();
+    private List<BusinessUnit> businessUnits = new ArrayList<>();
 
     @OneToMany(mappedBy = "vendor")
     private List<Invoice> invoices = new ArrayList<>();
@@ -52,14 +48,6 @@ public class Vendor extends DBEntityTemplate {
     public Vendor() {
     }
 
-    public List<Merchandise> getMerchandises() {
-        return merchandises;
-    }
-
-    public void setMerchandises(List<Merchandise> merchandises) {
-        this.merchandises = merchandises;
-    }
-
     public List<Invoice> getInvoices() {
         return invoices;
     }
@@ -76,11 +64,11 @@ public class Vendor extends DBEntityTemplate {
         this.outsourcingList = outsourcingList;
     }
 
-    public List<Team> getBusinessUnits() {
+    public List<BusinessUnit> getBusinessUnits() {
         return businessUnits;
     }
 
-    public void setBusinessUnits(List<Team> businessUnits) {
+    public void setBusinessUnits(List<BusinessUnit> businessUnits) {
         this.businessUnits = businessUnits;
     }
 

@@ -32,7 +32,7 @@ public class CostCenterService {
                 simpleCCModel.put("code",c.getCode());
                 simpleCCModel.put("id",c.getId());
                 simpleCCModel.put("teamCode",c.getTeam().getCode());
-                simpleCCModel.put("countryCode",c.getTeam().getCountry().getCode());
+                simpleCCModel.put("countryCode",c.getTeam().getBusinessUnit().getFunction().getCountry().getCode());
                 list.put(simpleCCModel);
             }
             res.put("costCenterList",list);
@@ -65,7 +65,7 @@ public class CostCenterService {
                 GeneralEntityModel costCenterManager = c.getCostCenterManager() == null? null : new GeneralEntityModel(c.getCostCenterManager());
                 GeneralEntityModel bmApprover = new GeneralEntityModel(c.getBmApprover());
                 GeneralEntityModel functionApprover = new GeneralEntityModel(c.getFunctionApprover());
-                GeneralEntityModel country = new GeneralEntityModel(c.getTeam().getCountry());
+                GeneralEntityModel country = new GeneralEntityModel(c.getTeam().getOffice().getCountry());
 
                 CostCenterModel cModel = new CostCenterModel(c.getObjectName(),c.getCode(),c.getId(),team,costCenterManager,bmApprover,functionApprover,country);
                 returnList.add(cModel);

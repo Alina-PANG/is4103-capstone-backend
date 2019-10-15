@@ -7,6 +7,7 @@ import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,23 +31,7 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     private Double totalAmount;
 
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
-
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
-
     public PurchaseOrder() {
-    }
-
-    public ApprovalStatusEnum getStatus() {
-        return status;
-    }
-
-    public void setStatus(ApprovalStatusEnum status) {
-        this.status = status;
     }
 
     public List<String> getRelatedBJF() {
@@ -71,6 +56,22 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public void setStatementOfAccount(List<StatementOfAcctLineItem> statementOfAccount) {
         this.statementOfAccount = statementOfAccount;
+    }
+
+    public ApprovalStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(ApprovalStatusEnum status) {
+        this.status = status;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public Double getTotalAmount() {

@@ -1,19 +1,19 @@
 package capstone.is4103capstone.seat.service;
 
+import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.repository.OfficeRepository;
+import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatMap;
-import capstone.is4103capstone.seat.model.SeatModelForSeatMap;
-import capstone.is4103capstone.seat.model.SeatMapModel;
+import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForSetup;
 import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
-import capstone.is4103capstone.util.exception.SeatCreationException;
-import capstone.is4103capstone.util.exception.SeatMapCreationException;
-import capstone.is4103capstone.util.exception.SeatMapNotFoundException;
-import capstone.is4103capstone.util.exception.SeatMapUpdateException;
+import capstone.is4103capstone.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +30,13 @@ public class SeatMapService {
     private SeatAllocationRepository seatAllocationRepository;
     @Autowired
     private OfficeRepository officeRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     @Autowired
     private SeatService seatService;
+    @Autowired
+    private EmployeeService employeeService;
 
     public SeatMapService() {
 
@@ -45,7 +49,7 @@ public class SeatMapService {
     // 3. the req passed in has already been checked in terms of user access rights to different offices (before the seat map was drawn in front-end canvas)
     // Post-condition:
     // 1. all the seats in the new seatmap are created
-    public String createNewSeatMap(SeatMapModel createSeatMapReq) throws SeatMapCreationException {
+    public String createNewSeatMap(SeatMapModelForSetup createSeatMapReq) throws SeatMapCreationException {
 
         if (createSeatMapReq.getRegion() == null) {
             throw new SeatMapCreationException("Creation of seat map failed: region not given.");
@@ -67,8 +71,14 @@ public class SeatMapService {
         if (!optionalOffice.isPresent()) {
             throw new SeatMapCreationException("Creation of seat map failed: invalid office information.");
         }
-
         Office office = optionalOffice.get();
+
+        // Check whether there is an existing seat map that has the same floor and the same office as the new one
+        if (seatMapRepository.findByOfficeIdAndFloor(office.getId(), createSeatMapReq.getFloor()).isPresent()) {
+            throw new SeatMapCreationException("Creation of seat map failed: a seat map already exists on the same floor in the office.");
+        }
+
+
         SeatMap newSeatMap = new SeatMap();
         newSeatMap.setFloor(createSeatMapReq.getFloor());
         newSeatMap.setOffice(office);
@@ -86,6 +96,22 @@ public class SeatMapService {
 
         newSeatMap.setNumOfSeats(newSeatMap.getSeats().size());
 
+        if (hasDuplicateOrInconsecutiveSerialNumber(newSeatMap)) {
+            throw new SeatMapCreationException("Seat map creation failed: there is duplicate or inconsecutive serial number of seats.");
+        }
+
+        if (hasInvalidOfficeSeat(newSeatMap)) {
+            throw new SeatMapCreationException("Seat map creation failed: there is invalid seat under office. Please check" +
+                    " whether the seats are adjacent if there are more than one seat under the same office.");
+        }
+
+        // Update numOfFloors in office if needed
+        if (!office.getFloors().contains(newSeatMap.getFloor())) {
+            office.getFloors().add(newSeatMap.getFloor());
+            office.setNumOfFloors(office.getFloors().size());
+            officeRepository.save(office);
+        }
+
         // Initialise codes for seatmap and its seats
         // seatmap code example: SG-ORQ-26
         // seat code example: SG-ORQ-26-01
@@ -95,13 +121,6 @@ public class SeatMapService {
         newSeatMap.setObjectName(newSeatMap.getCode());
         newSeatMap.setHierachyPath(newSeatMap.getCode());
         newSeatMap = seatMapRepository.save(newSeatMap);
-
-        // Update numOfFloors in office if needed
-        if (!office.getFloors().contains(newSeatMap.getFloor())) {
-            office.getFloors().add(newSeatMap.getFloor());
-            office.setNumOfFloors(office.getFloors().size());
-            officeRepository.save(office);
-        }
 
         refreshSeatCode(newSeatMap);
 
@@ -127,26 +146,43 @@ public class SeatMapService {
     }
 
 
+    public List<SeatMap> retrieveSeatMapsWithActiveEmployeeAllocations(String employeeId) throws EmployeeNotFoundException {
+        List<SeatMap> seatMaps;
+        Employee employee = employeeService.retrieveEmployeeById(employeeId);
+        seatMaps = seatMapRepository.findByActiveEmployeeSeatAllocation(employee.getId());
+        return seatMaps;
+    }
+
+
+    public Optional<SeatMap> retrieveSeatMapWithActiveEmployeeAllocations(String seatMapId, String employeeId) throws EmployeeNotFoundException, SeatMapNotFoundException {
+        Employee employee = employeeService.retrieveEmployeeById(employeeId);
+        return seatMapRepository.findBySeatMapIdAndActiveEmployeeSeatAllocation(seatMapId, employee.getId());
+    }
+
+
     public List<SeatMap> getAllSeatMaps() {
         List<SeatMap> seatMaps = seatMapRepository.findAllUndeleted();
         return seatMaps;
     }
 
 
-    public void updateSeatMap(SeatMapModel seatMapModel) throws SeatMapUpdateException, SeatMapNotFoundException {
+    // Pre-condition:
+    // 1. Update of seat maps does not allow changing a normal seat into an office seat (vice versa). This must be done through
+    //    deletion of the original seat first accompanied by the addition of new seat (with the new seat type).
+    public void updateSeatMap(SeatMapModelForSetup seatMapModelForSetup) throws SeatMapUpdateException, SeatMapNotFoundException {
 
         System.out.println("******************** Update Seat Map ********************");
 
         // Validation of passed in seat map information
-        if (seatMapModel.getId() == null || seatMapModel.getId().trim().length() == 0) {
+        if (seatMapModelForSetup.getId() == null || seatMapModelForSetup.getId().trim().length() == 0) {
             throw new SeatMapUpdateException("Seat map update failed: insufficient seat map info given.");
         }
-        Collections.sort(seatMapModel.getSeats());
-        if (hasDuplicateSeatModelIdOrSerialNumber(seatMapModel)) {
+        Collections.sort(seatMapModelForSetup.getSeats());
+        if (hasDuplicateSeatModelIdOrSerialNumber(seatMapModelForSetup)) {
             throw new SeatMapUpdateException("Seat map update failed: there are seats with duplicate serial number or id.");
         }
 
-        SeatMap seatMap = getSeatMapById(seatMapModel.getId().trim());
+        SeatMap seatMap = getSeatMapById(seatMapModelForSetup.getId().trim());
         List<String> originalSeatsIds = new ArrayList<>();
         for (Seat originalSeat:
              seatMap.getSeats()) {
@@ -154,16 +190,16 @@ public class SeatMapService {
         }
 
         System.out.println("********** the number of original seats: " + originalSeatsIds.size() + " **********");
-        // Find the seat in the original seatmap.
+        // Find the seat in the original seat map.
         for (SeatModelForSeatMap seatModel:
-             seatMapModel.getSeats()) {
+             seatMapModelForSetup.getSeats()) {
             if (seatModel.getId() == null || seatModel.getId().trim().length() == 0) {
-                // This is a new seat. Need to create this seat and add to the existing seatmap.
+                // This is a new seat. Need to create this seat and add to the existing seat map.
                 Seat newSeat = seatService.createNewSeat(seatModel);
                 seatMap.getSeats().add(newSeat);
                 newSeat.setSeatMap(seatMap);
             } else {
-                // Find the seat in the original seatmap.
+                // Find the seat in the original seat map.
                 boolean doesSeatExist = false;
 
                 for (Seat seatToUpdate:
@@ -181,6 +217,10 @@ public class SeatMapService {
                         seatToUpdate.setyCoordinate(seatModel.getY());
                         System.out.println("***** new X: " + seatToUpdate.getxCoordinate() + " *****");
                         System.out.println("***** new Y: " + seatToUpdate.getyCoordinate() + " *****");
+
+                        if (seatToUpdate.isUnderOffice()) {
+                            seatToUpdate.setAdjacentSeatSeqNum(seatModel.getAdjacentSeatSeqNum());
+                        }
                         originalSeatsIds.remove(seatToUpdate.getId());
 
                         break;
@@ -189,13 +229,13 @@ public class SeatMapService {
 
                 if (!doesSeatExist) {
                     throw new SeatMapUpdateException("Seat map update failed: invalid seat info given. There is no seat" +
-                            "with id " + seatModel.getId() + "or the seatmap does not have such seat");
+                            "with id " + seatModel.getId() + "or the seat map does not have such seat");
                 }
             }
         }
 
         System.out.println("********** Pick out extra seats **********");
-        // Pick out the seats that are in the original seatmap but not in the updated seatmap.
+        // Pick out the seats that are in the original seat map but not in the updated seat map.
         ListIterator<Seat> seatListIterator = seatMap.getSeats().listIterator();
         List<Seat> extraSeats = new ArrayList<>();
         while (seatListIterator.hasNext()) {
@@ -212,14 +252,17 @@ public class SeatMapService {
         if (hasDuplicateOrInconsecutiveSerialNumber(seatMap)) {
             throw new SeatMapUpdateException("Seat map update failed: there are seats with duplicate or inconsecutive seat numbers.");
         }
+        if (hasInvalidOfficeSeat(seatMap)) {
+            throw new SeatMapUpdateException("Seat map update failed: there are seats under office with invalid adjacent seat serial number.");
+        }
 
-        deleteExtraSeats(extraSeats);
+        deleteSeats(extraSeats);
         System.out.println("********** Save all the changes **********");
         // Save all the changes.
         // Need to set all the seats' code to null to avoid SQLIntegrityConstraintViolationException: duplicate entry of code
         for (Seat updatedSeat:
                 seatMap.getSeats()) {
-           updatedSeat.setCode(null);
+            updatedSeat.setCode(null);
             seatRepository.saveAndFlush(updatedSeat);
         }
 
@@ -240,34 +283,19 @@ public class SeatMapService {
 
     // Pre-condition:
     // 1. a user will be warned at the front-end if any seat in the seatmap has active allocations
-    // 2. a user can enforce to delete a seatmap even if being warned
+    // 2. a user can enforce to delete a seat map even if being warned
     // Post-condition:
-    // 1. all the seats together with their seat allocations in the  seatmap will soft-deleted
+    // 1. all the seats together with their seat allocations in the seat map will be soft-deleted
     public void deleteSeatMapById(String id) throws SeatMapNotFoundException {
 
         SeatMap seatMap = getSeatMapById(id);
 
-        for (Seat seat:
-             seatMap.getSeats()) {
-            for (SeatAllocation seatAllocation:
-                 seat.getActiveSeatAllocations()) {
-                seatAllocation.setDeleted(true);
-                seatAllocationRepository.save(seatAllocation);
-            }
-            for (SeatAllocation seatAllocation:
-                    seat.getInactiveSeatAllocations()) {
-                seatAllocation.setDeleted(true);
-                seatAllocationRepository.save(seatAllocation);
-            }
-            seat.setDeleted(true);
-            seat.setCode(null);
-            seatRepository.save(seat);
-        }
+        deleteSeats(seatMap.getSeats());
 
         Office office = seatMap.getOffice();
 
         // Update numOfFloors in office if needed
-        if (seatMapRepository.findByOfficeIdAndFloor(office.getId(), seatMap.getFloor()).size() <= 1) {
+        if (!seatMapRepository.findByOfficeIdAndFloor(office.getId(), seatMap.getFloor()).isPresent()) {
             office.getFloors().remove(seatMap.getFloor());
             office.setNumOfFloors(office.getFloors().size());
             officeRepository.save(office);
@@ -280,14 +308,14 @@ public class SeatMapService {
 
     // -----------------------------------------------Helper methods-----------------------------------------------
 
-    private boolean hasDuplicateSeatModelIdOrSerialNumber(SeatMapModel seatMap) {
+    private boolean hasDuplicateSeatModelIdOrSerialNumber(SeatMapModelForSetup seatMap) {
         List<String> ids = new ArrayList<>();
 
         for (int count = 0; count < seatMap.getSeats().size() - 1; count++ ) {
             SeatModelForSeatMap thisSeat = seatMap.getSeats().get(count);
             if (thisSeat.getSerialNumber().equals(seatMap.getSeats().get(count + 1).getSerialNumber())) {
                 return true;
-            } else {
+            } else if (thisSeat.getId() != null && thisSeat.getId().trim().length() > 0){
                 if (ids.contains(thisSeat.getId())) {
                     return true;
                 } else {
@@ -312,9 +340,39 @@ public class SeatMapService {
     }
 
 
-    private void deleteExtraSeats(List<Seat> extraSeats) {
+    private boolean hasInvalidOfficeSeat(SeatMap seatMap) {
+        HashMap<Integer, Integer> adjacentSeatSeqNumPairs = new HashMap<>();
         for (Seat seat :
-                extraSeats) {
+                seatMap.getSeats()) {
+            if (seat.isUnderOffice() && seat.getAdjacentSeatSeqNum() != null) {
+                Integer adjacentSeatSeqNum = seat.getAdjacentSeatSeqNum();
+                if (adjacentSeatSeqNum <= 0) {
+                    return true;
+                } else {
+                    if (adjacentSeatSeqNumPairs.containsKey(seat.getSerialNumber())) {
+                        if (adjacentSeatSeqNumPairs.get(seat.getSerialNumber()) != adjacentSeatSeqNum) {
+                            return true;
+                        } else {
+                            adjacentSeatSeqNumPairs.remove(seat.getSerialNumber());
+                        }
+                    } else {
+                        adjacentSeatSeqNumPairs.put(adjacentSeatSeqNum, seat.getSerialNumber());
+                    }
+                }
+            }
+        }
+
+        if (adjacentSeatSeqNumPairs.size() > 0) { // there is some seat that doesn't have any matched adjacent seat
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private void deleteSeats(List<Seat> seats) {
+        for (Seat seat :
+                seats) {
             System.out.println("-------------------------------------------");
             System.out.println("***** removing seat: " + seat.getId() + " *****");
             for (SeatAllocation seatAllocation:
@@ -355,7 +413,7 @@ public class SeatMapService {
             }
             numOf0Count = bigCount - smallCount;
             String zeroString = "";
-            while(numOf0Count > 0) {
+            while(numOf0Count >= 0) {
                 zeroString += "0";
                 numOf0Count --;
             }
