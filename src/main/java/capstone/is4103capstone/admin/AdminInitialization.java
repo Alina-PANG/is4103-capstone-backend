@@ -34,18 +34,18 @@ public class AdminInitialization {
 
     @PostConstruct
     public void init() {
-
-        List<Currency> currencyList = currencyRepository.findAll();
-        if (currencyList == null || currencyList.size() == 0) {
-            createCurrency();
-            createGeo();
-            System.out.println("-----Created Geographies-----");
-            createEmployee();
-        }
-        List<CostCenter> costCenterList = costCenterRepository.findAll();
-        if (costCenterList == null || costCenterList.size() == 0) {
-            createCostCenter();
-        }
+//
+//        List<Currency> currencyList = currencyRepository.findAll();
+//        if (currencyList == null || currencyList.size() == 0) {
+//            createCurrency();
+//            createGeo();
+//            System.out.println("-----Created Geographies-----");
+//            createEmployee();
+//        }
+//        List<CostCenter> costCenterList = costCenterRepository.findAll();
+//        if (costCenterList == null || costCenterList.size() == 0) {
+//            createCostCenter();
+//        }
     }
 
     public void createCurrency() {
@@ -96,8 +96,8 @@ public class AdminInitialization {
 
         Team team = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
 
-        newEmployee.getMemberOfTeams().add(team);
-        newEmployee2.getMemberOfTeams().add(team);
+        newEmployee.setTeam(team);
+        newEmployee2.setTeam(team);
         team.getMembers().add(newEmployee);
         team.getMembers().add(newEmployee2);
         newEmployee.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-yingshi2502");

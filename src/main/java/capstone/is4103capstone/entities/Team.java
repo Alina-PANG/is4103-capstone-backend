@@ -26,25 +26,14 @@ public class Team extends DBEntityTemplate {
     @JsonIgnore
     private Office office;
 
-    @OneToMany(mappedBy = "team")
-    private List<CostCenter> costCenters;
+    @OneToOne(mappedBy = "team")
+    private CostCenter costCenter;
 
     @OneToMany(mappedBy = "team")
     private List<Contract> contracts = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "team_employee",
-            joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "employee_id")
-    )
+    @OneToMany(mappedBy = "team")
     private List<Employee> members = new ArrayList<>();
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "team_vendor",
-            joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "vendor_id")
-    )
-    private List<Vendor> vendors = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="team_leader_id")
@@ -55,14 +44,6 @@ public class Team extends DBEntityTemplate {
 
     public Team(String teamName, String teamCode, String hierarchyPath) {
         super(teamName, teamCode, hierarchyPath);
-    }
-
-    public List<Vendor> getVendors() {
-        return vendors;
-    }
-
-    public void setVendors(List<Vendor> vendors) {
-        this.vendors = vendors;
     }
 
     public List<Contract> getContracts() {
@@ -81,12 +62,12 @@ public class Team extends DBEntityTemplate {
         this.teamLeader = teamLeader;
     }
 
-    public List<CostCenter> getCostCenters() {
-        return costCenters;
+    public CostCenter getCostCenter() {
+        return costCenter;
     }
 
-    public void setCostCenters(List<CostCenter> costCenters) {
-        this.costCenters = costCenters;
+    public void setCostCenter(CostCenter costCenter) {
+        this.costCenter = costCenter;
     }
 
     public BusinessUnit getBusinessUnit() { return businessUnit; }

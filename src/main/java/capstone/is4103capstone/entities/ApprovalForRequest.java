@@ -25,7 +25,7 @@ public class ApprovalForRequest extends DBEntityTemplate {
 
     //use approvalType to match entity table, use requestedItemCode to find the actual item;
     /*
-        e.g., request for a merchandiseItem:
+        e.g., request for a serviceItem:
         approvalType will be BJFBUSINESS,
         requestedItemCode will be the code for that BJF entity.
      */

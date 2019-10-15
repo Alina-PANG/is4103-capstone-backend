@@ -1,7 +1,6 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.supplyChain.ContractLine;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -9,63 +8,65 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Merchandise extends DBEntityTemplate {
+public class Service extends DBEntityTemplate {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budgetSub2_id")
     @JsonIgnore
     private BudgetSub2 budgetSub2;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vendor_id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "service_vendor",
+            joinColumns = @JoinColumn(name = "service_id"),
+            inverseJoinColumns = @JoinColumn(name = "vendor_id"))
     @JsonIgnore
-    private Vendor vendor;
+    private List<Vendor> vendor;
 
-    @NotNull
     private String measureUnit;
 
-//  We don't need to view purchase orders under merchandise right, no this use case.
+//  We don't need to view purchase orders under service right, no this use case.
     // only know from po who are the items, which shows in the purchaseOrderLineItem
 //    @ManyToMany
-//    @JoinTable(name = "po_merchandise",
+//    @JoinTable(name = "po_service",
 //            joinColumns = @JoinColumn(name = "po_id"),
-//            inverseJoinColumns = @JoinColumn(name = "merchandise_id")
+//            inverseJoinColumns = @JoinColumn(name = "service_id")
 //    )
 //    private List<PurchaseOrder> purchaseOrders;
 
-    private BigDecimal currentPrice;
-
-    private String currentContractCode;
-
+    private BigDecimal referencePrice;
     private String currencyCode;
 
-
-    public Merchandise() {
+    public Service() {
     }
 
-    public Merchandise(String itemName, @NotNull String measureUnit) {
-        super(itemName);
+    public Service(String objectName, String measureUnit, BigDecimal referencePrice, String currencyCode) {
+        super(objectName);
         this.measureUnit = measureUnit;
+        this.referencePrice = referencePrice;
+        this.currencyCode = currencyCode;
     }
 
-    public String getCurrentContractCode() {
-        return currentContractCode;
+    public Service(String objectName, BudgetSub2 budgetSub2, List<Vendor> vendor, String measureUnit, BigDecimal referencePrice, String currencyCode) {
+        super(objectName);
+        this.budgetSub2 = budgetSub2;
+        this.vendor = vendor;
+        this.measureUnit = measureUnit;
+        this.referencePrice = referencePrice;
+        this.currencyCode = currencyCode;
     }
 
-    public void setCurrentContractCode(String currentContractCode) {
-        this.currentContractCode = currentContractCode;
-    }
-
-    public Merchandise(String objectName, String code, String hierachyPath, String measureUnit, String opsUser) {
+    public Service(String objectName, String code, String hierachyPath, String measureUnit, String opsUser) {
         super(objectName, code,hierachyPath);
         this.setCreatedBy(opsUser);
         this.setLastModifiedBy(opsUser);
         this.measureUnit = measureUnit;
 
     }
+
 
 
     public String getMeasureUnit() {
@@ -76,8 +77,8 @@ public class Merchandise extends DBEntityTemplate {
         this.measureUnit = measureUnit;
     }
 
-    public Merchandise(String merchandiseName, String merchandiseCode, String hierachyPath) {
-        super(merchandiseName, merchandiseCode, hierachyPath);
+    public Service(String serviceName, String serviceCode, String hierachyPath) {
+        super(serviceName, serviceCode, hierachyPath);
     }
 
     public BudgetSub2 getBudgetSub2() {
@@ -96,21 +97,21 @@ public class Merchandise extends DBEntityTemplate {
 //        this.purchaseOrders = purchaseOrders;
 //    }
 
-    public Vendor getVendor() {
+
+    public List<Vendor> getVendor() {
         return vendor;
     }
 
-    public void setVendor(Vendor vendor) {
+    public void setVendor(List<Vendor> vendor) {
         this.vendor = vendor;
     }
 
-
-    public BigDecimal getCurrentPrice() {
-        return currentPrice;
+    public BigDecimal getReferencePrice() {
+        return referencePrice;
     }
 
-    public void setCurrentPrice(BigDecimal currentPrice) {
-        this.currentPrice = currentPrice;
+    public void setReferencePrice(BigDecimal referencePrice) {
+        this.referencePrice = referencePrice;
     }
 
     public String getCurrencyCode() {

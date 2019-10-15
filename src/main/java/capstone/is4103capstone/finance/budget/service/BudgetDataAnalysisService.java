@@ -39,7 +39,7 @@ public class BudgetDataAnalysisService {
     BudgetService budgetService;
 
 
-    private static final String[] cols = {"Category, Sub1, Sub2, Merchandise_Code", "Amount", "Currency", "Comment"};
+    private static final String[] cols = {"Category, Sub1, Sub2, service_Code", "Amount", "Currency", "Comment"};
 
     public GeneralRes readUploadedFile(String filePath){
         try{

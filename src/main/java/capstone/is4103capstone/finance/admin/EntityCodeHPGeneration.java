@@ -36,7 +36,7 @@ public class EntityCodeHPGeneration {
         return hp;
     }
     public static String setPlanItemHP(PlanLineItem pl){
-        String hp = pl.getPlanBelongsTo().getHierachyPath() + "-"+pl.getMerchandiseCode();
+        String hp = pl.getPlanBelongsTo().getHierachyPath() + "-"+pl.getserviceCode();
         pl.setHierachyPath(hp);
         return hp;
     }
