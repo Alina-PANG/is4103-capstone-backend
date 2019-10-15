@@ -27,7 +27,7 @@ public class TeamService {
         teamId = teamId.trim();
         Optional<Team> optionalTeam = teamRepository.findById(teamId);
         if (!optionalTeam.isPresent()) {
-            throw new TeamNotFoundException("Employee with ID " + teamId + " does not exist!");
+            throw new TeamNotFoundException("Team with ID " + teamId + " does not exist!");
         }
 
         return optionalTeam.get();

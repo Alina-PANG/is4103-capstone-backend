@@ -196,6 +196,8 @@ public class SeatMapService {
             throw new SeatMapNotFoundException("Fail to retrieve seat maps: schedule info is required!");
         }
 
+        Office office = seatAllocation.getEmployee().getTeam().getOffice();
+
         // Retrieve the corresponding hierarchy level
         if (hierarchy.equals("TEAM")) {
             Team team = teamService.retrieveTeamById(hierarchyId);
@@ -206,10 +208,12 @@ public class SeatMapService {
                 throw new SeatMapNotFoundException("Fail to retrieve seat maps: business unit with id " + hierarchyId + " does not exist!");
             }
             BusinessUnit businessUnit = optionalBusinessUnit.get();
-            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByBusinessUnit(businessUnit, seatAllocation.getSchedule(), seatAllocation.getAllocationType()));
+            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByBusinessUnit(businessUnit,
+                    seatAllocation.getSchedule(), seatAllocation.getAllocationType(), office));
         } else if (hierarchy.equals("FUNCTION")) {
             CompanyFunction function = companyFunctionService.retrieveCompanyFunctionById(hierarchyId);
-            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByFunction(function, seatAllocation.getSchedule(), seatAllocation.getAllocationType()));
+            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByFunction(function,
+                    seatAllocation.getSchedule(), seatAllocation.getAllocationType(), office));
         } else {
             throw new SeatMapNotFoundException("Fail to retrieve seat maps: hierarchy type is invalid!");
         }
@@ -259,7 +263,10 @@ public class SeatMapService {
 
 
     // TODO: must ensure that the user does the checking has access to the office where the teams are located
-    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByBusinessUnit(BusinessUnit businessUnit, Schedule schedule, SeatAllocationTypeEnum seatAllocationTypeEnum) {
+    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByBusinessUnit(BusinessUnit businessUnit,
+                                                                                                 Schedule schedule,
+                                                                                                 SeatAllocationTypeEnum seatAllocationTypeEnum,
+                                                                                                 Office office) {
 
         List<SeatMapModelForAllocation> seatMapModels = new ArrayList<>();
         List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToBusinessUnit(businessUnit.getId());
@@ -272,6 +279,9 @@ public class SeatMapService {
             seatMapModelForAllocation.setCode(seatMap.getCode());
             List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
 
+            if (!seatMap.getOffice().getId().equals(office.getId())) {
+                continue;
+            }
             boolean shouldBeIncluded = false;
 
             for (Seat seat :
@@ -298,7 +308,10 @@ public class SeatMapService {
     }
 
 
-    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByFunction(CompanyFunction function, Schedule schedule, SeatAllocationTypeEnum seatAllocationTypeEnum) {
+    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByFunction(CompanyFunction function,
+                                                                                             Schedule schedule,
+                                                                                             SeatAllocationTypeEnum seatAllocationTypeEnum,
+                                                                                             Office office) {
 
         List<SeatMapModelForAllocation> seatMapModels = new ArrayList<>();
         List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToFunction(function.getId());
@@ -311,6 +324,9 @@ public class SeatMapService {
             seatMapModelForAllocation.setCode(seatMap.getCode());
             List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
 
+            if (!seatMap.getOffice().getId().equals(office.getId())) {
+                continue;
+            }
             boolean shouldBeIncluded = false;
 
             for (Seat seat :

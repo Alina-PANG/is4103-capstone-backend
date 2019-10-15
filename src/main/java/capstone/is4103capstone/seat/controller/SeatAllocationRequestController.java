@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.Schedule;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.seat.model.ScheduleModel;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocation;
 import capstone.is4103capstone.seat.service.EntityModelConversionService;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
 import capstone.is4103capstone.seat.service.SeatMapService;
@@ -16,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/seatAllocation/request")
@@ -60,6 +63,7 @@ public class SeatAllocationRequestController {
 
         seatAllocation.setSchedule(entityModelConversionService.convertScheduleModelToSchedule(seatAllocationModelForEmployee.getSchedule(),
                 seatAllocation.getAllocationType().toString()));
-        return ResponseEntity.ok("OK");
+        List<SeatMapModelForAllocation> seatMapModels = seatMapService.retrieveAvailableSeatMapsForAllocationByHierarchy(hierarchy, hierarchyId, seatAllocation);
+        return ResponseEntity.ok(seatMapModels);
     }
 }
