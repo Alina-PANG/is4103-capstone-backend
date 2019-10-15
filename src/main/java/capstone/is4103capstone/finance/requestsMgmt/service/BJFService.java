@@ -11,6 +11,7 @@ import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
+import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.service.VendorService;
 import capstone.is4103capstone.util.enums.ProjectStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,16 @@ public class BJFService {
         return new ArrayList<>();
     }
 
-    public void purchaseOrderApproved(PurchaseOrder po){
+    public GeneralRes bjfItemReceived(String bjfId){
+        return new GeneralRes();
+    }
 
+    public void purchaseOrderApproved(PurchaseOrder po){
+        //update the 'committed' value;
     }
 
     public void purchaseOrderClosed(PurchaseOrder po){
-
+        //update the 'actuals' spending;
     }
 
 }

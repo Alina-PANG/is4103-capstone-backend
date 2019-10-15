@@ -23,10 +23,11 @@ public class ProjectModel extends RequestFormModel {
         setProjectTitle(e.getProjectTitle());
         setProjectOwner(new EmployeeModel(e.getProjectOwner()));
         setRequester(new EmployeeModel(e.getRequester()));
-        setApprovalStatus(e.getApprovalStatus().name());
         setId(e.getId());
         setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
         setProjectSupervisor(new EmployeeModel(e.getProjectSupervisor()));
+        setStartDate(Tools.dateFormatter.format(e.getStartDate()));
+        setEndDate(Tools.dateFormatter.format(e.getEndDate()));
 
     }
 
