@@ -2,14 +2,14 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.BusinessUnit;
-import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.finance.Invoice;
-import capstone.is4103capstone.entities.finance.Service;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table
@@ -24,7 +24,7 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactEmail;
 
     @ManyToMany(mappedBy = "vendors", fetch = FetchType.EAGER)
-    private List<BusinessUnit> businessUnits = new ArrayList<>();
+    private Set<BusinessUnit> businessUnits = new HashSet<>();
 
     @OneToMany(mappedBy = "vendor")
     private List<Invoice> invoices = new ArrayList<>();
@@ -64,11 +64,11 @@ public class Vendor extends DBEntityTemplate {
         this.outsourcingList = outsourcingList;
     }
 
-    public List<BusinessUnit> getBusinessUnits() {
+    public Set<BusinessUnit> getBusinessUnits() {
         return businessUnits;
     }
 
-    public void setBusinessUnits(List<BusinessUnit> businessUnits) {
+    public void setBusinessUnits(Set<BusinessUnit> businessUnits) {
         this.businessUnits = businessUnits;
     }
 

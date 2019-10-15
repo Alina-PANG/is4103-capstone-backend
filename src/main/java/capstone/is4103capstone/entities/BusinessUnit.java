@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table
@@ -31,7 +33,7 @@ public class BusinessUnit extends DBEntityTemplate {
             joinColumns = @JoinColumn(name = "businessUnit_id"),
             inverseJoinColumns = @JoinColumn(name = "vendor_id")
     )
-    private List<Vendor> vendors = new ArrayList<>();
+    private Set<Vendor> vendors = new HashSet<>();
 
     public BusinessUnit() {
     }
@@ -40,11 +42,11 @@ public class BusinessUnit extends DBEntityTemplate {
         super(businessUnitName, businessUnitCode, hierarchyPath);
     }
 
-    public List<Vendor> getVendors() {
+    public Set<Vendor> getVendors() {
         return vendors;
     }
 
-    public void setVendors(List<Vendor> vendors) {
+    public void setVendors(Set<Vendor> vendors) {
         this.vendors = vendors;
     }
 
