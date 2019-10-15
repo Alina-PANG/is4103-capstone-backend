@@ -15,8 +15,9 @@ public class ChildContractModel implements Serializable {
     private BigDecimal contractValue;
     private GeneralEntityModel masterContract;
     private ChildContractStatusEnum childContractStatusEnum;
+    private GeneralEntityModel approver;
 
-    public ChildContractModel(String name, String code, String id, Long seqNo, String serviceCode, BigDecimal contractValue, GeneralEntityModel masterContract, ChildContractStatusEnum childContractStatusEnum) {
+    public ChildContractModel(String name, String code, String id, Long seqNo, String serviceCode, BigDecimal contractValue, GeneralEntityModel masterContract, ChildContractStatusEnum childContractStatusEnum, GeneralEntityModel approver) {
         this.name = name;
         this.code = code;
         this.id = id;
@@ -25,10 +26,19 @@ public class ChildContractModel implements Serializable {
         this.contractValue = contractValue;
         this.masterContract = masterContract;
         this.childContractStatusEnum = childContractStatusEnum;
+        this.approver = approver;
     }
 
     public ChildContractModel() {
 
+    }
+
+    public GeneralEntityModel getApprover() {
+        return approver;
+    }
+
+    public void setApprover(GeneralEntityModel approver) {
+        this.approver = approver;
     }
 
     public ChildContractStatusEnum getChildContractStatusEnum() {

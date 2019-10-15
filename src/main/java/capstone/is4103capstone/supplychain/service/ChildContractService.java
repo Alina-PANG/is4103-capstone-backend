@@ -166,6 +166,11 @@ public class ChildContractService {
 
     public ChildContractModel transformToChildContractModel(ChildContract childContract){
         GeneralEntityModel masterContract = null;
+        GeneralEntityModel approver = null;
+
+        if(childContract.getApprover() != null){
+            approver = new GeneralEntityModel(childContract.getApprover());
+        }
 
         if(childContract.getMasterContract() != null) {
             masterContract = new GeneralEntityModel(childContract.getMasterContract());
@@ -174,7 +179,7 @@ public class ChildContractService {
         ChildContractModel childContractModel = new ChildContractModel(
                 childContract.getObjectName(), childContract.getCode(), childContract.getId(),
                 childContract.getSeqNo(), childContract.getServiceCode(), childContract.getContractValue(),
-                masterContract, childContract.getChildContractStatus());
+                masterContract, childContract.getChildContractStatus(), approver);
 
         return childContractModel;
     }

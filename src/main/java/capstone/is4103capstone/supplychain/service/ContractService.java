@@ -307,12 +307,16 @@ public class ContractService {
         GeneralEntityModel vendor = null;
         GeneralEntityModel employeeInChargeContract = null;
         GeneralEntityModel team = null;
+        GeneralEntityModel approver = null;
 
         if(contract.getVendor() != null){
             vendor = new GeneralEntityModel(contract.getVendor());
         }
         if(contract.getEmployeeInChargeContract() != null){
             employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
+        }
+        if(contract.getApprover() != null){
+            approver = new GeneralEntityModel(contract.getApprover());
         }
         if(contract.getTeam() != null) {
             team = new GeneralEntityModel(contract.getTeam());
@@ -322,7 +326,7 @@ public class ContractService {
                 contract.getContractDescription(), contract.getObjectName(), contract.getCode(), contract.getId(), contract.getSeqNo(),
                 contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
                 contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
-                vendor, employeeInChargeContract, team, contract.getTotalContractValue(), contract.getCurrencyCode(),
+                vendor, employeeInChargeContract, approver, team, contract.getTotalContractValue(), contract.getCurrencyCode(),
                 contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
 
         return contractModel;
