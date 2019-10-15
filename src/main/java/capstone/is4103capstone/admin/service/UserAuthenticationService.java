@@ -1,5 +1,6 @@
 package capstone.is4103capstone.admin.service;
 
+import capstone.is4103capstone.admin.dto.SessionKeyDto;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.repository.SessionKeyRepo;
 import capstone.is4103capstone.entities.Employee;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,25 +29,31 @@ public class UserAuthenticationService {
     @Autowired
     SessionKeyRepo sessionKeyRepo;
 
-    public SessionKey createNewSession(String username, String password) {
-        try {
-            if (checkPassword(username, password)) {
-                // generate new sessionKey
-                SessionKey sk = new SessionKey();
-                // set the linked user
-                sk.setLinkedUser(er.findEmployeeByUserName(username));
-                // set the expiry date of the cookie
-                sk.setLastAuthenticated(new Date());
-                // set the session key (UUID)
-                sk.setSessionKey(UUID.randomUUID().toString());
-                // save to DB
-                sessionKeyRepo.save(sk);
-                return sk;
-            } else {
-                throw new UserAuthenticationFailedException("Invalid Username or Password");
-            }
-        } catch (DbObjectNotFoundException ex) {
-            throw new UserAuthenticationFailedException("Invalid Username or Password");
+    public SessionKeyDto createNewSession(String username, String password) throws Exception {
+        if (checkPassword(username, password)) {
+            // generate new sessionKey
+            SessionKey sk = new SessionKey();
+            // set the linked user
+            Employee employee = er.findEmployeeByUserName(username);
+            if (Objects.isNull(employee))
+                throw new Exception("Invalid Username or Password. Please check your input and try again.");
+            sk.setLinkedUser(employee);
+            // set the expiry date of the cookie
+            sk.setLastAuthenticated(new Date());
+            // set the session key (UUID)
+            sk.setSessionKey(UUID.randomUUID().toString());
+            // save to DB
+            sessionKeyRepo.save(sk);
+            // write the DTO object
+            SessionKeyDto sessionKeyDto = new SessionKeyDto();
+            sessionKeyDto.setSessionKey(Optional.of(sk.getSessionKey()));
+            sessionKeyDto.setLinkedUserName(Optional.of(sk.getLinkedUser().getUserName()));
+            sessionKeyDto.setLinkedUserSid(Optional.of(sk.getLinkedUser().getSecurityId()));
+            sessionKeyDto.setLinkedUserUuid(Optional.of(sk.getLinkedUser().getId()));
+            sessionKeyDto.setLinkedUserFullName(Optional.of(sk.getLinkedUser().getFullName()));
+            return sessionKeyDto;
+        } else {
+            throw new Exception("Invalid Username or Password. Please check your input and try again.");
         }
     }
 
