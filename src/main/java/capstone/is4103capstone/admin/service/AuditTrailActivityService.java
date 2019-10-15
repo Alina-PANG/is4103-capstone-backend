@@ -65,7 +65,7 @@ public class AuditTrailActivityService {
     //!!using Spring JPA Projection
     public AuditTrailRes getAllAuditTrailWithUsername(){
         try {
-            List<AuditTrailModel> models = auditTrailActivityRepo.findAuditTailsWithUsername();
+            List<AuditTrailModel> models = auditTrailActivityRepo.findAuditTrailActivityWithUsername();
             return new AuditTrailRes("Retrieved " +models.size()+" records.",false,models);
         }catch (Exception e){
             return new AuditTrailRes(e.getMessage(),true);
