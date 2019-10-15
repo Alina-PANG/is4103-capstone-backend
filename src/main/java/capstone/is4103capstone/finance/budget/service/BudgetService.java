@@ -373,7 +373,7 @@ public class BudgetService {
 
     private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content){
         Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
-        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, ApprovalTypeEnum.BUDGETPLAN);
+        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, ApprovalTypeEnum.BUDGET);
         //TODO: What's the message content?
     }
 
