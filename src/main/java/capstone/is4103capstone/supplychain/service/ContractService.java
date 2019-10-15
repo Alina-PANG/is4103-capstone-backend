@@ -19,6 +19,7 @@ import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.model.res.GetContractsRes;
 import capstone.is4103capstone.supplychain.model.res.GetContractRes;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
+import capstone.is4103capstone.util.enums.ChildContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +96,7 @@ public class ContractService {
 
             //send approval request
             try{
-                createApprovalTicket(createContractReq.getModifierUsername(),newContract,"Approver please review the contract.");
+                createApprovalTicket(createContractReq.getModifierUsername(),newContract.getId(),"Approver please review the contract.");
             }catch (Exception emailExc){
             }
 
@@ -108,10 +109,23 @@ public class ContractService {
         }
     }
 
-    private void createApprovalTicket(String requesterUsername, Contract newContract, String content){
-        Employee requester = employeeRepository.findEmployeeByUserName(requesterUsername);
-        Employee approver = newContract.getApprover();
-        ApprovalTicketService.createTicketAndSendEmail(requester,approver,newContract,content, ApprovalTypeEnum.CONTRACT);
+    public GeneralRes createApprovalTicket(String requesterUsername, String contractId, String content){
+        try {
+            Contract contract = contractRepository.getOne(contractId);
+            Employee requester = employeeRepository.findEmployeeByUserName(requesterUsername);
+            Employee approver = contract.getApprover();
+
+            if(contract.getContractStatus().equals(ContractStatusEnum.ACTIVE)){
+                logger.error("This contract has been approved. Cannot request for approval again!");
+                throw new Exception("This contract has been approved. Cannot request for approval again!");
+            }
+            ApprovalTicketService.createTicketAndSendEmail(requester, approver, contract, content, ApprovalTypeEnum.CONTRACT);
+
+            return new GeneralRes("Request for approval has been sent Successfully!", false);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new GeneralRes( ex.getMessage(), true);
+        }
     }
 
     @Transactional
@@ -135,6 +149,11 @@ public class ContractService {
             if (!contract.getContractStatus().equals(ContractStatusEnum.PENDING_APPROVAL)) {
                 logger.error("Internal error, a non-pending contract goes into approve function");
                 throw new Exception("Internal error, a non-pending contract goes into approve function");
+            }
+
+            if(!getApprovalRight(contract, approveContractReq.getUsername())){
+                logger.error("This user is not the approver and does not have the right to approve this contract");
+                throw new Exception("This user is not the approver and does not have the right to approve this contract");
             }
 
             if (!approveContractReq.getApproved()){

@@ -84,4 +84,17 @@ public class ChildContractController {
                     .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
+
+    @PostMapping("/request-approve/{childContractId}")
+    public ResponseEntity requestApprove(@PathVariable("childContractId") String childContractId, @RequestParam(name = "username", required = true) String username){
+        if (Authentication.authenticateUser(username)) {
+            return ResponseEntity
+                    .ok()
+                    .body(childContractService.createApprovalTicket(username, childContractId, "Approver please review the contract."));
+        }else{
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
 }

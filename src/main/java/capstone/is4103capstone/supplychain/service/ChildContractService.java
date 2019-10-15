@@ -76,7 +76,7 @@ public class ChildContractService {
 
             //send approval request
             try{
-                createApprovalTicket(createChildContractReq.getModifierUsername(),newChildContract,"Approver please review the child contract.");
+                createApprovalTicket(createChildContractReq.getModifierUsername(),newChildContract.getId(),"Approver please review the child contract.");
             }catch (Exception emailExc){
             }
 
@@ -179,11 +179,24 @@ public class ChildContractService {
         return childContractModel;
     }
 
+    public GeneralRes createApprovalTicket(String requesterUsername, String childContractId, String content){
+        try{
+            ChildContract childContract = childContractRepository.getOne(childContractId);
+            Employee requester = employeeRepository.findEmployeeByUserName(requesterUsername);
+            Employee approver = childContract.getApprover();
 
-    private void createApprovalTicket(String requesterUsername, ChildContract newChildContract, String content){
-        Employee requester = employeeRepository.findEmployeeByUserName(requesterUsername);
-        Employee approver = newChildContract.getApprover();
-        ApprovalTicketService.createTicketAndSendEmail(requester,approver,newChildContract,content, ApprovalTypeEnum.CHILD_CONTRACT);
+            if(childContract.getChildContractStatus().equals(ChildContractStatusEnum.APPROVED)){
+                logger.error("This child contract has been approved. Cannot request for approval again!");
+                throw new Exception("This child contract has been approved. Cannot request for approval again!");
+            }
+
+            ApprovalTicketService.createTicketAndSendEmail(requester,approver,childContract,content, ApprovalTypeEnum.CHILD_CONTRACT);
+            return new GeneralRes("Request for approval has been sent Successfully!", false);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new GeneralRes( ex.getMessage(), true);
+        }
     }
 
     @Transactional
@@ -207,6 +220,10 @@ public class ChildContractService {
             if (!childContract.getChildContractStatus().equals(ChildContractStatusEnum.PENDING_APPROVAL)) {
                 logger.error("Internal error, a non-pending child contract goes into approve function");
                 throw new Exception("Internal error, a non-pending child contract goes into approve function");
+            }
+            if(!getApprovalRight(childContract, approveChildContractReq.getUsername())){
+                logger.error("This user is not the approver and does not have the right to approve this child contract");
+                throw new Exception("This user is not the approver and does not have the right to approve this child contract");
             }
 
             if (!approveChildContractReq.getApproved()){
