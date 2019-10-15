@@ -45,8 +45,9 @@ public class Employee extends DBEntityTemplate {
     @JoinColumn(name = "costcenter_id")
     private CostCenter defaultCostCenter;
 
-    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
-    private List<Team> memberOfTeams = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
@@ -117,6 +118,15 @@ public class Employee extends DBEntityTemplate {
         this.userName = userName;
     }
 
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -165,15 +175,6 @@ public class Employee extends DBEntityTemplate {
 
     public void setEmployeeType(EmployeeTypeEnum employeeType) {
         this.employeeType = employeeType;
-    }
-
-
-    public List<Team> getMemberOfTeams() {
-        return memberOfTeams;
-    }
-
-    public void setMemberOfTeams(List<Team> memberOfTeams) {
-        this.memberOfTeams = memberOfTeams;
     }
 
     public Employee getManager() {

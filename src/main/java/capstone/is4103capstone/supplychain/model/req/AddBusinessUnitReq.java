@@ -4,22 +4,22 @@ import java.io.Serializable;
 
 public class AddBusinessUnitReq implements Serializable {
     private String username;
-    private String teamId;
+    private String businessUnitId;
 
     public AddBusinessUnitReq() {
     }
 
-    public AddBusinessUnitReq(String username, String teamId) {
+    public AddBusinessUnitReq(String username, String businessUnitId) {
         this.username = username;
-        this.teamId = teamId;
+        this.businessUnitId = businessUnitId;
     }
 
-    public String getTeamId() {
-        return teamId;
+    public String getBusinessUnitId() {
+        return businessUnitId;
     }
 
-    public void setTeamId(String teamId) {
-        this.teamId = teamId;
+    public void setBusinessUnitId(String businessUnitId) {
+        this.businessUnitId = businessUnitId;
     }
 
     public String getUsername() {

@@ -2,28 +2,26 @@ package capstone.is4103capstone.supplychain;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.finance.Merchandise;
+import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.*;
-import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
+import capstone.is4103capstone.finance.Repository.ServiceRepository;
 import capstone.is4103capstone.supplychain.Repository.*;
 import capstone.is4103capstone.util.enums.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Service
+@org.springframework.stereotype.Service
 @Transactional
 public class SupplyChainInitialization {
     @Autowired
     VendorRepository vendorRepository;
     @Autowired
-    MerchandiseRepository merchandiseRepository;
+    ServiceRepository serviceRepository;
     @Autowired
     ContractRepository contractRepository;
     @Autowired
@@ -40,8 +38,6 @@ public class SupplyChainInitialization {
     OutsourcingRepository outsourcingRepository;
     @Autowired
     EmployeeRepository employeeRepository;
-    @Autowired
-    ContractLineRepository contractLineRepository;
 
     private final String opsUserId = "yingshi2502";
 
@@ -55,33 +51,33 @@ public class SupplyChainInitialization {
 //            newEmployee2.setCode("EMPLOYEE-xuhong");
 //            employeeRepository.save(newEmployee2);
 //
-////            createMechandise();
-////            createVendors();
-////            createContract();
-////            createDispute();
-////            createAction();
-////            createOutsourcingAssessmentLine();
-////            createOutsourcingAssessmentSection();
-////            createOutsourcingAssessment();
-////            createOutsourcing();
+//            createMechandise();
+//            createVendors();
+//            createContract();
+//            createDispute();
+//            createAction();
+//            createOutsourcingAssessmentLine();
+//            createOutsourcingAssessmentSection();
+//            createOutsourcingAssessment();
+//            createOutsourcing();
 //        }
     }
 
     public void createMechandise() {
-        Merchandise merchandise1 = new Merchandise("Banana", "SG_Banana", "dummy_hierachy", "piece", opsUserId);
-        Merchandise merchandise2 = new Merchandise("Mango", "SG_Mango", "dummy_hierachy", "piece", opsUserId);
+        Service service1 = new Service("Banana", "SG_Banana", "dummy_hierachy", "piece", opsUserId);
+        Service service2 = new Service("Mango", "SG_Mango", "dummy_hierachy", "piece", opsUserId);
 
-        merchandise1.setCreatedBy("xuhong");
-        merchandise1.setCreatedDateTime(new Date());
-        merchandise1.setLastModifiedBy("xuhong");
-        merchandise1.setLastModifiedDateTime(new Date());
+        service1.setCreatedBy("xuhong");
+        service1.setCreatedDateTime(new Date());
+        service1.setLastModifiedBy("xuhong");
+        service1.setLastModifiedDateTime(new Date());
 
-        merchandise2.setCreatedBy("xuhong");
-        merchandise2.setCreatedDateTime(new Date());
-        merchandise2.setLastModifiedBy("xuhong");
-        merchandise2.setLastModifiedDateTime(new Date());
-        merchandiseRepository.save(merchandise1);
-        merchandiseRepository.save(merchandise2);
+        service2.setCreatedBy("xuhong");
+        service2.setCreatedDateTime(new Date());
+        service2.setLastModifiedBy("xuhong");
+        service2.setLastModifiedDateTime(new Date());
+        serviceRepository.save(service1);
+        serviceRepository.save(service2);
     }
 
     public void createVendors() {
@@ -99,39 +95,19 @@ public class SupplyChainInitialization {
         vendor1.setLastModifiedBy("xuhong");
         vendor1.setLastModifiedDateTime(new Date());
 
-        Merchandise merchandise = merchandiseRepository.findMerchandiseByCode("SG_Banana");
-        vendor1.getMerchandises().add(merchandise);
+        Service service = serviceRepository.findServiceByCode("SG_Banana");
+        //vendor1.getservices().add(service);
 
         vendorRepository.save(vendor1);
-        merchandise.setVendor(vendor1);
-        merchandiseRepository.saveAndFlush(merchandise);
+//        service.setVendor(vendor1);
+        serviceRepository.saveAndFlush(service);
     }
 
     @Transactional
     public void createContract() throws ParseException {
 
-        Merchandise banana = merchandiseRepository.findMerchandiseByCode("SG_Banana");
-        Merchandise mango = merchandiseRepository.findMerchandiseByCode("SG_Mango");
-
-        ContractLine contractLine1 = new ContractLine("SG_Banana", BigDecimal.valueOf(2.0), "SGD", opsUserId);
-        ContractLine contractLine2 = new ContractLine("SG_Mango", BigDecimal.valueOf(5.0), "SGD", opsUserId);
-
-        contractLine1.setCreatedBy("xuhong");
-        contractLine1.setCreatedDateTime(new Date());
-        contractLine1.setLastModifiedBy("xuhong");
-        contractLine1.setLastModifiedDateTime(new Date());
-
-        contractLine2.setCreatedBy("xuhong");
-        contractLine2.setCreatedDateTime(new Date());
-        contractLine2.setLastModifiedBy("xuhong");
-        contractLine2.setLastModifiedDateTime(new Date());
-
-        contractLine1 = contractLineRepository.save(contractLine1);
-        contractLine2 = contractLineRepository.save(contractLine2);
-
-        contractLine1.setMerchandiseCode("SG_Banana");
-        contractLine2.setMerchandiseCode("SG_Mango");
-
+        Service banana = serviceRepository.findServiceByCode("SG_Banana");
+        Service mango = serviceRepository.findServiceByCode("SG_Mango");
 
         Contract contract1 = new Contract();
         contract1.setPurchaseType(PurchaseTypeEnum.TERMLICENSE);
@@ -150,15 +126,8 @@ public class SupplyChainInitialization {
 
         contract1 = contractRepository.save(contract1);
 
-        banana.setCurrentContractCode("Contract1");
-        mango.setCurrentContractCode("Contract1");
-
-        contract1.getContractLines().add(contractLine1);
-        contract1.getContractLines().add(contractLine2);
-        contractLine1.setContract(contract1);
-        contractLine2.setContract(contract1);
-        contractLineRepository.saveAndFlush(contractLine1);
-        contractLineRepository.saveAndFlush(contractLine2);
+//        banana.setCurrentContractCode("Contract1");
+//        mango.setCurrentContractCode("Contract1");
 
         Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
         Employee newEmployee = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
@@ -171,8 +140,8 @@ public class SupplyChainInitialization {
 
         contractRepository.saveAndFlush(contract1);
         vendorRepository.saveAndFlush(vendor);
-        merchandiseRepository.saveAndFlush(banana);
-        merchandiseRepository.saveAndFlush(mango);
+        serviceRepository.saveAndFlush(banana);
+        serviceRepository.saveAndFlush(mango);
         employeeRepository.saveAndFlush(newEmployee);
     }
 

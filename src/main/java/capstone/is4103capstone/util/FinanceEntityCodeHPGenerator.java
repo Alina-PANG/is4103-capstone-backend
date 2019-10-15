@@ -43,7 +43,7 @@ public class FinanceEntityCodeHPGenerator {
         return cc.getCode() + "-" + plan.getPlanType().name()+"-"+plan.getForYear();
     }
     public String getPlanItemHP(PlanLineItem pl){
-        return pl.getPlanBelongsTo().getHierachyPath() + "-"+pl.getMerchandiseCode();
+        return pl.getPlanBelongsTo().getHierachyPath() + "-"+pl.getserviceCode();
     }
 
     //after connecting all the relationships:
@@ -96,8 +96,8 @@ public class FinanceEntityCodeHPGenerator {
                         //name = base+price+ddmmyy
                         code = String.format(FX_RECORD_TEMPLATE, objectName, seqNoStr);
                         break;
-                    case "Merchandise":
-                        //                    Merchandise m = (Merchandise) entity;
+                    case "service":
+                        //                    service m = (service) entity;
                         code = String.format(MERCHANDISE_TEMPALTE, objectName, seqNoStr);
                         break;
                     case "Plan":

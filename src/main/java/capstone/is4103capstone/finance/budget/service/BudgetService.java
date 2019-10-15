@@ -3,14 +3,12 @@ package capstone.is4103capstone.finance.budget.service;
 import capstone.is4103capstone.admin.repository.CostCenterRepository;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.finance.*;
-import capstone.is4103capstone.finance.Repository.MerchandiseRepository;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
+import capstone.is4103capstone.finance.Repository.ServiceRepository;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
 import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
@@ -29,14 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.GenerationType;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@Service
+@org.springframework.stereotype.Service
 public class BudgetService {
     private static final Logger logger = LoggerFactory.getLogger(BudgetService.class);
     @Autowired
@@ -46,7 +42,7 @@ public class BudgetService {
     @Autowired
     CostCenterRepository costCenterRepository;
     @Autowired
-    MerchandiseRepository merchandiseRepository;
+    ServiceRepository serviceRepository;
     @Autowired
     EmployeeRepository employeeRepository;
 
@@ -91,7 +87,7 @@ public class BudgetService {
         try{
             int version = 1;
             if (!isValidPlan(createBudgetReq.getItems()))
-                throw new Exception("Submitted budget plan not valid, duplicate merchandise fields!");
+                throw new Exception("Submitted budget plan not valid, duplicate service fields!");
             CostCenter cc = costCenterRepository.findCostCenterByCode(createBudgetReq.getCostCenterCode());
 
 
@@ -193,15 +189,15 @@ public class BudgetService {
             plan.setDescription(p.getPlanDescription());
             plan.setCostCenterCode(p.getCostCenter().getCode());
             plan.setTeamCode(p.getCostCenter().getTeam().getCode());
-            plan.setCountryCode(p.getCostCenter().getTeam().getCountry().getCode());
-            plan.setFunctionCode(p.getCostCenter().getTeam().getFunction().getCode());
+            plan.setCountryCode(p.getCostCenter().getTeam().getBusinessUnit().getFunction().getCountry().getCode());
+            plan.setFunctionCode(p.getCostCenter().getTeam().getBusinessUnit().getFunction().getCode());
 
             plan.setLastModifiedTime(datetimeFormatter.format(p.getLastModifiedDateTime() == null ? p.getCreatedDateTime() : p.getLastModifiedDateTime()));
 
             for(int i = 0; i < p.getLineItems().size(); i ++){
                 PlanLineItem item = p.getLineItems().get(i);
-                Merchandise m = merchandiseRepository.findMerchandiseByCode(item.getMerchandiseCode());
-                System.out.println(item.getMerchandiseCode());
+                Service m = serviceRepository.findServiceByCode(item.getserviceCode());
+                System.out.println(item.getserviceCode());
                 BudgetSub2 budgetSub2 = m.getBudgetSub2();
                 System.out.println("sub2: "+budgetSub2.getCode());
                 BudgetSub1 budgetSub1 = budgetSub2.getBudgetSub1();
@@ -254,39 +250,7 @@ public class BudgetService {
             return new GetBudgetListRes(ex.getMessage(), true, null);
 
         }
-//
-//
-//
-//        try{
-//            if (retrieveType != null && (retrieveType > 2 || retrieveType < 0))
-//                throw new Exception("Retrieve Type can only take value 0,1,2");
-//
-//            CostCenter ccThis = costCenterRepository.getOne(costcenterId);
-//
-//            List<Plan> plans = planRepository.findByCostCenterId(costcenterId);
-//            List<BudgetModel> result = new ArrayList<>();
-//
-//
-//            logger.info("Req: username: "+username+" plan type: "+retrieveType);
-//            for(Plan p: plans){
-//                if(p.getDeleted() || p.getCreatedBy() == null || p.getBudgetPlanStatus() == null || p.getPlanType() == null) continue;
-//                if(checkPlanTypeAndYear(p,retrieveType,year)){
-//                    BudgetModel thisPlan = new BudgetModel(p.getForYear(), p.getForMonth(), p.getObjectName(), p.getId(), p.getBudgetPlanStatus(),p.getPlanType());
-//                    thisPlan.setCostCenterCode(ccThis.getCode());
-//
-//                    thisPlan.setCreateBy(p.getCreatedBy());
-//                    thisPlan.setLastModifiedTime(datetimeFormatter.format(p.getLastModifiedDateTime() == null ? p.getCreatedDateTime() : p.getLastModifiedDateTime()));
-//                    result.add(thisPlan);
-//                }
-//            }
-//            if(result.size() == 0){
-//                return new GetBudgetListRes("There is no plan to view according to the search type!", true, null);
-//            }
-//            return new GetBudgetListRes("Successsfully retrieved plans under the cost center!",false, result);
-//        } catch(Exception ex){
-//            ex.printStackTrace();
-//            return new GetBudgetListRes("An unexpected error happens: "+ex.getMessage(), true, null);
-//        }
+
     }
 
     public GeneralRes approveBudget(ApproveBudgetReq approveBudgetReq) {
@@ -317,12 +281,12 @@ public class BudgetService {
 
     //validate the plan items submitted by the user, whether there're any repeatative;
     private boolean isValidPlan(List<PlanLineItem> items){
-        Set<String> submittedMerchandiseCodes = new HashSet<String>();
+        Set<String> submittedserviceCodes = new HashSet<String>();
         for (PlanLineItem item: items){
-            if (item.getMerchandiseCode() == null){
+            if (item.getserviceCode() == null){
                 return false;
             }
-            if (!submittedMerchandiseCodes.add(item.getMerchandiseCode()))
+            if (!submittedserviceCodes.add(item.getserviceCode()))
                 return false;
         }
         return true;

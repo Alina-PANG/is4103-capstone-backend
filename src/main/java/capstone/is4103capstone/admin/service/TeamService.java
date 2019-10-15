@@ -92,8 +92,8 @@ public class TeamService {
         teamDto.setId(Optional.of(input.getId()));
         teamDto.setCode(Optional.of(input.getCode()));
         teamDto.setObjectName(Optional.of(input.getObjectName()));
-        teamDto.setCompanyFunction(Optional.of(input.getFunction().getId()));
-        teamDto.setCountry(Optional.of(input.getCountry().getId()));
+        teamDto.setCompanyFunction(Optional.of(input.getBusinessUnit().getFunction().getId()));
+        teamDto.setCountry(Optional.of(input.getBusinessUnit().getFunction().getCountry().getId()));
         return teamDto;
     }
 

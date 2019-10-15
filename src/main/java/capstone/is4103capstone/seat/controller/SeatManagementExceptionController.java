@@ -56,4 +56,13 @@ public class SeatManagementExceptionController {
         error.setStatus(HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = EmployeeNotFoundException.class)
+    public ResponseEntity handleEmployeeNotFoundException(EmployeeNotFoundException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }
