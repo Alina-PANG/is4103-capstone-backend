@@ -4,6 +4,7 @@ import capstone.is4103capstone.admin.service.CostCenterService;
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.finance.Project;
+import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
@@ -46,6 +47,12 @@ public class BJFService {
         return new ArrayList<>();
     }
 
+    public void purchaseOrderApproved(PurchaseOrder po){
 
+    }
+
+    public void purchaseOrderClosed(PurchaseOrder po){
+
+    }
 
 }
