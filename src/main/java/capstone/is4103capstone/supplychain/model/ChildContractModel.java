@@ -1,6 +1,7 @@
 package capstone.is4103capstone.supplychain.model;
 
 import capstone.is4103capstone.general.model.GeneralEntityModel;
+import capstone.is4103capstone.util.enums.ChildContractStatusEnum;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,8 +14,9 @@ public class ChildContractModel implements Serializable {
     private String serviceCode;
     private BigDecimal contractValue;
     private GeneralEntityModel masterContract;
+    private ChildContractStatusEnum childContractStatusEnum;
 
-    public ChildContractModel(String name, String code, String id, Long seqNo, String serviceCode, BigDecimal contractValue, GeneralEntityModel masterContract) {
+    public ChildContractModel(String name, String code, String id, Long seqNo, String serviceCode, BigDecimal contractValue, GeneralEntityModel masterContract, ChildContractStatusEnum childContractStatusEnum) {
         this.name = name;
         this.code = code;
         this.id = id;
@@ -22,10 +24,19 @@ public class ChildContractModel implements Serializable {
         this.serviceCode = serviceCode;
         this.contractValue = contractValue;
         this.masterContract = masterContract;
+        this.childContractStatusEnum = childContractStatusEnum;
     }
 
     public ChildContractModel() {
 
+    }
+
+    public ChildContractStatusEnum getChildContractStatusEnum() {
+        return childContractStatusEnum;
+    }
+
+    public void setChildContractStatusEnum(ChildContractStatusEnum childContractStatusEnum) {
+        this.childContractStatusEnum = childContractStatusEnum;
     }
 
     public String getName() {

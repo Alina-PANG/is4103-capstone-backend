@@ -3,6 +3,7 @@ package capstone.is4103capstone.supplychain.controller;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.model.req.ApproveContractReq;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.service.ContractService;
 import org.slf4j.Logger;
@@ -97,4 +98,17 @@ public class ContractController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
+
+    @PostMapping("/approve-contract")
+    public ResponseEntity approveContract(@RequestBody ApproveContractReq approveContractReq){
+        if(Authentication.authenticateUser(approveContractReq.getUsername()))
+            return ResponseEntity
+                    .ok()
+                    .body(contractService.approveContract(approveContractReq));
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
 }

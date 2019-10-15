@@ -85,7 +85,10 @@ public class Employee extends DBEntityTemplate {
     private List<Contract> contractInCharged = new ArrayList<>();
 
     @OneToMany(mappedBy = "approver")
-    private List<Contract> contractApproved = new ArrayList<>();
+    private List<Contract> contractsApproved = new ArrayList<>();
+
+    @OneToMany(mappedBy = "approver")
+    private List<ChildContract> childContractsApproved = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
@@ -104,6 +107,13 @@ public class Employee extends DBEntityTemplate {
         this.securityId = "S-" + UUID.randomUUID();
     }
 
+    public List<ChildContract> getChildContractsApproved() {
+        return childContractsApproved;
+    }
+
+    public void setChildContractsApproved(List<ChildContract> childContractsApproved) {
+        this.childContractsApproved = childContractsApproved;
+    }
 
     public CostCenter getDefaultCostCenter() {
         return defaultCostCenter;
@@ -121,12 +131,12 @@ public class Employee extends DBEntityTemplate {
         this.userName = userName;
     }
 
-    public List<Contract> getContractApproved() {
-        return contractApproved;
+    public List<Contract> getContractsApproved() {
+        return contractsApproved;
     }
 
-    public void setContractApproved(List<Contract> contractApproved) {
-        this.contractApproved = contractApproved;
+    public void setContractsApproved(List<Contract> contractsApproved) {
+        this.contractsApproved = contractsApproved;
     }
 
     public Team getTeam() {

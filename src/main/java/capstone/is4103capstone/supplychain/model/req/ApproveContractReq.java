@@ -5,19 +5,17 @@ import java.io.Serializable;
 public class ApproveContractReq implements Serializable {
     private Boolean approved;
     private String username;
-    private String contarctId;
+    private String contractId;
     private String comment;
-    private int approvalType;
 
     public ApproveContractReq() {
     }
 
-    public ApproveContractReq(Boolean approved, String username, String contarctId, String comment, int approvalType) {
+    public ApproveContractReq(Boolean approved, String username, String contractId, String comment) {
         this.approved = approved;
         this.username = username;
-        this.contarctId = contarctId;
+        this.contractId = contractId;
         this.comment = comment;
-        this.approvalType = approvalType;
     }
 
     public String getUsername() {
@@ -28,12 +26,12 @@ public class ApproveContractReq implements Serializable {
         this.username = username;
     }
 
-    public String getContarctId() {
-        return contarctId;
+    public String getContractId() {
+        return contractId;
     }
 
-    public void setContarctId(String contarctId) {
-        this.contarctId = contarctId;
+    public void setContractId(String contractId) {
+        this.contractId = contractId;
     }
 
     public String getComment() {
@@ -42,14 +40,6 @@ public class ApproveContractReq implements Serializable {
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public int getApprovalType() {
-        return approvalType;
-    }
-
-    public void setApprovalType(int approvalType) {
-        this.approvalType = approvalType;
     }
 
     public Boolean getApproved() {

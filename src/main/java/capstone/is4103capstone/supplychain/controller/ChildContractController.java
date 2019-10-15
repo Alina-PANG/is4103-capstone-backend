@@ -3,6 +3,7 @@ package capstone.is4103capstone.supplychain.controller;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.model.req.ApproveChildContractReq;
 import capstone.is4103capstone.supplychain.model.req.CreateChildContractReq;
 import capstone.is4103capstone.supplychain.service.ChildContractService;
 import org.slf4j.Logger;
@@ -70,5 +71,17 @@ public class ChildContractController {
                     .ok()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
+    }
+
+    @PostMapping("/approve-child-contract")
+    public ResponseEntity approveChildContract(@RequestBody ApproveChildContractReq approveChildContractReq){
+        if(Authentication.authenticateUser(approveChildContractReq.getUsername()))
+            return ResponseEntity
+                    .ok()
+                    .body(childContractService.approveChildContract(approveChildContractReq));
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 }
