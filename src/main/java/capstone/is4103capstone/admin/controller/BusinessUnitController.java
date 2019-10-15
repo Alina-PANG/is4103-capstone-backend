@@ -38,7 +38,7 @@ public class BusinessUnitController {
         }
     }
 
-    @GetMapping("/byCountry/{uuid}")
+    @GetMapping("/byCountryUuid/{uuid}")
     public ResponseEntity<GenericObjectRes> getBusinessUnitsByCountryUuid(@PathVariable(name = "uuid") String input) {
         try {
             WriteAuditTrail.autoAuditUsingSpringSecurity();
