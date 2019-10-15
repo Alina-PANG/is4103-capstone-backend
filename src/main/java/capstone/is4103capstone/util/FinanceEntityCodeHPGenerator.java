@@ -31,6 +31,10 @@ public class FinanceEntityCodeHPGenerator {
     private final String PROJECT_TEMPLATE = "PJ-%1$s";
     private final String INVOICE_TEMPLATE = "INV-%1$s-%2$s";
     private final String STATEMENT_OF_ACCT_TEMPLATE = "SOA-%1$s-%2$s";
+    private final String TRAVEL_PLAN_TEMPLATE = "TRAVEL-%1$s-%2$s";
+    private final String TRAIN_PLAN_TEMPLATE = "TRAIN-%1$s-%2$s";
+    private final String COST_CENTER_TEMPLATE = "%1$s-%2$s";
+
 
     public String generateHierachyPath(DBEntityTemplate parent, DBEntityTemplate son){
         //for categories:cat: country's path + cat_name  -> parent'path + objectName;
@@ -46,8 +50,16 @@ public class FinanceEntityCodeHPGenerator {
         return pl.getPlanBelongsTo().getHierachyPath() + "-"+pl.getserviceCode();
     }
 
-    //after connecting all the relationships:
+    public String generateCode(JpaRepository repo, DBEntityTemplate entity,String additionalInfo) throws Exception{
+        return process(repo,entity,additionalInfo);
+    }
+
     public String generateCode(JpaRepository repo, DBEntityTemplate entity) throws Exception {
+        return process(repo,entity,"");
+    }
+
+        //after connecting all the relationships:
+    private String process(JpaRepository repo, DBEntityTemplate entity,String additionalInfo) throws Exception {
         Optional<DBEntityTemplate> entityOptional = repo.findById(entity.getId());
         String code = "";
         if (entityOptional.isPresent()){
@@ -96,7 +108,7 @@ public class FinanceEntityCodeHPGenerator {
                         //name = base+price+ddmmyy
                         code = String.format(FX_RECORD_TEMPLATE, objectName, seqNoStr);
                         break;
-                    case "service":
+                    case "Service":
                         //                    service m = (service) entity;
                         code = String.format(MERCHANDISE_TEMPALTE, objectName, seqNoStr);
                         break;
@@ -125,6 +137,12 @@ public class FinanceEntityCodeHPGenerator {
                         //name: ponumber+index
                         code = String.format(STATEMENT_OF_ACCT_TEMPLATE, objectName, seqNoStr);
                         break;
+                    case "TravelForm":
+                        code = String.format(TRAVEL_PLAN_TEMPLATE,additionalInfo,seqNoStr);
+                    case "TrainingForm":
+                        code = String.format(TRAIN_PLAN_TEMPLATE,additionalInfo,seqNoStr);
+                    case "CostCenter":
+                        code = additionalInfo.isEmpty()? String.format(COST_CENTER_TEMPLATE,"CC",seqNoStr):String.format(COST_CENTER_TEMPLATE,"PJCC",seqNoStr);
                     default:
                         System.out.println("Not found");
                 }

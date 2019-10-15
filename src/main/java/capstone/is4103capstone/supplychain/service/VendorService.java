@@ -4,6 +4,7 @@ import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.entities.finance.Project;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
@@ -21,9 +22,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VendorService {
@@ -205,5 +208,20 @@ public class VendorService {
 //    public GeneralRes removeBusinessUnit(){
 //
 //    }
+
+    public Vendor validateVendor(String idOrCode) throws EntityNotFoundException {
+        Optional<Vendor> vendor = vendorRepository.findById(idOrCode);
+        if (vendor.isPresent())
+            if (!vendor.get().getDeleted())
+                return vendor.get();
+            else
+                throw new EntityNotFoundException("Vendor already deleted.");
+
+        Vendor e = vendorRepository.findVendorByCode(idOrCode);
+        if (e != null && !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("Vendor code or id not valid");
+    }
 
 }

@@ -1,8 +1,8 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.entities.RequestFormTemplate;
+import capstone.is4103capstone.util.enums.BJFStatusEnum;
 import capstone.is4103capstone.util.enums.BjfTypeEnum;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -13,14 +13,10 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BJF extends RequestFormTemplate {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id")
-    @JsonIgnore
-    private Service service;
+    //justification == form description
+    private String serviceId;
 
     private BjfTypeEnum BjfType;
-
-    private String justification;
 
     private String currencyCode;
 
@@ -32,35 +28,26 @@ public class BJF extends RequestFormTemplate {
 
     private String projectCode = null; // if type == project
 
-    private String purchaseOrdersNumber;
+    private String purchaseOrderNumber;
 
     // link to the unique code from the approval
     private String businessApprovalTicketCode;
     // link to the unique code from the approval
     private String budgetApprovalTicketCode;
 
+    private BJFStatusEnum bjfStatus = BJFStatusEnum.PENDING_APPROVAL;
+
 
     public BJF() {
     }
 
 
-
-    public BJF(BjfTypeEnum bjfType, String justification, String currencyCode, BigDecimal ongoingCost, BigDecimal totalAmt, BigDecimal projectCost, String projectCode) {
-        this.BjfType = bjfType;
-        this.justification = justification;
-        this.currencyCode = currencyCode;
-        this.ongoingCost = ongoingCost;
-        this.totalAmt = totalAmt;
-        this.projectCost = projectCost;
-        this.projectCode = projectCode;
+    public String getServiceId() {
+        return serviceId;
     }
 
-    public Service getService() {
-        return service;
-    }
-
-    public void setService(Service service) {
-        this.service = service;
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
     }
 
     public BjfTypeEnum getBjfType() {
@@ -112,12 +99,12 @@ public class BJF extends RequestFormTemplate {
         this.projectCode = projectCode;
     }
 
-    public String getPurchaseOrdersNumber() {
-        return purchaseOrdersNumber;
+    public String getPurchaseOrderNumber() {
+        return purchaseOrderNumber;
     }
 
-    public void setPurchaseOrdersNumber(String purchaseOrdersNumber) {
-        this.purchaseOrdersNumber = purchaseOrdersNumber;
+    public void setPurchaseOrderNumber(String purchaseOrderNumber) {
+        this.purchaseOrderNumber = purchaseOrderNumber;
     }
 
     public String getBusinessApprovalTicketCode() {
@@ -136,12 +123,4 @@ public class BJF extends RequestFormTemplate {
         this.budgetApprovalTicketCode = budgetApprovalTicketCode;
     }
 
-
-    public String getJustification() {
-        return justification;
-    }
-
-    public void setJustification(String justification) {
-        this.justification = justification;
-    }
 }

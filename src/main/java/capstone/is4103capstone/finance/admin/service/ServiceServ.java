@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -188,6 +189,21 @@ public class ServiceServ {
         if (result){
             throw new Exception("This item already exists for the vendor and sub2 category");
         }
+    }
+
+    public Service validateService(String idOrCode) throws EntityNotFoundException {
+        Optional<Service> service = serviceRepository.findById(idOrCode);
+        if (service.isPresent())
+            if (!service.get().getDeleted())
+                return service.get();
+            else
+                throw new EntityNotFoundException("Product or service already deleted.");
+
+        Service e = serviceRepository.findServiceByCode(idOrCode);
+        if (e != null && !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("Product or service code or id not valid");
     }
 
     private void logProblem(String message){

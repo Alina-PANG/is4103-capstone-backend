@@ -1,11 +1,15 @@
 package capstone.is4103capstone.entities.finance;
 
+import capstone.is4103capstone.entities.CostCenter;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.RequestFormTemplate;
 import capstone.is4103capstone.entities.enums.TrainingTypeEnum;
+import capstone.is4103capstone.util.enums.TravelTrainingTypeEnum;
 
 import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -28,9 +32,33 @@ public class TrainingForm extends RequestFormTemplate {
 
     private String trainerCompany;// if internal: empty
 
-    private TrainingTypeEnum trainingType;
+    private TrainingTypeEnum trainerType;
+    private TravelTrainingTypeEnum trainingType;
+
 
     public TrainingForm() {
+    }
+
+    public TrainingForm(String objectName, Employee requester, CostCenter costCenter, String requestDescription, String additionalInfo, BigDecimal estimatedBudget, String currency, Date startDate, Date endDate, String trainingLocation, String targetAudience, String trainingTitle, String trainerName, String trainerEmail, String trainerCompany, TrainingTypeEnum trainingType, TravelTrainingTypeEnum travelType) {
+        super(objectName, requester, costCenter, requestDescription, additionalInfo, estimatedBudget, currency);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.trainingLocation = trainingLocation;
+        this.targetAudience = targetAudience;
+        this.trainingTitle = trainingTitle;
+        this.trainerName = trainerName;
+        this.trainerEmail = trainerEmail;
+        this.trainerCompany = trainerCompany;
+        this.trainerType = trainingType;
+        this.trainingType = travelType;
+    }
+
+    public TravelTrainingTypeEnum getTrainingType() {
+        return trainingType;
+    }
+
+    public void setTrainingType(TravelTrainingTypeEnum trainingType) {
+        this.trainingType = trainingType;
     }
 
     public TrainingForm(Date startDate, Date endDate, String trainingLocation, String targetAudience, String trainingTitle, String trainerName, String trainerEmail, String trainerCompany, TrainingTypeEnum trainingType) {
@@ -42,7 +70,7 @@ public class TrainingForm extends RequestFormTemplate {
         this.trainerName = trainerName;
         this.trainerEmail = trainerEmail;
         this.trainerCompany = trainerCompany;
-        this.trainingType = trainingType;
+        this.trainerType = trainingType;
     }
 
     public String getTargetAudience() {
@@ -109,11 +137,11 @@ public class TrainingForm extends RequestFormTemplate {
         this.trainerCompany = trainerCompany;
     }
 
-    public TrainingTypeEnum getTrainingType() {
-        return trainingType;
+    public TrainingTypeEnum getTrainerType() {
+        return trainerType;
     }
 
-    public void setTrainingType(TrainingTypeEnum trainingType) {
-        this.trainingType = trainingType;
+    public void setTrainerType(TrainingTypeEnum trainerType) {
+        this.trainerType = trainerType;
     }
 }

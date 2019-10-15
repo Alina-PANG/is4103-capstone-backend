@@ -13,6 +13,7 @@ public class ProjectModel extends RequestFormModel {
     private String endDate;
 
     private EmployeeModel projectOwner;
+    private EmployeeModel projectSupervisor;
     private List<EmployeeModel> teamMembers = new ArrayList<>();
     private String projectTitle;
     private String lifeCycleStatus;
@@ -22,9 +23,13 @@ public class ProjectModel extends RequestFormModel {
         setProjectTitle(e.getProjectTitle());
         setProjectOwner(new EmployeeModel(e.getProjectOwner()));
         setRequester(new EmployeeModel(e.getRequester()));
-        setApprovalStatus(e.getStatus().name());
+        setApprovalStatus(e.getApprovalStatus().name());
         setId(e.getId());
+        setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
+        setProjectSupervisor(new EmployeeModel(e.getProjectSupervisor()));
+
     }
+
 
     public ProjectModel(Project e, List<Employee> members) {//team members need to manually convert? or just no need....
         super(e);
@@ -33,11 +38,20 @@ public class ProjectModel extends RequestFormModel {
         setProjectOwner(new EmployeeModel(e.getProjectOwner()));
         setProjectTitle(e.getProjectTitle());
         setLifeCycleStatus(e.getProjectLifeCycleStatus().name());
+        setProjectSupervisor(new EmployeeModel(e.getProjectSupervisor()));
         for (Employee member:members){
             teamMembers.add(new EmployeeModel(member));
         }
     }
 
+
+    public EmployeeModel getProjectSupervisor() {
+        return projectSupervisor;
+    }
+
+    public void setProjectSupervisor(EmployeeModel projectSupervisor) {
+        this.projectSupervisor = projectSupervisor;
+    }
     public ProjectModel() {
     }
 
