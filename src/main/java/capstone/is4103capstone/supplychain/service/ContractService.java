@@ -2,28 +2,38 @@ package capstone.is4103capstone.supplychain.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.repository.TeamRepository;
+import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.model.ContractModel;
+import capstone.is4103capstone.supplychain.model.req.ApproveContractReq;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.model.res.GetContractsRes;
 import capstone.is4103capstone.supplychain.model.res.GetContractRes;
+import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
+import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
+import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContractService {
@@ -41,7 +51,6 @@ public class ContractService {
         try{
             Contract newContract = new Contract();
             newContract.setContractDescription(createContractReq.getContractDescription());
-            newContract.setContractStatus(createContractReq.getContractStatus());
             newContract.setContractTerm(createContractReq.getContractTerm());
             newContract.setContractType(createContractReq.getContractType());
             newContract.setCpgReviewAlertDate(createContractReq.getCpgReviewAlertDate());
@@ -57,6 +66,7 @@ public class ContractService {
             newContract.setTotalContractValue(createContractReq.getTotalContractValue());
             newContract.setCurrencyCode(createContractReq.getCurrencyCode());
             newContract.setDeleted(false);
+            newContract.setContractStatus(ContractStatusEnum.PENDING_APPROVAL);
             newContract = contractRepository.saveAndFlush(newContract);
             if (newContract.getSeqNo() == null) {
                 newContract.setSeqNo(new Long(contractRepository.findAll().size()));
@@ -71,6 +81,10 @@ public class ContractService {
             newContract.setEmployeeInChargeContract(employeeInCharge);
             employeeInCharge.getContractInCharged().add(newContract);
 
+            Employee approver = employeeRepository.getOne(createContractReq.getApproverId());
+            newContract.setApprover(approver);
+            employeeRepository.saveAndFlush(approver);
+
             Team team  = teamRepository.getOne(createContractReq.getTeamId());
             newContract.setTeam(team);
             team.getContracts().add(newContract);
@@ -81,13 +95,78 @@ public class ContractService {
             vendorRepository.saveAndFlush(vendor);
             employeeRepository.saveAndFlush(employeeInCharge);
             teamRepository.saveAndFlush(team);
-            logger.info("Successfully created new contract! -- "+createContractReq.getModifierUsername()+" "+new Date());
+
+            //send approval request
+            try{
+                createApprovalTicket(createContractReq.getModifierUsername(),newContract,"Approver please review the contract.");
+            }catch (Exception emailExc){
+            }
+
+            logger.info("Successfully created new contract! -- "+createContractReq.getModifierUsername()+" "+"Waiting for approval!");
             return new GeneralRes("Successfully created new contract!", false);
         }
         catch(Exception ex){
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
         }
+    }
+
+    private void createApprovalTicket(String requesterUsername, Contract newContract, String content){
+        Employee requester = employeeRepository.findEmployeeByUserName(requesterUsername);
+        Employee approver = newContract.getApprover();
+        ApprovalTicketService.createTicketAndSendEmail(requester,approver,newContract,content, ApprovalTypeEnum.CONTRACT);
+    }
+
+    @Transactional
+    public boolean getApprovalRight(Contract contract, String username) throws Exception{
+        Employee approver = contract.getApprover();
+
+        if (approver.getUserName().equals(username)){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+//    public GeneralRes approveContract(ApproveContractReq approveContractReq) {
+//        try {
+//            Optional<Plan> planOp = planRepository.findById(approveBudgetReq.getPlanId());
+//            if (!planOp.isPresent()) {
+//                throw new Exception("Plan Id not found");
+//            }
+//            Plan plan = planOp.get();
+//            if (!plan.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.PENDING_BM_APPROVAL) && !plan.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.PENDING_FUNCTION_APPROVAL)) {
+//                logger.error("Internal error, a non-pending budget plan goes into approve function");
+//                throw new Exception("Internal error, a non-pending budget plan goes into approve function");
+//            }
+//
+//
+//
+//            if (approveBudgetReq.getApprovalType() == 0) { //0:bm
+//                return BMApproval(approveBudgetReq, plan);
+//            } else {
+//                return functionApproval(approveBudgetReq, plan);
+//            }
+//
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            return new GeneralRes( ex.getMessage(), true);
+//        }
+//    }
+//
+    private GeneralRes functionApproval(ApproveContractReq approveContractReq, Contract contract) throws Exception{
+        if (!approveContractReq.getApproved()){
+            contract.setContractStatus(ContractStatusEnum.REJECTED);
+            ApprovalTicketService.rejectTicketByEntity(contract,approveContractReq.getComment(),approveContractReq.getUsername());
+        }
+        else{
+            contract.setContractStatus(ContractStatusEnum.ACTIVE);
+            ApprovalTicketService.approveTicketByEntity(contract,approveContractReq.getComment(),approveContractReq.getUsername());
+        }
+
+        contractRepository.saveAndFlush(contract);
+        logger.info("APPROVER Successfully: "+contract.getContractStatus()+" the new contract! -- "+approveContractReq.getUsername()+" "+new Date());
+        return new GeneralRes("APPROVER Successfully "+contract.getContractStatus()+" the contract!", false);
     }
 
     public GetContractRes getContract(String id){

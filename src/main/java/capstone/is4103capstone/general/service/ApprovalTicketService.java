@@ -39,7 +39,7 @@ public class ApprovalTicketService {
     @Value("${spring.mail.username}")
     private static String senderEmailAddr;
 
-    static  EmployeeRepository employeeRepo;
+    static EmployeeRepository employeeRepo;
     static ApprovalForRequestRepository approvalForRequestRepo;
     static MailSenderService mailSenderService;
 

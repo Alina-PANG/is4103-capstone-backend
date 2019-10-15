@@ -84,6 +84,9 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "employeeInChargeContract")
     private List<Contract> contractInCharged = new ArrayList<>();
 
+    @OneToMany(mappedBy = "approver")
+    private List<Contract> contractApproved = new ArrayList<>();
+
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
 
@@ -118,6 +121,13 @@ public class Employee extends DBEntityTemplate {
         this.userName = userName;
     }
 
+    public List<Contract> getContractApproved() {
+        return contractApproved;
+    }
+
+    public void setContractApproved(List<Contract> contractApproved) {
+        this.contractApproved = contractApproved;
+    }
 
     public Team getTeam() {
         return team;
