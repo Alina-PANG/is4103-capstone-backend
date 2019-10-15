@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeatModelForDeallocationViaSeatMap implements Comparable<SeatModelForDeallocationViaSeatMap>, Serializable {
+public class SeatModelWithHighlighting implements Comparable<SeatModelWithHighlighting>, Serializable {
     private Integer serialNumber;
     private String id;
     private String code;
@@ -28,15 +28,15 @@ public class SeatModelForDeallocationViaSeatMap implements Comparable<SeatModelF
     private boolean underOffice;
     private Integer adjacentSeatSeqNum;
 
-    private boolean needHighlightForEmployee;
+    private boolean needHighlight;
 
-    public SeatModelForDeallocationViaSeatMap() {
+    public SeatModelWithHighlighting() {
     }
 
-    public SeatModelForDeallocationViaSeatMap(Integer serialNumber, String id, String code, String type,
-                                              GroupModel functionAssigned, GroupModel businessUnitAssigned, GroupModel teamAssigned,
-                                              SeatAllocationModelForEmployee currentOccupancy, List<SeatAllocationModelForEmployee> allocations,
-                                              Integer x, Integer y, boolean underOffice, Integer adjacentSeatSeqNum, boolean needHighlightForEmployee) {
+    public SeatModelWithHighlighting(Integer serialNumber, String id, String code, String type,
+                                     GroupModel functionAssigned, GroupModel businessUnitAssigned, GroupModel teamAssigned,
+                                     SeatAllocationModelForEmployee currentOccupancy, List<SeatAllocationModelForEmployee> allocations,
+                                     Integer x, Integer y, boolean underOffice, Integer adjacentSeatSeqNum, boolean needHighlight) {
         this.serialNumber = serialNumber;
         this.id = id;
         this.code = code;
@@ -50,7 +50,7 @@ public class SeatModelForDeallocationViaSeatMap implements Comparable<SeatModelF
         this.y = y;
         this.underOffice = underOffice;
         this.adjacentSeatSeqNum = adjacentSeatSeqNum;
-        this.needHighlightForEmployee = needHighlightForEmployee;
+        this.needHighlight = needHighlight;
     }
 
     public Integer getSerialNumber() {
@@ -157,16 +157,16 @@ public class SeatModelForDeallocationViaSeatMap implements Comparable<SeatModelF
         this.adjacentSeatSeqNum = adjacentSeatSeqNum;
     }
 
-    public boolean isNeedHighlightForEmployee() {
-        return needHighlightForEmployee;
+    public boolean isNeedHighlight() {
+        return needHighlight;
     }
 
-    public void setNeedHighlightForEmployee(boolean needHighlightForEmployee) {
-        this.needHighlightForEmployee = needHighlightForEmployee;
+    public void setNeedHighlight(boolean needHighlight) {
+        this.needHighlight = needHighlight;
     }
 
     @Override
-    public int compareTo(SeatModelForDeallocationViaSeatMap anotherSeat) {
+    public int compareTo(SeatModelWithHighlighting anotherSeat) {
         return this.serialNumber - anotherSeat.getSerialNumber();
     }
 }

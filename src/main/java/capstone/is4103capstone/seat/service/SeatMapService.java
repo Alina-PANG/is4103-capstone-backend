@@ -1,18 +1,23 @@
 package capstone.is4103capstone.seat.service;
 
+import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.repository.OfficeRepository;
+import capstone.is4103capstone.admin.service.CompanyFunctionService;
 import capstone.is4103capstone.admin.service.EmployeeService;
-import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.Office;
+import capstone.is4103capstone.admin.service.TeamService;
+import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
+import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocation;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForSetup;
 import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
+import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
 import capstone.is4103capstone.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,16 +37,26 @@ public class SeatMapService {
     private OfficeRepository officeRepository;
     @Autowired
     private EmployeeRepository employeeRepository;
+    @Autowired
+    private BusinessUnitRepository businessUnitRepository;
 
     @Autowired
     private SeatService seatService;
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private TeamService teamService;
+    @Autowired
+    private CompanyFunctionService companyFunctionService;
+    @Autowired
+    private EntityModelConversionService entityModelConversionService;
 
     public SeatMapService() {
 
     }
 
+
+    // ---------------------------------- Creation -----------------------------------
 
     // Pre-condition:
     // 1. the seats in the seatmap do not have any crossing coordinates (their squares won't overlap)
@@ -132,6 +147,8 @@ public class SeatMapService {
     }
 
 
+    // ---------------------------------- Retrieval -----------------------------------
+
     public SeatMap getSeatMapById(String id) throws SeatMapNotFoundException {
 
         Optional<SeatMap> optionalSeatMap = seatMapRepository.findUndeletedById(id);
@@ -146,11 +163,177 @@ public class SeatMapService {
     }
 
 
+    public List<SeatMap> getAllSeatMaps() {
+        List<SeatMap> seatMaps = seatMapRepository.findAllUndeleted();
+        return seatMaps;
+    }
+
+
     public List<SeatMap> retrieveSeatMapsWithActiveEmployeeAllocations(String employeeId) throws EmployeeNotFoundException {
         List<SeatMap> seatMaps;
         Employee employee = employeeService.retrieveEmployeeById(employeeId);
         seatMaps = seatMapRepository.findByActiveEmployeeSeatAllocation(employee.getId());
         return seatMaps;
+    }
+
+    // Retrieve seat maps that have seats available for a required allocation under a specific function/business unit/team
+    // This step is done when an approver tries to see whether the request can be fulfilled; when a request is escalated to a higher hierarchy,
+    //    there is no checking done
+    public List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByHierarchy(String hierarchy, String hierarchyId, SeatAllocation seatAllocation)
+            throws SeatMapNotFoundException, TeamNotFoundException, CompanyFunctionNotFoundException {
+
+        List<SeatMapModelForAllocation> seatMapModelsOfAvailableSeatMaps = new ArrayList<>();
+
+        if (hierarchy == null || hierarchy.trim().length() == 0) {
+            throw new SeatMapNotFoundException("Fail to retrieve seat maps: hierarchy type is required!");
+        }
+
+        if (hierarchyId == null || hierarchyId.trim().length() == 0) {
+            throw new SeatMapNotFoundException("Fail to retrieve seat maps: hierarchy detail is required!");
+        }
+
+        if (seatAllocation.getSchedule() == null) {
+            throw new SeatMapNotFoundException("Fail to retrieve seat maps: schedule info is required!");
+        }
+
+        // Retrieve the corresponding hierarchy level
+        if (hierarchy.equals("TEAM")) {
+            Team team = teamService.retrieveTeamById(hierarchyId);
+            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByTeam(team, seatAllocation.getSchedule(), seatAllocation.getAllocationType()));
+        } else if (hierarchy.equals("BUSINESS_UNIT")) {
+            Optional<BusinessUnit> optionalBusinessUnit = businessUnitRepository.findById(hierarchyId);
+            if (!optionalBusinessUnit.isPresent()) {
+                throw new SeatMapNotFoundException("Fail to retrieve seat maps: business unit with id " + hierarchyId + " does not exist!");
+            }
+            BusinessUnit businessUnit = optionalBusinessUnit.get();
+            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByBusinessUnit(businessUnit, seatAllocation.getSchedule(), seatAllocation.getAllocationType()));
+        } else if (hierarchy.equals("FUNCTION")) {
+            CompanyFunction function = companyFunctionService.retrieveCompanyFunctionById(hierarchyId);
+            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByFunction(function, seatAllocation.getSchedule(), seatAllocation.getAllocationType()));
+        } else {
+            throw new SeatMapNotFoundException("Fail to retrieve seat maps: hierarchy type is invalid!");
+        }
+
+        return seatMapModelsOfAvailableSeatMaps;
+    }
+
+
+    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByTeam(Team team, Schedule schedule, SeatAllocationTypeEnum seatAllocationTypeEnum) {
+
+        List<SeatMapModelForAllocation> seatMapModels = new ArrayList<>();
+        List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToTeam(team.getId());
+        // Check each seat inside the seat map
+        // - whether it's allocated to the team
+        // - whether it has schedule clashes
+        for (SeatMap seatMap :
+                availableSeatMaps) {
+
+            SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
+            seatMapModelForAllocation.setId(seatMap.getId());
+            seatMapModelForAllocation.setCode(seatMap.getCode());
+            List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
+
+            boolean shouldBeIncluded = false;
+
+            for (Seat seat :
+                    seatMap.getSeats()) {
+                if (seat.getTeamAssigned() != null && seat.getTeamAssigned().getId().equals(team.getId())) {
+                    // Check schedule clashes
+                    if (!seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
+                        // its seat map should be included; need to convert the seat as well
+                        shouldBeIncluded = true;
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, true));
+                    } else {
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
+                    }
+                }
+            }
+
+            if (shouldBeIncluded) {
+                seatMapModelForAllocation.setSeatModelsForDeallocationViaSeatMap(seatModels);
+                seatMapModels.add(seatMapModelForAllocation);
+            }
+        }
+        return seatMapModels;
+    }
+
+
+    // TODO: must ensure that the user does the checking has access to the office where the teams are located
+    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByBusinessUnit(BusinessUnit businessUnit, Schedule schedule, SeatAllocationTypeEnum seatAllocationTypeEnum) {
+
+        List<SeatMapModelForAllocation> seatMapModels = new ArrayList<>();
+        List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToBusinessUnit(businessUnit.getId());
+
+        for (SeatMap seatMap :
+                availableSeatMaps) {
+
+            SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
+            seatMapModelForAllocation.setId(seatMap.getId());
+            seatMapModelForAllocation.setCode(seatMap.getCode());
+            List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
+
+            boolean shouldBeIncluded = false;
+
+            for (Seat seat :
+                    seatMap.getSeats()) {
+                if (seat.getBusinessUnitAssigned() != null && seat.getBusinessUnitAssigned().getId().equals(businessUnit.getId())) {
+                    // Check schedule clashes
+                    if (!seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
+                        // its seat map should be included; need to convert the seat as well
+                        shouldBeIncluded = true;
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, true));
+                    } else {
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
+                    }
+                }
+            }
+
+            if (shouldBeIncluded) {
+                seatMapModelForAllocation.setSeatModelsForDeallocationViaSeatMap(seatModels);
+                seatMapModels.add(seatMapModelForAllocation);
+            }
+        }
+
+        return seatMapModels;
+    }
+
+
+    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByFunction(CompanyFunction function, Schedule schedule, SeatAllocationTypeEnum seatAllocationTypeEnum) {
+
+        List<SeatMapModelForAllocation> seatMapModels = new ArrayList<>();
+        List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToFunction(function.getId());
+
+        for (SeatMap seatMap :
+                availableSeatMaps) {
+
+            SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
+            seatMapModelForAllocation.setId(seatMap.getId());
+            seatMapModelForAllocation.setCode(seatMap.getCode());
+            List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
+
+            boolean shouldBeIncluded = false;
+
+            for (Seat seat :
+                    seatMap.getSeats()) {
+                if (seat.getFunctionAssigned() != null && seat.getFunctionAssigned().getId().equals(function.getId())) {
+                    // Check schedule clashes
+                    if (!seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
+                        // its seat map should be included; need to convert the seat as well
+                        shouldBeIncluded = true;
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, true));
+                    } else {
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
+                    }
+                }
+            }
+
+            if (shouldBeIncluded) {
+                seatMapModelForAllocation.setSeatModelsForDeallocationViaSeatMap(seatModels);
+                seatMapModels.add(seatMapModelForAllocation);
+            }
+        }
+
+        return seatMapModels;
     }
 
 
@@ -160,11 +343,8 @@ public class SeatMapService {
     }
 
 
-    public List<SeatMap> getAllSeatMaps() {
-        List<SeatMap> seatMaps = seatMapRepository.findAllUndeleted();
-        return seatMaps;
-    }
 
+    // ---------------------------------- Update -----------------------------------
 
     // Pre-condition:
     // 1. Update of seat maps does not allow changing a normal seat into an office seat (vice versa). This must be done through
@@ -256,7 +436,7 @@ public class SeatMapService {
             throw new SeatMapUpdateException("Seat map update failed: there are seats under office with invalid adjacent seat serial number.");
         }
 
-        deleteSeats(extraSeats);
+        seatService.deleteSeats(extraSeats);
         System.out.println("********** Save all the changes **********");
         // Save all the changes.
         // Need to set all the seats' code to null to avoid SQLIntegrityConstraintViolationException: duplicate entry of code
@@ -281,6 +461,9 @@ public class SeatMapService {
         seatMapRepository.saveAndFlush(seatMap);
     }
 
+
+    // ---------------------------------- Deletion -----------------------------------
+
     // Pre-condition:
     // 1. a user will be warned at the front-end if any seat in the seatmap has active allocations
     // 2. a user can enforce to delete a seat map even if being warned
@@ -290,7 +473,7 @@ public class SeatMapService {
 
         SeatMap seatMap = getSeatMapById(id);
 
-        deleteSeats(seatMap.getSeats());
+        seatService.deleteSeats(seatMap.getSeats());
 
         Office office = seatMap.getOffice();
 
@@ -305,6 +488,7 @@ public class SeatMapService {
         seatMap.setCode(null);
         seatMapRepository.save(seatMap);
     }
+
 
     // -----------------------------------------------Helper methods-----------------------------------------------
 
@@ -367,29 +551,6 @@ public class SeatMapService {
         }
 
         return false;
-    }
-
-
-    private void deleteSeats(List<Seat> seats) {
-        for (Seat seat :
-                seats) {
-            System.out.println("-------------------------------------------");
-            System.out.println("***** removing seat: " + seat.getId() + " *****");
-            for (SeatAllocation seatAllocation:
-                    seat.getActiveSeatAllocations()) {
-                seatAllocation.setDeleted(true);
-                seatAllocationRepository.save(seatAllocation);
-            }
-            for (SeatAllocation seatAllocation:
-                    seat.getInactiveSeatAllocations()) {
-                seatAllocation.setDeleted(true);
-                seatAllocationRepository.save(seatAllocation);
-            }
-            seat.setDeleted(true);
-            seat.setSeatMap(null);
-            seat.setCode(null);
-            seatRepository.save(seat);
-        }
     }
 
 

@@ -1,6 +1,6 @@
 package capstone.is4103capstone.seat.model.seatMap;
 
-import capstone.is4103capstone.seat.model.seat.SeatModelForDeallocationViaSeatMap;
+import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
@@ -8,15 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeatMapModelForDeallocation implements Serializable {
+public class SeatMapModelForAllocation implements Serializable {
     private String id;
     private String code;
-    private List<SeatModelForDeallocationViaSeatMap> seatModelsForDeallocationViaSeatMap = new ArrayList<>();
+    private List<SeatModelWithHighlighting> seatModelsForDeallocationViaSeatMap = new ArrayList<>();
 
-    public SeatMapModelForDeallocation() {
+    public SeatMapModelForAllocation() {
     }
 
-    public SeatMapModelForDeallocation(String id, String code, List<SeatModelForDeallocationViaSeatMap> seatModelsForDeallocationViaSeatMap) {
+    public SeatMapModelForAllocation(String id, String code, List<SeatModelWithHighlighting> seatModelsForDeallocationViaSeatMap) {
         this.id = id;
         this.code = code;
         this.seatModelsForDeallocationViaSeatMap = seatModelsForDeallocationViaSeatMap;
@@ -38,11 +38,11 @@ public class SeatMapModelForDeallocation implements Serializable {
         this.code = code;
     }
 
-    public List<SeatModelForDeallocationViaSeatMap> getSeatModelsForDeallocationViaSeatMap() {
+    public List<SeatModelWithHighlighting> getSeatModelsForDeallocationViaSeatMap() {
         return seatModelsForDeallocationViaSeatMap;
     }
 
-    public void setSeatModelsForDeallocationViaSeatMap(List<SeatModelForDeallocationViaSeatMap> seatModelsForDeallocationViaSeatMap) {
+    public void setSeatModelsForDeallocationViaSeatMap(List<SeatModelWithHighlighting> seatModelsForDeallocationViaSeatMap) {
         this.seatModelsForDeallocationViaSeatMap = seatModelsForDeallocationViaSeatMap;
     }
 }

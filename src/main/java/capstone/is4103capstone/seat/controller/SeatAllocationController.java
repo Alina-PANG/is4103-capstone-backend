@@ -10,10 +10,11 @@ import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.finance.budget.controller.BudgetController;
 import capstone.is4103capstone.seat.model.*;
 import capstone.is4103capstone.seat.model.seat.SeatModelForAllocation;
-import capstone.is4103capstone.seat.model.seat.SeatModelForDeallocationViaSeatMap;
+import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatAllocation.*;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapGroupModelForDeallocation;
-import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForDeallocation;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocation;
+import capstone.is4103capstone.seat.service.EntityModelConversionService;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
 import capstone.is4103capstone.seat.service.SeatManagementBackgroundService;
 import capstone.is4103capstone.seat.service.SeatMapService;
@@ -32,7 +33,7 @@ import java.util.*;
 @CrossOrigin(origins = "http://localhost:3000")
 public class SeatAllocationController {
 
-    private static final Logger logger = LoggerFactory.getLogger(BudgetController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SeatAllocationController.class);
 
     @Autowired
     private SeatAllocationService seatAllocationService;
@@ -40,6 +41,8 @@ public class SeatAllocationController {
     private SeatMapService seatMapService;
     @Autowired
     private SeatManagementBackgroundService seatManagementBackgroundService;
+    @Autowired
+    private EntityModelConversionService entityModelConversionService;
     @Autowired
     TaskScheduler taskScheduler;
 
@@ -95,118 +98,7 @@ public class SeatAllocationController {
     @GetMapping("/seat/{id}")
     public ResponseEntity retrieveSeatWithItsAllocations(@PathVariable String id) {
         Seat seat = seatAllocationService.retrieveSeatWithAllocationsBySeatId(id);
-        SeatModelForAllocation seatModelForAllocation = new SeatModelForAllocation();
-
-        // Basic info
-        seatModelForAllocation.setId(seat.getId());
-        seatModelForAllocation.setCode(seat.getCode());
-        seatModelForAllocation.setType(seat.getType().toString());
-
-        // Function, business unit and team
-        CompanyFunction function = seat.getFunctionAssigned();
-        if (function != null) {
-            GroupModel functionModel = new GroupModel();
-            functionModel.setId(function.getId());
-            functionModel.setName(function.getObjectName());
-            functionModel.setCode(function.getCode());
-            seatModelForAllocation.setFunctionAssigned(functionModel);
-        }
-
-        BusinessUnit businessUnit = seat.getBusinessUnitAssigned();
-        if (businessUnit != null) {
-            GroupModel businessUnitModel = new GroupModel();
-            businessUnitModel.setId(businessUnit.getId());
-            businessUnitModel.setName(businessUnit.getObjectName());
-            businessUnitModel.setCode(businessUnit.getCode());
-            seatModelForAllocation.setBusinessUnitAssigned(businessUnitModel);
-        }
-
-        Team team = seat.getTeamAssigned();
-        if (team != null) {
-            GroupModel teamModel = new GroupModel();
-            teamModel.setId(team.getId());
-            teamModel.setName(team.getObjectName());
-            teamModel.setCode(team.getCode());
-            seatModelForAllocation.setTeamAssigned(teamModel);
-        }
-
-
-        // Current occupancy
-        SeatAllocationModelForEmployee currentOccupancyModel = new SeatAllocationModelForEmployee();
-        SeatAllocation currentOccupancy = seat.getCurrentOccupancy();
-        if (currentOccupancy != null) {
-            currentOccupancyModel.setId(currentOccupancy.getId());
-            currentOccupancyModel.setType(currentOccupancy.getAllocationType().toString());
-
-            EmployeeModel employeeModel = new EmployeeModel(currentOccupancy.getEmployee().getId(), currentOccupancy.getEmployee().getFullName());
-            currentOccupancyModel.setEmployee(employeeModel);
-
-            ScheduleModel scheduleModel = new ScheduleModel();
-            Schedule schedule = currentOccupancy.getSchedule();
-            scheduleModel.setId(schedule.getId());
-            scheduleModel.setRecurring(schedule.isRecurring());
-            scheduleModel.setStartDateTime(schedule.getStartDateTime());
-            if (schedule.getEndDateTime() != null) {
-                scheduleModel.setEndDateTime(schedule.getEndDateTime());
-            }
-            if (schedule.getRecurringBasis() != null) {
-                scheduleModel.setRecurringBasis(schedule.getRecurringBasis().toString());
-            }
-            scheduleModel.setRecurringDates(schedule.getRecurringDates());
-            List<Integer> recurringWeekdays = new ArrayList<>();
-            for (DayOfWeek dayOfWeek:
-                    schedule.getRecurringWeekdays()) {
-                recurringWeekdays.add(dayOfWeek.getValue());
-            }
-            scheduleModel.setRecurringWeekdays(recurringWeekdays);
-            if (schedule.getRecurringStartTime() != null) {
-                scheduleModel.setRecurringStartTime(schedule.getRecurringStartTime());
-            }
-            if (schedule.getRecurringEndTime() != null) {
-                scheduleModel.setRecurringEndTime(schedule.getRecurringEndTime());
-            }
-            currentOccupancyModel.setSchedule(scheduleModel);
-        }
-        seatModelForAllocation.setCurrentOccupancy(currentOccupancyModel);
-
-        // Active allocations
-        for (SeatAllocation allocation :
-                seat.getActiveSeatAllocations()) {
-            SeatAllocationModelForEmployee allocationModelForEmployee = new SeatAllocationModelForEmployee();
-            allocationModelForEmployee.setId(allocation.getId());
-            allocationModelForEmployee.setType(allocation.getAllocationType().toString());
-
-            EmployeeModel employeeModel = new EmployeeModel(allocation.getEmployee().getId(), allocation.getEmployee().getFullName());
-            allocationModelForEmployee.setEmployee(employeeModel);
-
-            ScheduleModel scheduleModel = new ScheduleModel();
-            Schedule schedule = allocation.getSchedule();
-            scheduleModel.setId(schedule.getId());
-            scheduleModel.setRecurring(schedule.isRecurring());
-            scheduleModel.setStartDateTime(schedule.getStartDateTime());
-            if (schedule.getEndDateTime() != null) {
-                scheduleModel.setEndDateTime(schedule.getEndDateTime());
-            }
-            if (schedule.getRecurringBasis() != null) {
-                scheduleModel.setRecurringBasis(schedule.getRecurringBasis().toString());
-            }
-            scheduleModel.setRecurringDates(schedule.getRecurringDates());
-            List<Integer> recurringWeekdays = new ArrayList<>();
-            for (DayOfWeek dayOfWeek:
-                    schedule.getRecurringWeekdays()) {
-                recurringWeekdays.add(dayOfWeek.getValue());
-            }
-            scheduleModel.setRecurringWeekdays(recurringWeekdays);
-            if (schedule.getRecurringStartTime() != null) {
-                scheduleModel.setRecurringStartTime(schedule.getRecurringStartTime());
-            }
-            if (schedule.getRecurringEndTime() != null) {
-                scheduleModel.setRecurringEndTime(schedule.getRecurringEndTime());
-            }
-
-            allocationModelForEmployee.setSchedule(scheduleModel);
-            seatModelForAllocation.getAllocations().add(allocationModelForEmployee);
-        }
+        SeatModelForAllocation seatModelForAllocation = entityModelConversionService.convertSeatToSeatModelForAllocation(seat);
         return ResponseEntity.ok(seatModelForAllocation);
     }
 
@@ -232,140 +124,14 @@ public class SeatAllocationController {
         Optional<SeatMap> optionalSeatMap = seatMapService.retrieveSeatMapWithActiveEmployeeAllocations(seatMapId, employeeId);
         if (optionalSeatMap.isPresent()) {
             SeatMap seatMap = optionalSeatMap.get();
-            SeatMapModelForDeallocation seatMapModelForDeallocation = new SeatMapModelForDeallocation();
-            seatMapModelForDeallocation.setId(seatMap.getId());
-            seatMapModelForDeallocation.setCode(seatMap.getCode());
+            SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
+            seatMapModelForAllocation.setId(seatMap.getId());
+            seatMapModelForAllocation.setCode(seatMap.getCode());
 
-            List<SeatModelForDeallocationViaSeatMap> seatModelsForDeallocationViaSeatMap = new ArrayList<>();
-            for (Seat seat :
-                    seatMap.getSeats()) {
-                // Basic info
-                SeatModelForDeallocationViaSeatMap seatModelForDeallocationViaSeatMap = new SeatModelForDeallocationViaSeatMap();
-                seatModelForDeallocationViaSeatMap.setId(seat.getId());
-                seatModelForDeallocationViaSeatMap.setCode(seat.getCode());
-                seatModelForDeallocationViaSeatMap.setSerialNumber(seat.getSerialNumber());
-                seatModelForDeallocationViaSeatMap.setType(seat.getType().toString());
-                seatModelForDeallocationViaSeatMap.setX(seat.getxCoordinate());
-                seatModelForDeallocationViaSeatMap.setY(seat.getyCoordinate());
-                seatModelForDeallocationViaSeatMap.setUnderOffice(seat.isUnderOffice());
-                if (seat.isUnderOffice() && seat.getAdjacentSeatSeqNum() != null) {
-                    seatModelForDeallocationViaSeatMap.setAdjacentSeatSeqNum(seat.getAdjacentSeatSeqNum());
-                }
-
-                // Function, business unit and team
-                CompanyFunction function = seat.getFunctionAssigned();
-                if (function != null) {
-                    GroupModel functionModel = new GroupModel();
-                    functionModel.setId(function.getId());
-                    functionModel.setName(function.getObjectName());
-                    functionModel.setCode(function.getCode());
-                    seatModelForDeallocationViaSeatMap.setFunctionAssigned(functionModel);
-                }
-
-                BusinessUnit businessUnit = seat.getBusinessUnitAssigned();
-                if (businessUnit != null) {
-                    GroupModel businessUnitModel = new GroupModel();
-                    businessUnitModel.setId(businessUnit.getId());
-                    businessUnitModel.setName(businessUnit.getObjectName());
-                    businessUnitModel.setCode(businessUnit.getCode());
-                    seatModelForDeallocationViaSeatMap.setBusinessUnitAssigned(businessUnitModel);
-                }
-
-                Team team = seat.getTeamAssigned();
-                if (team != null) {
-                    GroupModel teamModel = new GroupModel();
-                    teamModel.setId(team.getId());
-                    teamModel.setName(team.getObjectName());
-                    teamModel.setCode(team.getCode());
-                    seatModelForDeallocationViaSeatMap.setTeamAssigned(teamModel);
-                }
-
-                // Current occupancy
-                SeatAllocationModelForEmployee currentOccupancyModel = new SeatAllocationModelForEmployee();
-                SeatAllocation currentOccupancy = seat.getCurrentOccupancy();
-                if (currentOccupancy != null) {
-                    currentOccupancyModel.setId(currentOccupancy.getId());
-                    currentOccupancyModel.setType(currentOccupancy.getAllocationType().toString());
-
-                    EmployeeModel employeeModel = new EmployeeModel(currentOccupancy.getEmployee().getId(), currentOccupancy.getEmployee().getFullName());
-                    currentOccupancyModel.setEmployee(employeeModel);
-
-                    ScheduleModel scheduleModel = new ScheduleModel();
-                    Schedule schedule = currentOccupancy.getSchedule();
-                    scheduleModel.setId(schedule.getId());
-                    scheduleModel.setRecurring(schedule.isRecurring());
-                    scheduleModel.setStartDateTime(schedule.getStartDateTime());
-                    if (schedule.getEndDateTime() != null) {
-                        scheduleModel.setEndDateTime(schedule.getEndDateTime());
-                    }
-                    if (schedule.getRecurringBasis() != null) {
-                        scheduleModel.setRecurringBasis(schedule.getRecurringBasis().toString());
-                    }
-                    scheduleModel.setRecurringDates(schedule.getRecurringDates());
-                    List<Integer> recurringWeekdays = new ArrayList<>();
-                    for (DayOfWeek dayOfWeek:
-                            schedule.getRecurringWeekdays()) {
-                        recurringWeekdays.add(dayOfWeek.getValue());
-                    }
-                    scheduleModel.setRecurringWeekdays(recurringWeekdays);
-                    if (schedule.getRecurringStartTime() != null) {
-                        scheduleModel.setRecurringStartTime(schedule.getRecurringStartTime());
-                    }
-                    if (schedule.getRecurringEndTime() != null) {
-                        scheduleModel.setRecurringEndTime(schedule.getRecurringEndTime());
-                    }
-                    currentOccupancyModel.setSchedule(scheduleModel);
-                }
-                seatModelForDeallocationViaSeatMap.setCurrentOccupancy(currentOccupancyModel);
-
-                // Active allocations
-                for (SeatAllocation allocation :
-                        seat.getActiveSeatAllocations()) {
-                    SeatAllocationModelForEmployee allocationModelForEmployee = new SeatAllocationModelForEmployee();
-                    allocationModelForEmployee.setId(allocation.getId());
-                    allocationModelForEmployee.setType(allocation.getAllocationType().toString());
-
-                    EmployeeModel employeeModel = new EmployeeModel(allocation.getEmployee().getId(), allocation.getEmployee().getFullName());
-                    allocationModelForEmployee.setEmployee(employeeModel);
-
-                    ScheduleModel scheduleModel = new ScheduleModel();
-                    Schedule schedule = allocation.getSchedule();
-                    scheduleModel.setId(schedule.getId());
-                    scheduleModel.setRecurring(schedule.isRecurring());
-                    scheduleModel.setStartDateTime(schedule.getStartDateTime());
-                    if (schedule.getEndDateTime() != null) {
-                        scheduleModel.setEndDateTime(schedule.getEndDateTime());
-                    }
-                    if (schedule.getRecurringBasis() != null) {
-                        scheduleModel.setRecurringBasis(schedule.getRecurringBasis().toString());
-                    }
-                    scheduleModel.setRecurringDates(schedule.getRecurringDates());
-                    List<Integer> recurringWeekdays = new ArrayList<>();
-                    for (DayOfWeek dayOfWeek:
-                            schedule.getRecurringWeekdays()) {
-                        recurringWeekdays.add(dayOfWeek.getValue());
-                    }
-                    scheduleModel.setRecurringWeekdays(recurringWeekdays);
-                    if (schedule.getRecurringStartTime() != null) {
-                        scheduleModel.setRecurringStartTime(schedule.getRecurringStartTime());
-                    }
-                    if (schedule.getRecurringEndTime() != null) {
-                        scheduleModel.setRecurringEndTime(schedule.getRecurringEndTime());
-                    }
-                    if (allocation.getEmployee().getId().equals(employeeId)) {
-                        seatModelForDeallocationViaSeatMap.setNeedHighlightForEmployee(true);
-                    }
-
-                    allocationModelForEmployee.setSchedule(scheduleModel);
-                    seatModelForDeallocationViaSeatMap.getAllocations().add(allocationModelForEmployee);
-                }
-
-                seatModelsForDeallocationViaSeatMap.add(seatModelForDeallocationViaSeatMap);
-            }
-
-            seatMapModelForDeallocation.setSeatModelsForDeallocationViaSeatMap(seatModelsForDeallocationViaSeatMap);
-            Collections.sort(seatMapModelForDeallocation.getSeatModelsForDeallocationViaSeatMap());
-            return ResponseEntity.ok(seatMapModelForDeallocation);
+            List<SeatModelWithHighlighting> seatModelsForDeallocationViaSeatMap = entityModelConversionService.convertSeatsToSeatModelsWithHighlightingEmployee(seatMap.getSeats(), employeeId);
+            seatMapModelForAllocation.setSeatModelsForDeallocationViaSeatMap(seatModelsForDeallocationViaSeatMap);
+            Collections.sort(seatMapModelForAllocation.getSeatModelsForDeallocationViaSeatMap());
+            return ResponseEntity.ok(seatMapModelForAllocation);
         }
 
         return ResponseEntity.ok("No seat map was found to satisfy the condition.");
