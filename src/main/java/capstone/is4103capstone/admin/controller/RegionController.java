@@ -1,6 +1,6 @@
 package capstone.is4103capstone.admin.controller;
 
-import capstone.is4103capstone.admin.controller.model.res.RegionRes;
+import capstone.is4103capstone.admin.model.res.RegionRes;
 import capstone.is4103capstone.admin.dto.RegionDto;
 import capstone.is4103capstone.admin.service.RegionService;
 import capstone.is4103capstone.general.service.WriteAuditTrail;

@@ -1,13 +1,12 @@
 package capstone.is4103capstone.entities.helper;
 
-import capstone.is4103capstone.entities.enums.PermissionTypeEnum;
+import capstone.is4103capstone.util.enums.OperationTypeEnum;
 import org.apache.commons.collections4.MapIterator;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 
 import javax.persistence.AttributeConverter;
 import java.util.ArrayList;
-import java.util.List;
 
 /*
     READ, ryan
@@ -15,15 +14,15 @@ import java.util.List;
     READ, all_users
    "READ,ryan|READ,yingshi|READ,all_users"
  */
-public class MultiValuedMapConverter implements AttributeConverter<MultiValuedMap<PermissionTypeEnum, String>, String> {
+public class MultiValuedMapConverter implements AttributeConverter<MultiValuedMap<OperationTypeEnum, String>, String> {
     private final String INNER_SEP = ",";
     private final String OUTER_SEP = "|";
 
     @Override
-    public String convertToDatabaseColumn(MultiValuedMap<PermissionTypeEnum, String> map) {
+    public String convertToDatabaseColumn(MultiValuedMap<OperationTypeEnum, String> map) {
         ArrayList<String> pairs = new ArrayList<>();
 
-        MapIterator<PermissionTypeEnum,String> iterator = map.mapIterator();
+        MapIterator<OperationTypeEnum,String> iterator = map.mapIterator();
         while (iterator.hasNext()){
             String permissionType = iterator.next().toString();
             String sid = iterator.getValue();
@@ -34,8 +33,8 @@ public class MultiValuedMapConverter implements AttributeConverter<MultiValuedMa
     }
 
     @Override
-    public MultiValuedMap<PermissionTypeEnum, String> convertToEntityAttribute(String dbData) {
-        MultiValuedMap<PermissionTypeEnum,String> map = new HashSetValuedHashMap<>();
+    public MultiValuedMap<OperationTypeEnum, String> convertToEntityAttribute(String dbData) {
+        MultiValuedMap<OperationTypeEnum,String> map = new HashSetValuedHashMap<>();
         if (dbData.length() == 0){
             return map;
         }
@@ -52,7 +51,7 @@ public class MultiValuedMapConverter implements AttributeConverter<MultiValuedMa
             String[] permission_sid = pairs[i].split(INNER_SEP);
             String permission = permission_sid[0];
             String sid = permission_sid[1];
-            map.put(PermissionTypeEnum.valueOf(permission),sid);
+            map.put(OperationTypeEnum.valueOf(permission),sid);
         }
 
         return map;

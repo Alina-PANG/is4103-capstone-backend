@@ -1,6 +1,6 @@
 package capstone.is4103capstone.admin.controller;
 
-import capstone.is4103capstone.admin.controller.model.res.CurrencyRes;
+import capstone.is4103capstone.admin.model.res.CurrencyRes;
 import capstone.is4103capstone.admin.dto.CurrencyDto;
 import capstone.is4103capstone.admin.service.CurrencyService;
 import capstone.is4103capstone.general.service.WriteAuditTrail;

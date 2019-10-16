@@ -1,6 +1,6 @@
 package capstone.is4103capstone.admin.service;
 
-import capstone.is4103capstone.admin.controller.model.res.AuditTrailRes;
+import capstone.is4103capstone.admin.model.res.AuditTrailRes;
 import capstone.is4103capstone.admin.dto.AuditTrailActivityDto;
 import capstone.is4103capstone.admin.model.AuditTrailModel;
 import capstone.is4103capstone.admin.repository.AuditTrailActivityRepo;
@@ -65,7 +65,7 @@ public class AuditTrailActivityService {
     //!!using Spring JPA Projection
     public AuditTrailRes getAllAuditTrailWithUsername(){
         try {
-            List<AuditTrailModel> models = auditTrailActivityRepo.findAuditTailsWithUsername();
+            List<AuditTrailModel> models = auditTrailActivityRepo.findAuditTrailActivityWithUsername();
             return new AuditTrailRes("Retrieved " +models.size()+" records.",false,models);
         }catch (Exception e){
             return new AuditTrailRes(e.getMessage(),true);

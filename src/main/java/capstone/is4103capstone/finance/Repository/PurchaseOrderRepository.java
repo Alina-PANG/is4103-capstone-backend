@@ -1,6 +1,5 @@
 package capstone.is4103capstone.finance.Repository;
 
-import capstone.is4103capstone.entities.finance.Merchandise;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;

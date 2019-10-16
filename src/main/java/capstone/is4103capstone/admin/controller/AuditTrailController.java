@@ -1,6 +1,6 @@
 package capstone.is4103capstone.admin.controller;
 
-import capstone.is4103capstone.admin.controller.model.res.AuditTrailRes;
+import capstone.is4103capstone.admin.model.res.AuditTrailRes;
 import capstone.is4103capstone.admin.service.AuditTrailActivityService;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;

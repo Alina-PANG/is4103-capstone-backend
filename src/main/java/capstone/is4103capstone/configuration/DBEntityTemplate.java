@@ -1,7 +1,7 @@
 package capstone.is4103capstone.configuration;
 
-import capstone.is4103capstone.entities.enums.PermissionTypeEnum;
 import capstone.is4103capstone.entities.helper.MultiValuedMapConverter;
+import capstone.is4103capstone.util.enums.OperationTypeEnum;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,7 +13,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -25,8 +24,8 @@ public class DBEntityTemplate implements Serializable {
             name = "uuid",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(unique = true, updatable = false, nullable = false,length = 36)
-    @Length(min=36, max=36)
+    @Column(unique = true, updatable = false, nullable = false, length = 36)
+    @Length(min = 36, max = 36)
     private String id;
 
     private Long seqNo;
@@ -52,11 +51,8 @@ public class DBEntityTemplate implements Serializable {
     private Date lastModifiedDateTime;
 
     @Convert(converter = MultiValuedMapConverter.class)
-    private MultiValuedMap<PermissionTypeEnum, String> permissionMap = new HashSetValuedHashMap<>();
+    private MultiValuedMap<OperationTypeEnum, String> permissionMap = new HashSetValuedHashMap<>();
 
-    public String getId() {
-        return id;
-    }
     public DBEntityTemplate() {
     }
 
@@ -83,6 +79,14 @@ public class DBEntityTemplate implements Serializable {
         this.lastModifiedBy = lastModifiedBy;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public Long getSeqNo() {
         return seqNo;
     }
@@ -91,9 +95,6 @@ public class DBEntityTemplate implements Serializable {
         this.seqNo = seqNo;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
     public Boolean getDeleted() {
         return isDeleted;
     }
@@ -158,11 +159,11 @@ public class DBEntityTemplate implements Serializable {
         this.objectName = objectName;
     }
 
-    public MultiValuedMap<PermissionTypeEnum, String> getPermissionMap() {
+    public MultiValuedMap<OperationTypeEnum, String> getPermissionMap() {
         return permissionMap;
     }
 
-    public void setPermissionMap(MultiValuedMap<PermissionTypeEnum, String> permissionMap) {
+    public void setPermissionMap(MultiValuedMap<OperationTypeEnum, String> permissionMap) {
         this.permissionMap = permissionMap;
     }
 }
