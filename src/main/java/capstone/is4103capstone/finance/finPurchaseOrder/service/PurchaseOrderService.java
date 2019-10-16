@@ -97,11 +97,6 @@ public class PurchaseOrderService {
 
     }
 
-    private void createApprovalTicket(String requesterUsername, Employee receiver, PurchaseOrder purchaseOrder, String content){
-        Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
-        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,purchaseOrder,content, ApprovalTypeEnum.PURCHASEORDER);
-    }
-
     public ResponseEntity<GeneralRes> approvePO(String id, Boolean approved, String username){
         try{
             logger.info("Getting purchase order with id "+id);
@@ -118,8 +113,6 @@ public class PurchaseOrderService {
             else po.setStatus(ApprovalStatusEnum.REJECTED);
             purchaseOrderRepository.saveAndFlush(po);
             logger.info("Approving/Rejecting the purchase order created by "+po.getCreatedBy());
-//            Employee creater = employeeRepository.findEmployeeByUserName(po.getCreatedBy());
-//            createApprovalTicket(username, creater, po, "Your purchase order has been approved!");
             return ResponseEntity.ok().body(new GeneralRes("Successfully approved/rejected the purchase orders!", true));
         }catch(Exception ex){
             ex.printStackTrace();

@@ -16,8 +16,12 @@ public class StatementOfAcctLineItem extends DBEntityTemplate {
     @JoinColumn(name = "purchaseOrder_id")
     @JsonIgnore
     private PurchaseOrder purchaseOrder;
+
     @Temporal(TemporalType.DATE)
     private Date scheduleDate;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    Invoice invoice;
 
     private BigDecimal paidAmt;
     private BigDecimal actualPmt;
@@ -31,6 +35,14 @@ public class StatementOfAcctLineItem extends DBEntityTemplate {
         this.paidAmt = paidAmt;
         this.actualPmt = actualPmt;
         this.accruals = accruals;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 
     public Date getScheduleDate() {

@@ -28,6 +28,10 @@ public class Invoice extends DBEntityTemplate {
 
     private String fileName;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    StatementOfAcctLineItem statementOfAcctLineItem;
+
+
     @Lob
     private byte[] data;
 
@@ -50,6 +54,14 @@ public class Invoice extends DBEntityTemplate {
         super(objectName, code);
         this.description = description;
         this.paymentAmount = paymentAmount;
+    }
+
+    public StatementOfAcctLineItem getStatementOfAcctLineItem() {
+        return statementOfAcctLineItem;
+    }
+
+    public void setStatementOfAcctLineItem(StatementOfAcctLineItem statementOfAcctLineItem) {
+        this.statementOfAcctLineItem = statementOfAcctLineItem;
     }
 
     public String getFileType() {
