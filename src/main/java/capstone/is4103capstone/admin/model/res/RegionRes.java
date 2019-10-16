@@ -1,6 +1,6 @@
-package capstone.is4103capstone.admin.controller.model.res;
+package capstone.is4103capstone.admin.model.res;
 
-import capstone.is4103capstone.admin.dto.TeamDto;
+import capstone.is4103capstone.admin.dto.RegionDto;
 import capstone.is4103capstone.general.model.GeneralRes;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
@@ -12,15 +12,15 @@ import java.util.Optional;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_EMPTY) // don't serialize nulls since there are optional classes
-public class TeamRes extends GeneralRes {
+public class RegionRes extends GeneralRes {
 
     public Integer totalRecords;
-    private Optional<List<TeamDto>> results;
+    private Optional<List<RegionDto>> results;
 
-    public TeamRes() {
+    public RegionRes() {
     }
 
-    public TeamRes(String message, Boolean hasError, Optional<List<TeamDto>> results) {
+    public RegionRes(String message, Boolean hasError, Optional<List<RegionDto>> results) {
         super(message, hasError);
         this.results = results;
         results.ifPresent(obj -> {

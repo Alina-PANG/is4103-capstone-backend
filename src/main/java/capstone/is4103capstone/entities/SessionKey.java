@@ -1,7 +1,5 @@
 package capstone.is4103capstone.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -15,8 +13,8 @@ public class SessionKey implements Serializable {
     private int id;
     private String sessionKey;
     private Date lastAuthenticated;
+
     @OneToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
     private Employee linkedUser;
 
     public SessionKey() {

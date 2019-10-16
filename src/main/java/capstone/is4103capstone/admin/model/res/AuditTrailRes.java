@@ -1,4 +1,4 @@
-package capstone.is4103capstone.admin.controller.model.res;
+package capstone.is4103capstone.admin.model.res;
 
 import capstone.is4103capstone.admin.dto.AuditTrailActivityDto;
 import capstone.is4103capstone.admin.model.AuditTrailModel;
