@@ -64,11 +64,6 @@ public class ContractService {
             newContract.setCurrencyCode(createContractReq.getCurrencyCode());
             newContract.setDeleted(false);
             newContract.setContractStatus(ContractStatusEnum.PENDING_APPROVAL);
-            newContract = contractRepository.saveAndFlush(newContract);
-            if (newContract.getSeqNo() == null) {
-                newContract.setSeqNo(new Long(contractRepository.findAll().size()));
-            }
-            Authentication.configurePermissionMap(newContract);
 
             Vendor vendor = vendorRepository.getOne(createContractReq.getVendorId());
             newContract.setVendor(vendor);
@@ -85,6 +80,12 @@ public class ContractService {
             Team team  = teamRepository.getOne(createContractReq.getTeamId());
             newContract.setTeam(team);
             team.getContracts().add(newContract);
+
+            newContract = contractRepository.saveAndFlush(newContract);
+            if (newContract.getSeqNo() == null) {
+                newContract.setSeqNo(new Long(contractRepository.findAll().size()));
+            }
+            Authentication.configurePermissionMap(newContract);
 
             newContract = contractRepository.saveAndFlush(newContract);
             newContract.setCode(SCMEntityCodeHPGeneration.getCode(contractRepository,newContract));

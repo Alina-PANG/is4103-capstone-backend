@@ -52,23 +52,23 @@ public class ChildContractService {
             newChildContract.setServiceCode(createChildContractReq.getServiceCode());
             newChildContract.setDeleted(false);
             newChildContract.setChildContractStatus(ChildContractStatusEnum.PENDING_APPROVAL);
-            newChildContract = childContractRepository.saveAndFlush(newChildContract);
 
             Employee approver = employeeRepository.getOne(createChildContractReq.getApproverId());
             newChildContract.setApprover(approver);
             approver.getChildContractsApproved().add(newChildContract);
 
+            Contract masterContract = contractRepository.getOne(createChildContractReq.getMasterContractID());
+            newChildContract.setMasterContract(masterContract);
+            masterContract.getChildContractList().add(newChildContract);
+
+            newChildContract = childContractRepository.saveAndFlush(newChildContract);
             if(newChildContract.getSeqNo() == null){
                 newChildContract.setSeqNo(new Long(childContractRepository.findAll().size()));
             }
 
             Authentication.configurePermissionMap(newChildContract);
 
-            Contract masterContract = contractRepository.getOne(createChildContractReq.getMasterContractID());
-            newChildContract.setMasterContract(masterContract);
-            masterContract.getChildContractList().add(newChildContract);
             newChildContract = childContractRepository.saveAndFlush(newChildContract);
-
             newChildContract.setCode(SCMEntityCodeHPGeneration.getCode(childContractRepository, newChildContract));
             childContractRepository.saveAndFlush(newChildContract);
             contractRepository.saveAndFlush(masterContract);
