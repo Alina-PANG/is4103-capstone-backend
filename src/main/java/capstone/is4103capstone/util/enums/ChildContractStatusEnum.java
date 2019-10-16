@@ -1,9 +1,7 @@
 package capstone.is4103capstone.util.enums;
 
-public enum ContractStatusEnum {
+public enum ChildContractStatusEnum {
     PENDING_APPROVAL,
     REJECTED,
-    ACTIVE,
-    MERGED,
-    TERMINATED
+    APPROVED
 }

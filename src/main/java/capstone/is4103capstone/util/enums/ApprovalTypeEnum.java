@@ -3,5 +3,7 @@ package capstone.is4103capstone.util.enums;
 public enum ApprovalTypeEnum {
     BJFBUSINESS,
     BJFBUDGET,
-    BUDGETPLAN
+    BUDGETPLAN,
+    CONTRACT,
+    CHILD_CONTRACT
 }

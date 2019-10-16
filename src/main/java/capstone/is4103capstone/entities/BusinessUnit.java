@@ -8,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table
@@ -25,27 +27,11 @@ public class BusinessUnit extends DBEntityTemplate {
     @OneToMany(mappedBy = "businessUnit")
     private List<Team> teams = new ArrayList<>();
 
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "businessUnit_vendor",
-            joinColumns = @JoinColumn(name = "businessUnit_id"),
-            inverseJoinColumns = @JoinColumn(name = "vendor_id")
-    )
-    private List<Vendor> vendors = new ArrayList<>();
-
     public BusinessUnit() {
     }
 
     public BusinessUnit(String businessUnitName, String businessUnitCode, String hierarchyPath) {
         super(businessUnitName, businessUnitCode, hierarchyPath);
-    }
-
-    public List<Vendor> getVendors() {
-        return vendors;
-    }
-
-    public void setVendors(List<Vendor> vendors) {
-        this.vendors = vendors;
     }
 
     public CompanyFunction getFunction() {

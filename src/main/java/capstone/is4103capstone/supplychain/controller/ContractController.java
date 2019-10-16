@@ -3,6 +3,7 @@ package capstone.is4103capstone.supplychain.controller;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.model.req.ApproveContractReq;
 import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.service.ContractService;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class ContractController {
         if (Authentication.authenticateUser(createContractReq.getModifierUsername())) {
             return ResponseEntity
                     .ok()
-                    .body(contractService.CreateContract(createContractReq));
+                    .body(contractService.createContract(createContractReq));
         } else {
             return ResponseEntity
                     .ok()
@@ -51,7 +52,7 @@ public class ContractController {
         if (Authentication.authenticateUser(updateContractReq.getModifierUsername())) {
             return ResponseEntity
                     .ok()
-                    .body(contractService.UpdateContract(updateContractReq, id));
+                    .body(contractService.updateContract(updateContractReq, id));
         } else {
             return ResponseEntity
                     .badRequest()
@@ -91,6 +92,31 @@ public class ContractController {
             return ResponseEntity
                     .ok()
                     .body(contractService.getContractsByVendorId(vendorId));
+        }else{
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+    }
+
+    @PostMapping("/approve-contract")
+    public ResponseEntity approveContract(@RequestBody ApproveContractReq approveContractReq){
+        if(Authentication.authenticateUser(approveContractReq.getUsername()))
+            return ResponseEntity
+                    .ok()
+                    .body(contractService.approveContract(approveContractReq));
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @PostMapping("/request-approve/{contractId}")
+    public ResponseEntity requestApprove(@PathVariable("contractId") String contractId, @RequestParam(name = "username", required = true) String username){
+        if (Authentication.authenticateUser(username)) {
+            return ResponseEntity
+                    .ok()
+                    .body(contractService.createApprovalTicket(username, contractId, "Approver please review the contract."));
         }else{
             return ResponseEntity
                     .ok()

@@ -305,7 +305,7 @@ public class BudgetService {
         }
 
         planRepository.saveAndFlush(plan);
-        logger.info("BM APPROVEL Successully "+plan.getBudgetPlanStatus()+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
+        logger.info("BM APPROVER Successully "+plan.getBudgetPlanStatus()+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
         return new GeneralRes("BM APPROVAL Successfully "+plan.getBudgetPlanStatus()+" the plan!", false);
 
     }
