@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities.supplyChain;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.finance.Invoice;
+import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -23,8 +24,8 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactName;
     private String escalationContactEmail;
 
-    @ManyToMany(mappedBy = "vendors", fetch = FetchType.EAGER)
-    private Set<BusinessUnit> businessUnits = new HashSet<>();
+    @Convert(converter = StringListConverter.class)
+    private List<String> businessUnits = new ArrayList<>();
 
     @OneToMany(mappedBy = "vendor")
     private List<Invoice> invoices = new ArrayList<>();
@@ -35,7 +36,7 @@ public class Vendor extends DBEntityTemplate {
     @OneToMany(mappedBy = "outsourcedVendor")
     private List<Outsourcing> outsourcingList = new ArrayList<>();
 
-    public Vendor(String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
+    public Vendor(String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail, List<String> businessUnits, List<Invoice> invoices, List<Contract> contracts, List<Outsourcing> outsourcingList) {
         this.serviceDescription = serviceDescription;
         this.relationshipManagerName = relationshipManagerName;
         this.relationshipManagerEmail = relationshipManagerEmail;
@@ -43,6 +44,10 @@ public class Vendor extends DBEntityTemplate {
         this.billingContactEmail = billingContactEmail;
         this.escalationContactName = escalationContactName;
         this.escalationContactEmail = escalationContactEmail;
+        this.businessUnits = businessUnits;
+        this.invoices = invoices;
+        this.contracts = contracts;
+        this.outsourcingList = outsourcingList;
     }
 
     public Vendor() {
@@ -64,11 +69,11 @@ public class Vendor extends DBEntityTemplate {
         this.outsourcingList = outsourcingList;
     }
 
-    public Set<BusinessUnit> getBusinessUnits() {
+    public List<String> getBusinessUnits() {
         return businessUnits;
     }
 
-    public void setBusinessUnits(Set<BusinessUnit> businessUnits) {
+    public void setBusinessUnits(List<String> businessUnits) {
         this.businessUnits = businessUnits;
     }
 

@@ -27,27 +27,11 @@ public class BusinessUnit extends DBEntityTemplate {
     @OneToMany(mappedBy = "businessUnit")
     private List<Team> teams = new ArrayList<>();
 
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "businessUnit_vendor",
-            joinColumns = @JoinColumn(name = "businessUnit_id"),
-            inverseJoinColumns = @JoinColumn(name = "vendor_id")
-    )
-    private Set<Vendor> vendors = new HashSet<>();
-
     public BusinessUnit() {
     }
 
     public BusinessUnit(String businessUnitName, String businessUnitCode, String hierarchyPath) {
         super(businessUnitName, businessUnitCode, hierarchyPath);
-    }
-
-    public Set<Vendor> getVendors() {
-        return vendors;
-    }
-
-    public void setVendors(Set<Vendor> vendors) {
-        this.vendors = vendors;
     }
 
     public CompanyFunction getFunction() {
