@@ -1,8 +1,7 @@
 package capstone.is4103capstone.admin.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -78,6 +77,7 @@ public class EmployeeDto implements Serializable {
         this.securityId = securityId;
     }
 
+    @JsonIgnore // so DTO to JSON does not display password: null
     public Optional<String> getPassword() {
         return password;
     }

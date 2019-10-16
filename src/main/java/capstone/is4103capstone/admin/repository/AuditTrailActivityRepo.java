@@ -14,5 +14,5 @@ public interface AuditTrailActivityRepo extends JpaRepository<AuditTrailActivity
     @Query(value = "select a.activity,a.time_stamp,a.user_uuid,e.user_name " +
             "from audit_trail_activity a join employee e on a.user_uuid=e.id"
             ,nativeQuery = true)
-    List<AuditTrailModel> findAuditTailsWithUsername();
+    List<AuditTrailModel> findAuditTrailActivityWithUsername();
 }

@@ -1,6 +1,6 @@
 package capstone.is4103capstone.admin.controller;
 
-import capstone.is4103capstone.admin.controller.model.res.TeamRes;
+import capstone.is4103capstone.admin.model.res.TeamRes;
 import capstone.is4103capstone.admin.service.TeamService;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
