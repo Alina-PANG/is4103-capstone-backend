@@ -1,6 +1,6 @@
 package capstone.is4103capstone.admin.controller;
 
-import capstone.is4103capstone.admin.controller.model.res.OfficeRes;
+import capstone.is4103capstone.admin.model.res.OfficeRes;
 import capstone.is4103capstone.admin.dto.OfficeDto;
 import capstone.is4103capstone.admin.service.OfficeService;
 import capstone.is4103capstone.general.service.WriteAuditTrail;

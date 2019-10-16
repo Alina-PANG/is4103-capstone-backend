@@ -1,7 +1,6 @@
 package capstone.is4103capstone.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import capstone.is4103capstone.util.enums.OperationTypeEnum;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -16,8 +15,10 @@ public class AuditTrailActivity implements Serializable {
     @GeneratedValue
     private int id;
     private String userUuid;
-    private String urlVisited;
     private String activity;
+    private String modifiedObjectUuid = "";
+    private String objectType = "";
+    private OperationTypeEnum operationTypeEnum;
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeStamp;
 
@@ -32,20 +33,20 @@ public class AuditTrailActivity implements Serializable {
         this.timeStamp = new Date();
     }
 
-    public AuditTrailActivity(String userUuid, String activity, String visitedUrl) {
+    public AuditTrailActivity(String userUuid, String activity, String modifiedObjectUuid) {
         this.userUuid = userUuid;
         this.activity = activity;
-        this.urlVisited = visitedUrl;
+        this.modifiedObjectUuid = modifiedObjectUuid;
         // set date performed to now
         this.timeStamp = new Date();
     }
 
-    public String getUrlVisited() {
-        return urlVisited;
+    public String getModifiedObjectUuid() {
+        return modifiedObjectUuid;
     }
 
-    public void setUrlVisited(String urlVisited) {
-        this.urlVisited = urlVisited;
+    public void setModifiedObjectUuid(String modifiedObjectUuid) {
+        this.modifiedObjectUuid = modifiedObjectUuid;
     }
 
     public int getId() {

@@ -686,7 +686,7 @@ public class SeatAllocationService {
     // Check whether the office where the seats belong has the business unit required
     private BusinessUnit validateBusinessUnitInformation(String businessUnitId, List<Seat> seats) throws SeatAllocationException {
 
-        Optional<BusinessUnit> optionalBusinessUnit = businessUnitRepository.findById(businessUnitId);
+        Optional<BusinessUnit> optionalBusinessUnit = businessUnitRepository.findByIdNonDeleted(businessUnitId);
         if(!optionalBusinessUnit.isPresent()) {
             throw new SeatAllocationException("Allocation of seats failed: business unit does not exist!");
         }
