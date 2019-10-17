@@ -49,8 +49,6 @@ public class ChildContractService {
             newChildContract.setServiceCode(createChildContractReq.getServiceCode());
 
             Employee approver = employeeRepository.getOne(createChildContractReq.getApproverId());
-//            newChildContract.setApprover(approver);
-//            approver.getChildContractsApproved().add(newChildContract);
 
             Contract masterContract = contractRepository.getOne(createChildContractReq.getMasterContractID());
             newChildContract.setMasterContract(masterContract);
