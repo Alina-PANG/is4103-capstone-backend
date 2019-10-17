@@ -48,7 +48,7 @@ public class ServiceServ {
 
     //assume you can give either vendor code or id?
     @Transactional
-    public JSONObject createservice(CreateServiceRequest req){
+    public JSONObject createService(CreateServiceRequest req){
         try{
             Vendor vendor = vendorRepository.findVendorByCode(req.getVendorCode());
             if (vendor == null || vendor.getDeleted()){
@@ -108,6 +108,17 @@ public class ServiceServ {
             res.put("message",e.getMessage());
             return res;
         }
+    }
+
+    public ServiceListRes retrieveAllService() throws Exception{
+        List<Service> lists = serviceRepository.findAll();
+        List<ServiceModel> models = new ArrayList<>();
+        for (Service s:lists){
+            if (!s.getDeleted()){
+                models.add(new ServiceModel(s));
+            }
+        }
+        return new ServiceListRes("retrieved all service",false, models,models.size());
     }
 
     //sub2 can be either code or id will take as code by default and double check id;

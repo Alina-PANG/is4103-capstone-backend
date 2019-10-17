@@ -15,6 +15,7 @@ public class BJF extends RequestFormTemplate {
 
     //justification == form description
     private String serviceId;
+    private String vendorId;
 
     private BjfTypeEnum BjfType;
 
@@ -26,7 +27,7 @@ public class BJF extends RequestFormTemplate {
 
     private BigDecimal projectCost = null; // if type == project
 
-    private String projectCode = null; // if type == project
+    private String projectCode = null; // string/id both should word: if type == project
 
     private String purchaseOrderNumber;
 
@@ -41,6 +42,21 @@ public class BJF extends RequestFormTemplate {
     public BJF() {
     }
 
+    public BJFStatusEnum getBjfStatus() {
+        return bjfStatus;
+    }
+
+    public void setBjfStatus(BJFStatusEnum bjfStatus) {
+        this.bjfStatus = bjfStatus;
+    }
+
+    public String getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(String vendorId) {
+        this.vendorId = vendorId;
+    }
 
     public String getServiceId() {
         return serviceId;

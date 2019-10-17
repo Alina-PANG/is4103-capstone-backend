@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 public class CreateBJFReq implements Serializable {
     String requester;
-    String requestType;
+    String requestType;  //BAU:
     String costCenter;
     String project;
     String vendor;
@@ -14,7 +14,7 @@ public class CreateBJFReq implements Serializable {
     BigDecimal projectCost;
     BigDecimal ongoingCost;
     String currency;
-    String totalBudget;// not required, because can calcuated
+    BigDecimal totalBudget;// not required, because can calcuated
     String additionalInfo;
 
     public CreateBJFReq() {
@@ -100,11 +100,11 @@ public class CreateBJFReq implements Serializable {
         this.currency = currency;
     }
 
-    public String getTotalBudget() {
+    public BigDecimal getTotalBudget() {
         return totalBudget;
     }
 
-    public void setTotalBudget(String totalBudget) {
+    public void setTotalBudget(BigDecimal totalBudget) {
         this.totalBudget = totalBudget;
     }
 

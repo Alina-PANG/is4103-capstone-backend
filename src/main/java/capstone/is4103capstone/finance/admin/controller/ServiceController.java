@@ -27,7 +27,7 @@ public class ServiceController {
     ResponseEntity<Object> createservice(@RequestBody CreateServiceRequest req) {
 
         if(Authentication.authenticateUser(req.getUsername())){
-            return new ResponseEntity<Object>(serviceService.createservice(req).toString(), HttpStatus.OK);
+            return new ResponseEntity<Object>(serviceService.createService(req).toString(), HttpStatus.OK);
         }
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
@@ -47,5 +47,21 @@ public class ServiceController {
                     .body(new ServiceListRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
 
     }
+
+    @GetMapping
+    public ResponseEntity<ServiceListRes> viewAllServices(){
+        try{
+            return ResponseEntity
+                    .ok()
+                    .body(serviceService.retrieveAllService());
+        }catch (Exception ex){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ServiceListRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+
+
+    }
+
 
 }

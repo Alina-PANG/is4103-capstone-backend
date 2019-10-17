@@ -151,16 +151,21 @@ public class ProjectService {
 
 
     public Project validateProject(String idOrCode) throws EntityNotFoundException {
+
+        Project e = projectRepository.getProjectByCode(idOrCode);
+        if (e != null)
+            if (!e.getDeleted())
+                return e;
+            else
+                throw new EntityNotFoundException("Project already deleted.");
+
+
         Optional<Project> project = projectRepository.findById(idOrCode);
         if (project.isPresent())
             if (!project.get().getDeleted())
                 return project.get();
             else
                 throw new EntityNotFoundException("Project already deleted.");
-
-        Project e = projectRepository.getProjectByCode(idOrCode);
-        if (e != null && !e.getDeleted())
-            return e;
 
         throw new EntityNotFoundException("Project code or id not valid");
     }
