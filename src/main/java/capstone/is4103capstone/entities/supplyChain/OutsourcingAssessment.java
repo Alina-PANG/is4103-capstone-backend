@@ -22,12 +22,14 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     private String businessCaseDescription;
 
     @OneToMany(mappedBy = "outsourcingAssessment",fetch = FetchType.EAGER)
-    private List<OutsourcingAssessmentSection> sectionList = new ArrayList<>();
+    private List<OutsourcingAssessmentSection> sectionList;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_assess")
     @JsonIgnore
     private Employee employeeAssess;
+
+
 
     private OutsourcingAssessmentStatusEnum outsourcingAssessmentStatus;
 

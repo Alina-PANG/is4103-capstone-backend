@@ -6,4 +6,5 @@ public enum ApprovalTypeEnum {
     BUDGETPLAN,
     CONTRACT,
     CHILD_CONTRACT
+
 }
