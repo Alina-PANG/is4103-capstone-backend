@@ -3,7 +3,6 @@ package capstone.is4103capstone.finance.finPurchaseOrder.service;
 import capstone.is4103capstone.entities.finance.Invoice;
 import capstone.is4103capstone.finance.Repository.InvoiceRepository;
 import capstone.is4103capstone.general.model.GeneralRes;
-import capstone.is4103capstone.general.repository.FileRepository;
 import capstone.is4103capstone.util.exception.FileStorageException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
