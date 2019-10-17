@@ -212,7 +212,7 @@ public class SupplyChainInitialization {
         OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
         outsourcingAssessment.setCode("Outsourcing_Assessment1");
         outsourcingAssessment.setEmployeeAssess(employeeAssess);
-        outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.CREATED);
+        outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.TEMPLATE);
         outsourcingAssessment.setCreatedBy("xuhong");
         outsourcingAssessment.setCreatedDateTime(new Date());
         outsourcingAssessment.setLastModifiedBy("xuhong");

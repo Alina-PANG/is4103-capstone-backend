@@ -1,9 +1,9 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.helper.StringListConverter;
-import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
+import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -18,45 +18,20 @@ public class PurchaseOrder extends DBEntityTemplate {
     @Convert(converter = StringListConverter.class)
     private List<String> relatedBJF;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vendor_id")
-    private Vendor vendor;
-
-    private BigDecimal totalValue;
-
-    private String description;
-
     @OneToMany(mappedBy = "purchaseOrder")
     private List<Invoice> invoices = new ArrayList<>();
 
     @OneToMany(mappedBy = "purchaseOrder")
     private List<StatementOfAcctLineItem> statementOfAccount = new ArrayList<>();
 
+    @Column(name = "status")
+    private ApprovalStatusEnum status;
+
     private String currencyCode;
 
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
-
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
+    private Double totalAmount;
 
     public PurchaseOrder() {
-    }
-
-    public PurchaseOrder(String poCode, String hierachyPath) {
-        super(poCode, hierachyPath);
-    }
-
-
-
-    public Vendor getVendor() {
-        return vendor;
-    }
-
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
     }
 
     public List<String> getRelatedBJF() {
@@ -66,7 +41,6 @@ public class PurchaseOrder extends DBEntityTemplate {
     public void setRelatedBJF(List<String> relatedBJF) {
         this.relatedBJF = relatedBJF;
     }
-
 
     public List<Invoice> getInvoices() {
         return invoices;
@@ -84,19 +58,27 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.statementOfAccount = statementOfAccount;
     }
 
-    public BigDecimal getTotalValue() {
-        return totalValue;
+    public ApprovalStatusEnum getStatus() {
+        return status;
     }
 
-    public void setTotalValue(BigDecimal totalValue) {
-        this.totalValue = totalValue;
+    public void setStatus(ApprovalStatusEnum status) {
+        this.status = status;
     }
 
-    public String getDescription() {
-        return description;
+    public String getCurrencyCode() {
+        return currencyCode;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }
