@@ -4,16 +4,10 @@ import capstone.is4103capstone.configuration.DBEntityTemplate;
 //import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.finance.*;
-import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
-import com.sun.xml.internal.bind.v2.model.core.ID;
-import org.apache.poi.ss.formula.functions.T;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.swing.text.html.Option;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class FinanceEntityCodeHPGenerator {
@@ -25,7 +19,7 @@ public class FinanceEntityCodeHPGenerator {
     private final String BUDGET_SUB1_TEMPLATE = "CATS1-%1$s-%2$s";
     private final String BUDGET_SUB2_TEMPLATE = "CATS2-%1$s-%2$s";
     private final String FX_RECORD_TEMPLATE = "FX-%1$s-%2$s";
-    private final String MERCHANDISE_TEMPALTE = "M-%1$s-%2$s";
+    private final String MERCHANDISE_TEMPALTE = "SP-%1$s-%2$s";
     private final String PLAN_TEMPLATE = "%1$s-%2$s";
     private final String PLAN_ITEM_TEMPLATE = "PLINE-%1$s";
     private final String PROJECT_TEMPLATE = "PJ-%1$s";
@@ -158,5 +152,4 @@ public class FinanceEntityCodeHPGenerator {
             throw new RepositoryEntityMismatchException("Repository class given does not match the entity type.");
         }
     }
-
 }
