@@ -4,5 +4,7 @@ public enum ApprovalTypeEnum {
     BJFBUSINESS,
     BJFBUDGET,
     BUDGETPLAN,
-    PURCHASEORDER
+    CONTRACT,
+    CHILD_CONTRACT
+
 }

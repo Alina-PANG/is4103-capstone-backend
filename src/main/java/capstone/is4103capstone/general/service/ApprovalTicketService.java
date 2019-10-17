@@ -39,7 +39,7 @@ public class ApprovalTicketService {
     @Value("${spring.mail.username}")
     private static String senderEmailAddr;
 
-    static  EmployeeRepository employeeRepo;
+    static EmployeeRepository employeeRepo;
     static ApprovalForRequestRepository approvalForRequestRepo;
     static MailSenderService mailSenderService;
 
@@ -106,6 +106,11 @@ public class ApprovalTicketService {
 
     public static boolean createTicketAndSendEmail(Employee requester, Employee receiver, DBEntityTemplate requestedItem, String content,ApprovalTypeEnum approvalType){
         try {
+            if(requester == null || receiver == null){
+                logger.error("Requester or approver is null! Cannot create request for approval!");
+                throw new Exception("Requester or approver is null! Cannot create request for approval!");
+            }
+
             ApprovalForRequest ticket = new ApprovalForRequest();
             ticket.setCreatedBy(requester.getUserName());
             ticket.setRequestedItemId(requestedItem.getId());
@@ -123,10 +128,12 @@ public class ApprovalTicketService {
             receiver.getMyApprovals().add(ticket.getId());
             sendEmail(ticket);
         }catch (Exception e){
+            e.printStackTrace();
             return false;
         }
         return true;
     }
+
     public static boolean approveTicket(String ticketId, String comment){
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findById(ticketId);
         if (!ticketOp.isPresent()) return false;

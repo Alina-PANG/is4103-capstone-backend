@@ -63,13 +63,19 @@ public class Contract extends DBEntityTemplate {
     private Employee employeeInChargeContract;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_approve")
+    @JsonIgnore
+    private Employee approver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     @JsonIgnore
     private Team team;
 
     private String currencyCode;
 
-    public Contract(String contractDescription, PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, BigDecimal totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ChildContract> childContractList, Employee employeeInChargeContract, Team team, String currencyCode) {
+    public Contract(String contractDescription, PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, BigDecimal totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ChildContract> childContractList, Employee employeeInChargeContract, Employee approver, Team team, String currencyCode) {
+        this.contractDescription = contractDescription;
         this.purchaseType = purchaseType;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -84,12 +90,20 @@ public class Contract extends DBEntityTemplate {
         this.vendor = vendor;
         this.childContractList = childContractList;
         this.employeeInChargeContract = employeeInChargeContract;
+        this.approver = approver;
         this.team = team;
         this.currencyCode = currencyCode;
-        this.contractDescription = contractDescription;
     }
 
     public Contract() {
+    }
+
+    public Employee getApprover() {
+        return approver;
+    }
+
+    public void setApprover(Employee approver) {
+        this.approver = approver;
     }
 
     public String getContractDescription() {

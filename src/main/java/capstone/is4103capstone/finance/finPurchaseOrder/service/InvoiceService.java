@@ -1,11 +1,13 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.service;
 
 import capstone.is4103capstone.entities.finance.Invoice;
+import capstone.is4103capstone.finance.Repository.InvoiceRepository;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.repository.FileRepository;
 import capstone.is4103capstone.util.exception.FileStorageException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,9 +15,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 import java.io.IOException;
 import java.util.Optional;
 
+@Service
 public class InvoiceService {
     @Autowired
-    FileRepository fileRepository;
+    InvoiceRepository invoiceRepository;
     public ResponseEntity<GeneralRes> storeFile(MultipartFile file) {
         // Normalize file name
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -31,17 +34,18 @@ public class InvoiceService {
             invoice.setFileType(file.getContentType());
             invoice.setData(file.getBytes());
 
-            fileRepository.save(invoice);
+            invoiceRepository.save(invoice);
 
 
         } catch (IOException ex) {
             throw new FileStorageException("Could not store file " + fileName + ". Please try again!", ex);
         }
+        return null;
     }
 
     public ResponseEntity<Invoice> getFile(String fileId) {
-        Optional invoice = fileRepository.findById(fileId);
-
+        Optional invoice = invoiceRepository.findById(fileId);
+        return null;
 
     }
 }

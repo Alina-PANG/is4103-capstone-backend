@@ -12,7 +12,7 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
 
     @Override
     public String convertToDatabaseColumn(List<String> stringList) {
-        if (stringList.size()==0){
+        if (stringList == null || stringList.size()==0){
             return "";
         }
         return String.join(SPLIT_CHAR,stringList);
@@ -20,7 +20,7 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
 
     @Override
     public List<String> convertToEntityAttribute(String s) {
-        if (s.length()==0){
+        if (s == null || s.length()==0){
             return new ArrayList<>();
         }
         return Arrays.asList(s.split(SPLIT_CHAR));
