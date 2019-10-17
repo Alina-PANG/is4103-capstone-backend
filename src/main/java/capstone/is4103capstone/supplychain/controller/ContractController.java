@@ -116,7 +116,7 @@ public class ContractController {
         if (Authentication.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
-                    .body(contractService.createApprovalTicket(username, contractId, "Approver please review the contract."));
+                    .body(contractService.createApprovalTicket(username, contractId, "Approver please review the contract and related child contracts."));
         }else{
             return ResponseEntity
                     .ok()
