@@ -23,27 +23,13 @@ public class ChildContract extends DBEntityTemplate {
     @JsonIgnore
     private Contract masterContract;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_approve")
-    @JsonIgnore
-    private Employee approver;
-
     public ChildContract() {
     }
 
-    public ChildContract(@NotNull String serviceCode, BigDecimal contractValue, Contract masterContract, Employee approver) {
+    public ChildContract(@NotNull String serviceCode, BigDecimal contractValue, Contract masterContract) {
         this.serviceCode = serviceCode;
         this.contractValue = contractValue;
         this.masterContract = masterContract;
-        this.approver = approver;
-    }
-
-    public Employee getApprover() {
-        return approver;
-    }
-
-    public void setApprover(Employee approver) {
-        this.approver = approver;
     }
 
     public String getServiceCode() {

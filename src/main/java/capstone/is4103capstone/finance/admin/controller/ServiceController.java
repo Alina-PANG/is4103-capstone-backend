@@ -48,4 +48,20 @@ public class ServiceController {
 
     }
 
+    @GetMapping
+    public ResponseEntity<ServiceListRes> viewAllServices(){
+        try{
+            return ResponseEntity
+                    .ok()
+                    .body(serviceService.retrieveAllService());
+        }catch (Exception ex){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ServiceListRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+
+
+    }
+
+
 }
