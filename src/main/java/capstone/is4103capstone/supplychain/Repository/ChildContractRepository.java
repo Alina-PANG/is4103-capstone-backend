@@ -15,4 +15,7 @@ public interface ChildContractRepository extends JpaRepository<ChildContract, St
 
     @Query(value = "SELECT * FROM child_contract child WHERE child.is_deleted=false AND child.master_contract=?1",nativeQuery = true)
     List<ChildContract> findChildContractsByMasterContractId(String masterContractId);
+
+    @Query(value = "SELECT * FROM child_contract child WHERE child.is_deleted=false AND child.service_code=?1",nativeQuery = true)
+    List<ChildContract> findChildContractsByServiceCode(String serviceCode);
 }

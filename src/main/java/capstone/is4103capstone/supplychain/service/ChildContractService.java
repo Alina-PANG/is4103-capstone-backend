@@ -2,36 +2,31 @@ package capstone.is4103capstone.supplychain.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Contract;
+import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.finance.Repository.ServiceRepository;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
-import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.model.ChildContractModel;
-import capstone.is4103capstone.supplychain.model.req.ApproveChildContractReq;
-import capstone.is4103capstone.supplychain.model.req.ApproveContractReq;
+import capstone.is4103capstone.supplychain.model.ContractServiceModel;
 import capstone.is4103capstone.supplychain.model.req.CreateChildContractReq;
 import capstone.is4103capstone.supplychain.model.res.GetChildContractRes;
 import capstone.is4103capstone.supplychain.model.res.GetChildContractsRes;
-import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
-import capstone.is4103capstone.util.enums.ChildContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
-@Service
+@org.springframework.stereotype.Service
 public class ChildContractService {
     private static final Logger logger = LoggerFactory.getLogger(VendorService.class);
 
@@ -41,6 +36,8 @@ public class ChildContractService {
     ChildContractRepository childContractRepository;
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    ServiceRepository serviceRepository;
 
     public GeneralRes createChildContract(CreateChildContractReq createChildContractReq){
         try{
@@ -51,7 +48,6 @@ public class ChildContractService {
             newChildContract.setContractValue(createChildContractReq.getContractValue());
             newChildContract.setServiceCode(createChildContractReq.getServiceCode());
             newChildContract.setDeleted(false);
-            newChildContract.setChildContractStatus(ChildContractStatusEnum.PENDING_APPROVAL);
 
             Employee approver = employeeRepository.getOne(createChildContractReq.getApproverId());
             newChildContract.setApprover(approver);
@@ -74,39 +70,12 @@ public class ChildContractService {
             contractRepository.saveAndFlush(masterContract);
             employeeRepository.saveAndFlush(approver);
 
-            //send approval request
-            try{
-                createApprovalTicket(createChildContractReq.getModifierUsername(),newChildContract.getId(),"Approver please review the child contract.");
-            }catch (Exception emailExc){
-            }
-
             logger.info("Successfully created new child contract under master contract! -- "+masterContract.getCode() +" Waiting for approval!");
             return new GeneralRes("Successfully created new child contract!", false);
         }
         catch(Exception ex){
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
-        }
-    }
-
-    public GetChildContractRes getChildContract(String id){
-        try{
-            logger.info("Getting child contract by child contract id: " + id);
-            ChildContract childContract = childContractRepository.getOne(id);
-
-            if(childContract == null){
-                return new GetChildContractRes("There is no child contract in the database with id " + id, true, null);
-            }
-            else if(childContract.getDeleted()){
-                return new GetChildContractRes("This child contract is deleted", true, null);
-            }
-            else{
-                ChildContractModel childContractModel = transformToChildContractModel(childContract);
-                return new GetChildContractRes("Successfully retrieved the contract with id " + id, false, childContractModel);
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return new GetChildContractRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
 
@@ -150,9 +119,6 @@ public class ChildContractService {
             if(updateChildContractReq.getContractValue() != null){
                 childContract.setContractValue(updateChildContractReq.getContractValue());
             }
-            if(updateChildContractReq.getChildContractStatusEnum() != null){
-                childContract.setChildContractStatus(updateChildContractReq.getChildContractStatusEnum());
-            }
 
             childContract.setLastModifiedBy(updateChildContractReq.getModifierUsername());
             childContractRepository.saveAndFlush(childContract);
@@ -163,6 +129,26 @@ public class ChildContractService {
         }
     }
 
+    public GetChildContractRes getChildContract(String id){
+        try{
+            logger.info("Getting child contract by child contract id: " + id);
+            ChildContract childContract = childContractRepository.getOne(id);
+
+            if(childContract == null){
+                return new GetChildContractRes("There is no child contract in the database with id " + id, true, null);
+            }
+            else if(childContract.getDeleted()){
+                return new GetChildContractRes("This child contract is deleted", true, null);
+            }
+            else{
+                ChildContractModel childContractModel = transformToChildContractModel(childContract);
+                return new GetChildContractRes("Successfully retrieved the contract with id " + id, false, childContractModel);
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return new GetChildContractRes("An unexpected error happens: "+ex.getMessage(), true, null);
+        }
+    }
 
     public ChildContractModel transformToChildContractModel(ChildContract childContract){
         GeneralEntityModel masterContract = null;
@@ -176,77 +162,45 @@ public class ChildContractService {
             masterContract = new GeneralEntityModel(childContract.getMasterContract());
         }
 
+        Boolean canUpdate = false;
+        ContractStatusEnum contractStatus = childContract.getMasterContract().getContractStatus();
+
+        if(contractStatus.equals(ContractStatusEnum.PENDING_APPROVAL)
+            ||contractStatus.equals(ContractStatusEnum.REJECTED)
+            ||contractStatus.equals(ContractStatusEnum.DRAFT)){
+            canUpdate = true;
+        }
+
+        Service service = serviceRepository.findServiceByCode(childContract.getServiceCode());
+
         ChildContractModel childContractModel = new ChildContractModel(
                 childContract.getObjectName(), childContract.getCode(), childContract.getId(),
-                childContract.getSeqNo(), childContract.getServiceCode(), childContract.getContractValue(),
-                masterContract, childContract.getChildContractStatus(), approver);
+                childContract.getSeqNo(), service.getObjectName(), childContract.getContractValue(),
+                masterContract, approver, childContract.getMasterContract().getCurrencyCode(), canUpdate);
 
         return childContractModel;
     }
 
-    public GeneralRes createApprovalTicket(String requesterUsername, String childContractId, String content){
-        try{
-            ChildContract childContract = childContractRepository.getOne(childContractId);
-            Employee requester = employeeRepository.findEmployeeByUserName(requesterUsername);
-            Employee approver = childContract.getApprover();
 
-            if(childContract.getChildContractStatus().equals(ChildContractStatusEnum.APPROVED)){
-                logger.error("This child contract has been approved. Cannot request for approval again!");
-                throw new Exception("This child contract has been approved. Cannot request for approval again!");
+    public List<ContractServiceModel> getChildContractByServiceId(String serviceCode){
+        List<ContractServiceModel> result = new ArrayList<>();
+        List<ChildContract> childContractList = childContractRepository.findChildContractsByServiceCode(serviceCode);
+
+        for(ChildContract cc: childContractList){
+            Contract masterContract = cc.getMasterContract();
+
+            //check whether these child contract is active
+            if(masterContract.getContractStatus().equals(ContractStatusEnum.ACTIVE) || masterContract.getContractStatus().equals(ContractStatusEnum.MERGED)){
+                Vendor vendor = masterContract.getVendor();
+
+                //create ContractServiceModel
+                ContractServiceModel contractServiceModel = new ContractServiceModel(
+                        vendor.getObjectName(), vendor.getId(),
+                        masterContract.getStartDate(), masterContract.getEndDate());
+
+                result.add(contractServiceModel);
             }
-
-            ApprovalTicketService.createTicketAndSendEmail(requester,approver,childContract,content, ApprovalTypeEnum.CHILD_CONTRACT);
-            return new GeneralRes("Request for approval has been sent Successfully!", false);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return new GeneralRes( ex.getMessage(), true);
         }
-    }
-
-    @Transactional
-    public boolean getApprovalRight(ChildContract childContract, String username) throws Exception{
-        Employee approver = childContract.getApprover();
-
-        if (approver.getUserName().equals(username)){
-            return true;
-        }else {
-            return false;
-        }
-    }
-
-    public GeneralRes approveChildContract(ApproveChildContractReq approveChildContractReq) {
-        try {
-            Optional<ChildContract> childContractOp = childContractRepository.findById(approveChildContractReq.getChildContractId());
-            if (!childContractOp.isPresent()) {
-                throw new Exception("Child Contract Id not found");
-            }
-            ChildContract childContract = childContractOp.get();
-            if (!childContract.getChildContractStatus().equals(ChildContractStatusEnum.PENDING_APPROVAL)) {
-                logger.error("Internal error, a non-pending child contract goes into approve function");
-                throw new Exception("Internal error, a non-pending child contract goes into approve function");
-            }
-            if(!getApprovalRight(childContract, approveChildContractReq.getUsername())){
-                logger.error("This user is not the approver and does not have the right to approve this child contract");
-                throw new Exception("This user is not the approver and does not have the right to approve this child contract");
-            }
-
-            if (!approveChildContractReq.getApproved()){
-                childContract.setChildContractStatus(ChildContractStatusEnum.REJECTED);
-                ApprovalTicketService.rejectTicketByEntity(childContract,approveChildContractReq.getComment(),approveChildContractReq.getUsername());
-            }
-            else{
-                childContract.setChildContractStatus(ChildContractStatusEnum.APPROVED);
-                ApprovalTicketService.approveTicketByEntity(childContract,approveChildContractReq.getComment(),approveChildContractReq.getUsername());
-            }
-
-            childContractRepository.saveAndFlush(childContract);
-            logger.info("Approver Successfully: "+childContract.getChildContractStatus()+" the new child contract! -- "+approveChildContractReq.getUsername()+" "+new Date());
-            return new GeneralRes("Approver Successfully "+childContract.getChildContractStatus()+" the child contract!", false);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return new GeneralRes( ex.getMessage(), true);
-        }
+        return result;
     }
 }
