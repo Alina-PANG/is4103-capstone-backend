@@ -1,6 +1,7 @@
 package capstone.is4103capstone.util;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.supplychain.service.ContractService;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ public class SupplychainEntityCodeHPGenerator {
     private static final Logger logger = LoggerFactory.getLogger(SupplychainEntityCodeHPGenerator.class);
     private final String VENDOR_TEMPLATE = "Vendor-%1$s-%2$s";
     private final String CONTRACT_TEMPLATE = "Contract-%1$s";
+    private final String CHILD_CONTRACT_TEMPLATE = "ChildContract-%1$s";
 
     public String generateCode(JpaRepository repo, DBEntityTemplate entity) throws Exception {
         Optional<DBEntityTemplate> entityOptional = repo.findById(entity.getId());
@@ -40,6 +42,8 @@ public class SupplychainEntityCodeHPGenerator {
                     case "Contract":
                         code = String.format(CONTRACT_TEMPLATE, seqNoStr);
                         break;
+                    case "ChildContract":
+                        code = String.format(CHILD_CONTRACT_TEMPLATE, seqNoStr);
                     default:
                         System.out.println("Not found");
                 }

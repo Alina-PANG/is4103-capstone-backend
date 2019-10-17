@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities.supplyChain;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.util.enums.ChildContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
@@ -22,27 +23,43 @@ public class ChildContract extends DBEntityTemplate {
 
     @NotNull
     private String serviceCode;
-
     private BigDecimal contractValue;
+    private ChildContractStatusEnum childContractStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_contract")
     @JsonIgnore
     private Contract masterContract;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_approve")
+    @JsonIgnore
+    private Employee approver;
+
     public ChildContract() {
     }
 
-    public ChildContract(String objectName, String code, @NotNull String serviceCode, BigDecimal contractValue, Contract masterContract) {
-        super(objectName, code);
+    public ChildContract(@NotNull String serviceCode, BigDecimal contractValue, Contract masterContract, Employee approver) {
         this.serviceCode = serviceCode;
         this.contractValue = contractValue;
         this.masterContract = masterContract;
+        this.approver = approver;
     }
 
-    public ChildContract(@NotNull String serviceCode, BigDecimal contractValue) {
-        this.serviceCode = serviceCode;
-        this.contractValue = contractValue;
+    public Employee getApprover() {
+        return approver;
+    }
+
+    public void setApprover(Employee approver) {
+        this.approver = approver;
+    }
+
+    public ChildContractStatusEnum getChildContractStatus() {
+        return childContractStatus;
+    }
+
+    public void setChildContractStatus(ChildContractStatusEnum childContractStatus) {
+        this.childContractStatus = childContractStatus;
     }
 
     public String getServiceCode() {
