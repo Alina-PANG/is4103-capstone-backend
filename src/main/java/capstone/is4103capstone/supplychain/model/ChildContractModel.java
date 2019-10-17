@@ -13,11 +13,10 @@ public class ChildContractModel implements Serializable {
     private String serviceName;
     private BigDecimal contractValue;
     private GeneralEntityModel masterContract;
-    private GeneralEntityModel approver;
     private String currencyCode;
     private Boolean canUpdate;
 
-    public ChildContractModel(String childContractName, String code, String id, Long seqNo, String serviceName, BigDecimal contractValue, GeneralEntityModel masterContract, GeneralEntityModel approver, String currencyCode, Boolean canUpdate) {
+    public ChildContractModel(String childContractName, String code, String id, Long seqNo, String serviceName, BigDecimal contractValue, GeneralEntityModel masterContract, String currencyCode, Boolean canUpdate) {
         this.childContractName = childContractName;
         this.code = code;
         this.id = id;
@@ -25,7 +24,6 @@ public class ChildContractModel implements Serializable {
         this.serviceName = serviceName;
         this.contractValue = contractValue;
         this.masterContract = masterContract;
-        this.approver = approver;
         this.currencyCode = currencyCode;
         this.canUpdate = canUpdate;
     }
@@ -40,14 +38,6 @@ public class ChildContractModel implements Serializable {
 
     public void setCurrencyCode(String currencyCode) {
         this.currencyCode = currencyCode;
-    }
-
-    public GeneralEntityModel getApprover() {
-        return approver;
-    }
-
-    public void setApprover(GeneralEntityModel approver) {
-        this.approver = approver;
     }
 
     public String getChildContractName() {

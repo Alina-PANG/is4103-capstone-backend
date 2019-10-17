@@ -46,7 +46,15 @@ public class ChildContractService {
             newChildContract.setCreatedBy(createChildContractReq.getModifierUsername());
             newChildContract.setLastModifiedBy(createChildContractReq.getModifierUsername());
             newChildContract.setContractValue(createChildContractReq.getContractValue());
-            newChildContract.setServiceCode(createChildContractReq.getServiceCode());
+
+            Service service =  serviceRepository.findServiceByCode(createChildContractReq.getServiceCode());
+            if(service != null) {
+                newChildContract.setServiceCode(createChildContractReq.getServiceCode());
+            }
+            else{
+                logger.info("Wrong service code!");
+                return new GeneralRes("Wrong service code! No existing service with this service code!", true);
+            }
 
             Contract masterContract = contractRepository.getOne(createChildContractReq.getMasterContractID());
             newChildContract.setMasterContract(masterContract);
@@ -64,7 +72,7 @@ public class ChildContractService {
             childContractRepository.saveAndFlush(newChildContract);
             contractRepository.saveAndFlush(masterContract);
 
-            logger.info("Successfully created new child contract under master contract! -- "+masterContract.getCode() +" Waiting for approval!");
+            logger.info("Successfully created new child contract under master contract! -- "+masterContract.getCode());
             return new GeneralRes("Successfully created new child contract!", false);
         }
         catch(Exception ex){
@@ -144,13 +152,10 @@ public class ChildContractService {
         }
     }
 
-    public ChildContractModel transformToChildContractModel(ChildContract childContract){
+    public ChildContractModel transformToChildContractModel(ChildContract childContract) throws Exception{
         GeneralEntityModel masterContract = null;
-        GeneralEntityModel approver = null;
 
-//        if(childContract.getApprover() != null){
-//            approver = new GeneralEntityModel(childContract.getApprover());
-//        }
+        String serviceName = null;
 
         if(childContract.getMasterContract() != null) {
             masterContract = new GeneralEntityModel(childContract.getMasterContract());
@@ -166,11 +171,14 @@ public class ChildContractService {
         }
 
         Service service = serviceRepository.findServiceByCode(childContract.getServiceCode());
+        if(service != null) {
+            serviceName = service.getObjectName();
+        }
 
         ChildContractModel childContractModel = new ChildContractModel(
                 childContract.getObjectName(), childContract.getCode(), childContract.getId(),
-                childContract.getSeqNo(), service.getObjectName(), childContract.getContractValue(),
-                masterContract, approver, childContract.getMasterContract().getCurrencyCode(), canUpdate);
+                childContract.getSeqNo(), serviceName, childContract.getContractValue(),
+                masterContract, childContract.getMasterContract().getCurrencyCode(), canUpdate);
 
         return childContractModel;
     }
