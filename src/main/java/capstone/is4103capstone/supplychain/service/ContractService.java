@@ -279,6 +279,14 @@ public class ContractService {
                 employee.getContractInCharged().add(contract);
                 employeeRepository.saveAndFlush(employee);
             }
+            if (updateContractReq.getApproverId() != null){
+                Employee approver = employeeRepository.getOne(updateContractReq.getApproverId());
+                contract.setApprover(approver);
+
+                contract = contractRepository.saveAndFlush(contract);
+                approver.getContractsApproved().add(contract);
+                employeeRepository.saveAndFlush(approver);
+            }
             if (updateContractReq.getVendorId() != null) {
                 Vendor vendor = vendorRepository.getOne(updateContractReq.getVendorId());
                 contract.setVendor(vendor);

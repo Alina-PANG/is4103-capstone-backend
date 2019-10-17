@@ -9,26 +9,16 @@ public class CreateChildContractReq implements Serializable {
     private String serviceCode;
     private BigDecimal contractValue;
     private String masterContractID;
-    private String approverId;
 
     public CreateChildContractReq() {
     }
 
-    public CreateChildContractReq(String modifierUsername, String childContractName, String serviceCode, BigDecimal contractValue, String masterContractID, String approverId) {
+    public CreateChildContractReq(String modifierUsername, String childContractName, String serviceCode, BigDecimal contractValue, String masterContractID) {
         this.modifierUsername = modifierUsername;
         this.childContractName = childContractName;
         this.serviceCode = serviceCode;
         this.contractValue = contractValue;
         this.masterContractID = masterContractID;
-        this.approverId = approverId;
-    }
-
-    public String getApproverId() {
-        return approverId;
-    }
-
-    public void setApproverId(String approverId) {
-        this.approverId = approverId;
     }
 
     public String getModifierUsername() {
