@@ -48,8 +48,6 @@ public class ChildContractService {
             newChildContract.setContractValue(createChildContractReq.getContractValue());
             newChildContract.setServiceCode(createChildContractReq.getServiceCode());
 
-            Employee approver = employeeRepository.getOne(createChildContractReq.getApproverId());
-
             Contract masterContract = contractRepository.getOne(createChildContractReq.getMasterContractID());
             newChildContract.setMasterContract(masterContract);
             masterContract.getChildContractList().add(newChildContract);
@@ -65,7 +63,6 @@ public class ChildContractService {
             newChildContract.setCode(SCMEntityCodeHPGeneration.getCode(childContractRepository, newChildContract));
             childContractRepository.saveAndFlush(newChildContract);
             contractRepository.saveAndFlush(masterContract);
-            employeeRepository.saveAndFlush(approver);
 
             logger.info("Successfully created new child contract under master contract! -- "+masterContract.getCode() +" Waiting for approval!");
             return new GeneralRes("Successfully created new child contract!", false);
