@@ -8,6 +8,8 @@ import capstone.is4103capstone.finance.budget.service.PlansComparisonService;
 import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateAssessmentFromReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service.AssessmentFormService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,54 +27,57 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssessmentFormController {
     private static final Logger logger = LoggerFactory.getLogger(BudgetController.class);
 
-//    @Autowired
-//    private
-//
-//
-//    @PostMapping("/create")
-//    public ResponseEntity<GeneralRes> createBudget(@RequestBody CreateBudgetReq createBudgetReq) {
-//        if(Authentication.authenticateUser(createBudgetReq.getUsername()))
-//            return ResponseEntity
-//                    .ok()
-//                    .body(budgetService.createBudget(createBudgetReq, null));
-//        else
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-//    }
-//
-//    @PostMapping("/update/{id}")
-//    public ResponseEntity<GeneralRes> updateBudget(@RequestBody CreateBudgetReq createBudgetReq, @PathVariable("id") String id) {
-//        if(Authentication.authenticateUser(createBudgetReq.getUsername()))
-//            return ResponseEntity
-//                    .ok()
-//                    .body(budgetService.createBudget(createBudgetReq, id));
-//        else
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-//    }
-//
-//    @GetMapping("/getDetails/{id}")
-//    public ResponseEntity<GeneralRes> getBudget(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username){
-//        if(Authentication.authenticateUser(username))
-//            return ResponseEntity.ok().body(budgetService.getBudget(id,username));
-//        else
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-//    }
-//
-//    @PostMapping("/approve")
-//    public ResponseEntity approveBudget(@RequestBody ApproveBudgetReq approveBudgetReq){
-//        if(Authentication.authenticateUser(approveBudgetReq.getUsername()))
-//            return ResponseEntity
-//                    .ok()
-//                    .body(budgetService.approveBudget(approveBudgetReq));
-//        else
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-//    }
+    @Autowired
+    private AssessmentFormService assessmentFormService;
 
+
+    @PostMapping("/create/{isTemplate}")
+    public ResponseEntity<GeneralRes> createAssessmentForm(@PathVariable("isTemplate") boolean isTemplate,@RequestBody CreateAssessmentFromReq createAssessmentFromReq) {
+        if(Authentication.authenticateUser(createAssessmentFromReq.getUsername()))
+            return assessmentFormService.createForm(isTemplate, createAssessmentFromReq, null);
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @PostMapping("/update/{id}/{isTemplate}")
+    public ResponseEntity<GeneralRes> updateForm(@PathVariable("isTemplate") boolean isTemplate, @RequestBody CreateAssessmentFromReq createAssessmentFromReq,  @PathVariable("id") String id) {
+        if(Authentication.authenticateUser(createAssessmentFromReq.getUsername()))
+            return assessmentFormService.createForm(isTemplate, createAssessmentFromReq, id);
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @GetMapping("/getDetails/{id}")
+    public ResponseEntity<GeneralRes> getForm(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username){
+        if(Authentication.authenticateUser(username))
+            return assessmentFormService.getForm(id);
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @GetMapping("/getTemplate")
+    public ResponseEntity<GeneralRes> getTemplateForm(@RequestParam(name="username", required=true) String username){
+        if(Authentication.authenticateUser(username))
+            return assessmentFormService.getTemplateForm();
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @PostMapping("/approve/{level}/{id}")
+    public ResponseEntity<GeneralRes> approveFirstLevel(@PathVariable("id") String id, @PathVariable("level") int level, @RequestParam(name="username", required=true) String username, @RequestParam(name="approved", required=true) Boolean approved){
+        if(Authentication.authenticateUser(username))
+            return assessmentFormService.approve(id, approved, username, level);
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
 }
