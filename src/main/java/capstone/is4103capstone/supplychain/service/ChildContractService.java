@@ -47,11 +47,10 @@ public class ChildContractService {
             newChildContract.setLastModifiedBy(createChildContractReq.getModifierUsername());
             newChildContract.setContractValue(createChildContractReq.getContractValue());
             newChildContract.setServiceCode(createChildContractReq.getServiceCode());
-            newChildContract.setDeleted(false);
 
             Employee approver = employeeRepository.getOne(createChildContractReq.getApproverId());
-            newChildContract.setApprover(approver);
-            approver.getChildContractsApproved().add(newChildContract);
+//            newChildContract.setApprover(approver);
+//            approver.getChildContractsApproved().add(newChildContract);
 
             Contract masterContract = contractRepository.getOne(createChildContractReq.getMasterContractID());
             newChildContract.setMasterContract(masterContract);
@@ -154,9 +153,9 @@ public class ChildContractService {
         GeneralEntityModel masterContract = null;
         GeneralEntityModel approver = null;
 
-        if(childContract.getApprover() != null){
-            approver = new GeneralEntityModel(childContract.getApprover());
-        }
+//        if(childContract.getApprover() != null){
+//            approver = new GeneralEntityModel(childContract.getApprover());
+//        }
 
         if(childContract.getMasterContract() != null) {
             masterContract = new GeneralEntityModel(childContract.getMasterContract());

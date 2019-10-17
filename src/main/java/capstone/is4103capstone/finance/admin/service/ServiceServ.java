@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -109,6 +110,17 @@ public class ServiceServ {
         }
     }
 
+    public ServiceListRes retrieveAllService() throws Exception{
+        List<Service> lists = serviceRepository.findAll();
+        List<ServiceModel> models = new ArrayList<>();
+        for (Service s:lists){
+            if (!s.getDeleted()){
+                models.add(new ServiceModel(s));
+            }
+        }
+        return new ServiceListRes("retrieved all service",false, models,models.size());
+    }
+
     //sub2 can be either code or id will take as code by default and double check id;
     public ServiceListRes viewserviceItemsBySub2(String sub2Id){
         try{
@@ -188,6 +200,21 @@ public class ServiceServ {
         if (result){
             throw new Exception("This item already exists for the vendor and sub2 category");
         }
+    }
+
+    public Service validateService(String idOrCode) throws EntityNotFoundException {
+        Optional<Service> service = serviceRepository.findById(idOrCode);
+        if (service.isPresent())
+            if (!service.get().getDeleted())
+                return service.get();
+            else
+                throw new EntityNotFoundException("Product or service already deleted.");
+
+        Service e = serviceRepository.findServiceByCode(idOrCode);
+        if (e != null && !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("Product or service code or id not valid");
     }
 
     private void logProblem(String message){

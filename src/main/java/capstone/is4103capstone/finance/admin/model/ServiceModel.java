@@ -1,5 +1,7 @@
 package capstone.is4103capstone.finance.admin.model;
 
+import capstone.is4103capstone.entities.finance.Service;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -45,6 +47,15 @@ public class ServiceModel implements Serializable {
 //    String comment;
 
     public ServiceModel() {
+
+    }
+    public ServiceModel(Service s){
+        setServiceName(s.getObjectName());
+        setServiceCode(s.getCode());
+        setReferencePrice(s.getReferencePrice());
+        setCurrency(s.getCurrencyCode());
+        setMeasureUnit(s.getMeasureUnit());
+
     }
 
     public ServiceModel(String serviceName, String serviceCode) {
@@ -82,22 +93,6 @@ public class ServiceModel implements Serializable {
 
     public void setHasActiveContract(boolean hasActiveContract) {
         this.hasActiveContract = hasActiveContract;
-    }
-
-    public String getserviceName() {
-        return serviceName;
-    }
-
-    public void setserviceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public String getserviceCode() {
-        return serviceCode;
-    }
-
-    public void setserviceCode(String serviceCode) {
-        this.serviceCode = serviceCode;
     }
 
 //    public String getVendorCode() {
