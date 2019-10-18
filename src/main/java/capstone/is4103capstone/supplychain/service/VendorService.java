@@ -3,16 +3,14 @@ package capstone.is4103capstone.supplychain.service;
 import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.BusinessUnit;
-import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.model.VendorModel;
-import capstone.is4103capstone.supplychain.model.req.AddBusinessUnitReq;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
 import capstone.is4103capstone.supplychain.model.res.GetVendorsRes;
 import capstone.is4103capstone.supplychain.model.res.GetVendorRes;
@@ -21,9 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import javax.persistence.EntityNotFoundException;
+import java.util.*;
 
 @Service
 public class VendorService {
@@ -40,6 +37,9 @@ public class VendorService {
     @Autowired
     private BusinessUnitRepository businessUnitRepository;
 
+    public VendorService() {
+    }
+
     public GeneralRes createNewVendor(CreateVendorReq createVendorReq){
         try{
             Vendor newVendor = new Vendor();
@@ -53,18 +53,10 @@ public class VendorService {
             newVendor.setRelationshipManagerEmail(createVendorReq.getRelationshipManagerEmail());
             newVendor.setCreatedBy(createVendorReq.getUsername());
             newVendor.setLastModifiedBy(createVendorReq.getUsername());
-            Authentication.configurePermissionMap(newVendor);
+            newVendor.setBusinessUnits(createVendorReq.getBusinessUnitIds());
+            AuthenticationTools.configurePermissionMap(newVendor);
 
             newVendor = vendorRepository.saveAndFlush(newVendor);
-            if(createVendorReq.getBusinessUnits() != null && createVendorReq.getBusinessUnits().size() != 0) {
-                for (BusinessUnit businessUnit : createVendorReq.getBusinessUnits()) {
-                    newVendor.getBusinessUnits().add(businessUnit);
-                    newVendor = vendorRepository.saveAndFlush(newVendor);
-                    businessUnit.getVendors().add(newVendor);
-                    businessUnitRepository.saveAndFlush(businessUnit);
-                }
-            }
-
             if (newVendor.getSeqNo() == null) {
                 newVendor.setSeqNo(new Long(vendorRepository.findAll().size()));
             }
@@ -153,6 +145,11 @@ public class VendorService {
                 vendor.setServiceDescription(updateVendorReq.getServiceDescription());
             }
 
+            //update businessUnits
+            if(updateVendorReq.getBusinessUnitIds() != null) {
+                vendor.setBusinessUnits(updateVendorReq.getBusinessUnitIds());
+            }
+
             vendor.setLastModifiedBy(updateVendorReq.getUsername());
             vendorRepository.saveAndFlush(vendor);
             return new GeneralRes("Successfully updated the vendor!", false);
@@ -162,35 +159,15 @@ public class VendorService {
         }
     }
 
-    public GeneralRes addBusinessUnit(AddBusinessUnitReq addBusinessUnitReq, String vendorId){
-        try{
-            Vendor vendor = vendorRepository.getOne(vendorId);
-            BusinessUnit businessUnit = businessUnitRepository.getOne(addBusinessUnitReq.getBusinessUnitId());
-
-            if(vendor.getDeleted() || businessUnit.getDeleted()){
-                return new GetVendorRes("This vendor or business unit is deleted.", true, null);
-            }
-
-            vendor.getBusinessUnits().add(businessUnit);
-            vendor.setLastModifiedBy(addBusinessUnitReq.getUsername());
-
-            vendor = vendorRepository.saveAndFlush(vendor);
-            businessUnit.getVendors().add(vendor);
-            businessUnit.setLastModifiedBy(addBusinessUnitReq.getUsername());
-            businessUnitRepository.saveAndFlush(businessUnit);
-
-            return new GeneralRes("Successfully add the business unit to vendor!", false);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
-        }
-    }
-
     private VendorModel transformToGeneralEntityModel(Vendor vendor){
         List<GeneralEntityModel> businessUnits = new ArrayList<>();
-        for(BusinessUnit b: vendor.getBusinessUnits()){
-            GeneralEntityModel businessUnit = new GeneralEntityModel(b);
-            businessUnits.add(businessUnit);
+
+        if(vendor.getBusinessUnits() != null) {
+            for (String id : vendor.getBusinessUnits()) {
+                BusinessUnit b = businessUnitRepository.getOne(id);
+                GeneralEntityModel businessUnit = new GeneralEntityModel(b);
+                businessUnits.add(businessUnit);
+            }
         }
 
         VendorModel vendorModel = new VendorModel(
@@ -202,8 +179,19 @@ public class VendorService {
         return vendorModel;
     }
 
-//    public GeneralRes removeBusinessUnit(){
-//
-//    }
 
+    public Vendor validateVendor(String idOrUsername) throws EntityNotFoundException {
+        Optional<Vendor> vendorOps = vendorRepository.findById(idOrUsername);
+        if (vendorOps.isPresent()){
+            if (vendorOps.get().getDeleted())
+                throw new EntityNotFoundException("vendor already removed");
+            return vendorOps.get();
+        }
+
+        Vendor e = vendorRepository.findVendorByCode(idOrUsername);
+        if (e != null || !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("username or id not valid");
+    }
 }

@@ -15,6 +15,7 @@ public class BusinessUnitDto implements Serializable {
     private Optional<String> id = Optional.empty();
     private Optional<String> objectName = Optional.empty();
     private Optional<String> code = Optional.empty();
+    private Optional<String> companyFunctionUuid = Optional.empty();
 
     public Optional<String> getId() {
         return id;

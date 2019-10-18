@@ -28,6 +28,11 @@ public class Project extends RequestFormTemplate {
     @JoinColumn(name = "project_owner_id")
     private Employee projectOwner;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supervisor_id")
+    private Employee projectSupervisor;
+
+
     @Convert(converter = StringListConverter.class)
     private List<String> members = new ArrayList<>();
 
@@ -38,13 +43,23 @@ public class Project extends RequestFormTemplate {
     public Project() {
     }
 
-    public Project(String objectName, Employee requester, CostCenter costCenter, String requestDescription, String additionalInfo, BigDecimal estimatedBudget, String currency, Date startDate, Date endDate, Employee projectOwner, List<String> members, String projectTitle) {
+    public Project(String objectName, Employee requester, CostCenter costCenter, String requestDescription, String additionalInfo, BigDecimal estimatedBudget, String currency, Date startDate, Date endDate, Employee projectOwner, Employee projectSupervisor, List<String> members, String projectTitle, ProjectStatus projectLifeCycleStatus) {
         super(objectName, requester, costCenter, requestDescription, additionalInfo, estimatedBudget, currency);
         this.startDate = startDate;
         this.endDate = endDate;
         this.projectOwner = projectOwner;
+        this.projectSupervisor = projectSupervisor;
         this.members = members;
         this.projectTitle = projectTitle;
+        this.projectLifeCycleStatus = projectLifeCycleStatus;
+    }
+
+    public Employee getProjectSupervisor() {
+        return projectSupervisor;
+    }
+
+    public void setProjectSupervisor(Employee projectSupervisor) {
+        this.projectSupervisor = projectSupervisor;
     }
 
     public ProjectStatus getProjectLifeCycleStatus() {

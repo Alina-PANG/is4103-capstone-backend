@@ -1,6 +1,7 @@
 package capstone.is4103capstone.supplychain.model;
 
 import capstone.is4103capstone.general.model.GeneralEntityModel;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
@@ -23,7 +24,8 @@ public class ContractModel implements Serializable {
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
     private GeneralEntityModel vendor;
-    private GeneralEntityModel employeeInChargeContract;
+    private EmployeeModel employeeInChargeContract;
+    private EmployeeModel approver;
     private GeneralEntityModel team;
     private BigDecimal totalContractValue;
     private String currencyCode;
@@ -40,7 +42,7 @@ public class ContractModel implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
-    public ContractModel(String contractDescription, String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, GeneralEntityModel employeeInChargeContract, GeneralEntityModel team, BigDecimal totalContractValue, String currencyCode, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
+    public ContractModel(String contractDescription, String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, EmployeeModel employeeInChargeContract, EmployeeModel approver, GeneralEntityModel team, BigDecimal totalContractValue, String currencyCode, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
         this.contractDescription = contractDescription;
         this.name = name;
         this.code = code;
@@ -54,6 +56,7 @@ public class ContractModel implements Serializable {
         this.noticeDaysToExit = noticeDaysToExit;
         this.vendor = vendor;
         this.employeeInChargeContract = employeeInChargeContract;
+        this.approver = approver;
         this.team = team;
         this.totalContractValue = totalContractValue;
         this.currencyCode = currencyCode;
@@ -64,6 +67,10 @@ public class ContractModel implements Serializable {
     }
 
     public ContractModel() {
+    }
+
+    public void setEmployeeInChargeContract(EmployeeModel employeeInChargeContract) {
+        this.employeeInChargeContract = employeeInChargeContract;
     }
 
     public String getContractDescription() {
@@ -186,12 +193,8 @@ public class ContractModel implements Serializable {
         this.vendor = vendor;
     }
 
-    public GeneralEntityModel getEmployeeInChargeContract() {
+    public EmployeeModel getEmployeeInChargeContract() {
         return employeeInChargeContract;
-    }
-
-    public void setEmployeeInChargeContract(GeneralEntityModel employeeInChargeContract) {
-        this.employeeInChargeContract = employeeInChargeContract;
     }
 
     public Date getStartDate() {

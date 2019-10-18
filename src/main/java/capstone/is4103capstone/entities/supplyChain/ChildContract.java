@@ -2,18 +2,12 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.Team;
-import capstone.is4103capstone.util.enums.ContractStatusEnum;
-import capstone.is4103capstone.util.enums.ContractTypeEnum;
-import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table
@@ -22,7 +16,6 @@ public class ChildContract extends DBEntityTemplate {
 
     @NotNull
     private String serviceCode;
-
     private BigDecimal contractValue;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,16 +26,10 @@ public class ChildContract extends DBEntityTemplate {
     public ChildContract() {
     }
 
-    public ChildContract(String objectName, String code, @NotNull String serviceCode, BigDecimal contractValue, Contract masterContract) {
-        super(objectName, code);
+    public ChildContract(@NotNull String serviceCode, BigDecimal contractValue, Contract masterContract) {
         this.serviceCode = serviceCode;
         this.contractValue = contractValue;
         this.masterContract = masterContract;
-    }
-
-    public ChildContract(@NotNull String serviceCode, BigDecimal contractValue) {
-        this.serviceCode = serviceCode;
-        this.contractValue = contractValue;
     }
 
     public String getServiceCode() {

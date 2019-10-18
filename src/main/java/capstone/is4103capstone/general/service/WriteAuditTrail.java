@@ -25,13 +25,15 @@ public class WriteAuditTrail {
         }
     }
 
-    public static void autoAuditUsingSpringSecurity() {
+    public static void autoAuditUsingSpringSecurity() throws Exception{
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Employee user = (Employee) auth.getPrincipal();
-            audit.createNewRecordUsingUsername(AUTO_DETECT_FLAG, user.getUserName());
+//            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//            Employee user = (Employee) auth.getPrincipal();
+//            audit.createNewRecordUsingUsername(AUTO_DETECT_FLAG, user.getUserName());
         } catch (Exception ex) {
             logger.error("Audit function error, username given from the internal controller is not correct. ");
+
+            throw ex;
         }
     }
 

@@ -50,7 +50,6 @@ public class MailSenderService {
                     MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name());
             messageHelper.setFrom(mail.getFrom());
-            System.out.println(mail.getTo());
             messageHelper.setTo(mail.getTo());
             messageHelper.setText(html, true);
             messageHelper.setSubject(mail.getSubject());

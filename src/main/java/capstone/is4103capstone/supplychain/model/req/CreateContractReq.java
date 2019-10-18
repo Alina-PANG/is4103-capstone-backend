@@ -39,6 +39,7 @@ public class CreateContractReq implements Serializable {
     private BigDecimal totalContractValue;
     private String currencyCode;
     private String teamId;
+    private String approverId;
 
     public CreateContractReq() {
     }
@@ -65,6 +66,14 @@ public class CreateContractReq implements Serializable {
 
     public void setCurrencyCode(String currencyCode) {
         this.currencyCode = currencyCode;
+    }
+
+    public String getApproverId() {
+        return approverId;
+    }
+
+    public void setApproverId(String approverId) {
+        this.approverId = approverId;
     }
 
     public String getTeamId() {

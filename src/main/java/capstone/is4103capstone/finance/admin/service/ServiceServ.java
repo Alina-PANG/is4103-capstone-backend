@@ -3,7 +3,6 @@ package capstone.is4103capstone.finance.admin.service;
 import capstone.is4103capstone.entities.finance.BudgetSub2;
 import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
@@ -11,7 +10,7 @@ import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.model.ServiceModel;
 import capstone.is4103capstone.finance.admin.model.req.CreateServiceRequest;
 import capstone.is4103capstone.finance.admin.model.res.ServiceListRes;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,7 +47,7 @@ public class ServiceServ {
 
     //assume you can give either vendor code or id?
     @Transactional
-    public JSONObject createservice(CreateServiceRequest req){
+    public JSONObject createService(CreateServiceRequest req){
         try{
             Vendor vendor = vendorRepository.findVendorByCode(req.getVendorCode());
             if (vendor == null || vendor.getDeleted()){
@@ -79,7 +79,7 @@ public class ServiceServ {
             Service newItem = new Service(req.getItemName().trim(),req.getMeasureUnit(),req.getReferencePrice(),req.getCurrency());
             newItem.setCreatedBy(req.getUsername());
             newItem.setHierachyPath(EntityCodeHPGeneration.setHP(sub2,newItem));
-            Authentication.configurePermissionMap(newItem);
+            AuthenticationTools.configurePermissionMap(newItem);
             newItem = serviceRepository.save(newItem);
 
             newItem.setCode(EntityCodeHPGeneration.getCode(serviceRepository,newItem));
@@ -107,6 +107,17 @@ public class ServiceServ {
             res.put("message",e.getMessage());
             return res;
         }
+    }
+
+    public ServiceListRes retrieveAllService() throws Exception{
+        List<Service> lists = serviceRepository.findAll();
+        List<ServiceModel> models = new ArrayList<>();
+        for (Service s:lists){
+            if (!s.getDeleted()){
+                models.add(new ServiceModel(s));
+            }
+        }
+        return new ServiceListRes("retrieved all service",false, models,models.size());
     }
 
     //sub2 can be either code or id will take as code by default and double check id;
@@ -188,6 +199,21 @@ public class ServiceServ {
         if (result){
             throw new Exception("This item already exists for the vendor and sub2 category");
         }
+    }
+
+    public Service validateService(String idOrCode) throws EntityNotFoundException {
+        Optional<Service> service = serviceRepository.findById(idOrCode);
+        if (service.isPresent())
+            if (!service.get().getDeleted())
+                return service.get();
+            else
+                throw new EntityNotFoundException("Product or service already deleted.");
+
+        Service e = serviceRepository.findServiceByCode(idOrCode);
+        if (e != null && !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("Product or service code or id not valid");
     }
 
     private void logProblem(String message){

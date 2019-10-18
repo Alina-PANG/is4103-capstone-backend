@@ -4,7 +4,7 @@ import capstone.is4103capstone.admin.service.PermissionControllerService;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.util.enums.OperationTypeEnum;
 
-public class Authentication {
+public class AuthenticationTools {
     public static boolean authenticateUser(String username){
         return true;
     }

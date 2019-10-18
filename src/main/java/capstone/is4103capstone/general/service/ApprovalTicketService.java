@@ -7,7 +7,12 @@ import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.finance.Repository.ApprovalForRequestRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
+import capstone.is4103capstone.finance.requestsMgmt.service.ProjectService;
+import capstone.is4103capstone.finance.requestsMgmt.service.TrainingService;
+import capstone.is4103capstone.finance.requestsMgmt.service.TravelService;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
+import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
@@ -16,8 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.swing.text.html.Option;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,11 +43,19 @@ public class ApprovalTicketService {
     ApprovalForRequestRepository _approvalForRequestRepository;
     @Autowired
     private MailSenderService _mailSenderService;
+    @Autowired
+    BJFService bjfService;
+    @Autowired
+    TravelService travelService;
+    @Autowired
+    TrainingService trainingService;
+    @Autowired
+    ProjectService projectService;
 
     @Value("${spring.mail.username}")
     private static String senderEmailAddr;
 
-    static  EmployeeRepository employeeRepo;
+    static EmployeeRepository employeeRepo;
     static ApprovalForRequestRepository approvalForRequestRepo;
     static MailSenderService mailSenderService;
 
@@ -100,12 +116,15 @@ public class ApprovalTicketService {
             logger.error(e.getMessage());
             return false;
         }
-
-
     }
 
     public static boolean createTicketAndSendEmail(Employee requester, Employee receiver, DBEntityTemplate requestedItem, String content,ApprovalTypeEnum approvalType){
         try {
+            if(requester == null || receiver == null){
+                logger.error("Requester or approver is null! Cannot create request for approval!");
+                throw new Exception("Requester or approver is null! Cannot create request for approval!");
+            }
+
             ApprovalForRequest ticket = new ApprovalForRequest();
             ticket.setCreatedBy(requester.getUserName());
             ticket.setRequestedItemId(requestedItem.getId());
@@ -123,10 +142,12 @@ public class ApprovalTicketService {
             receiver.getMyApprovals().add(ticket.getId());
             sendEmail(ticket);
         }catch (Exception e){
+            e.printStackTrace();
             return false;
         }
         return true;
     }
+
     public static boolean approveTicket(String ticketId, String comment){
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findById(ticketId);
         if (!ticketOp.isPresent()) return false;
@@ -200,11 +221,67 @@ public class ApprovalTicketService {
     }
 
 
-    private static void approveRequest(){
+    public GeneralRes approveTicketAPI(String requestedItemId, String approverComment, boolean isApproved) throws Exception{
+        List<ApprovalForRequest> relatedTickets = _approvalForRequestRepository.findTicketsByRequestedItemId(requestedItemId);
 
+        if (relatedTickets.isEmpty())
+            throw new EntityNotFoundException("No approval tickets associated with the requested item.");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currentEmployee = (Employee) auth.getPrincipal();
+        List<ApprovalForRequest> availableTickets = new ArrayList<>();
+        for (ApprovalForRequest ticket: relatedTickets)
+            if (ticket.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
+                availableTickets.add(ticket);
+
+        if (availableTickets.size() > 1)
+            throw new Exception("[Internal Error] Multiple open tickets associated with the item");
+        else if (availableTickets.isEmpty())
+            throw new Exception("No open tickets associated with the item");
+
+        ApprovalForRequest ticket = availableTickets.get(0);
+
+        if (!currentEmployee.getId().equals(ticket.getRequester().getId()))
+            throw new Exception("You don't have the right to approve the tickets;");
+
+
+        ticket.setApprovalStatus(isApproved? ApprovalStatusEnum.APPROVED:ApprovalStatusEnum.REJECTED);
+        ticket.setCommentByApprover(approverComment);
+        _approvalForRequestRepository.save(ticket);
+        try{
+            mapApprovalType(ticket);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw new Exception("Internal Error happened: cannot approve or reject ticket."+ex.getMessage());
+        }
+
+
+        return new GeneralRes("Successfully "+ticket.getApprovalStatus()+" "+ticket.getApprovalType()+" request.",false);
     }
 
-
+    private void mapApprovalType(ApprovalForRequest ticket) throws Exception{
+        switch (ticket.getApprovalType()){
+            case CONTRACT:
+                System.out.println("Already implemented in other ways");
+                break;
+            case BUDGETPLAN:
+                System.out.println("Already implemented in other ways");
+                break;
+            case TRAVEL:
+                travelService.travelPlanApproval(ticket);
+                break;
+            case TRAINING:
+                trainingService.trainingPlanApproval(ticket);
+                break;
+            case PROJECT:
+                projectService.projectApproval(ticket);
+                break;
+            case BJF:
+                bjfService.bjfApproval(ticket);
+                break;
+            default:
+                throw new Exception("Approval type not registered");
+        }
+    }
 
     public static void sendEmail(ApprovalForRequest ticket){
         String subject = "Request for Approval: "+ ticket.getCode();
