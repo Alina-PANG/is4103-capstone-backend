@@ -4,7 +4,7 @@ import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
@@ -54,7 +54,7 @@ public class VendorService {
             newVendor.setCreatedBy(createVendorReq.getUsername());
             newVendor.setLastModifiedBy(createVendorReq.getUsername());
             newVendor.setBusinessUnits(createVendorReq.getBusinessUnitIds());
-            Authentication.configurePermissionMap(newVendor);
+            AuthenticationTools.configurePermissionMap(newVendor);
 
             newVendor = vendorRepository.saveAndFlush(newVendor);
             if (newVendor.getSeqNo() == null) {

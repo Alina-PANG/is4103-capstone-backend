@@ -1,7 +1,6 @@
 package capstone.is4103capstone.finance.admin.service;
 
 import capstone.is4103capstone.admin.repository.CountryRepository;
-import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.finance.BudgetCategory;
 import capstone.is4103capstone.entities.finance.BudgetSub1;
 import capstone.is4103capstone.entities.finance.BudgetSub2;
@@ -9,21 +8,17 @@ import capstone.is4103capstone.finance.Repository.BudgetCategoryRepository;
 import capstone.is4103capstone.finance.Repository.BudgetSub1Repository;
 import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
-import capstone.is4103capstone.finance.admin.model.CategoryModel;
 import capstone.is4103capstone.finance.admin.model.Sub1Model;
 import capstone.is4103capstone.finance.admin.model.Sub2Model;
 import capstone.is4103capstone.finance.admin.model.req.CreateSub1Sub2Request;
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
-import capstone.is4103capstone.general.Authentication;
-import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
-import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
+import capstone.is4103capstone.general.AuthenticationTools;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +56,7 @@ public class Sub1Service {
             sub1.setCreatedBy(request.getUsername());
             sub1.setLastModifiedBy(request.getUsername());
             EntityCodeHPGeneration.setHP(cat,sub1);
-            Authentication.configurePermissionMap(sub1);
+            AuthenticationTools.configurePermissionMap(sub1);
 
             sub1.setBudgetCategory(cat);
             sub1 = sub1Repository.save(sub1);

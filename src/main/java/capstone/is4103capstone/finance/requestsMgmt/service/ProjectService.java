@@ -2,6 +2,8 @@ package capstone.is4103capstone.finance.requestsMgmt.service;
 
 import capstone.is4103capstone.admin.repository.CostCenterRepository;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.Project;
@@ -28,9 +30,9 @@ public class ProjectService {
     @Autowired
     ProjectRepository projectRepository;
     @Autowired
-    EmployeeRepository employeeRepository;
-    @Autowired
     CostCenterRepository costCenterRepository;
+    @Autowired
+    EmployeeService employeeService;
 
     public ProjectModel createProject(CreateProjectReq req) throws Exception{
 
@@ -46,15 +48,15 @@ public class ProjectService {
             throw new Exception("Date format incorrect.");
         }
 
-        Employee projectOwner = validateUser(req.getProjectOwner());
-        Employee projectRequester = validateUser(req.getRequester());
-        Employee projectSupervisory = validateUser(req.getProjectSupervisor());
+        Employee projectOwner = employeeService.validateUser(req.getProjectOwner());
+        Employee projectRequester = employeeService.validateUser(req.getRequester());
+        Employee projectSupervisory = employeeService.validateUser(req.getProjectSupervisor());
 
         p.setProjectOwner(projectOwner);
         p.setRequester(projectRequester);
         p.setProjectSupervisor(projectSupervisory);
         for (String member:req.getTeamMembers())
-            validateUser(member);
+            employeeService.validateUser(member);
 
         p.setMembers(req.getTeamMembers());
         p.setCreatedBy(req.getRequester());
@@ -80,7 +82,7 @@ public class ProjectService {
 
         List<Employee> members = new ArrayList<>();
         for (String memId: p.getMembers()){
-            Employee e = employeeRepository.findEmployeeById(memId);
+            Employee e = employeeService.validateUser(memId);
             if (e == null)
                 throw new Exception("Team member not found in database.");
             members.add(e);
@@ -127,7 +129,7 @@ public class ProjectService {
     }
 
     public List<ProjectModel> retrieveProjectsByOwner(String ownerId) throws Exception{
-        Employee owner = validateUser(ownerId);
+        Employee owner = employeeService.validateUser(ownerId);
         List<Project> projects = projectRepository.getProjectsByProjectOwnerId(owner.getId());
         if (projects.isEmpty())
             throw new Exception("No projects owned by the user.");
@@ -138,16 +140,6 @@ public class ProjectService {
         return projectModels;
     }
 
-    private Employee validateUser(String idOrUsername) throws Exception{
-        Optional<Employee> employee = employeeRepository.findUndeletedEmployeeById(idOrUsername);
-        if (employee.isPresent())
-            return employee.get();
-        Employee e = employeeRepository.findEmployeeByUserName(idOrUsername);
-        if (e != null)
-            return e;
-
-        throw new Exception("username or id not valid");
-    }
 
 
     public Project validateProject(String idOrCode) throws EntityNotFoundException {
@@ -168,5 +160,9 @@ public class ProjectService {
                 throw new EntityNotFoundException("Project already deleted.");
 
         throw new EntityNotFoundException("Project code or id not valid");
+    }
+
+    public void projectApproval(ApprovalForRequest ticket){
+
     }
 }

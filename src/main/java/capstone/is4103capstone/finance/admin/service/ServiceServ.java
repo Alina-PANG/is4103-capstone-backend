@@ -3,7 +3,6 @@ package capstone.is4103capstone.finance.admin.service;
 import capstone.is4103capstone.entities.finance.BudgetSub2;
 import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BudgetSub2Repository;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
@@ -11,7 +10,7 @@ import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.model.ServiceModel;
 import capstone.is4103capstone.finance.admin.model.req.CreateServiceRequest;
 import capstone.is4103capstone.finance.admin.model.res.ServiceListRes;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
@@ -80,7 +79,7 @@ public class ServiceServ {
             Service newItem = new Service(req.getItemName().trim(),req.getMeasureUnit(),req.getReferencePrice(),req.getCurrency());
             newItem.setCreatedBy(req.getUsername());
             newItem.setHierachyPath(EntityCodeHPGeneration.setHP(sub2,newItem));
-            Authentication.configurePermissionMap(newItem);
+            AuthenticationTools.configurePermissionMap(newItem);
             newItem = serviceRepository.save(newItem);
 
             newItem.setCode(EntityCodeHPGeneration.getCode(serviceRepository,newItem));

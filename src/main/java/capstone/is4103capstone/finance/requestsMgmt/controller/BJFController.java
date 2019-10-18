@@ -68,4 +68,15 @@ public class BJFController {
             return ResponseEntity.badRequest().body(new TTListResponse(ex.getMessage(),true));
         }
     }
+
+    @GetMapping("/view-no-po-by-vendor/{vendorId}")
+    public ResponseEntity<TTListResponse> getBjfWithoutPOForVendor(@PathVariable(name = "vendorId") String vendorId){
+        try{
+            return ResponseEntity.ok().body(
+                    new TTListResponse("Successfully retrieved", bjfService.getBjfByVendorWithoutPurchaseOrder(vendorId)));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new TTListResponse(ex.getMessage(),true));
+        }
+    }
 }

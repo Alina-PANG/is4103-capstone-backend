@@ -16,7 +16,7 @@ import capstone.is4103capstone.finance.admin.model.Sub1Model;
 import capstone.is4103capstone.finance.admin.model.req.CreateBudgetCategoryRequest;
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class CategoryService {
             newCat.setCreatedBy(categoryRequest.getUsername());
             EntityCodeHPGeneration.setHP(country,newCat);
 
-            Authentication.configurePermissionMap(newCat);
+            AuthenticationTools.configurePermissionMap(newCat);
             newCat.setCountry(country);
             newCat = budgetCategoryRepository.save(newCat);
             newCat.setCode(EntityCodeHPGeneration.getCode(budgetCategoryRepository,newCat));

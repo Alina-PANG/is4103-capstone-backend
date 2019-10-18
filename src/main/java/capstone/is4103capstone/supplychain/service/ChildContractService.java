@@ -1,13 +1,12 @@
 package capstone.is4103capstone.supplychain.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
-import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
@@ -65,7 +64,7 @@ public class ChildContractService {
                 newChildContract.setSeqNo(new Long(childContractRepository.findAll().size()));
             }
 
-            Authentication.configurePermissionMap(newChildContract);
+            AuthenticationTools.configurePermissionMap(newChildContract);
 
             newChildContract = childContractRepository.saveAndFlush(newChildContract);
             newChildContract.setCode(SCMEntityCodeHPGeneration.getCode(childContractRepository, newChildContract));

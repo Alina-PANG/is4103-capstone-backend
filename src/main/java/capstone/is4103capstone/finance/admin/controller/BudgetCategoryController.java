@@ -5,7 +5,7 @@ import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
 import capstone.is4103capstone.finance.admin.service.CategoryService;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class BudgetCategoryController {
 
     @PostMapping("/create")
     public ResponseEntity<BudgetCategoryRes> createCategory(@RequestBody CreateBudgetCategoryRequest categoryRequest) {
-        if(Authentication.authenticateUser(categoryRequest.getUsername()))
+        if(AuthenticationTools.authenticateUser(categoryRequest.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(categoryService.createCategory(categoryRequest));
@@ -38,7 +38,7 @@ public class BudgetCategoryController {
 
     @PostMapping("/update")
     public ResponseEntity<BudgetCategoryRes> updateCategory(@RequestBody UpdateCategoryReq updateCategoryReq) {
-        if(Authentication.authenticateUser(updateCategoryReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(updateCategoryReq.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(categoryService.updateBudgetName(updateCategoryReq));
@@ -50,7 +50,7 @@ public class BudgetCategoryController {
 
     @GetMapping("/view-all-levels")
     public @ResponseBody ResponseEntity<Object> viewAllLevelsByCountry(@RequestParam(name = "country",required = true) String countryCode,@RequestParam(name="username", required=true) String username){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return new ResponseEntity<Object>(categoryService.viewAllLevelsByCountry(countryCode).toString(), HttpStatus.OK);
 
         else
@@ -60,7 +60,7 @@ public class BudgetCategoryController {
 
     @GetMapping("/view-by-country")
     public @ResponseBody ResponseEntity<Object> viewCategoriesByCountry(@RequestParam(name="username", required=true) String username, @RequestParam(name="countryCode", required=true) String countryCode){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return new ResponseEntity<Object>(categoryService.viewCategoriesUnderCountry(countryCode).toString(), HttpStatus.OK);
 
         else
@@ -68,7 +68,7 @@ public class BudgetCategoryController {
     }
     @GetMapping("/delete")
     public @ResponseBody ResponseEntity<Object> deleteCategory(@RequestParam(name="username", required=true) String username, @RequestParam(name="categoryCode", required=true) String categoryCode){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return new ResponseEntity<Object>(categoryService.removeBudgetCategory(categoryCode,username).toString(), HttpStatus.OK);
 
         else
