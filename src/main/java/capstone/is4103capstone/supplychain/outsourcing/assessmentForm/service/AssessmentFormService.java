@@ -10,11 +10,14 @@ import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentSection
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderRes;
 import capstone.is4103capstone.finance.finPurchaseOrder.service.PurchaseOrderService;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.general.model.Mail;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentLineRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentSectionRepository;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.configuration.ThreadPoolTaskSchedulerConfig;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateAssessmentFromReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateSchedulerReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.res.GetAssessmentFormRes;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
@@ -22,13 +25,18 @@ import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.task.TaskSchedulerBuilder;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ScheduledFuture;
 
 @Service
 public class AssessmentFormService {
@@ -177,4 +185,27 @@ public class AssessmentFormService {
         Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
         ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,outsourcingAssessment,content, ApprovalTypeEnum.OUTSOURCING_ASSESSMENT_FORM);
     }
+
+    public ResponseEntity<GeneralRes> setTimer(CreateSchedulerReq createSchedulerReq, String id){
+        try{
+            String link = "http://localhost:3000/api/assessmentForm/getDetails/"+id;
+            OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.getOne(id);
+            if(outsourcingAssessment == null) return ResponseEntity
+                    .notFound().build();
+            else {
+                ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig = new ThreadPoolTaskSchedulerConfig();
+                AssessmentRunnableTask assessmentRunnableTask = new AssessmentRunnableTask(createSchedulerReq.getMail());
+                threadPoolTaskSchedulerConfig.threadPoolTaskScheduler().schedule(assessmentRunnableTask, createSchedulerReq.getDate());
+                return ResponseEntity.ok().body(new GetAssessmentFormRes("Successfully retrieved the assessment form!", true, outsourcingAssessment));
+            }
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+        }
+    }
+
+
 }

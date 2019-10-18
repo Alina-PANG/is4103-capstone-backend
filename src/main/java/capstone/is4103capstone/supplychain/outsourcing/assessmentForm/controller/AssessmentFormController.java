@@ -9,6 +9,7 @@ import capstone.is4103capstone.general.Authentication;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateAssessmentFromReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateSchedulerReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service.AssessmentFormService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/assessmentForm")
@@ -72,9 +75,19 @@ public class AssessmentFormController {
     }
 
     @PostMapping("/approve/{level}/{id}")
-    public ResponseEntity<GeneralRes> approveFirstLevel(@PathVariable("id") String id, @PathVariable("level") int level, @RequestParam(name="username", required=true) String username, @RequestParam(name="approved", required=true) Boolean approved){
+    public ResponseEntity<GeneralRes> approve(@PathVariable("id") String id, @PathVariable("level") int level, @RequestParam(name="username", required=true) String username, @RequestParam(name="approved", required=true) Boolean approved){
         if(Authentication.authenticateUser(username))
             return assessmentFormService.approve(id, approved, username, level);
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @PostMapping("/createTimer/{id}")
+    public ResponseEntity<GeneralRes> setTimer(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, CreateSchedulerReq createSchedulerReq){
+        if(Authentication.authenticateUser(username))
+            return assessmentFormService.setTimer(createSchedulerReq, id);
         else
             return ResponseEntity
                     .badRequest()

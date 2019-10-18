@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>hello</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+</head>
+<body>
+<h3>Annual Self Assessment To Be Completed in 3 Days</h3>
+<br/>
+<br/>
+
+<p><strong>Comment: </strong></p>
+<p th:text="${comment}"></p>
+<p><strong>Ticket Code: </strong></p>
+<a th:href="${url}" th:text="${ticket_code}" />
+<p><strong>Request Item Id:</strong></p>
+<p th:text="${request_item_id}"></p>
+<p><strong>Created Date & Time:</strong> </p>
+<p th:text="${created_datetime}"></p>
+</body>
+</html>
