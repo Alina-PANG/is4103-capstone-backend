@@ -7,5 +7,6 @@ public enum ApprovalTypeEnum {
     TRAINING,
     BUDGETPLAN,
     CONTRACT,
-    CHILD_CONTRACT
+    CHILD_CONTRACT,
+    OUTSOURCING_ASSESSMENT_FORM
 }

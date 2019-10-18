@@ -9,10 +9,18 @@ public class CreatePOReq implements Serializable {
     private List<String> relatedBJF;
     private String username;
     private Double amount;
-
+    private String vendorid;
 
 
     public CreatePOReq() {
+    }
+
+    public String getVendorid() {
+        return vendorid;
+    }
+
+    public void setVendorid(String vendorid) {
+        this.vendorid = vendorid;
     }
 
     public String getCurrencyCode() {

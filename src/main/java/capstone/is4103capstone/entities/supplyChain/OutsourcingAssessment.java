@@ -43,6 +43,8 @@ public class OutsourcingAssessment extends DBEntityTemplate {
         this.outsourcingAssessmentStatus = outsourcingAssessmentStatus;
     }
 
+
+
     public Outsourcing getOutsourcing() {
         return outsourcing;
     }

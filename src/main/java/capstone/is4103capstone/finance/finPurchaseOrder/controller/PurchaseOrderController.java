@@ -51,12 +51,11 @@ public class PurchaseOrderController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @GetMapping("/getListPO/{status}")
-    public ResponseEntity<GeneralRes> getListPO(@PathVariable("status") int status, @RequestParam(name="username", required=true) String username){
+    @GetMapping("/getListPO")
+    public ResponseEntity<GeneralRes> getListPO(@RequestParam(name="username", required=true) String username){
         ApprovalStatusEnum inputStatus;
-        logger.info("Controller: request for pos in status "+ status);
         if(AuthenticationTools.authenticateUser(username))
-            return purchaseOrderService.getListPO(status);
+            return purchaseOrderService.getListPO();
         else
             return ResponseEntity
                     .badRequest()
