@@ -16,21 +16,17 @@ public class CreateProjectReq implements Serializable {
     BigDecimal budget;
     String currency;
     String additionalInfo;
+    String projectSupervisor;
 
     public CreateProjectReq() {
     }
 
-    public CreateProjectReq(String requester, String projectTitle, String projectDescription, String startDate, String endDate, String projectOwner, List<String> teamMembers, BigDecimal budget, String currency, String additionalInfo) {
-        this.requester = requester;
-        this.projectTitle = projectTitle;
-        this.projectDescription = projectDescription;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.projectOwner = projectOwner;
-        this.teamMembers = teamMembers;
-        this.budget = budget;
-        this.currency = currency;
-        this.additionalInfo = additionalInfo;
+    public String getProjectSupervisor() {
+        return projectSupervisor;
+    }
+
+    public void setProjectSupervisor(String projectSupervisor) {
+        this.projectSupervisor = projectSupervisor;
     }
 
     public String getRequester() {

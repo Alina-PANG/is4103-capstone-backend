@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -184,6 +185,17 @@ public class EmployeeService {
     public String getUsernameByUuid(String uuid){
         Employee e = employeeRepository.findEmployeeById(uuid);
         return e == null? null :e.getUserName();
+    }
+
+    public Employee validateUser(String idOrUsername) throws EntityNotFoundException {
+        Optional<Employee> employee = employeeRepository.findUndeletedEmployeeById(idOrUsername);
+        if (employee.isPresent())
+            return employee.get();
+        Employee e = employeeRepository.findEmployeeByUserName(idOrUsername);
+        if (e != null)
+            return e;
+
+        throw new EntityNotFoundException("username or id not valid");
     }
 
 }

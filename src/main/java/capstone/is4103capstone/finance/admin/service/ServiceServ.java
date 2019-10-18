@@ -48,7 +48,7 @@ public class ServiceServ {
 
     //assume you can give either vendor code or id?
     @Transactional
-    public JSONObject createservice(CreateServiceRequest req){
+    public JSONObject createService(CreateServiceRequest req){
         try{
             Vendor vendor = vendorRepository.findVendorByCode(req.getVendorCode());
             if (vendor == null || vendor.getDeleted()){

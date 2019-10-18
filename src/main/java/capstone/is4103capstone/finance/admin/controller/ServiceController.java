@@ -27,7 +27,7 @@ public class ServiceController {
     ResponseEntity<Object> createservice(@RequestBody CreateServiceRequest req) {
 
         if(Authentication.authenticateUser(req.getUsername())){
-            return new ResponseEntity<Object>(serviceService.createservice(req).toString(), HttpStatus.OK);
+            return new ResponseEntity<Object>(serviceService.createService(req).toString(), HttpStatus.OK);
         }
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
