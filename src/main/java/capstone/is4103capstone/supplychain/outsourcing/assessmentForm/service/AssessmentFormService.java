@@ -4,6 +4,7 @@ import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
+import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentLine;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentSection;
@@ -15,6 +16,7 @@ import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentLineRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentSectionRepository;
+import capstone.is4103capstone.supplychain.Repository.OutsourcingRepository;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.configuration.ThreadPoolTaskSchedulerConfig;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateAssessmentFromReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateSchedulerReq;
@@ -32,10 +34,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
 @Service
@@ -49,6 +48,8 @@ public class AssessmentFormService {
     OutsourcingAssessmentRepository outsourcingAssessmentRepository;
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    OutsourcingRepository outsourcingRepository;
 
     public ResponseEntity<GeneralRes> getForm(String id){
         try{
@@ -186,17 +187,18 @@ public class AssessmentFormService {
         ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,outsourcingAssessment,content, ApprovalTypeEnum.OUTSOURCING_ASSESSMENT_FORM);
     }
 
-    public ResponseEntity<GeneralRes> setTimer(CreateSchedulerReq createSchedulerReq, String id){
+    public ResponseEntity<GeneralRes> setTimer(Date date, String id){
         try{
-            String link = "http://localhost:3000/api/assessmentForm/getDetails/"+id;
-            OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.getOne(id);
-            if(outsourcingAssessment == null) return ResponseEntity
+
+            Outsourcing outsourcing = outsourcingRepository.getOne(id);
+            if(outsourcing == null) return ResponseEntity
                     .notFound().build();
             else {
+                Mail mail = buildMail(outsourcing);
                 ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig = new ThreadPoolTaskSchedulerConfig();
-                AssessmentRunnableTask assessmentRunnableTask = new AssessmentRunnableTask(createSchedulerReq.getMail());
-                threadPoolTaskSchedulerConfig.threadPoolTaskScheduler().schedule(assessmentRunnableTask, createSchedulerReq.getDate());
-                return ResponseEntity.ok().body(new GetAssessmentFormRes("Successfully retrieved the assessment form!", true, outsourcingAssessment));
+                AssessmentRunnableTask assessmentRunnableTask = new AssessmentRunnableTask(mail);
+                threadPoolTaskSchedulerConfig.threadPoolTaskScheduler().schedule(assessmentRunnableTask, date);
+                return ResponseEntity.ok().body(new GeneralRes("Successfully set the alert for the outsourcing!", true));
             }
         }
         catch (Exception ex){
@@ -207,5 +209,15 @@ public class AssessmentFormService {
         }
     }
 
+    private Mail buildMail(Outsourcing outsourcing){
+        String from = "is4103.capstone@gmail.com";
+        String toUsername = outsourcing.getCreatedBy();
+        String to = employeeRepository.findEmployeeByUserName(toUsername).getEmail();
+        String subject = "Reminder: Please Complete the Annual Outsourcing Assessment Form";
+        Map<String, Object> model = new HashMap<>();
 
+        String link = "http://localhost:3000/api/assessmentForm/getDetails/"+outsourcing.getId();
+        model.put("link", link);
+        return new Mail(from, to, subject, model);
+    }
 }

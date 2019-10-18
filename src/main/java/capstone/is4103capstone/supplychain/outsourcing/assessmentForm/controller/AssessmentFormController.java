@@ -84,10 +84,10 @@ public class AssessmentFormController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @PostMapping("/createTimer/{id}")
-    public ResponseEntity<GeneralRes> setTimer(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, CreateSchedulerReq createSchedulerReq){
+    @PostMapping("/notification/{id}")
+    public ResponseEntity<GeneralRes> setTimer(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, Date date){
         if(Authentication.authenticateUser(username))
-            return assessmentFormService.setTimer(createSchedulerReq, id);
+            return assessmentFormService.setTimer(date, id);
         else
             return ResponseEntity
                     .badRequest()
