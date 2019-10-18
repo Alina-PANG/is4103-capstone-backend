@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ApprovalTicketModel implements Serializable {
+    private String id;
     private String reviewerUsername;
     private String requestedItemId;
     private String approverComment;
@@ -22,7 +23,8 @@ public class ApprovalTicketModel implements Serializable {
     public ApprovalTicketModel() {
     }
 
-    public ApprovalTicketModel(String reviewerUsername, String requestedItemId, String approverComment, String requesterComment, String createdDateTime, String reviewedDateTime, ApprovalStatusEnum ticketResult, ApprovalTypeEnum requestType) {
+    public ApprovalTicketModel(String id, String reviewerUsername, String requestedItemId, String approverComment, String requesterComment, String createdDateTime, String reviewedDateTime, ApprovalStatusEnum ticketResult, ApprovalTypeEnum requestType) {
+        this.id = id;
         this.reviewerUsername = reviewerUsername;
         this.requestedItemId = requestedItemId;
         this.approverComment = approverComment;
@@ -33,12 +35,20 @@ public class ApprovalTicketModel implements Serializable {
         this.requestType = requestType;
     }
 
-    public ApprovalTicketModel(String reviewerUsername, String comment, Date createdDateTime, Date reviewedDateTime, ApprovalStatusEnum ticketResult) {
+    public ApprovalTicketModel(String id, String reviewerUsername, String comment, Date createdDateTime, Date reviewedDateTime, ApprovalStatusEnum ticketResult) {
         this.reviewerUsername = reviewerUsername;
         this.approverComment = comment;
         this.createdDateTime = datetimeFormatter.format(createdDateTime);
         this.reviewedDateTime = datetimeFormatter.format(reviewedDateTime);
         this.ticketResult = ticketResult;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getRequesterComment() {

@@ -122,7 +122,7 @@ public class SeatAllocationRequestService {
         ApprovalForRequest ticket = new ApprovalForRequest();
         ticket.setCreatedBy(requester.getUserName());
         ticket.setRequestedItemId(seatAllocationRequest.getId());
-        ticket.setApprovalType(ApprovalTypeEnum.SEATALLOCATION);
+        ticket.setApprovalType(ApprovalTypeEnum.SEAT_ALLOCATION);
         ticket.setRequester(requester);
         ticket.setApprover(approver);
         ticket.setApprovalStatus(ApprovalStatusEnum.PENDING);

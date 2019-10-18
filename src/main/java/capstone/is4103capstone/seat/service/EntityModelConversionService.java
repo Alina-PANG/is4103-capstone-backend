@@ -650,11 +650,12 @@ public class EntityModelConversionService {
     public ApprovalTicketModel convertExistingApprovalTicketEntityToModel(ApprovalForRequest approvalForRequest) {
         ApprovalTicketModel approvalTicketModel = new ApprovalTicketModel();
         approvalTicketModel.setId(approvalForRequest.getId());
-        approvalTicketModel.setComment(approvalForRequest.getCommentByApprover());
+        approvalTicketModel.setApproverComment(approvalForRequest.getCommentByApprover());
+        approvalTicketModel.setRequesterComment(approvalForRequest.getCommentByRequester());
         approvalTicketModel.setCreatedDateTime(approvalForRequest.getCreatedDateTime().toString());
         approvalTicketModel.setReviewerUsername(approvalForRequest.getApprover().getUserName());
         approvalTicketModel.setReviewedDateTime(approvalForRequest.getLastModifiedDateTime().toString());
-        approvalTicketModel.setTicketResult(approvalForRequest.getApprovalStatus().toString());
+        approvalTicketModel.setTicketResult(approvalForRequest.getApprovalStatus());
         return approvalTicketModel;
     }
 }
