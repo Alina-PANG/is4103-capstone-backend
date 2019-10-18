@@ -47,17 +47,25 @@ public class BJFController {
 //        }
 //    }
 
-    @GetMapping("/view-my/{userId}")
+    @GetMapping("/view-my-requests/{userId}")
     public ResponseEntity<TTListResponse> getBJFSubmittedByUser(@PathVariable(name = "userId") String idOrUsername){
         try{
             return ResponseEntity.ok().body(
-                    new TTListResponse("Successfully retrieved",false, bjfService.getBJFByRequester(idOrUsername)));
+                    new TTListResponse("Successfully retrieved", bjfService.getBJFByRequester(idOrUsername)));
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new TTListResponse(ex.getMessage(),true));
         }
     }
 
-
-
+    @GetMapping("/view-my-approval/{userId}")
+    public ResponseEntity<TTListResponse> getBJFWaitingForUserApprove(@PathVariable(name = "userId") String idOrUsername){
+        try{
+            return ResponseEntity.ok().body(
+                    new TTListResponse("Successfully retrieved", bjfService.getBJFByApprover(idOrUsername)));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new TTListResponse(ex.getMessage(),true));
+        }
+    }
 }

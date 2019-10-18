@@ -19,11 +19,7 @@ public class BJF extends RequestFormTemplate {
 
     private BjfTypeEnum BjfType;
 
-    private String currencyCode;
-
     private BigDecimal ongoingCost;
-
-    private BigDecimal totalAmt;
 
     private BigDecimal projectCost = null; // if type == project
 
@@ -74,28 +70,12 @@ public class BJF extends RequestFormTemplate {
         BjfType = bjfType;
     }
 
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
-
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
-
     public BigDecimal getOngoingCost() {
         return ongoingCost;
     }
 
     public void setOngoingCost(BigDecimal ongoingCost) {
         this.ongoingCost = ongoingCost;
-    }
-
-    public BigDecimal getTotalAmt() {
-        return totalAmt;
-    }
-
-    public void setTotalAmt(BigDecimal totalAmt) {
-        this.totalAmt = totalAmt;
     }
 
 

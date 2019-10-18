@@ -10,7 +10,9 @@ import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
+import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
+import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFAggregateModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
@@ -21,8 +23,10 @@ import capstone.is4103capstone.util.enums.BjfTypeEnum;
 import capstone.is4103capstone.util.enums.ProjectStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @org.springframework.stereotype.Service
 public class BJFService {
@@ -38,6 +42,8 @@ public class BJFService {
     VendorService vendorService;
     @Autowired
     ServiceServ serviceServ;
+    @Autowired
+    PurchaseOrderRepository poRepository;
 
     public BJFModel createBJF(CreateBJFReq req) throws Exception{
         Employee requester = employeeService.validateUser(req.getRequester());
@@ -55,38 +61,65 @@ public class BJFService {
 
         newBjf.setRequestDescription(req.getJustification());
         newBjf.setAdditionalInfo(req.getAdditionalInfo());
-        newBjf.setCurrencyCode(req.getCurrency());
-        newBjf.setTotalAmt(req.getTotalBudget());
-
+        newBjf.setCurrency(req.getCurrency());
+        newBjf.setEstimatedBudget(req.getTotalBudget());
+        Project p = null;
         if (req.getRequestType().equalsIgnoreCase("Project")){
             if (req.getOngoingCost().add(req.getProjectCost()).compareTo(req.getTotalBudget()) != 0){
                 throw new Exception("Ongoing Cost + Project Cost not equal to total amount");
             }
-
-            newBjf.setProjectCode(projectService.validateProject(req.getProject()).getCode());
+            p = projectService.validateProject(req.getProject());
+            newBjf.setProjectCode(p.getCode());
             newBjf.setOngoingCost(req.getOngoingCost());
             newBjf.setProjectCost(req.getProjectCost());
         }
 
+        newBjf = bjfRepository.save(newBjf);
 
+        //or go to outsourcing
+        //wait for outsourcing result.
 
-
-
-
-
-
-        return new BJFModel();
+        return new BJFModel(newBjf,service,vendor,null,p);
     }
 
-    public BJFModel getBJFDetails(String idOrCode){
-        return new BJFModel();
+    public List<BJFAggregateModel> getBJFByApprover(String idOrUsername){
+
+        return null;
+    }
+    //TODO: collaborate with Outsourcing
+    public void afterOutsourcing(String bjfId){
+
+    }
+    //TODO: Collaborate with Purchase Order
+    public void afterPOUpdated(String poId){
+
     }
 
-    public List<BJFModel> getBJFByRequester(String userIdOrUsername){
-        return new ArrayList<>();
+    public BJFModel getBJFDetails(String idOrCode) throws Exception{
+        BJF bjf = validateBJF(idOrCode);
+        Vendor vendor = vendorService.validateVendor(bjf.getVendorId());
+        Service service = serviceServ.validateService(bjf.getServiceId());
+        Project p = null;
+        PurchaseOrder po = null;
+        if (bjf.getBjfType().equals(BjfTypeEnum.PROJECT))
+            p = projectService.validateProject(bjf.getProjectCode());
+        if (bjf.getPurchaseOrderNumber() != null)
+            po = poRepository.getOne(bjf.getPurchaseOrderNumber());
+
+        return new BJFModel(bjf,service,vendor,po,p);
+    }
+
+    public List<BJFAggregateModel> getBJFByRequester(String userIdOrUsername) throws Exception{
+        Employee user = employeeService.validateUser(userIdOrUsername);
+        List<BJFAggregateModel> myRequests = bjfRepository.getSimpleBJFsByRequester(user.getId());
+        if (myRequests.isEmpty())
+            throw new Exception("No records found.");
+
+        return myRequests;
     }
 
     public GeneralRes bjfItemReceived(String bjfId){
+
         return new GeneralRes();
     }
 
@@ -98,4 +131,19 @@ public class BJFService {
         //update the 'actuals' spending;
     }
 
+    public BJF validateBJF(String idOrCode) throws EntityNotFoundException{
+        Optional<BJF> bjfOps = bjfRepository.findById(idOrCode);
+        if (bjfOps.isPresent()){
+            if (bjfOps.get().getDeleted())
+                throw new EntityNotFoundException("BJF already removed");
+            return bjfOps.get();
+        }
+
+        BJF e = bjfRepository.getBJFByCode(idOrCode);
+        if (e != null || !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("BJF Code or Id not valid");
+
+    }
 }

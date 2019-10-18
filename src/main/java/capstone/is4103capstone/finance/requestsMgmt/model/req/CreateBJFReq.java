@@ -4,18 +4,18 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class CreateBJFReq implements Serializable {
-    String requester;
-    String requestType;  //BAU:
-    String costCenter;
-    String project;
-    String vendor;
-    String serviceOrProduct;
-    String justification;
-    BigDecimal projectCost;
-    BigDecimal ongoingCost;
-    String currency;
-    BigDecimal totalBudget;// not required, because can calcuated
-    String additionalInfo;
+    private String requester;
+    private String requestType;  //BAU:
+    private String costCenter;
+    private String project;
+    private String vendor;
+    private String serviceOrProduct;
+    private String justification;
+    private BigDecimal projectCost;
+    private BigDecimal ongoingCost;
+    private String currency;
+    private BigDecimal totalBudget;// not required, because can calcuated
+    private String additionalInfo;
 
     public CreateBJFReq() {
     }
