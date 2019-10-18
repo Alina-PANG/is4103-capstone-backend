@@ -10,8 +10,10 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CostCenterService {
@@ -85,7 +87,20 @@ public class CostCenterService {
         return ccList;
     }
 
+    public CostCenter validateCostCenter(String idOrCode) throws EntityNotFoundException {
+        Optional<CostCenter> employee = costCenterRepository.findById(idOrCode);
+        if (employee.isPresent())
+            if (!employee.get().getDeleted())
+                return employee.get();
+            else
+                throw new EntityNotFoundException("Cost center code or id not valid");
 
+        CostCenter e = costCenterRepository.findCostCenterByCode(idOrCode);
+        if (e != null && !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("Cost center code or id not valid");
+    }
 
 
 }

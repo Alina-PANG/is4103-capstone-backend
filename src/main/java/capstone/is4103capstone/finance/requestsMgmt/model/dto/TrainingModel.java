@@ -1,6 +1,7 @@
 package capstone.is4103capstone.finance.requestsMgmt.model.dto;
 
 import capstone.is4103capstone.entities.finance.TrainingForm;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.Tools;
 
 public class TrainingModel extends RequestFormModel {
@@ -18,15 +19,28 @@ public class TrainingModel extends RequestFormModel {
     public TrainingModel() {
     }
 
+    public TrainingModel(TrainingForm e, boolean isSimpleVersion) {
+        setStartDate(Tools.dateFormatter.format(e.getStartDate()));
+        setEndDate(Tools.dateFormatter.format(e.getEndDate()));
+        setTrainingLocation(e.getTrainingLocation());
+        setTrainingTitle(e.getTrainingTitle());
+        setTrainingType(e.getTrainerType().name());
+        setTrainerName(e.getTrainerName());
+        setRequester(new EmployeeModel(e.getRequester()));
+        setApprovalStatus(e.getApprovalStatus().name());
+        setId(e.getId());
+        setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
+    }
+
     public TrainingModel(TrainingForm e) {
         super(e);
-              setStartDate(Tools.dateFormatter.format(e.getStartDate()));
+        setStartDate(Tools.dateFormatter.format(e.getStartDate()));
         setEndDate(Tools.dateFormatter.format(e.getEndDate()));
         setTrainingLocation(e.getTrainingLocation());
         setTargetAudience(e.getTargetAudience());
 
         setTrainingTitle(e.getTrainingTitle());
-        setTrainingType(e.getTrainingType().name());
+        setTrainingType(e.getTrainerType().name());
 
         setTrainerCompany(e.getTrainerCompany());
         setTrainerEmail(e.getTrainerEmail());

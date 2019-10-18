@@ -24,6 +24,5 @@ public class ApprovalTicketController {
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
 
-
     }
 }

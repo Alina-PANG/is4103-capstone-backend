@@ -14,5 +14,6 @@ public interface ProjectRepository extends JpaRepository<Project,String> {
     @Query(value = "SELECT * FROM project WHERE is_deleted=0 AND project_owner_id=?1",nativeQuery = true)
     public List<Project> getProjectsByProjectOwnerId(String id);
 
+    public Project getProjectByCode(String code);
 
 }

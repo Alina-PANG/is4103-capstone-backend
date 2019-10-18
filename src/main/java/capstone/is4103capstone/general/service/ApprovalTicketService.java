@@ -100,8 +100,6 @@ public class ApprovalTicketService {
             logger.error(e.getMessage());
             return false;
         }
-
-
     }
 
     public static boolean createTicketAndSendEmail(Employee requester, Employee receiver, DBEntityTemplate requestedItem, String content,ApprovalTypeEnum approvalType){

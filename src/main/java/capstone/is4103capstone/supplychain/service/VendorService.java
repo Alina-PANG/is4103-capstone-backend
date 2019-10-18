@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -176,5 +177,21 @@ public class VendorService {
                 vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
 
         return vendorModel;
+    }
+
+
+    public Vendor validateVendor(String idOrUsername) throws EntityNotFoundException {
+        Optional<Vendor> vendorOps = vendorRepository.findById(idOrUsername);
+        if (vendorOps.isPresent()){
+            if (vendorOps.get().getDeleted())
+                throw new EntityNotFoundException("vendor already removed");
+            return vendorOps.get();
+        }
+
+        Vendor e = vendorRepository.findVendorByCode(idOrUsername);
+        if (e != null || !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("username or id not valid");
     }
 }
