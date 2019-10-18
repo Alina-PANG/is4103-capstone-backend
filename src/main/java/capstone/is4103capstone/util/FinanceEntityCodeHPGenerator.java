@@ -1,7 +1,6 @@
 package capstone.is4103capstone.util;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-//import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;

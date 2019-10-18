@@ -48,8 +48,11 @@ public class BJFModel extends RequestFormModel {
             setPurchaseOrder(new GeneralEntityModel(po));
         if (s != null)
             setService(new GeneralEntityModel(s));
-        if (p != null)
+        if (p != null){
             setProject(new GeneralEntityModel(p));
+            setProjectCost(e.getProjectCost());
+            setOngoingCost(e.getOngoingCost());
+        }
         if (v != null)
             setVendor(new GeneralEntityModel(v));
 
@@ -57,7 +60,6 @@ public class BJFModel extends RequestFormModel {
         setStatus(e.getBjfStatus().name());
         setCurrencyCode(e.getCurrency());
         setEstimatedBudget(e.getEstimatedBudget());
-        setOngoingCost(e.getOngoingCost());
         setAdditionalInfo(e.getAdditionalInfo());
         setDescription(e.getRequestDescription());
         setRequester(new EmployeeModel(e.getRequester()));
