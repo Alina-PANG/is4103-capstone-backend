@@ -121,6 +121,7 @@ public class ContractService {
             }
 
             contract.setContractStatus(ContractStatusEnum.PENDING_APPROVAL);
+            contractRepository.saveAndFlush(contract);
             ApprovalTicketService.createTicketAndSendEmail(requester, approver, contract, content, ApprovalTypeEnum.CONTRACT);
 
             return new GeneralRes("Request for approval has been sent Successfully!", false);
