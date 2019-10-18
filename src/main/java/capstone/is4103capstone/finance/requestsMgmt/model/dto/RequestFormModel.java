@@ -2,6 +2,7 @@ package capstone.is4103capstone.finance.requestsMgmt.model.dto;
 
 import capstone.is4103capstone.entities.RequestFormTemplate;
 import capstone.is4103capstone.seat.model.EmployeeModel;
+import capstone.is4103capstone.util.Tools;
 
 import java.math.BigDecimal;
 
@@ -15,6 +16,7 @@ public class RequestFormModel {
     private String currencyCode;
     private String approvalStatus;
     private String id;
+    private String createdDateTime;
 
     public RequestFormModel() {
     }
@@ -26,12 +28,13 @@ public class RequestFormModel {
         setDescription(e.getRequestDescription());
         setEstimatedBudget(e.getEstimatedBudget());
         setCurrencyCode(e.getCurrency());
-        setApprovalStatus(e.getStatus().name());
+        setApprovalStatus(e.getApprovalStatus().name());
         setRequester(new EmployeeModel(e.getRequester()));
         setId(e.getId());
+        setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
     }
 
-    public RequestFormModel(EmployeeModel requester, String costCenterCode, String description, String additionalInfo, BigDecimal estimatedBudget, String currencyCode, String approvalStatus, String id) {
+    public RequestFormModel(EmployeeModel requester, String costCenterCode, String description, String additionalInfo, BigDecimal estimatedBudget, String currencyCode, String approvalStatus, String id, String createdDateTime) {
         this.requester = requester;
         this.costCenterCode = costCenterCode;
         this.description = description;
@@ -40,6 +43,15 @@ public class RequestFormModel {
         this.currencyCode = currencyCode;
         this.approvalStatus = approvalStatus;
         this.id = id;
+        this.createdDateTime = createdDateTime;
+    }
+
+    public String getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(String createdDateTime) {
+        this.createdDateTime = createdDateTime;
     }
 
     public String getId() {

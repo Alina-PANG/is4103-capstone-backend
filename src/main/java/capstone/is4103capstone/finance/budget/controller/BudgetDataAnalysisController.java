@@ -1,15 +1,12 @@
 package capstone.is4103capstone.finance.budget.controller;
 
 import capstone.is4103capstone.finance.budget.service.BudgetDataAnalysisService;
-import capstone.is4103capstone.finance.budget.model.req.BudgetDataAnalysisReq;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.FilePathReq;
 import capstone.is4103capstone.general.model.GeneralRes;
-import capstone.is4103capstone.general.model.UploadFileResponse;
 import capstone.is4103capstone.general.service.ExportToFileService;
 import capstone.is4103capstone.general.service.FileStorageService;
-import capstone.is4103capstone.general.service.ReadFromFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +15,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/budgetData")
@@ -41,7 +36,7 @@ public class BudgetDataAnalysisController {
 
     @PostMapping("/uploadFile/{username}")
     public ResponseEntity<GeneralRes> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable("username") String username) {
-        if(Authentication.authenticateUser(username)){
+        if(AuthenticationTools.authenticateUser(username)){
             Path p = fileStorageService.storeFileAndReturnPath(file);
             return ResponseEntity
                     .ok()
@@ -56,7 +51,7 @@ public class BudgetDataAnalysisController {
 
     @PostMapping(value = "/upload")
     public  ResponseEntity<GeneralRes> uploadFile(@RequestBody FilePathReq filePathReq) {
-        if(Authentication.authenticateUser(filePathReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(filePathReq.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(budgetDataAnalysisService.readUploadedFile(filePathReq.getFilePath()));

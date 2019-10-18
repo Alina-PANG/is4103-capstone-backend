@@ -1,6 +1,6 @@
 package capstone.is4103capstone.supplychain.controller;
 
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.model.req.ApproveContractReq;
@@ -23,7 +23,7 @@ public class ContractController {
 
     @PostMapping("/create-contract")
     public ResponseEntity<GeneralRes> createContract(@RequestBody CreateContractReq createContractReq) {
-        if (Authentication.authenticateUser(createContractReq.getModifierUsername())) {
+        if (AuthenticationTools.authenticateUser(createContractReq.getModifierUsername())) {
             return ResponseEntity
                     .ok()
                     .body(contractService.createContract(createContractReq));
@@ -36,7 +36,7 @@ public class ContractController {
 
     @GetMapping("/get-contract/{id}")
     public ResponseEntity<GeneralRes> getContract(@PathVariable("id") String id, @RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(contractService.getContract(id));
@@ -49,7 +49,7 @@ public class ContractController {
 
     @PostMapping("/update-contract/{id}")
     public ResponseEntity<GeneralRes> updateContract(@RequestBody CreateContractReq updateContractReq, @PathVariable("id") String id) {
-        if (Authentication.authenticateUser(updateContractReq.getModifierUsername())) {
+        if (AuthenticationTools.authenticateUser(updateContractReq.getModifierUsername())) {
             return ResponseEntity
                     .ok()
                     .body(contractService.updateContract(updateContractReq, id));
@@ -62,7 +62,7 @@ public class ContractController {
 
     @GetMapping("/get-all-contracts")
     public  ResponseEntity<GeneralRes> getAllContract(@RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(contractService.getAllContracts());
@@ -75,7 +75,7 @@ public class ContractController {
 
     @GetMapping("/get-contracts-by-team/{teamId}")
     public ResponseEntity<GeneralRes> getContractsByTeamId(@PathVariable("teamId") String teamId, @RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(contractService.getContractsByTeamId(teamId));
@@ -88,7 +88,7 @@ public class ContractController {
 
     @GetMapping("/get-contracts-by-vendor/{vendorId}")
     public ResponseEntity<GeneralRes> getContractsByVendorId(@PathVariable("vendorId") String vendorId, @RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(contractService.getContractsByVendorId(vendorId));
@@ -101,7 +101,7 @@ public class ContractController {
 
     @PostMapping("/approve-contract")
     public ResponseEntity approveContract(@RequestBody ApproveContractReq approveContractReq){
-        if(Authentication.authenticateUser(approveContractReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(approveContractReq.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(contractService.approveContract(approveContractReq));
@@ -113,10 +113,10 @@ public class ContractController {
 
     @PostMapping("/request-approve/{contractId}")
     public ResponseEntity requestApprove(@PathVariable("contractId") String contractId, @RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
-                    .body(contractService.createApprovalTicket(username, contractId, "Approver please review the contract."));
+                    .body(contractService.createApprovalTicket(username, contractId, "Approver please review the contract and related child contracts."));
         }else{
             return ResponseEntity
                     .ok()

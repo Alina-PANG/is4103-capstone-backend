@@ -26,7 +26,7 @@ public class RequestFormTemplate extends DBEntityTemplate {
 
     private String currency;
 
-    private ApprovalStatusEnum status = ApprovalStatusEnum.PENDING;
+    private ApprovalStatusEnum approvalStatus = ApprovalStatusEnum.PENDING;
 
     public RequestFormTemplate() {
     }
@@ -41,12 +41,12 @@ public class RequestFormTemplate extends DBEntityTemplate {
         this.currency = currency;
     }
 
-    public ApprovalStatusEnum getStatus() {
-        return status;
+    public ApprovalStatusEnum getApprovalStatus() {
+        return approvalStatus;
     }
 
-    public void setStatus(ApprovalStatusEnum status) {
-        this.status = status;
+    public void setApprovalStatus(ApprovalStatusEnum approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 
     public Employee getRequester() {

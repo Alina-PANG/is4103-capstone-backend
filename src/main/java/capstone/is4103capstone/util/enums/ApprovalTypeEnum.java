@@ -1,11 +1,12 @@
 package capstone.is4103capstone.util.enums;
 
 public enum ApprovalTypeEnum {
-    BJFBUSINESS,
-    BJFBUDGET,
+    BJF,
+    PROJECT,
+    TRAVEL,
+    TRAINING,
     BUDGETPLAN,
     CONTRACT,
     CHILD_CONTRACT,
     OUTSOURCING_ASSESSMENT_FORM
-
 }

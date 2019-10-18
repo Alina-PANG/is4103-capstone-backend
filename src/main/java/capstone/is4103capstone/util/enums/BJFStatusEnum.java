@@ -1,9 +1,8 @@
 package capstone.is4103capstone.util.enums;
 
-public enum ProjectStatus {
+public enum  BJFStatusEnum {
     PENDING_APPROVAL,
     APPROVED,
-    ONGOING,
-    CLOSED,
-    REJECTED
+    POVALUE_UPDATED,
+    DELIVERED
 }

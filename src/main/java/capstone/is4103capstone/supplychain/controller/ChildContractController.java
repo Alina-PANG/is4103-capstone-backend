@@ -1,9 +1,8 @@
 package capstone.is4103capstone.supplychain.controller;
 
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
-import capstone.is4103capstone.supplychain.model.req.ApproveChildContractReq;
 import capstone.is4103capstone.supplychain.model.req.CreateChildContractReq;
 import capstone.is4103capstone.supplychain.service.ChildContractService;
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class ChildContractController {
 
     @PostMapping("/create-child-contract")
     public ResponseEntity<GeneralRes> createChildContract(@RequestBody CreateChildContractReq createChildContractReq) {
-        if (Authentication.authenticateUser(createChildContractReq.getModifierUsername())) {
+        if (AuthenticationTools.authenticateUser(createChildContractReq.getModifierUsername())) {
             return ResponseEntity
                     .ok()
                     .body(childContractService.createChildContract(createChildContractReq));
@@ -36,7 +35,7 @@ public class ChildContractController {
 
     @GetMapping("/get-child-contract/{id}")
     public ResponseEntity<GeneralRes> getChildContract(@PathVariable("id") String id, @RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(childContractService.getChildContract(id));
@@ -49,7 +48,7 @@ public class ChildContractController {
 
     @PostMapping("/update-child-contract/{id}")
     public ResponseEntity<GeneralRes> updateChildContract(@RequestBody CreateChildContractReq updateChildContractReq, @PathVariable("id") String id) {
-        if (Authentication.authenticateUser(updateChildContractReq.getModifierUsername())) {
+        if (AuthenticationTools.authenticateUser(updateChildContractReq.getModifierUsername())) {
             return ResponseEntity
                     .ok()
                     .body(childContractService.updateChildContract(updateChildContractReq, id));
@@ -62,35 +61,10 @@ public class ChildContractController {
 
     @GetMapping("/get-child-contracts-by-master-contract/{masterContractId}")
     public ResponseEntity<GeneralRes> getChildContractsByMasterContract(@PathVariable("masterContractId") String masterContractId, @RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(childContractService.getChildContractsByMasterContractId(masterContractId));
-        }else{
-            return ResponseEntity
-                    .ok()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-        }
-    }
-
-    @PostMapping("/approve-child-contract")
-    public ResponseEntity approveChildContract(@RequestBody ApproveChildContractReq approveChildContractReq){
-        if(Authentication.authenticateUser(approveChildContractReq.getUsername()))
-            return ResponseEntity
-                    .ok()
-                    .body(childContractService.approveChildContract(approveChildContractReq));
-        else
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-    }
-
-    @PostMapping("/request-approve/{childContractId}")
-    public ResponseEntity requestApprove(@PathVariable("childContractId") String childContractId, @RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
-            return ResponseEntity
-                    .ok()
-                    .body(childContractService.createApprovalTicket(username, childContractId, "Approver please review the contract."));
         }else{
             return ResponseEntity
                     .ok()

@@ -4,7 +4,7 @@ import capstone.is4103capstone.finance.admin.model.req.CreateFXRequest;
 import capstone.is4103capstone.finance.admin.model.req.FXRecordQueryReq;
 import capstone.is4103capstone.finance.admin.model.res.ViewFXRecordRes;
 import capstone.is4103capstone.finance.admin.service.FXTableService;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
@@ -31,7 +31,7 @@ public class FXTableController {
     public @ResponseBody
     ResponseEntity<Object> createFXRecord(@RequestBody CreateFXRequest req) {
         WriteAuditTrail.autoAudit(req.getUsername());
-        if(Authentication.authenticateUser(req.getUsername())){
+        if(AuthenticationTools.authenticateUser(req.getUsername())){
             return new ResponseEntity<Object>(fxService.createFXRecord(req).toString(), HttpStatus.OK);
         }
         else
@@ -45,9 +45,9 @@ public class FXTableController {
                                                          @RequestParam(value = "endDate",required = false) String endDate,
                                                          @RequestParam(value = "baseCurr",required = false) String baseCurr,
                                                          @RequestParam(value = "priceCurr",required = false) String priceCurr){
-        String username = Authentication.getUsernameFromToken(authToken);
+        String username = AuthenticationTools.getUsernameFromToken(authToken);
         WriteAuditTrail.autoAudit(username);
-        if(Authentication.authenticateUser(username)){
+        if(AuthenticationTools.authenticateUser(username)){
             FXRecordQueryReq req = new FXRecordQueryReq(startDate,endDate,baseCurr,priceCurr,username);
             return ResponseEntity
                     .ok()

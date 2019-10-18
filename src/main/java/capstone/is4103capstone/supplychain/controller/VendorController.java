@@ -1,6 +1,6 @@
 package capstone.is4103capstone.supplychain.controller;
 
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
@@ -22,7 +22,7 @@ public class VendorController {
 
     @PostMapping("/create-vendor")
     public ResponseEntity<GeneralRes> createVendor(@RequestBody CreateVendorReq createVendorReq) {
-        if (Authentication.authenticateUser(createVendorReq.getUsername())) {
+        if (AuthenticationTools.authenticateUser(createVendorReq.getUsername())) {
             return ResponseEntity
                     .ok()
                     .body(vendorService.createNewVendor(createVendorReq));
@@ -35,7 +35,7 @@ public class VendorController {
 
     @PostMapping("/update-vendor/{id}")
     public ResponseEntity<GeneralRes> updateVendor(@RequestBody CreateVendorReq updateVendorReq, @PathVariable("id") String id) {
-        if (Authentication.authenticateUser(updateVendorReq.getUsername())) {
+        if (AuthenticationTools.authenticateUser(updateVendorReq.getUsername())) {
             return ResponseEntity
                     .ok()
                     .body(vendorService.updateVendor(updateVendorReq, id));
@@ -48,7 +48,7 @@ public class VendorController {
 
     @GetMapping("/get-vendor/{id}")
     public ResponseEntity<GeneralRes> getVendor(@PathVariable("id") String id, @RequestParam(name = "username", required = true) String username) {
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(vendorService.getVendor(id));
@@ -61,7 +61,7 @@ public class VendorController {
 
     @GetMapping("/get-all-vendors")
     public ResponseEntity<GeneralRes> getAllVendors(@RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
+        if (AuthenticationTools.authenticateUser(username)) {
             return ResponseEntity
                     .ok()
                     .body(vendorService.getAllVendors());

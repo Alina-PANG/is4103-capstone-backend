@@ -3,7 +3,7 @@ package capstone.is4103capstone.finance.admin.controller;
 import capstone.is4103capstone.finance.admin.model.req.CreateServiceRequest;
 import capstone.is4103capstone.finance.admin.model.res.ServiceListRes;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import org.slf4j.Logger;
@@ -26,8 +26,8 @@ public class ServiceController {
     public @ResponseBody
     ResponseEntity<Object> createservice(@RequestBody CreateServiceRequest req) {
 
-        if(Authentication.authenticateUser(req.getUsername())){
-            return new ResponseEntity<Object>(serviceService.createservice(req).toString(), HttpStatus.OK);
+        if(AuthenticationTools.authenticateUser(req.getUsername())){
+            return new ResponseEntity<Object>(serviceService.createService(req).toString(), HttpStatus.OK);
         }
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
@@ -35,7 +35,7 @@ public class ServiceController {
 
     @GetMapping("/view")
     public ResponseEntity<ServiceListRes> viewserviceUnderSub2(@RequestParam(name="username", required=true) String username, @RequestParam(name="sub2Code", required=true) String sub2Code){
-        if(Authentication.authenticateUser(username)){
+        if(AuthenticationTools.authenticateUser(username)){
             return ResponseEntity
                     .ok()
                     .body(serviceService.viewserviceItemsBySub2(sub2Code));
@@ -47,5 +47,21 @@ public class ServiceController {
                     .body(new ServiceListRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
 
     }
+
+    @GetMapping
+    public ResponseEntity<ServiceListRes> viewAllServices(){
+        try{
+            return ResponseEntity
+                    .ok()
+                    .body(serviceService.retrieveAllService());
+        }catch (Exception ex){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ServiceListRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
+
+
+    }
+
 
 }

@@ -1,60 +1,51 @@
 package capstone.is4103capstone.supplychain.model;
 
 import capstone.is4103capstone.general.model.GeneralEntityModel;
-import capstone.is4103capstone.util.enums.ChildContractStatusEnum;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ChildContractModel implements Serializable {
-    private String name;
+    private String childContractName;
     private String code;
     private String id;
     private Long seqNo;
-    private String serviceCode;
+    private String serviceName;
     private BigDecimal contractValue;
     private GeneralEntityModel masterContract;
-    private ChildContractStatusEnum childContractStatusEnum;
-    private GeneralEntityModel approver;
+    private String currencyCode;
+    private Boolean canUpdate;
 
-    public ChildContractModel(String name, String code, String id, Long seqNo, String serviceCode, BigDecimal contractValue, GeneralEntityModel masterContract, ChildContractStatusEnum childContractStatusEnum, GeneralEntityModel approver) {
-        this.name = name;
+    public ChildContractModel(String childContractName, String code, String id, Long seqNo, String serviceName, BigDecimal contractValue, GeneralEntityModel masterContract, String currencyCode, Boolean canUpdate) {
+        this.childContractName = childContractName;
         this.code = code;
         this.id = id;
         this.seqNo = seqNo;
-        this.serviceCode = serviceCode;
+        this.serviceName = serviceName;
         this.contractValue = contractValue;
         this.masterContract = masterContract;
-        this.childContractStatusEnum = childContractStatusEnum;
-        this.approver = approver;
+        this.currencyCode = currencyCode;
+        this.canUpdate = canUpdate;
     }
 
     public ChildContractModel() {
 
     }
 
-    public GeneralEntityModel getApprover() {
-        return approver;
+    public String getCurrencyCode() {
+        return currencyCode;
     }
 
-    public void setApprover(GeneralEntityModel approver) {
-        this.approver = approver;
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
-    public ChildContractStatusEnum getChildContractStatusEnum() {
-        return childContractStatusEnum;
+    public String getChildContractName() {
+        return childContractName;
     }
 
-    public void setChildContractStatusEnum(ChildContractStatusEnum childContractStatusEnum) {
-        this.childContractStatusEnum = childContractStatusEnum;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setChildContractName(String childContractName) {
+        this.childContractName = childContractName;
     }
 
     public String getCode() {
@@ -81,12 +72,12 @@ public class ChildContractModel implements Serializable {
         this.seqNo = seqNo;
     }
 
-    public String getServiceCode() {
-        return serviceCode;
+    public String getServiceName() {
+        return serviceName;
     }
 
-    public void setServiceCode(String serviceCode) {
-        this.serviceCode = serviceCode;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     public BigDecimal getContractValue() {
@@ -103,5 +94,13 @@ public class ChildContractModel implements Serializable {
 
     public void setMasterContract(GeneralEntityModel masterContract) {
         this.masterContract = masterContract;
+    }
+
+    public Boolean getCanUpdate() {
+        return canUpdate;
+    }
+
+    public void setCanUpdate(Boolean canUpdate) {
+        this.canUpdate = canUpdate;
     }
 }

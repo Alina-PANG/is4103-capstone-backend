@@ -4,7 +4,7 @@ import capstone.is4103capstone.finance.admin.model.req.CreateSub1Sub2Request;
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
 import capstone.is4103capstone.finance.admin.service.Sub1Service;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class Sub1CategoryController {
 
     @PostMapping("/create")
     public ResponseEntity<BudgetCategoryRes> createCategory(@RequestBody CreateSub1Sub2Request req) {
-        if(Authentication.authenticateUser(req.getUsername()))
+        if(AuthenticationTools.authenticateUser(req.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(sub1Service.createSub1(req));
@@ -37,7 +37,7 @@ public class Sub1CategoryController {
 
     @PostMapping("/update")
     public ResponseEntity<BudgetCategoryRes> updateCategory(@RequestBody UpdateCategoryReq updateCategoryReq) {
-        if(Authentication.authenticateUser(updateCategoryReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(updateCategoryReq.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(sub1Service.updateSub1Name(updateCategoryReq));
@@ -49,7 +49,7 @@ public class Sub1CategoryController {
 
     @GetMapping("/view-by-category")
     public @ResponseBody ResponseEntity<Object> viewCategoriesByCountry(@RequestParam(name="username", required=true) String username, @RequestParam(name="categoryCode", required=true) String categoryCode){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return new ResponseEntity<Object>(sub1Service.viewSub1sUnderCategory(categoryCode).toString(), HttpStatus.OK);
 
         else
@@ -58,7 +58,7 @@ public class Sub1CategoryController {
 
     @GetMapping("/delete")
     public @ResponseBody ResponseEntity<Object> deleteCategory(@RequestParam(name="username", required=true) String username, @RequestParam(name="sub1CodeToDelete", required=true) String sub1CodeToDelete){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return new ResponseEntity<Object>(sub1Service.removeSub1Category(sub1CodeToDelete,username).toString(), HttpStatus.OK);
 
         else
