@@ -2,6 +2,7 @@ package capstone.is4103capstone.finance.requestsMgmt.service;
 
 import capstone.is4103capstone.admin.service.CostCenterService;
 import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.BJF;
@@ -11,6 +12,7 @@ import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
+import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFAggregateModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
@@ -45,6 +47,7 @@ public class BJFService {
     @Autowired
     PurchaseOrderRepository poRepository;
 
+    //TODO: can't same person created another request for same item before approval
     public BJFModel createBJF(CreateBJFReq req) throws Exception{
         Employee requester = employeeService.validateUser(req.getRequester());
         Vendor vendor = vendorService.validateVendor(req.getVendor());
@@ -58,6 +61,7 @@ public class BJFService {
         newBjf.setCostCenter(cc);
         newBjf.setVendorId(vendor.getId());
         newBjf.setRequester(requester);
+        newBjf.setObjectName(service.getObjectName()+"-"+vendor.getObjectName());
 
         newBjf.setRequestDescription(req.getJustification());
         newBjf.setAdditionalInfo(req.getAdditionalInfo());
@@ -75,21 +79,28 @@ public class BJFService {
         }
 
         newBjf = bjfRepository.save(newBjf);
-
+        String code = EntityCodeHPGeneration.getCode(bjfRepository,newBjf);
+        newBjf.setCode(code);
         //or go to outsourcing
         //wait for outsourcing result.
 
         return new BJFModel(newBjf,service,vendor,null,p);
     }
 
+    public void bjfApproval(ApprovalForRequest ticket){
+//can be approve or reject
+    }
+
     public List<BJFAggregateModel> getBJFByApprover(String idOrUsername){
 
         return null;
     }
+
     //TODO: collaborate with Outsourcing
     public void afterOutsourcing(String bjfId){
-
+        //start approval process;
     }
+
     //TODO: Collaborate with Purchase Order
     public void afterPOUpdated(String poId){
 
@@ -116,6 +127,14 @@ public class BJFService {
             throw new Exception("No records found.");
 
         return myRequests;
+    }
+
+    public List<BJFAggregateModel> getBjfByVendorWithoutPurchaseOrder(String vendorId) throws Exception{
+        Vendor vendor = vendorService.validateVendor(vendorId);
+        List<BJFAggregateModel> allBjfsWithoutPO = bjfRepository.getBjfByVendorWithoutPurchaseOrder(vendor.getId());
+        if (allBjfsWithoutPO.isEmpty())
+            throw new Exception("No records of this vendor found.");
+        return allBjfsWithoutPO;
     }
 
     public GeneralRes bjfItemReceived(String bjfId){

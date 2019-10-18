@@ -6,7 +6,7 @@ import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
@@ -85,7 +85,7 @@ public class ContractService {
             if (newContract.getSeqNo() == null) {
                 newContract.setSeqNo(new Long(contractRepository.findAll().size()));
             }
-            Authentication.configurePermissionMap(newContract);
+            AuthenticationTools.configurePermissionMap(newContract);
 
             newContract = contractRepository.saveAndFlush(newContract);
             newContract.setCode(SCMEntityCodeHPGeneration.getCode(contractRepository,newContract));

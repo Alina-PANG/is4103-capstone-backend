@@ -8,6 +8,8 @@ public interface BJFAggregateModel {
 
     @Value("#{target.service}")
     String getServiceName();
+    @Value("#{target.code}")
+    String getBjfCode();
     @Value("#{target.vendor}")
     String getVendorName();
     @Value("#{target.total_budget}")

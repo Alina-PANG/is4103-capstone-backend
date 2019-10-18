@@ -2,6 +2,7 @@ package capstone.is4103capstone.finance.requestsMgmt.service;
 
 import capstone.is4103capstone.admin.service.CostCenterService;
 import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.enums.TrainingTypeEnum;
@@ -103,4 +104,7 @@ public class TrainingService {
         }
     }
 
+    public void trainingPlanApproval(ApprovalForRequest ticket){
+
+    }
 }

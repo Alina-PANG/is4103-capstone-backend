@@ -37,6 +37,23 @@ public class AdminInitialization {
     @Transactional
     @PostConstruct
     public void init() {
+//        Employee newEmployee = new Employee("hangzhi", "H", "P", "", "password");
+//        newEmployee.setEmail("hangzhipang@u.nus.edu");
+//        newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+//        newEmployee.setCode("EMP-11");
+//        newEmployee.setCreatedBy("admin");
+//        newEmployee.setLastModifiedBy("admin");
+//
+//        employeeRepository.saveAndFlush(newEmployee);
+//
+//        Employee employee = new Employee("alina", "H", "P", "", "password");
+//        newEmployee.setEmail("hangzhipang@u.nus.edu");
+//        newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+//        newEmployee.setCode("EMP-12");
+//        newEmployee.setCreatedBy("admin");
+//        newEmployee.setLastModifiedBy("admin");
+//
+//        employeeRepository.saveAndFlush(employee);
 
 //        List<Country> countries = countryRepository.findAll();
 //        List<CompanyFunction> functions = functionRepository.findAll();

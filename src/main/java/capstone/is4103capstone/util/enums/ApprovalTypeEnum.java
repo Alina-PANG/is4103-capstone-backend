@@ -6,5 +6,6 @@ public enum ApprovalTypeEnum {
     TRAVEL,
     TRAINING,
     BUDGETPLAN,
-    CONTRACT
+    CONTRACT,
+    OUTSOURCING_ASSESSMENT_FORM
 }

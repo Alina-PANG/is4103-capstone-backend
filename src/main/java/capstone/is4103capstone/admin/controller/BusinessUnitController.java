@@ -21,9 +21,10 @@ public class BusinessUnitController {
     @GetMapping
     public ResponseEntity<GenericObjectRes> getAllBusinessUnits() {
         try {
-            WriteAuditTrail.autoAuditUsingSpringSecurity();
+//            WriteAuditTrail.autoAuditUsingSpringSecurity();
             return ResponseEntity.ok().body(new GenericObjectRes(null, false, Optional.of(businessUnitService.getAllBusinessUnits(true))));
         } catch (Exception ex) {
+            ex.printStackTrace();
             return ResponseEntity.badRequest().body(new GenericObjectRes(ex.getMessage(), true, Optional.empty()));
         }
     }
@@ -34,6 +35,7 @@ public class BusinessUnitController {
             WriteAuditTrail.autoAuditUsingSpringSecurity();
             return ResponseEntity.ok().body(new GenericObjectRes(null, false, Optional.of(Collections.singletonList(businessUnitService.getBusinessUnitByUuid(input)))));
         } catch (Exception ex) {
+            ex.printStackTrace();
             return ResponseEntity.badRequest().body(new GenericObjectRes(ex.getMessage(), true, Optional.empty()));
         }
     }

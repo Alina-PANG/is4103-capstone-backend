@@ -12,7 +12,7 @@ import capstone.is4103capstone.finance.admin.model.Sub2Model;
 import capstone.is4103capstone.finance.admin.model.req.CreateSub1Sub2Request;
 import capstone.is4103capstone.finance.admin.model.req.UpdateCategoryReq;
 import capstone.is4103capstone.finance.admin.model.res.BudgetCategoryRes;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class Sub2Service {
             sub2.setLastModifiedBy(request.getUsername());
             EntityCodeHPGeneration.setHP(sub1,sub2);
 
-            Authentication.configurePermissionMap(sub2);
+            AuthenticationTools.configurePermissionMap(sub2);
             sub2.setBudgetSub1(sub1);
             sub1.getBudgetSub2s().add(sub2);
 

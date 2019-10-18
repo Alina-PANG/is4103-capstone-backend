@@ -2,7 +2,7 @@ package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.model.res.GetCostCenterListRes;
 import capstone.is4103capstone.admin.service.CostCenterService;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
@@ -20,9 +20,9 @@ public class CostCenterController {
 
     @GetMapping("/view-my-cc")
     public @ResponseBody ResponseEntity<Object> retrieveSimpleCostCentersByUser(@RequestHeader("Authorization") String authToken){
-        String username = Authentication.getUsernameFromToken(authToken);
+        String username = AuthenticationTools.getUsernameFromToken(authToken);
         WriteAuditTrail.autoAudit(username);
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return new ResponseEntity<Object>(ccService.getCostCentersByUserSimple(username).toString(), HttpStatus.OK);
         else
             return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
@@ -32,9 +32,9 @@ public class CostCenterController {
 
     @GetMapping("/view-my")
     public ResponseEntity<GetCostCenterListRes> retrieveCostCenterByUser(@RequestHeader("Authorization") String authToken){
-        String username = Authentication.getUsernameFromToken(authToken);
+        String username = AuthenticationTools.getUsernameFromToken(authToken);
         WriteAuditTrail.autoAudit(username);
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return ResponseEntity
                     .ok()
                     .body(ccService.getCostCentersByUser(username));
