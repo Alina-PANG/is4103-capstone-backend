@@ -1,18 +1,15 @@
 package capstone.is4103capstone.finance.budget.controller;
 
-import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
-import capstone.is4103capstone.finance.budget.model.res.PlanCompareRes;
 import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
 import capstone.is4103capstone.finance.budget.service.PlansComparisonService;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +26,7 @@ public class BudgetController {
 
     @PostMapping("/createBudget")
     public ResponseEntity<GeneralRes> createBudget(@RequestBody CreateBudgetReq createBudgetReq) {
-        if(Authentication.authenticateUser(createBudgetReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(createBudgetReq.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(budgetService.createBudget(createBudgetReq, null));
@@ -41,7 +38,7 @@ public class BudgetController {
 
     @PostMapping("/updateBudget/{id}")
     public ResponseEntity<GeneralRes> updateBudget(@RequestBody CreateBudgetReq createBudgetReq, @PathVariable("id") String id) {
-        if(Authentication.authenticateUser(createBudgetReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(createBudgetReq.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(budgetService.createBudget(createBudgetReq, id));
@@ -53,7 +50,7 @@ public class BudgetController {
 
     @GetMapping("/getBudgetDetails/{id}")
     public ResponseEntity<GeneralRes> getBudget(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return ResponseEntity.ok().body(budgetService.getBudget(id,username));
         else
             return ResponseEntity
@@ -63,7 +60,7 @@ public class BudgetController {
 
     @GetMapping("/getBudgetListByTeam")
     public ResponseEntity<GeneralRes> getAllBudgetListByUser(@RequestParam(name="username", required=true) String username, @RequestParam(name="teamId", required=true) String teamId,@RequestParam(value = "ccId",required = false) String costcenterId, @RequestParam(name="type",required = false) Integer retrieveType, @RequestParam(name="year",required = false) Integer year){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return ResponseEntity
                     .ok()
                     .body(budgetService.getBudgetList(username,teamId));//,costcenterId,  retrieveType,year));
@@ -75,7 +72,7 @@ public class BudgetController {
 
     @PostMapping("/approveBudget")
     public ResponseEntity approveBudget(@RequestBody ApproveBudgetReq approveBudgetReq){
-        if(Authentication.authenticateUser(approveBudgetReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(approveBudgetReq.getUsername()))
             return ResponseEntity
                     .ok()
                     .body(budgetService.approveBudget(approveBudgetReq));

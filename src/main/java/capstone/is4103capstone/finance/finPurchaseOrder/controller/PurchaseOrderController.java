@@ -1,9 +1,8 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.controller;
 
-import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.finPurchaseOrder.service.PurchaseOrderService;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreatePOReq;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
@@ -23,7 +22,7 @@ public class PurchaseOrderController {
 
     @PostMapping("/createPO")
     public ResponseEntity<GeneralRes> createPO(@RequestBody CreatePOReq createPOReq) {
-        if(Authentication.authenticateUser(createPOReq.getUsername())) {
+        if(AuthenticationTools.authenticateUser(createPOReq.getUsername())) {
                 return purchaseOrderService.createPO(createPOReq, null);
         }
         else
@@ -34,7 +33,7 @@ public class PurchaseOrderController {
 
     @PostMapping("/updatePO/{id}")
     public ResponseEntity<GeneralRes> updatePO(@RequestBody CreatePOReq createPOReq, @PathVariable("id") String id) {
-        if(Authentication.authenticateUser(createPOReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(createPOReq.getUsername()))
             return purchaseOrderService.createPO(createPOReq, id);
         else
             return ResponseEntity
@@ -44,7 +43,7 @@ public class PurchaseOrderController {
 
     @GetMapping("/getPO/{id}")
     public ResponseEntity<GeneralRes> getPO(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return purchaseOrderService.getPO(id);
         else
             return ResponseEntity
@@ -56,7 +55,7 @@ public class PurchaseOrderController {
     public ResponseEntity<GeneralRes> getListPO(@PathVariable("status") int status, @RequestParam(name="username", required=true) String username){
         ApprovalStatusEnum inputStatus;
         logger.info("Controller: request for pos in status "+ status);
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return purchaseOrderService.getListPO(status);
         else
             return ResponseEntity
@@ -67,7 +66,7 @@ public class PurchaseOrderController {
 
     @PostMapping("/approvePO/{id}")
     public ResponseEntity<GeneralRes> getListPO(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, @RequestParam(name="approved", required=true) Boolean approved){
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return purchaseOrderService.approvePO(id, approved, username);
         else
             return ResponseEntity

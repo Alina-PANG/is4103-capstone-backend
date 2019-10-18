@@ -3,7 +3,7 @@ package capstone.is4103capstone.finance.admin.controller;
 import capstone.is4103capstone.finance.admin.model.req.CreateServiceRequest;
 import capstone.is4103capstone.finance.admin.model.res.ServiceListRes;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class ServiceController {
     public @ResponseBody
     ResponseEntity<Object> createservice(@RequestBody CreateServiceRequest req) {
 
-        if(Authentication.authenticateUser(req.getUsername())){
+        if(AuthenticationTools.authenticateUser(req.getUsername())){
             return new ResponseEntity<Object>(serviceService.createService(req).toString(), HttpStatus.OK);
         }
         else
@@ -35,7 +35,7 @@ public class ServiceController {
 
     @GetMapping("/view")
     public ResponseEntity<ServiceListRes> viewserviceUnderSub2(@RequestParam(name="username", required=true) String username, @RequestParam(name="sub2Code", required=true) String sub2Code){
-        if(Authentication.authenticateUser(username)){
+        if(AuthenticationTools.authenticateUser(username)){
             return ResponseEntity
                     .ok()
                     .body(serviceService.viewserviceItemsBySub2(sub2Code));

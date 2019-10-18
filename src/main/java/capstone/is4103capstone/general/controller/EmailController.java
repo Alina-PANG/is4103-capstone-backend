@@ -2,7 +2,7 @@ package capstone.is4103capstone.general.controller;
 
 import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
@@ -34,7 +34,7 @@ public class EmailController {
         model.put("message", "test message");
         mail.setModel(model);
 //        mailSenderService.sendmail();
-        if(Authentication.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(username))
             return ResponseEntity
                     .ok()
                     .body(mailSenderService.sendEmail(mail, template));

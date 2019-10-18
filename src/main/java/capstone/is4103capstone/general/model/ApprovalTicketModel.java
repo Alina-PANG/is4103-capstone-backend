@@ -1,6 +1,7 @@
 package capstone.is4103capstone.general.model;
 
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
+import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -8,29 +9,60 @@ import java.util.Date;
 
 public class ApprovalTicketModel implements Serializable {
     private String reviewerUsername;
-    private String comment;
+    private String requestedItemId;
+    private String approverComment;
+    private String requesterComment;
     private String createdDateTime;
     private String reviewedDateTime;
-    private String ticketResult;
+    private ApprovalStatusEnum ticketResult;
+    private ApprovalTypeEnum requestType;
 
     private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public ApprovalTicketModel() {
     }
 
-    public ApprovalTicketModel(String reviewerUsername, String comment, Date createdDateTime, Date reviewedDateTime, ApprovalStatusEnum ticketResult) {
+    public ApprovalTicketModel(String reviewerUsername, String requestedItemId, String approverComment, String requesterComment, String createdDateTime, String reviewedDateTime, ApprovalStatusEnum ticketResult, ApprovalTypeEnum requestType) {
         this.reviewerUsername = reviewerUsername;
-        this.comment = comment;
-        this.createdDateTime = datetimeFormatter.format(createdDateTime);
-        this.reviewedDateTime = datetimeFormatter.format(reviewedDateTime);
-        this.ticketResult = ticketResult.name();
-    }
-    public ApprovalTicketModel(String reviewerUsername, String comment, String createdDateTime, String reviewedDateTime, String ticketResult) {
-        this.reviewerUsername = reviewerUsername;
-        this.comment = comment;
+        this.requestedItemId = requestedItemId;
+        this.approverComment = approverComment;
+        this.requesterComment = requesterComment;
         this.createdDateTime = createdDateTime;
         this.reviewedDateTime = reviewedDateTime;
         this.ticketResult = ticketResult;
+        this.requestType = requestType;
+    }
+
+    public ApprovalTicketModel(String reviewerUsername, String comment, Date createdDateTime, Date reviewedDateTime, ApprovalStatusEnum ticketResult) {
+        this.reviewerUsername = reviewerUsername;
+        this.approverComment = comment;
+        this.createdDateTime = datetimeFormatter.format(createdDateTime);
+        this.reviewedDateTime = datetimeFormatter.format(reviewedDateTime);
+        this.ticketResult = ticketResult;
+    }
+
+    public String getRequesterComment() {
+        return requesterComment;
+    }
+
+    public void setRequesterComment(String requesterComment) {
+        this.requesterComment = requesterComment;
+    }
+
+    public String getRequestedItemId() {
+        return requestedItemId;
+    }
+
+    public void setRequestedItemId(String requestedItemId) {
+        this.requestedItemId = requestedItemId;
+    }
+
+    public ApprovalTypeEnum getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(ApprovalTypeEnum requestType) {
+        this.requestType = requestType;
     }
 
     public String getReviewerUsername() {
@@ -41,12 +73,12 @@ public class ApprovalTicketModel implements Serializable {
         this.reviewerUsername = reviewerUsername;
     }
 
-    public String getComment() {
-        return comment;
+    public String getApproverComment() {
+        return approverComment;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setApproverComment(String approverComment) {
+        this.approverComment = approverComment;
     }
 
     public String getCreatedDateTime() {
@@ -65,11 +97,13 @@ public class ApprovalTicketModel implements Serializable {
         this.reviewedDateTime = reviewedDateTime;
     }
 
-    public String getTicketResult() {
+    public ApprovalStatusEnum getTicketResult() {
         return ticketResult;
     }
 
-    public void setTicketResult(String ticketResult) {
+    public void setTicketResult(ApprovalStatusEnum ticketResult) {
         this.ticketResult = ticketResult;
     }
+
+
 }
