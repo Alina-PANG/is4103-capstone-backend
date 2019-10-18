@@ -110,6 +110,16 @@ public class AssessmentFormService {
                 if(temp != null){
                     temp.setDeleted(true);
                     outsourcingAssessmentRepository.saveAndFlush(temp);
+                    List<OutsourcingAssessmentSection> sections = temp.getSectionList();
+                    for(OutsourcingAssessmentSection s: sections){
+                        s.setDeleted(true);
+                        outsourcingAssessmentSectionRepository.saveAndFlush(s);
+                        List<OutsourcingAssessmentLine> lines = s.getOutsourcingAssessmentLines();
+                        for(OutsourcingAssessmentLine l: lines){
+                            l.setDeleted(true);
+                            outsourcingAssessmentLineRepository.saveAndFlush(l);
+                        }
+                    }
                 }
             }
 
@@ -121,22 +131,20 @@ public class AssessmentFormService {
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
 
             for (OutsourcingAssessmentSection s : sections) {
+                OutsourcingAssessmentSection newS = outsourcingAssessmentSectionRepository.saveAndFlush(s);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
                 for (OutsourcingAssessmentLine o : outsourcingAssessmentLine) {
                     o.setCreatedBy(createAssessmentFromReq.getUsername());
                     o.setCreatedDateTime(new Date());
-                    linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
-                }
-                s.setOutsourcingAssessmentLines(linesSaved);
-                s.setOutsourcingAssessment(newAssess);
-                s.setCreatedBy(createAssessmentFromReq.getUsername());
-                s.setCreatedDateTime(new Date());
-                OutsourcingAssessmentSection newS = outsourcingAssessmentSectionRepository.saveAndFlush(s);
-                for (OutsourcingAssessmentLine o : linesSaved) {
                     o.setOutsourcingAssessmentSection(newS);
                     linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
                 }
+                newS.setOutsourcingAssessmentLines(linesSaved);
+                newS.setOutsourcingAssessment(newAssess);
+                newS.setCreatedBy(createAssessmentFromReq.getUsername());
+                newS.setCreatedDateTime(new Date());
+                outsourcingAssessmentSectionRepository.saveAndFlush(newS);
             }
             newAssess.setSectionList(sections);
             newAssess.setCreatedBy(createAssessmentFromReq.getUsername());
@@ -170,8 +178,8 @@ public class AssessmentFormService {
             if(form.getDeleted()) return ResponseEntity
                     .notFound().build();
             if(approved) {
-                if(level == 1) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
-                else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
+                if(level == 2) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
+                else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
             }
             else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
             outsourcingAssessmentRepository.saveAndFlush(form);

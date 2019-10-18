@@ -2,8 +2,10 @@ package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -31,6 +33,11 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     private Double totalAmount;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchaseOrder_vendor")
+    @JsonIgnore
+    private Vendor vendor;
+
     public PurchaseOrder() {
     }
 
@@ -56,6 +63,14 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public void setStatementOfAccount(List<StatementOfAcctLineItem> statementOfAccount) {
         this.statementOfAccount = statementOfAccount;
+    }
+
+    public Vendor getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 
     public ApprovalStatusEnum getStatus() {

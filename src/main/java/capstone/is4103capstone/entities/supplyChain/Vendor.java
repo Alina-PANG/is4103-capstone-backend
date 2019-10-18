@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities.supplyChain;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.finance.Invoice;
+import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -33,6 +34,9 @@ public class Vendor extends DBEntityTemplate {
     @OneToMany(mappedBy = "vendor")
     private List<Contract> contracts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "vendor")
+    private List<PurchaseOrder> purchaseOrders= new ArrayList<>();
+
     @OneToMany(mappedBy = "outsourcedVendor")
     private List<Outsourcing> outsourcingList = new ArrayList<>();
 
@@ -51,6 +55,14 @@ public class Vendor extends DBEntityTemplate {
     }
 
     public Vendor() {
+    }
+
+    public List<PurchaseOrder> getPurchaseOrders() {
+        return purchaseOrders;
+    }
+
+    public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
+        this.purchaseOrders = purchaseOrders;
     }
 
     public List<Invoice> getInvoices() {

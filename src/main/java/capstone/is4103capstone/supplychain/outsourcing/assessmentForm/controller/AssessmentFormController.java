@@ -38,8 +38,7 @@ public class AssessmentFormController {
     public ResponseEntity<GeneralRes> createAssessmentForm(@PathVariable("isTemplate") int isTemplate,@RequestBody CreateAssessmentFromReq createAssessmentFromReq) {
         logger.info("*************** Creating Assessment Form *****************");
         if(Authentication.authenticateUser(createAssessmentFromReq.getUsername())) {
-            boolean isTemplateBool = isTemplate == 0 ? true: false;
-            return assessmentFormService.createForm(isTemplateBool, createAssessmentFromReq, null);
+            return assessmentFormService.createForm(isTemplate == 1, createAssessmentFromReq, null);
         }
         else
             return ResponseEntity
@@ -51,8 +50,7 @@ public class AssessmentFormController {
     public ResponseEntity<GeneralRes> updateForm(@PathVariable("isTemplate") int isTemplate, @RequestBody CreateAssessmentFromReq createAssessmentFromReq,  @PathVariable("id") String id) {
         logger.info("*************** Updating Assessment Form *****************");
         if(Authentication.authenticateUser(createAssessmentFromReq.getUsername())){
-            boolean isTemplateBool = isTemplate == 0 ? true: false;
-            return assessmentFormService.createForm(isTemplateBool, createAssessmentFromReq, id);
+            return assessmentFormService.createForm(isTemplate == 1, createAssessmentFromReq, id);
         }
         else
             return ResponseEntity
