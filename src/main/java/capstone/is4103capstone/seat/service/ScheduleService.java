@@ -57,6 +57,7 @@ public class ScheduleService {
         Schedule allocationSchedule = existingSeatAllocation.getSchedule();
         if (existingSeatAllocation.getAllocationType() == SeatAllocationTypeEnum.FIXED) {
             if (allocationSchedule.getEndDateTime() == null) {
+                // Two permanent allocations must clash because both don't have an end date time
                 throw new ScheduleClashException("Allocation schedule clash with another fixed seat allocation (for a permanent employee)!");
             } else {
                 if (allocationSchedule.getEndDateTime().after(requiredStartDateTime)) {

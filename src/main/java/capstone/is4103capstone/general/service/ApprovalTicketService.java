@@ -142,7 +142,7 @@ public class ApprovalTicketService {
         for (ApprovalForRequest a: list){
             if (a.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
                 continue;
-            models.add(new ApprovalTicketModel(a.getApprover().getUserName(),a.getCommentByApprover(),a.getCreatedDateTime(),a.getLastModifiedDateTime(),a.getApprovalStatus()));
+            models.add(new ApprovalTicketModel(a.getId(),a.getApprover().getUserName(),a.getCommentByApprover(),a.getCreatedDateTime(),a.getLastModifiedDateTime(),a.getApprovalStatus()));
         }
         return models;
     }
@@ -151,7 +151,7 @@ public class ApprovalTicketService {
         List<ApprovalForRequest> list = approvalForRequestRepo.findTicketsByRequestedItemId(requestedItem.getId());
         List<ApprovalTicketModel> models = new ArrayList<>();
         for (ApprovalForRequest a: list){
-            models.add(new ApprovalTicketModel(a.getApprover().getUserName(),a.getCommentByApprover(),a.getCreatedDateTime(),a.getLastModifiedDateTime(),a.getApprovalStatus()));
+            models.add(new ApprovalTicketModel(a.getId(),a.getApprover().getUserName(),a.getCommentByApprover(),a.getCreatedDateTime(),a.getLastModifiedDateTime(),a.getApprovalStatus()));
         }
         return models;
     }

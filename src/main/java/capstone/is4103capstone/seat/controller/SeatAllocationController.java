@@ -1,19 +1,14 @@
 package capstone.is4103capstone.seat.controller;
 
-import capstone.is4103capstone.entities.BusinessUnit;
-import capstone.is4103capstone.entities.CompanyFunction;
-import capstone.is4103capstone.entities.Schedule;
-import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.seat.Seat;
-import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatMap;
-import capstone.is4103capstone.finance.budget.controller.BudgetController;
 import capstone.is4103capstone.seat.model.*;
 import capstone.is4103capstone.seat.model.seat.SeatModelForAllocation;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatAllocation.*;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapGroupModelForDeallocation;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocation;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocationWithHighlight;
 import capstone.is4103capstone.seat.service.EntityModelConversionService;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
 import capstone.is4103capstone.seat.service.SeatManagementBackgroundService;
@@ -25,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.DayOfWeek;
 import java.util.*;
 
 @RestController
@@ -103,6 +97,21 @@ public class SeatAllocationController {
     }
 
     @GetMapping("/seatmap")
+    public ResponseEntity retrieveSeatMapWithSeatAllocations(@RequestParam(name="seatMapId", required=true) String seatMapId) {
+        SeatMap seatMap = seatMapService.getSeatMapById(seatMapId);
+        SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
+        seatMapModelForAllocation.setId(seatMapId);
+        seatMapModelForAllocation.setCode(seatMap.getCode());
+        for (Seat seat :
+                seatMap.getSeats()) {
+            SeatModelForAllocation seatModelForAllocation = entityModelConversionService.convertSeatToSeatModelForAllocation(seat);
+            seatMapModelForAllocation.getSeatModelsForAllocation().add(seatModelForAllocation);
+        }
+        Collections.sort(seatMapModelForAllocation.getSeatModelsForAllocation());
+        return ResponseEntity.ok(seatMapModelForAllocation);
+    }
+
+    @GetMapping("/seatmaps")
     public ResponseEntity retrieveSeatMapsContainingActiveEmployeeSeatAllocations(@RequestParam(name="employeeId", required=true) String employeeId) {
         List<SeatMap> seatMaps = seatMapService.retrieveSeatMapsWithActiveEmployeeAllocations(employeeId);
         List<GroupModel> seatMapModels = new ArrayList<>();
@@ -124,14 +133,14 @@ public class SeatAllocationController {
         Optional<SeatMap> optionalSeatMap = seatMapService.retrieveSeatMapWithActiveEmployeeAllocations(seatMapId, employeeId);
         if (optionalSeatMap.isPresent()) {
             SeatMap seatMap = optionalSeatMap.get();
-            SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
-            seatMapModelForAllocation.setId(seatMap.getId());
-            seatMapModelForAllocation.setCode(seatMap.getCode());
+            SeatMapModelForAllocationWithHighlight seatMapModelForAllocationWithHighlight = new SeatMapModelForAllocationWithHighlight();
+            seatMapModelForAllocationWithHighlight.setId(seatMap.getId());
+            seatMapModelForAllocationWithHighlight.setCode(seatMap.getCode());
 
             List<SeatModelWithHighlighting> seatModelsForDeallocationViaSeatMap = entityModelConversionService.convertSeatsToSeatModelsWithHighlightingEmployee(seatMap.getSeats(), employeeId);
-            seatMapModelForAllocation.setSeatModelsForDeallocationViaSeatMap(seatModelsForDeallocationViaSeatMap);
-            Collections.sort(seatMapModelForAllocation.getSeatModelsForDeallocationViaSeatMap());
-            return ResponseEntity.ok(seatMapModelForAllocation);
+            seatMapModelForAllocationWithHighlight.setSeatModelsForAllocationViaSeatMap(seatModelsForDeallocationViaSeatMap);
+            Collections.sort(seatMapModelForAllocationWithHighlight.getSeatModelsForAllocationViaSeatMap());
+            return ResponseEntity.ok(seatMapModelForAllocationWithHighlight);
         }
 
         return ResponseEntity.ok("No seat map was found to satisfy the condition.");

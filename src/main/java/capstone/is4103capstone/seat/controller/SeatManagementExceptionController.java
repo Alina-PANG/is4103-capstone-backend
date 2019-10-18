@@ -12,6 +12,16 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class SeatManagementExceptionController {
 
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity handleGeneralException(Exception ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        ex.printStackTrace();
+        error.setError("An internal server error occurred.");
+        error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(value = SeatAllocationException.class)
     public ResponseEntity handleSeatAllocationException(SeatAllocationException ex) {
         CustomErrorRes error = new CustomErrorRes();
@@ -86,6 +96,42 @@ public class SeatManagementExceptionController {
 
     @ExceptionHandler(value = EntityModelConversionException.class)
     public ResponseEntity handleEntityModelConversionException(EntityModelConversionException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = CreateSeatAllocationRequestException.class)
+    public ResponseEntity handleCreateSeatAllocationRequestException(CreateSeatAllocationRequestException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = CreateSeatAllocationRequestRightException.class)
+    public ResponseEntity handleCreateSeatAllocationRequestRightException(CreateSeatAllocationRequestRightException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = SeatRequestAdminMatchNotFoundException.class)
+    public ResponseEntity handleSeatRequestAdminMatchNotFoundException(SeatRequestAdminMatchNotFoundException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = SeatAllocationRequestNotFoundException.class)
+    public ResponseEntity handleSeatAllocationRequestNotFoundException(SeatAllocationRequestNotFoundException ex) {
         CustomErrorRes error = new CustomErrorRes();
         error.setTimestamp(LocalDateTime.now());
         error.setError(ex.getMessage());

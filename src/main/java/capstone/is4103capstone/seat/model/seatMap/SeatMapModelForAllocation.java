@@ -1,6 +1,6 @@
 package capstone.is4103capstone.seat.model.seatMap;
 
-import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
+import capstone.is4103capstone.seat.model.seat.SeatModelForAllocation;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
@@ -11,15 +11,15 @@ import java.util.List;
 public class SeatMapModelForAllocation implements Serializable {
     private String id;
     private String code;
-    private List<SeatModelWithHighlighting> seatModelsForDeallocationViaSeatMap = new ArrayList<>();
+    private List<SeatModelForAllocation> seatModelsForAllocation = new ArrayList<>();
 
     public SeatMapModelForAllocation() {
     }
 
-    public SeatMapModelForAllocation(String id, String code, List<SeatModelWithHighlighting> seatModelsForDeallocationViaSeatMap) {
+    public SeatMapModelForAllocation(String id, String code, List<SeatModelForAllocation> seatModelsForAllocation) {
         this.id = id;
         this.code = code;
-        this.seatModelsForDeallocationViaSeatMap = seatModelsForDeallocationViaSeatMap;
+        this.seatModelsForAllocation = seatModelsForAllocation;
     }
 
     public String getId() {
@@ -38,11 +38,12 @@ public class SeatMapModelForAllocation implements Serializable {
         this.code = code;
     }
 
-    public List<SeatModelWithHighlighting> getSeatModelsForDeallocationViaSeatMap() {
-        return seatModelsForDeallocationViaSeatMap;
+    public List<SeatModelForAllocation> getSeatModelsForAllocation() {
+        return seatModelsForAllocation;
     }
 
-    public void setSeatModelsForDeallocationViaSeatMap(List<SeatModelWithHighlighting> seatModelsForDeallocationViaSeatMap) {
-        this.seatModelsForDeallocationViaSeatMap = seatModelsForDeallocationViaSeatMap;
+    public void setSeatModelsForAllocation(List<SeatModelForAllocation> seatModelsForAllocation) {
+        this.seatModelsForAllocation = seatModelsForAllocation;
     }
+
 }

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ApprovalTicketModel implements Serializable {
+    private String id;
     private String reviewerUsername;
     private String comment;
     private String createdDateTime;
@@ -18,7 +19,8 @@ public class ApprovalTicketModel implements Serializable {
     public ApprovalTicketModel() {
     }
 
-    public ApprovalTicketModel(String reviewerUsername, String comment, Date createdDateTime, Date reviewedDateTime, ApprovalStatusEnum ticketResult) {
+    public ApprovalTicketModel(String id, String reviewerUsername, String comment, Date createdDateTime, Date reviewedDateTime, ApprovalStatusEnum ticketResult) {
+        this.id = id;
         this.reviewerUsername = reviewerUsername;
         this.comment = comment;
         this.createdDateTime = datetimeFormatter.format(createdDateTime);
@@ -26,11 +28,20 @@ public class ApprovalTicketModel implements Serializable {
         this.ticketResult = ticketResult.name();
     }
     public ApprovalTicketModel(String reviewerUsername, String comment, String createdDateTime, String reviewedDateTime, String ticketResult) {
+        this.id = id;
         this.reviewerUsername = reviewerUsername;
         this.comment = comment;
         this.createdDateTime = createdDateTime;
         this.reviewedDateTime = reviewedDateTime;
         this.ticketResult = ticketResult;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getReviewerUsername() {

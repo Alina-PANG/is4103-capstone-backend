@@ -2,12 +2,14 @@ package capstone.is4103capstone.seat.controller;
 
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.Schedule;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
-import capstone.is4103capstone.seat.model.ScheduleModel;
+import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
-import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocation;
+import capstone.is4103capstone.seat.model.seatAllocationRequest.CreateSeatAllocationRequestModel;
+import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestModel;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocationWithHighlight;
 import capstone.is4103capstone.seat.service.EntityModelConversionService;
+import capstone.is4103capstone.seat.service.SeatAllocationRequestService;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
 import capstone.is4103capstone.seat.service.SeatMapService;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
@@ -32,14 +34,24 @@ public class SeatAllocationRequestController {
     @Autowired
     private SeatMapService seatMapService;
     @Autowired
+    private SeatAllocationRequestService seatAllocationRequestService;
+    @Autowired
     private EmployeeService employeeService;
     @Autowired
     private EntityModelConversionService entityModelConversionService;
 
+    // ---------------------------------- POST: Create ----------------------------------
+
+    @PostMapping("/new")
+    public ResponseEntity createNewSeatAllocationRequest(@RequestBody CreateSeatAllocationRequestModel createSeatAllocationRequestModel) {
+        seatAllocationRequestService.createNewSeatAllocationRequest(createSeatAllocationRequestModel);
+        return ResponseEntity.ok("Create seat allocation request successfully!");
+    }
+
     // ---------------------------------- GET: Retrieve ----------------------------------
 
-    @GetMapping
-    public ResponseEntity retrieveSeatWithItsAllocations(@RequestParam(name="hierarchy", required=true) String hierarchy,
+    @GetMapping("/availability")
+    public ResponseEntity retrieveAvailableSeatMapsForAllocationByHierarchy(@RequestParam(name="hierarchy", required=true) String hierarchy,
                                                          @RequestParam(name="hierarchyId", required=true) String hierarchyId,
                                                          @RequestBody SeatAllocationModelForEmployee seatAllocationModelForEmployee) {
 
@@ -63,7 +75,14 @@ public class SeatAllocationRequestController {
 
         seatAllocation.setSchedule(entityModelConversionService.convertScheduleModelToSchedule(seatAllocationModelForEmployee.getSchedule(),
                 seatAllocation.getAllocationType().toString()));
-        List<SeatMapModelForAllocation> seatMapModels = seatMapService.retrieveAvailableSeatMapsForAllocationByHierarchy(hierarchy, hierarchyId, seatAllocation);
+        List<SeatMapModelForAllocationWithHighlight> seatMapModels = seatMapService.retrieveAvailableSeatMapsForAllocationByHierarchy(hierarchy, hierarchyId, seatAllocation);
         return ResponseEntity.ok(seatMapModels);
+    }
+
+    @GetMapping
+    public ResponseEntity retrieveSeatAllocationRequestById(@RequestParam(name="requestId", required=true) String requestId) {
+        SeatAllocationRequest seatAllocationRequest = seatAllocationRequestService.retrieveSeatAllocationRequestById(requestId);
+        SeatAllocationRequestModel seatAllocationRequestModel = entityModelConversionService.convertSeatAllocationRequestEntityToModel(seatAllocationRequest);
+        return ResponseEntity.ok(seatAllocationRequestModel);
     }
 }

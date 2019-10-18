@@ -9,10 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SeatModelForAllocation implements Serializable {
+public class SeatModelForAllocation implements Serializable, Comparable<SeatModelForAllocation> {
     private String id;
     private String code;
     private String type;
+    private Integer seqNum;
 
     private GroupModel functionAssigned;
     private GroupModel businessUnitAssigned;
@@ -24,11 +25,13 @@ public class SeatModelForAllocation implements Serializable {
     public SeatModelForAllocation() {
     }
 
-    public SeatModelForAllocation(String id, String code, String type, GroupModel functionAssigned, GroupModel businessUnitAssigned, GroupModel teamAssigned,
+    public SeatModelForAllocation(String id, String code, String type, Integer seqNum, GroupModel functionAssigned,
+                                  GroupModel businessUnitAssigned, GroupModel teamAssigned,
                                   SeatAllocationModelForEmployee currentOccupancy, List<SeatAllocationModelForEmployee> allocations) {
         this.id = id;
         this.code = code;
         this.type = type;
+        this.seqNum = seqNum;
         this.functionAssigned = functionAssigned;
         this.businessUnitAssigned = businessUnitAssigned;
         this.teamAssigned = teamAssigned;
@@ -58,6 +61,14 @@ public class SeatModelForAllocation implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Integer getSeqNum() {
+        return seqNum;
+    }
+
+    public void setSeqNum(Integer seqNum) {
+        this.seqNum = seqNum;
     }
 
     public GroupModel getFunctionAssigned() {
@@ -95,4 +106,7 @@ public class SeatModelForAllocation implements Serializable {
     public void setAllocations(List<SeatAllocationModelForEmployee> allocations) {
         this.allocations = allocations;
     }
+
+    @Override
+    public int compareTo(SeatModelForAllocation anotherSeat) { return this.seqNum - anotherSeat.getSeqNum(); }
 }

@@ -12,7 +12,7 @@ import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
-import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocation;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocationWithHighlight;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForSetup;
 import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
@@ -179,10 +179,10 @@ public class SeatMapService {
     // Retrieve seat maps that have seats available for a required allocation under a specific function/business unit/team
     // This step is done when an approver tries to see whether the request can be fulfilled; when a request is escalated to a higher hierarchy,
     //    there is no checking done
-    public List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByHierarchy(String hierarchy, String hierarchyId, SeatAllocation seatAllocation)
+    public List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByHierarchy(String hierarchy, String hierarchyId, SeatAllocation seatAllocation)
             throws SeatMapNotFoundException, TeamNotFoundException, CompanyFunctionNotFoundException {
 
-        List<SeatMapModelForAllocation> seatMapModelsOfAvailableSeatMaps = new ArrayList<>();
+        List<SeatMapModelForAllocationWithHighlight> seatMapModelsOfAvailableSeatMaps = new ArrayList<>();
 
         if (hierarchy == null || hierarchy.trim().length() == 0) {
             throw new SeatMapNotFoundException("Fail to retrieve seat maps: hierarchy type is required!");
@@ -222,9 +222,9 @@ public class SeatMapService {
     }
 
 
-    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByTeam(Team team, Schedule schedule, SeatAllocationTypeEnum seatAllocationTypeEnum) {
+    private List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByTeam(Team team, Schedule schedule, SeatAllocationTypeEnum seatAllocationTypeEnum) {
 
-        List<SeatMapModelForAllocation> seatMapModels = new ArrayList<>();
+        List<SeatMapModelForAllocationWithHighlight> seatMapModels = new ArrayList<>();
         List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToTeam(team.getId());
         // Check each seat inside the seat map
         // - whether it's allocated to the team
@@ -232,9 +232,9 @@ public class SeatMapService {
         for (SeatMap seatMap :
                 availableSeatMaps) {
 
-            SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
-            seatMapModelForAllocation.setId(seatMap.getId());
-            seatMapModelForAllocation.setCode(seatMap.getCode());
+            SeatMapModelForAllocationWithHighlight seatMapModelForAllocationWithHighlight = new SeatMapModelForAllocationWithHighlight();
+            seatMapModelForAllocationWithHighlight.setId(seatMap.getId());
+            seatMapModelForAllocationWithHighlight.setCode(seatMap.getCode());
             List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
 
             boolean shouldBeIncluded = false;
@@ -254,8 +254,8 @@ public class SeatMapService {
             }
 
             if (shouldBeIncluded) {
-                seatMapModelForAllocation.setSeatModelsForDeallocationViaSeatMap(seatModels);
-                seatMapModels.add(seatMapModelForAllocation);
+                seatMapModelForAllocationWithHighlight.setSeatModelsForAllocationViaSeatMap(seatModels);
+                seatMapModels.add(seatMapModelForAllocationWithHighlight);
             }
         }
         return seatMapModels;
@@ -263,20 +263,20 @@ public class SeatMapService {
 
 
     // TODO: must ensure that the user does the checking has access to the office where the teams are located
-    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByBusinessUnit(BusinessUnit businessUnit,
-                                                                                                 Schedule schedule,
-                                                                                                 SeatAllocationTypeEnum seatAllocationTypeEnum,
-                                                                                                 Office office) {
+    private List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByBusinessUnit(BusinessUnit businessUnit,
+                                                                                                              Schedule schedule,
+                                                                                                              SeatAllocationTypeEnum seatAllocationTypeEnum,
+                                                                                                              Office office) {
 
-        List<SeatMapModelForAllocation> seatMapModels = new ArrayList<>();
+        List<SeatMapModelForAllocationWithHighlight> seatMapModels = new ArrayList<>();
         List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToBusinessUnit(businessUnit.getId());
 
         for (SeatMap seatMap :
                 availableSeatMaps) {
 
-            SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
-            seatMapModelForAllocation.setId(seatMap.getId());
-            seatMapModelForAllocation.setCode(seatMap.getCode());
+            SeatMapModelForAllocationWithHighlight seatMapModelForAllocationWithHighlight = new SeatMapModelForAllocationWithHighlight();
+            seatMapModelForAllocationWithHighlight.setId(seatMap.getId());
+            seatMapModelForAllocationWithHighlight.setCode(seatMap.getCode());
             List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
 
             if (!seatMap.getOffice().getId().equals(office.getId())) {
@@ -299,8 +299,8 @@ public class SeatMapService {
             }
 
             if (shouldBeIncluded) {
-                seatMapModelForAllocation.setSeatModelsForDeallocationViaSeatMap(seatModels);
-                seatMapModels.add(seatMapModelForAllocation);
+                seatMapModelForAllocationWithHighlight.setSeatModelsForAllocationViaSeatMap(seatModels);
+                seatMapModels.add(seatMapModelForAllocationWithHighlight);
             }
         }
 
@@ -308,20 +308,20 @@ public class SeatMapService {
     }
 
 
-    private List<SeatMapModelForAllocation> retrieveAvailableSeatMapsForAllocationByFunction(CompanyFunction function,
-                                                                                             Schedule schedule,
-                                                                                             SeatAllocationTypeEnum seatAllocationTypeEnum,
-                                                                                             Office office) {
+    private List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByFunction(CompanyFunction function,
+                                                                                                          Schedule schedule,
+                                                                                                          SeatAllocationTypeEnum seatAllocationTypeEnum,
+                                                                                                          Office office) {
 
-        List<SeatMapModelForAllocation> seatMapModels = new ArrayList<>();
+        List<SeatMapModelForAllocationWithHighlight> seatMapModels = new ArrayList<>();
         List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToFunction(function.getId());
 
         for (SeatMap seatMap :
                 availableSeatMaps) {
 
-            SeatMapModelForAllocation seatMapModelForAllocation = new SeatMapModelForAllocation();
-            seatMapModelForAllocation.setId(seatMap.getId());
-            seatMapModelForAllocation.setCode(seatMap.getCode());
+            SeatMapModelForAllocationWithHighlight seatMapModelForAllocationWithHighlight = new SeatMapModelForAllocationWithHighlight();
+            seatMapModelForAllocationWithHighlight.setId(seatMap.getId());
+            seatMapModelForAllocationWithHighlight.setCode(seatMap.getCode());
             List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
 
             if (!seatMap.getOffice().getId().equals(office.getId())) {
@@ -344,8 +344,8 @@ public class SeatMapService {
             }
 
             if (shouldBeIncluded) {
-                seatMapModelForAllocation.setSeatModelsForDeallocationViaSeatMap(seatModels);
-                seatMapModels.add(seatMapModelForAllocation);
+                seatMapModelForAllocationWithHighlight.setSeatModelsForAllocationViaSeatMap(seatModels);
+                seatMapModels.add(seatMapModelForAllocationWithHighlight);
             }
         }
 

@@ -3,7 +3,10 @@ package capstone.is4103capstone.admin;
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.Address;
+import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
+import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +34,8 @@ public class AdminInitialization {
     CurrencyRepository currencyRepository;
     @Autowired
     CostCenterRepository costCenterRepository;
+    @Autowired
+    SeatRequestAdminMatchRepository seatRequestAdminMatchRepository;
 
     @PostConstruct
     public void init() {
@@ -106,10 +111,28 @@ public class AdminInitialization {
         newEmployee2.setManager(newEmployee);
         newEmployee.getSubordinates().add(newEmployee2);
 
+        // Seat admin setup for different hierarchies
+        SeatRequestAdminMatch seatRequestAdminMatch1 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch1.setHierarchyId(team.getId());
+        seatRequestAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch1.setSeatAdmin(newEmployee);
+
+        SeatRequestAdminMatch seatRequestAdminMatch2 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch2.setHierarchyId(team.getBusinessUnit().getId());
+        seatRequestAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatRequestAdminMatch2.setSeatAdmin(admin);
+
+        SeatRequestAdminMatch seatRequestAdminMatch3 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch3.setHierarchyId(team.getBusinessUnit().getFunction().getId());
+        seatRequestAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+        seatRequestAdminMatch3.setSeatAdmin(admin);
+
         teamRepository.saveAndFlush(team);
         employeeRepository.saveAndFlush(newEmployee);
         employeeRepository.saveAndFlush(newEmployee2);
-
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch1);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch2);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch3);
     }
 
     public void createGeo() {

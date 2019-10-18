@@ -16,4 +16,27 @@ public class BusinessUnitDto implements Serializable {
     private Optional<String> objectName = Optional.empty();
     private Optional<String> code = Optional.empty();
 
+    public Optional<String> getId() {
+        return id;
+    }
+
+    public void setId(Optional<String> id) {
+        this.id = id;
+    }
+
+    public Optional<String> getObjectName() {
+        return objectName;
+    }
+
+    public void setObjectName(Optional<String> objectName) {
+        this.objectName = objectName;
+    }
+
+    public Optional<String> getCode() {
+        return code;
+    }
+
+    public void setCode(Optional<String> code) {
+        this.code = code;
+    }
 }
