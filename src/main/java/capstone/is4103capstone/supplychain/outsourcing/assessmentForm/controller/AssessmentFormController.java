@@ -28,16 +28,19 @@ import java.util.Date;
 @RequestMapping("/api/assessmentForm")
 @CrossOrigin(origins = "http://localhost:3000")
 public class AssessmentFormController {
-    private static final Logger logger = LoggerFactory.getLogger(BudgetController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AssessmentFormController.class);
 
     @Autowired
     private AssessmentFormService assessmentFormService;
 
 
     @PostMapping("/create/{isTemplate}")
-    public ResponseEntity<GeneralRes> createAssessmentForm(@PathVariable("isTemplate") boolean isTemplate,@RequestBody CreateAssessmentFromReq createAssessmentFromReq) {
-        if(Authentication.authenticateUser(createAssessmentFromReq.getUsername()))
-            return assessmentFormService.createForm(isTemplate, createAssessmentFromReq, null);
+    public ResponseEntity<GeneralRes> createAssessmentForm(@PathVariable("isTemplate") int isTemplate,@RequestBody CreateAssessmentFromReq createAssessmentFromReq) {
+        logger.info("*************** Creating Assessment Form *****************");
+        if(Authentication.authenticateUser(createAssessmentFromReq.getUsername())) {
+            boolean isTemplateBool = isTemplate == 0 ? true: false;
+            return assessmentFormService.createForm(isTemplateBool, createAssessmentFromReq, null);
+        }
         else
             return ResponseEntity
                     .badRequest()
@@ -45,9 +48,12 @@ public class AssessmentFormController {
     }
 
     @PostMapping("/update/{id}/{isTemplate}")
-    public ResponseEntity<GeneralRes> updateForm(@PathVariable("isTemplate") boolean isTemplate, @RequestBody CreateAssessmentFromReq createAssessmentFromReq,  @PathVariable("id") String id) {
-        if(Authentication.authenticateUser(createAssessmentFromReq.getUsername()))
-            return assessmentFormService.createForm(isTemplate, createAssessmentFromReq, id);
+    public ResponseEntity<GeneralRes> updateForm(@PathVariable("isTemplate") int isTemplate, @RequestBody CreateAssessmentFromReq createAssessmentFromReq,  @PathVariable("id") String id) {
+        logger.info("*************** Updating Assessment Form *****************");
+        if(Authentication.authenticateUser(createAssessmentFromReq.getUsername())){
+            boolean isTemplateBool = isTemplate == 0 ? true: false;
+            return assessmentFormService.createForm(isTemplateBool, createAssessmentFromReq, id);
+        }
         else
             return ResponseEntity
                     .badRequest()
@@ -56,6 +62,7 @@ public class AssessmentFormController {
 
     @GetMapping("/getDetails/{id}")
     public ResponseEntity<GeneralRes> getForm(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username){
+        logger.info("*************** Getting Outsourcing Assessment Form Details "+id+"*****************");
         if(Authentication.authenticateUser(username))
             return assessmentFormService.getForm(id);
         else
@@ -66,6 +73,7 @@ public class AssessmentFormController {
 
     @GetMapping("/getTemplate")
     public ResponseEntity<GeneralRes> getTemplateForm(@RequestParam(name="username", required=true) String username){
+        logger.info("*************** Getting Outsourcing Assessment Form Template *****************");
         if(Authentication.authenticateUser(username))
             return assessmentFormService.getTemplateForm();
         else
@@ -75,9 +83,10 @@ public class AssessmentFormController {
     }
 
     @PostMapping("/approve/{level}/{id}")
-    public ResponseEntity<GeneralRes> approve(@PathVariable("id") String id, @PathVariable("level") int level, @RequestParam(name="username", required=true) String username, @RequestParam(name="approved", required=true) Boolean approved){
-        if(Authentication.authenticateUser(username))
-            return assessmentFormService.approve(id, approved, username, level);
+    public ResponseEntity<GeneralRes> approve(@PathVariable("id") String id, @PathVariable("level") int level, ApproveBudgetReq approveBudgetReq){
+        logger.info("*************** Approving Outsourcing Assessment Form "+id+" *****************");
+        if(Authentication.authenticateUser(approveBudgetReq.getUsername()))
+            return assessmentFormService.approve(id, approveBudgetReq.getApproved(), approveBudgetReq.getUsername(), level);
         else
             return ResponseEntity
                     .badRequest()
@@ -86,6 +95,7 @@ public class AssessmentFormController {
 
     @PostMapping("/notification/{id}")
     public ResponseEntity<GeneralRes> setTimer(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, Date date){
+        logger.info("*************** Creating Outsourcing Assessment Form Notification *****************");
         if(Authentication.authenticateUser(username))
             return assessmentFormService.setTimer(date, id);
         else

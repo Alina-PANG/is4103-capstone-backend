@@ -3,9 +3,10 @@ package capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentSection;
 import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CreateAssessmentFromReq {
+public class CreateAssessmentFromReq implements Serializable {
     private List<OutsourcingAssessmentSection> sectionList;
     private String businessCaseDescription;
     private String username;

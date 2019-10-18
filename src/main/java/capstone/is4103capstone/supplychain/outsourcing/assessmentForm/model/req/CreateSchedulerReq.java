@@ -2,9 +2,10 @@ package capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req
 
 import capstone.is4103capstone.general.model.Mail;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class CreateSchedulerReq {
+public class CreateSchedulerReq implements Serializable {
     Date date;
     Mail mail;
 

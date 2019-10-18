@@ -73,7 +73,7 @@ public class AssessmentFormService {
 
     public ResponseEntity<GeneralRes> getTemplateForm(){
         try{
-            OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findOutsourcingAssessmentByOutsourcingAssessmentStatusEnum(OutsourcingAssessmentStatusEnum.TEMPLATE);
+            OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findFormByStatus(0);
             for(OutsourcingAssessmentSection s: outsourcingAssessment.getSectionList()){
                 for(OutsourcingAssessmentLine o: s.getOutsourcingAssessmentLines()){
                     logger.info("Fetching line item question"+o.getQuestion());
@@ -93,6 +93,9 @@ public class AssessmentFormService {
 
     public ResponseEntity<GeneralRes> createForm(boolean isTemplate, CreateAssessmentFromReq createAssessmentFromReq, String id){
         try {
+
+            logger.info("Action performed by: "+createAssessmentFromReq.getUsername()+" on "+new Date());
+
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
 
             Employee approverA = employeeRepository.findEmployeeByUserName(createAssessmentFromReq.getApproverAUsername());
@@ -156,7 +159,7 @@ public class AssessmentFormService {
 
     public ResponseEntity<GeneralRes> approve(String id, Boolean approved, String username, int level){
         try{
-            logger.info("Getting purchase order with id "+id);
+            logger.info("****************** Getting assessment form with id "+id+" *********************");
             Optional<OutsourcingAssessment> formOptional= outsourcingAssessmentRepository.findById(id);
             if (!formOptional.isPresent()) {
                 logger.info("Assessment Form Not Found!");

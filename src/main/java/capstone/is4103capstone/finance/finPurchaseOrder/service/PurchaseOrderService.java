@@ -80,10 +80,9 @@ public class PurchaseOrderService {
         }
     }
 
-    public ResponseEntity<GeneralRes> getListPO(int status){
+    public ResponseEntity<GeneralRes> getListPO(){
         try{
-            logger.info("Getting all purchase orders with status "+status);
-            List<PurchaseOrder> list = purchaseOrderRepository.findPurchaseOrderByStatus(status);
+            List<PurchaseOrder> list = purchaseOrderRepository.findAll();
             if(list == null) return ResponseEntity
                     .notFound().build();
             else return ResponseEntity.ok().body(new GetPurchaseOrderListRes("Successfully retrieved the purchase orders!", true, list));
