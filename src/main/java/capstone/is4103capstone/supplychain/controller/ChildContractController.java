@@ -72,29 +72,4 @@ public class ChildContractController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
-
-    @PostMapping("/approve-child-contract")
-    public ResponseEntity approveChildContract(@RequestBody ApproveChildContractReq approveChildContractReq){
-        if(Authentication.authenticateUser(approveChildContractReq.getUsername()))
-            return ResponseEntity
-                    .ok()
-                    .body(childContractService.approveChildContract(approveChildContractReq));
-        else
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-    }
-
-    @PostMapping("/request-approve/{childContractId}")
-    public ResponseEntity requestApprove(@PathVariable("childContractId") String childContractId, @RequestParam(name = "username", required = true) String username){
-        if (Authentication.authenticateUser(username)) {
-            return ResponseEntity
-                    .ok()
-                    .body(childContractService.createApprovalTicket(username, childContractId, "Approver please review the contract."));
-        }else{
-            return ResponseEntity
-                    .ok()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-        }
-    }
 }

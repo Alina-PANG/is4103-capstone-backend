@@ -50,6 +50,7 @@ public class BusinessUnitService {
         businessUnitDto.setId(Optional.of(input.getId()));
         businessUnitDto.setObjectName(Optional.of(input.getObjectName()));
         businessUnitDto.setCode(Optional.of(input.getCode()));
+        businessUnitDto.setCompanyFunctionUuid(Optional.of(input.getFunction().getId()));
         return businessUnitDto;
     }
 

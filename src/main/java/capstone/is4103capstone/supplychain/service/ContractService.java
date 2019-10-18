@@ -19,7 +19,6 @@ import capstone.is4103capstone.supplychain.model.req.CreateContractReq;
 import capstone.is4103capstone.supplychain.model.res.GetContractsRes;
 import capstone.is4103capstone.supplychain.model.res.GetContractRes;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
-import capstone.is4103capstone.util.enums.ChildContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,12 +62,7 @@ public class ContractService {
             newContract.setTotalContractValue(createContractReq.getTotalContractValue());
             newContract.setCurrencyCode(createContractReq.getCurrencyCode());
             newContract.setDeleted(false);
-            newContract.setContractStatus(ContractStatusEnum.PENDING_APPROVAL);
-            newContract = contractRepository.saveAndFlush(newContract);
-            if (newContract.getSeqNo() == null) {
-                newContract.setSeqNo(new Long(contractRepository.findAll().size()));
-            }
-            Authentication.configurePermissionMap(newContract);
+            newContract.setContractStatus(ContractStatusEnum.DRAFT);
 
             Vendor vendor = vendorRepository.getOne(createContractReq.getVendorId());
             newContract.setVendor(vendor);
@@ -87,18 +81,18 @@ public class ContractService {
             team.getContracts().add(newContract);
 
             newContract = contractRepository.saveAndFlush(newContract);
+            if (newContract.getSeqNo() == null) {
+                newContract.setSeqNo(new Long(contractRepository.findAll().size()));
+            }
+            Authentication.configurePermissionMap(newContract);
+
+            newContract = contractRepository.saveAndFlush(newContract);
             newContract.setCode(SCMEntityCodeHPGeneration.getCode(contractRepository,newContract));
             contractRepository.saveAndFlush(newContract);
             vendorRepository.saveAndFlush(vendor);
             employeeRepository.saveAndFlush(employeeInCharge);
             employeeRepository.saveAndFlush(approver);
             teamRepository.saveAndFlush(team);
-
-            //send approval request
-            try{
-                createApprovalTicket(createContractReq.getModifierUsername(),newContract.getId(),"Approver please review the contract.");
-            }catch (Exception emailExc){
-            }
 
             logger.info("Successfully created new contract! -- "+createContractReq.getModifierUsername()+" "+"Waiting for approval!");
             return new GeneralRes("Successfully created new contract!", false);
@@ -115,10 +109,17 @@ public class ContractService {
             Employee requester = employeeRepository.findEmployeeByUserName(requesterUsername);
             Employee approver = contract.getApprover();
 
-            if(contract.getContractStatus().equals(ContractStatusEnum.ACTIVE)){
+            if((contract.getContractStatus().equals(ContractStatusEnum.MERGED) || contract.getContractStatus().equals(ContractStatusEnum.ACTIVE))){
                 logger.error("This contract has been approved. Cannot request for approval again!");
                 throw new Exception("This contract has been approved. Cannot request for approval again!");
             }
+
+            if(contract.getContractStatus().equals(ContractStatusEnum.TERMINATED)){
+                logger.error("This contract has been terminated. Cannot request for approval!");
+                throw new Exception("This contract has been terminated. Cannot request for approval!");
+            }
+
+            contract.setContractStatus(ContractStatusEnum.PENDING_APPROVAL);
             ApprovalTicketService.createTicketAndSendEmail(requester, approver, contract, content, ApprovalTypeEnum.CONTRACT);
 
             return new GeneralRes("Request for approval has been sent Successfully!", false);
@@ -277,6 +278,14 @@ public class ContractService {
                 contract = contractRepository.saveAndFlush(contract);
                 employee.getContractInCharged().add(contract);
                 employeeRepository.saveAndFlush(employee);
+            }
+            if (updateContractReq.getApproverId() != null){
+                Employee approver = employeeRepository.getOne(updateContractReq.getApproverId());
+                contract.setApprover(approver);
+
+                contract = contractRepository.saveAndFlush(contract);
+                approver.getContractsApproved().add(contract);
+                employeeRepository.saveAndFlush(approver);
             }
             if (updateContractReq.getVendorId() != null) {
                 Vendor vendor = vendorRepository.getOne(updateContractReq.getVendorId());
