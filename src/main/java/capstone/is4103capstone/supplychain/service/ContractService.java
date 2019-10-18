@@ -10,6 +10,7 @@ import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
@@ -120,6 +121,7 @@ public class ContractService {
             }
 
             contract.setContractStatus(ContractStatusEnum.PENDING_APPROVAL);
+            contractRepository.saveAndFlush(contract);
             ApprovalTicketService.createTicketAndSendEmail(requester, approver, contract, content, ApprovalTypeEnum.CONTRACT);
 
             return new GeneralRes("Request for approval has been sent Successfully!", false);
@@ -314,18 +316,20 @@ public class ContractService {
 
     public ContractModel transformToContractModel(Contract contract){
         GeneralEntityModel vendor = null;
-        GeneralEntityModel employeeInChargeContract = null;
+        EmployeeModel employeeInChargeContract = null;
         GeneralEntityModel team = null;
-        GeneralEntityModel approver = null;
+        EmployeeModel approver = null;
 
         if(contract.getVendor() != null){
             vendor = new GeneralEntityModel(contract.getVendor());
         }
         if(contract.getEmployeeInChargeContract() != null){
-            employeeInChargeContract = new GeneralEntityModel(contract.getEmployeeInChargeContract());
+            Employee employee = contract.getEmployeeInChargeContract();
+            employeeInChargeContract = new EmployeeModel(employee.getId(), employee.getFullName(), employee.getUserName());
         }
         if(contract.getApprover() != null){
-            approver = new GeneralEntityModel(contract.getApprover());
+            Employee employee = contract.getApprover();
+            approver = new EmployeeModel(employee.getId(), employee.getFullName(), employee.getUserName());
         }
         if(contract.getTeam() != null) {
             team = new GeneralEntityModel(contract.getTeam());
