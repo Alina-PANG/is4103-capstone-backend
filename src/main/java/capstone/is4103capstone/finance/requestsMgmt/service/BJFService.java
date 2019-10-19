@@ -17,16 +17,12 @@ import capstone.is4103capstone.finance.admin.service.ServiceServ;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFAggregateModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
-import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
-import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.service.VendorService;
 import capstone.is4103capstone.util.enums.BjfTypeEnum;
-import capstone.is4103capstone.util.enums.ProjectStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,7 +52,6 @@ public class BJFService {
 //        BjfTypeEnum type = req.getRequestType().equalsIgnoreCase("BAU")?BjfTypeEnum.BAU:BjfTypeEnum.PROJECT;
 
         BJF newBjf = new BJF();
-        newBjf.setBjfType(req.getRequestType().equalsIgnoreCase("BAU")?BjfTypeEnum.BAU:BjfTypeEnum.PROJECT);
         newBjf.setServiceId(service.getId());
         newBjf.setCostCenter(cc);
         newBjf.setVendorId(vendor.getId());
@@ -64,19 +59,24 @@ public class BJFService {
         newBjf.setObjectName(service.getObjectName()+"-"+vendor.getObjectName());
 
         newBjf.setRequestDescription(req.getJustification());
-        newBjf.setAdditionalInfo(req.getAdditionalInfo());
-        newBjf.setCurrency(req.getCurrency());
+        newBjf.setAdditionalInfo(req.getSponsor());
+        newBjf.setCurrency("GBP");
         newBjf.setEstimatedBudget(req.getTotalBudget());
+
+        newBjf.setSponsor(req.getSponsor());
+        newBjf.setCapex(req.getCapex());
+        newBjf.setCapexCurrency(req.getCapexCurr());
+        newBjf.setRevex(req.getRevex());
+        newBjf.setRevexCurrency(req.getRevexCurr());
+
         Project p = null;
-        if (req.getRequestType().equalsIgnoreCase("Project")){
-            if (req.getOngoingCost().add(req.getProjectCost()).compareTo(req.getTotalBudget()) != 0){
-                throw new Exception("Ongoing Cost + Project Cost not equal to total amount");
-            }
+        if (req.getProject() == null || !req.getProject().isEmpty()){
             p = projectService.validateProject(req.getProject());
             newBjf.setProjectCode(p.getCode());
-            newBjf.setOngoingCost(req.getOngoingCost());
-            newBjf.setProjectCost(req.getProjectCost());
-        }
+            newBjf.setBjfType(BjfTypeEnum.PROJECT);
+        }else
+            newBjf.setBjfType(BjfTypeEnum.BAU);
+
 
         newBjf = bjfRepository.save(newBjf);
         String code = EntityCodeHPGeneration.getCode(bjfRepository,newBjf);

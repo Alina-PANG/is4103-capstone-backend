@@ -46,7 +46,7 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
-        String thisUser = "yingshi2502";
+//        String thisUser = "yingshi2502";
 //        Country country = countryRepository.findCountryByCode("SG");
 //
 //        List<FXRecord> fxRecords = fxRecordRepository.findAll();
@@ -57,6 +57,9 @@ public class FinanceInit {
 //            createservice(thisUser,sub2Code);
 //        }
     }
+
+
+
 
     public void createFXRecord(String userOps){
         FXRecord fx = new FXRecord("SGD","CNY", BigDecimal.valueOf(5.16),new Date());
