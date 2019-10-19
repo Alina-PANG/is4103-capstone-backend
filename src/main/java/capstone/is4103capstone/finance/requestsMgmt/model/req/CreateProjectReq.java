@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class CreateProjectReq implements Serializable {
-
+    String projectId;
     String requester;
     String projectTitle;
     String projectDescription;
@@ -19,6 +19,14 @@ public class CreateProjectReq implements Serializable {
     String projectSupervisor;
 
     public CreateProjectReq() {
+    }
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
     }
 
     public String getProjectSupervisor() {

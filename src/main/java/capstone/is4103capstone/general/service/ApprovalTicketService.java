@@ -14,6 +14,7 @@ import capstone.is4103capstone.finance.requestsMgmt.service.TravelService;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import org.json.JSONObject;
@@ -143,6 +144,7 @@ public class ApprovalTicketService {
             sendEmail(ticket);
         }catch (Exception e){
             e.printStackTrace();
+            logger.error("Internal error in creating ticket for item ["+requestedItem.getClass().getSimpleName()+"] id:"+requestedItem.getId());
             return false;
         }
         return true;
@@ -177,6 +179,20 @@ public class ApprovalTicketService {
         return models;
     }
 
+    public static EmployeeModel getOpenTicketApproverByRequestedItem(String requestedItemId) throws Exception{
+        List<ApprovalForRequest> list = approvalForRequestRepo.findTicketsByRequestedItemId(requestedItemId);
+        List<ApprovalForRequest> models = new ArrayList<>();
+        for (ApprovalForRequest a: list){
+            if (a.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
+                models.add(a);
+        }
+        if (models.size() > 1)
+            logger.error("Internal error, multiple open tickets for item");
+        if (models.size() == 0)
+            throw new Exception("No ticket found");
+        return new EmployeeModel(models.get(0).getApprover());
+    }
+
     public static boolean approveTicketByEntity(DBEntityTemplate requestedItem, String comment, String approverUsername){
         String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityIdAndApproverId(requestedItem.getId(),approverId);
@@ -197,6 +213,13 @@ public class ApprovalTicketService {
         return modifyRequest(ApprovalStatusEnum.REJECTED, ticket);
     }
 
+    public static boolean checkCurrentUserHasApprovalFor(String requestedItemId) throws  Exception{
+        EmployeeModel approverOfProject = getOpenTicketApproverByRequestedItem(requestedItemId);
+        System.out.println(approverOfProject.getFullName()+" PROJECT "+requestedItemId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currEmployee = (Employee) auth.getPrincipal();
+        return  approverOfProject.getId().equals(currEmployee.getId());
+    }
 
     public static boolean rejectTicket(String ticketId, String comment){
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findById(ticketId);
@@ -240,7 +263,7 @@ public class ApprovalTicketService {
 
         ApprovalForRequest ticket = availableTickets.get(0);
 
-        if (!currentEmployee.getId().equals(ticket.getRequester().getId()))
+        if (!currentEmployee.getId().equals(ticket.getApprover().getId()))
             throw new Exception("You don't have the right to approve the tickets;");
 
 

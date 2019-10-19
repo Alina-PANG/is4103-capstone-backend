@@ -4,8 +4,11 @@ import capstone.is4103capstone.admin.dto.EmployeeDto;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +41,12 @@ public class EmployeeService {
         return optionalEmployee.get();
     }
 
+
+    public String getCurrentLoginUsername(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currEmployee = (Employee) auth.getPrincipal();
+        return currEmployee.getUserName();
+    }
     // ===== CRUD METHODS =====
     // === CREATE ===
     @Transactional
