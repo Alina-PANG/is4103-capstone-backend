@@ -10,17 +10,24 @@ import capstone.is4103capstone.entities.finance.Project;
 import capstone.is4103capstone.finance.Repository.ProjectRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.ProjectModel;
+import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateProjectReq;
+import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.Tools;
+import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
+import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
+import capstone.is4103capstone.util.enums.ProjectStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.awt.*;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +56,9 @@ public class ProjectService {
         }
 
         Employee projectOwner = employeeService.validateUser(req.getProjectOwner());
-        Employee projectRequester = employeeService.validateUser(req.getRequester());
+        Employee projectRequester = req.getRequester()==null? employeeService.getCurrentLoginEmployee() : employeeService.validateUser(req.getRequester());
+
+
         Employee projectSupervisory = employeeService.validateUser(req.getProjectSupervisor());
 
         p.setProjectOwner(projectOwner);
@@ -59,7 +68,7 @@ public class ProjectService {
             employeeService.validateUser(member);
 
         p.setMembers(req.getTeamMembers());
-        p.setCreatedBy(req.getRequester());
+        p.setCreatedBy(projectRequester.getUserName());
 
         p.setEstimatedBudget(req.getBudget());
         p.setCurrency(req.getCurrency());
@@ -68,7 +77,63 @@ public class ProjectService {
         p.setCode(code);
 
         //TODO: create request ticket
-        //TODO: once approved: create a cost center for this project, related with the project code
+        ApprovalTicketService.createTicketAndSendEmail(projectRequester,projectSupervisory,p,p.getRequestDescription(), ApprovalTypeEnum.PROJECT);
+
+        return new ProjectModel(p);
+    }
+
+    public ProjectModel updateProject(CreateProjectReq req) throws Exception{
+        Project p = validateProject(req.getProjectId());
+        System.out.println("*******"+req.getProjectId());
+        if ( p.getProjectLifeCycleStatus().equals(ProjectStatus.CLOSED)){
+            throw new Exception("Project is "+p.getProjectLifeCycleStatus()+", you can't update.");
+        }
+        if (!p.getProjectLifeCycleStatus().equals(ProjectStatus.PENDING_APPROVAL)){
+            //only allow start end date;
+            try{
+                p.setStartDate(Tools.dateFormatter.parse(req.getStartDate()));
+                p.setEndDate(Tools.dateFormatter.parse(req.getEndDate()));
+            }catch (ParseException pe){
+                throw new Exception("Date format incorrect.");
+            }
+        }else{
+            // pending status: can edit all the fields defined
+            p.setObjectName(req.getProjectTitle() == null? p.getObjectName():req.getProjectTitle());
+            p.setProjectTitle(req.getProjectTitle() == null? p.getObjectName():req.getProjectTitle());
+            p.setRequestDescription(req.getProjectDescription() == null? p.getRequestDescription():req.getProjectDescription());
+            p.setAdditionalInfo(req.getAdditionalInfo()==null?p.getAdditionalInfo():req.getAdditionalInfo());
+            try{
+                if (req.getStartDate() != null)
+                    p.setStartDate(Tools.dateFormatter.parse(req.getStartDate()));
+                if (req.getEndDate() != null)
+                    p.setEndDate(Tools.dateFormatter.parse(req.getEndDate()));
+            }catch (ParseException pe){
+                throw new Exception("Date format incorrect.");
+            }
+            Employee projectOwner = p.getProjectOwner();
+            Employee projectSupervisory = p.getProjectSupervisor();
+            if (req.getProjectOwner() != null)
+                projectOwner = employeeService.validateUser(req.getProjectOwner());
+                p.setProjectOwner(projectOwner);
+            if (req.getProjectSupervisor() != null)
+                projectSupervisory = employeeService.validateUser(req.getProjectSupervisor());
+                p.setProjectSupervisor(projectSupervisory);
+
+            for (String member:req.getTeamMembers())
+                employeeService.validateUser(member);
+
+            p.setMembers(req.getTeamMembers());
+
+            p.setEstimatedBudget(req.getBudget() == null?p.getEstimatedBudget() : req.getBudget());
+            p.setCurrency(req.getCurrency() == null? p.getCurrency(): req.getCurrency());
+            if (p.getProjectLifeCycleStatus().equals(ProjectStatus.REJECTED)){
+                p.setProjectLifeCycleStatus(ProjectStatus.PENDING_APPROVAL);
+                ApprovalTicketService.createTicketAndSendEmail(employeeService.getCurrentLoginEmployee(),projectSupervisory,p,"Re-submit Project plan."+p.getRequestDescription(), ApprovalTypeEnum.PROJECT);
+            }
+        }
+
+        p.setLastModifiedBy(employeeService.getCurrentLoginUsername());
+        p = projectRepository.saveAndFlush(p);
 
         return new ProjectModel(p);
     }
@@ -92,27 +157,60 @@ public class ProjectService {
         p.getProjectSupervisor();
         return new ProjectModel(p,members);
     }
-
-    //TODO: Pending test after approval step: this function is invoke after project plan is approved;
-    @Transactional
-    public void createCostCenterForProject(String projectId) throws Exception{
-        //cost center manager set to project owner;
-        //
-        CostCenter newCC = new CostCenter();
-        Optional<Project> pOps = projectRepository.findById(projectId);
-        if (!pOps.isPresent())
-            throw new Exception("[Internal error] given projectid not correct");
-        Project project = pOps.get();
-
-        newCC.setBmApprover(project.getProjectOwner());
-        newCC.setFunctionApprover(project.getProjectSupervisor());
-        newCC = costCenterRepository.save(newCC);
-        String code = EntityCodeHPGeneration.getCode(costCenterRepository,newCC,"project");
-        newCC.setCode(code);
-
+    public void projectApproval(ApprovalForRequest ticket) throws Exception{
+        Project p = validateProject(ticket.getRequestedItemId());
+        p.setApprovalStatus(ticket.getApprovalStatus());
+        boolean isApproved = ticket.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED);
+        if (isApproved){
+            p.setProjectLifeCycleStatus(ProjectStatus.APPROVED);
+            createCostCenterForProject(p);
+        }else {
+            p.setProjectLifeCycleStatus(ProjectStatus.REJECTED);
+            projectRepository.save(p);
+        }
     }
 
+    public void createCostCenterForProject(Project p) throws Exception{
+        //cost center manager set to project owner;
+        //
+        try{
+            CostCenter newCC = new CostCenter();
+            newCC.setBmApprover(p.getProjectOwner());
+            newCC.setFunctionApprover(p.getProjectSupervisor());
+            newCC = costCenterRepository.save(newCC);
+            String code = EntityCodeHPGeneration.getCode(costCenterRepository,newCC,"project");
+            newCC.setCode(code);
+            p.setCostCenter(newCC);
+            projectRepository.save(p);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw new Exception("Error happened in creating project cost center: "+ex.getMessage());
+        }
+    }
 
+    @Transactional
+    public void updateProjectStatusDailyCheck(){
+        List<Project> plist = projectRepository.findAll();
+        for (Project p:plist){
+            if (p.getDeleted() || p.getApprovalStatus().equals(ApprovalStatusEnum.REJECTED) || p.getProjectLifeCycleStatus().equals(ProjectStatus.REJECTED))
+                continue;
+            String today = Tools.dateFormatter.format(new Date());
+            String tomorrow = Tools.getTomorrowStr(new Date());
+            if (p.getProjectLifeCycleStatus().equals(ProjectStatus.APPROVED)){
+                String projectStartDate = Tools.dateFormatter.format(p.getStartDate());
+                if (projectStartDate.equals(today)){
+                    p.setProjectLifeCycleStatus(ProjectStatus.ONGOING);
+                    notifiyTeam(p,true);
+                }
+            }else{
+                if (p.getProjectLifeCycleStatus().equals(ProjectStatus.ONGOING)){
+                    p.setProjectLifeCycleStatus(ProjectStatus.CLOSED);
+                    notifiyTeam(p,false);
+                }
+            }
+
+        }
+    }
 
     public List<ProjectModel> retrieveAllProjects() throws Exception{
         List<Project> projects = projectRepository.getAllProjects();
@@ -162,7 +260,14 @@ public class ProjectService {
         throw new EntityNotFoundException("Project code or id not valid");
     }
 
-    public void projectApproval(ApprovalForRequest ticket){
-
+    //TODO:!! NEED EMAIL TEMPLATE
+    public void notifiyTeam(Project p, boolean isStart){
+        if (isStart){
+            //notify starting
+        }else{
+            //notify ending
+        }
     }
+
+
 }

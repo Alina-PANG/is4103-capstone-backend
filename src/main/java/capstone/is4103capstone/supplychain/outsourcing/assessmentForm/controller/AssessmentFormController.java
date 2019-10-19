@@ -8,6 +8,7 @@ import capstone.is4103capstone.finance.budget.service.PlansComparisonService;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.ApproveReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateAssessmentFromReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateSchedulerReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service.AssessmentFormService;
@@ -78,11 +79,11 @@ public class AssessmentFormController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @PostMapping("/approve/{level}/{id}")
-    public ResponseEntity<GeneralRes> approve(@PathVariable("id") String id, @PathVariable("level") int level, ApproveBudgetReq approveBudgetReq){
+    @PostMapping("/approve/{id}")
+    public ResponseEntity<GeneralRes> approve(@PathVariable("id") String id, ApproveReq approveReq){
         logger.info("*************** Approving Outsourcing Assessment Form "+id+" *****************");
-        if(AuthenticationTools.authenticateUser(approveBudgetReq.getUsername()))
-            return assessmentFormService.approve(id, approveBudgetReq.getApproved(), approveBudgetReq.getUsername(), level);
+        if(AuthenticationTools.authenticateUser(approveReq.getUsername()))
+            return assessmentFormService.approve(id, approveReq.getApproved());
         else
             return ResponseEntity
                     .badRequest()

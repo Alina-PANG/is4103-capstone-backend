@@ -7,8 +7,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Optional;
 
-@Getter
-@Setter
+
 @JsonInclude(JsonInclude.Include.NON_EMPTY) // don't serialize nulls since there are optional classes
 public class BusinessUnitDto implements Serializable {
 
@@ -17,4 +16,35 @@ public class BusinessUnitDto implements Serializable {
     private Optional<String> code = Optional.empty();
     private Optional<String> companyFunctionUuid = Optional.empty();
 
+    public Optional<String> getId() {
+        return id;
+    }
+
+    public void setId(Optional<String> id) {
+        this.id = id;
+    }
+
+    public Optional<String> getObjectName() {
+        return objectName;
+    }
+
+    public void setObjectName(Optional<String> objectName) {
+        this.objectName = objectName;
+    }
+
+    public Optional<String> getCode() {
+        return code;
+    }
+
+    public void setCode(Optional<String> code) {
+        this.code = code;
+    }
+
+    public Optional<String> getCompanyFunctionUuid() {
+        return companyFunctionUuid;
+    }
+
+    public void setCompanyFunctionUuid(Optional<String> companyFunctionUuid) {
+        this.companyFunctionUuid = companyFunctionUuid;
+    }
 }
