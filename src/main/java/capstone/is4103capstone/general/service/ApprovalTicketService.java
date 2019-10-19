@@ -186,10 +186,12 @@ public class ApprovalTicketService {
             if (a.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
                 models.add(a);
         }
-        if (models.size() > 1)
+        if (models.size() > 1){
             logger.error("Internal error, multiple open tickets for item");
+            return null;
+        }
         if (models.size() == 0)
-            throw new Exception("No ticket found");
+            return null;
         return new EmployeeModel(models.get(0).getApprover());
     }
 
