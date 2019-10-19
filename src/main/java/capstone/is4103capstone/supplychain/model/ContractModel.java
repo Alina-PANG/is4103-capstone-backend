@@ -29,6 +29,7 @@ public class ContractModel implements Serializable {
     private GeneralEntityModel team;
     private BigDecimal totalContractValue;
     private String currencyCode;
+    private Boolean canUpdateAndRequest;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -42,7 +43,7 @@ public class ContractModel implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
-    public ContractModel(String contractDescription, String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, EmployeeModel employeeInChargeContract, EmployeeModel approver, GeneralEntityModel team, BigDecimal totalContractValue, String currencyCode, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
+    public ContractModel(String contractDescription, String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, EmployeeModel employeeInChargeContract, EmployeeModel approver, GeneralEntityModel team, BigDecimal totalContractValue, String currencyCode, Boolean canUpdateAndRequest, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
         this.contractDescription = contractDescription;
         this.name = name;
         this.code = code;
@@ -60,6 +61,7 @@ public class ContractModel implements Serializable {
         this.team = team;
         this.totalContractValue = totalContractValue;
         this.currencyCode = currencyCode;
+        this.canUpdateAndRequest = canUpdateAndRequest;
         this.startDate = startDate;
         this.endDate = endDate;
         this.renewalStartDate = renewalStartDate;
@@ -71,6 +73,14 @@ public class ContractModel implements Serializable {
 
     public void setEmployeeInChargeContract(EmployeeModel employeeInChargeContract) {
         this.employeeInChargeContract = employeeInChargeContract;
+    }
+
+    public EmployeeModel getApprover() {
+        return approver;
+    }
+
+    public void setApprover(EmployeeModel approver) {
+        this.approver = approver;
     }
 
     public String getContractDescription() {
@@ -127,6 +137,14 @@ public class ContractModel implements Serializable {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Boolean getCanUpdateAndRequest() {
+        return canUpdateAndRequest;
+    }
+
+    public void setCanUpdateAndRequest(Boolean canUpdateAndRequest) {
+        this.canUpdateAndRequest = canUpdateAndRequest;
     }
 
     public String getId() {

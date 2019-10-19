@@ -120,6 +120,11 @@ public class ContractService {
                 throw new Exception("This contract has been terminated. Cannot request for approval!");
             }
 
+            if(contract.getContractStatus().equals(ContractStatusEnum.PENDING_APPROVAL)){
+                logger.error("This contract is pending approval. Cannot request for approval again!");
+                throw new Exception("This contract is pending approval. Cannot request for approval again!");
+            }
+
             contract.setContractStatus(ContractStatusEnum.PENDING_APPROVAL);
             contractRepository.saveAndFlush(contract);
             ApprovalTicketService.createTicketAndSendEmail(requester, approver, contract, content, ApprovalTypeEnum.CONTRACT);
@@ -335,11 +340,17 @@ public class ContractService {
             team = new GeneralEntityModel(contract.getTeam());
         }
 
+        Boolean canUpdateAndRequest = false;
+        ContractStatusEnum contractStatus = contract.getContractStatus();
+        if(contractStatus.equals(ContractStatusEnum.REJECTED)||contractStatus.equals(ContractStatusEnum.DRAFT)){
+            canUpdateAndRequest = true;
+        }
+
         ContractModel contractModel = new ContractModel(
                 contract.getContractDescription(), contract.getObjectName(), contract.getCode(), contract.getId(), contract.getSeqNo(),
                 contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
                 contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
-                vendor, employeeInChargeContract, approver, team, contract.getTotalContractValue(), contract.getCurrencyCode(),
+                vendor, employeeInChargeContract, approver, team, contract.getTotalContractValue(), contract.getCurrencyCode(), canUpdateAndRequest,
                 contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
 
         return contractModel;
