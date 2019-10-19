@@ -56,7 +56,9 @@ public class ProjectService {
         }
 
         Employee projectOwner = employeeService.validateUser(req.getProjectOwner());
-        Employee projectRequester = employeeService.validateUser(req.getRequester());
+        Employee projectRequester = req.getRequester()==null? employeeService.getCurrentLoginEmployee() : employeeService.validateUser(req.getRequester());
+
+
         Employee projectSupervisory = employeeService.validateUser(req.getProjectSupervisor());
 
         p.setProjectOwner(projectOwner);
@@ -66,7 +68,7 @@ public class ProjectService {
             employeeService.validateUser(member);
 
         p.setMembers(req.getTeamMembers());
-        p.setCreatedBy(req.getRequester());
+        p.setCreatedBy(projectRequester.getUserName());
 
         p.setEstimatedBudget(req.getBudget());
         p.setCurrency(req.getCurrency());
