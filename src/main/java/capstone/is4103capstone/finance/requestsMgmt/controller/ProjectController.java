@@ -29,7 +29,6 @@ public class ProjectController {
             return ResponseEntity.ok().body(new TTFormResponse("Successfully created",false,projectService.createProject(req)));
         }catch (Exception ex){
             ex.printStackTrace();
-
             return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
         }
     }

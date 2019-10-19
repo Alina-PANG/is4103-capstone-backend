@@ -47,11 +47,13 @@ public class EmployeeService {
         Employee currEmployee = (Employee) auth.getPrincipal();
         return currEmployee.getUserName();
     }
+
     public Employee getCurrentLoginEmployee(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currEmployee = (Employee) auth.getPrincipal();
         return currEmployee;
     }
+
     // ===== CRUD METHODS =====
     // === CREATE ===
     @Transactional

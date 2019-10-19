@@ -126,10 +126,15 @@ public class ProjectService {
 
             p.setEstimatedBudget(req.getBudget() == null?p.getEstimatedBudget() : req.getBudget());
             p.setCurrency(req.getCurrency() == null? p.getCurrency(): req.getCurrency());
+            if (p.getProjectLifeCycleStatus().equals(ProjectStatus.REJECTED)){
+                p.setProjectLifeCycleStatus(ProjectStatus.PENDING_APPROVAL);
+                ApprovalTicketService.createTicketAndSendEmail(employeeService.getCurrentLoginEmployee(),projectSupervisory,p,"Re-submit Project plan."+p.getRequestDescription(), ApprovalTypeEnum.PROJECT);
+            }
         }
 
         p.setLastModifiedBy(employeeService.getCurrentLoginUsername());
         p = projectRepository.saveAndFlush(p);
+
         return new ProjectModel(p);
     }
 
