@@ -88,7 +88,7 @@ public class ProjectService {
         if ( p.getProjectLifeCycleStatus().equals(ProjectStatus.CLOSED)){
             throw new Exception("Project is "+p.getProjectLifeCycleStatus()+", you can't update.");
         }
-        if (!p.getProjectLifeCycleStatus().equals(ProjectStatus.PENDING_APPROVAL)){
+        if (!p.getProjectLifeCycleStatus().equals(ProjectStatus.PENDING_APPROVAL) && !p.getProjectLifeCycleStatus().equals(ProjectStatus.REJECTED)){
             //only allow start end date;
             try{
                 p.setStartDate(Tools.dateFormatter.parse(req.getStartDate()));
