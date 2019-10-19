@@ -165,7 +165,7 @@ public class AssessmentFormService {
         }
     }
 
-    public ResponseEntity<GeneralRes> approve(String id, Boolean approved, String username, int level){
+    public ResponseEntity<GeneralRes> approve(String id, boolean approved){
         try{
             logger.info("****************** Getting assessment form with id "+id+" *********************");
             Optional<OutsourcingAssessment> formOptional= outsourcingAssessmentRepository.findById(id);
@@ -178,7 +178,7 @@ public class AssessmentFormService {
             if(form.getDeleted()) return ResponseEntity
                     .notFound().build();
             if(approved) {
-                if(level == 2) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
+                if(form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
                 else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
             }
             else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
