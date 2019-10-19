@@ -83,7 +83,7 @@ public class ProjectService {
     public ProjectModel updateProject(CreateProjectReq req) throws Exception{
         Project p = validateProject(req.getProjectId());
         System.out.println("*******"+req.getProjectId());
-        if (p.getProjectLifeCycleStatus().equals(ProjectStatus.REJECTED) || p.getProjectLifeCycleStatus().equals(ProjectStatus.CLOSED)){
+        if ( p.getProjectLifeCycleStatus().equals(ProjectStatus.CLOSED)){
             throw new Exception("Project is "+p.getProjectLifeCycleStatus()+", you can't update.");
         }
         if (!p.getProjectLifeCycleStatus().equals(ProjectStatus.PENDING_APPROVAL)){
