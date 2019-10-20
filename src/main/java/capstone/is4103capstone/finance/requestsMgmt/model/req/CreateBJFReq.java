@@ -20,8 +20,26 @@ public class CreateBJFReq implements Serializable {
     private BigDecimal revex;
     private BigDecimal capex;
     private Boolean competitiveQuotesAvailable;
+    private String approver;
+    private String bjfId;
 
     public CreateBJFReq() {
+    }
+
+    public String getBjfId() {
+        return bjfId;
+    }
+
+    public void setBjfId(String bjfId) {
+        this.bjfId = bjfId;
+    }
+
+    public String getApprover() {
+        return approver;
+    }
+
+    public void setApprover(String approver) {
+        this.approver = approver;
     }
 
     public Boolean getCompetitiveQuotesAvailable() {

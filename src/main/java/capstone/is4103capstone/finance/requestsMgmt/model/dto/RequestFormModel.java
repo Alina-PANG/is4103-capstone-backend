@@ -1,5 +1,6 @@
 package capstone.is4103capstone.finance.requestsMgmt.model.dto;
 
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.RequestFormTemplate;
 import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.Tools;
@@ -17,10 +18,18 @@ public class RequestFormModel {
     private String approvalStatus;
     private String id;
     private String createdDateTime;
+    private EmployeeModel approver;
 
     public RequestFormModel() {
     }
 
+    public EmployeeModel getApprover() {
+        return approver;
+    }
+
+    public void setApprover(EmployeeModel approver) {
+        this.approver = approver;
+    }
 
     public RequestFormModel(RequestFormTemplate e) {
         setAdditionalInfo(e.getAdditionalInfo());
@@ -32,6 +41,7 @@ public class RequestFormModel {
         setRequester(new EmployeeModel(e.getRequester()));
         setId(e.getId());
         setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
+        setApprover(new EmployeeModel(e.getApprover()));
     }
 
     public RequestFormModel(EmployeeModel requester, String costCenterCode, String description, String additionalInfo, BigDecimal estimatedBudget, String currencyCode, String approvalStatus, String id, String createdDateTime) {

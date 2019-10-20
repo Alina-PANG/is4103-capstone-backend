@@ -55,6 +55,8 @@ public class ApprovalTicketService {
 
     @Value("${spring.mail.username}")
     private static String senderEmailAddr;
+    @Value("${frontend.server.address}")
+    private static String serverAddress;
 
     static EmployeeRepository employeeRepo;
     static ApprovalForRequestRepository approvalForRequestRepo;
@@ -309,21 +311,26 @@ public class ApprovalTicketService {
     }
 
     public static void sendEmail(ApprovalForRequest ticket){
-        String subject = "Request for Approval: "+ ticket.getCode();
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("requestor_username", ticket.getRequester().getUserName());
-        map.put("requestor_email", ticket.getRequester().getEmail());
-        map.put("requestor_name", ticket.getRequester().getFullName());
-        map.put("requestor_type", ticket.getRequester().getEmployeeType());
+        try{
+            String subject = "Request for Approval: ["+ticket.getApprovalType().name()+"] "+ ticket.getCode();
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("requestor_username", ticket.getRequester().getUserName());
+            map.put("requestor_email", ticket.getRequester().getEmail());
+            map.put("requestor_name", ticket.getRequester().getFullName());
+            map.put("requestor_type", ticket.getRequester().getEmployeeType());
 
-        map.put("comment", ticket.getCommentByRequester());
-        map.put("ticket_code", ticket.getCode());
-        map.put("request_item_id", ticket.getRequestedItemId());
-        map.put("created_datetime", ticket.getCreatedDateTime());
+            map.put("comment", ticket.getCommentByRequester());
+            map.put("ticket_code", ticket.getCode());
+            map.put("request_item_id", ticket.getRequestedItemId());
+            map.put("created_datetime", ticket.getCreatedDateTime());
 
-        map.put("url", "http://localhost:3000/ticket/id/"+ticket.getId());
+            map.put("url", serverAddress+"/ticket/id/"+ticket.getId());
 
-        Mail mail = new Mail(senderEmailAddr == null? "is4103.capstone@gmail.com":senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
-        mailSenderService.sendEmail(mail, "approveBudgetMailTemplate");
+            Mail mail = new Mail(senderEmailAddr == null? "is4103.capstone@gmail.com":senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
+            mailSenderService.sendEmail(mail, "approveBudgetMailTemplate");
+        }catch (Exception e){
+            logger.error("Sending email error Ticket ID"+ticket.getId());
+        }
+
     }
 }

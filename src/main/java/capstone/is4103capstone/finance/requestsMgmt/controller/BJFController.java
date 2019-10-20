@@ -23,11 +23,20 @@ public class BJFController {
     @PostMapping
     public ResponseEntity<TTFormResponse> createBJF(@RequestBody CreateBJFReq req){
         try{
-            return ResponseEntity.ok().body(new TTFormResponse("Successfully created",false,bjfService.createBJF(req)));
+            return ResponseEntity.ok().body(new TTFormResponse("Successfully created",false,bjfService.createBJF(req,false)));
         }catch (Exception ex){
             ex.printStackTrace();
 
             return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
+        }
+    }
+    @PostMapping("/update")
+    public ResponseEntity<TTFormResponse> updateBJF(@RequestBody CreateBJFReq req){
+        try{
+            return ResponseEntity.ok().body(new TTFormResponse("Successfully updated",false,bjfService.createBJF(req,true)));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new TTFormResponse("Update Failed: "+ex.getMessage(),true));
         }
     }
 
