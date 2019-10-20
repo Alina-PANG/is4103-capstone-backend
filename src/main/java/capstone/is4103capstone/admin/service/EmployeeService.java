@@ -4,7 +4,6 @@ import capstone.is4103capstone.admin.dto.EmployeeDto;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
-import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -42,13 +41,13 @@ public class EmployeeService {
     }
 
 
-    public String getCurrentLoginUsername(){
+    public String getCurrentLoginUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currEmployee = (Employee) auth.getPrincipal();
         return currEmployee.getUserName();
     }
 
-    public Employee getCurrentLoginEmployee(){
+    public Employee getCurrentLoginEmployee() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currEmployee = (Employee) auth.getPrincipal();
         return currEmployee;
@@ -60,7 +59,7 @@ public class EmployeeService {
     public Employee createNewEmployeeEntity(Employee input) {
         Employee newE = employeeRepository.save(input);
         newE = employeeRepository.findEmployeeById(newE.getId());
-        newE.setCode("EMP-"+newE.getSeqNo());
+        newE.setCode("EMP-" + newE.getSeqNo());
         employeeRepository.save(newE);
         return newE;
     }
@@ -162,6 +161,7 @@ public class EmployeeService {
         employeeDto.setUserName(Optional.of(input.getUserName()));
         employeeDto.setSecurityId(Optional.of(input.getSecurityId()));
         employeeDto.setEmail(Optional.of(input.getEmail()));
+        employeeDto.setPermissions(Optional.ofNullable(input.getWebAppPermissionMap()));
         return employeeDto;
     }
 
@@ -198,9 +198,9 @@ public class EmployeeService {
         return employees;
     }
 
-    public String getUsernameByUuid(String uuid){
+    public String getUsernameByUuid(String uuid) {
         Employee e = employeeRepository.findEmployeeById(uuid);
-        return e == null? null :e.getUserName();
+        return e == null ? null : e.getUserName();
     }
 
     public Employee validateUser(String idOrUsername) throws EntityNotFoundException {

@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.entities.helper.WebAppPermissionMap;
 import capstone.is4103capstone.entities.supplyChain.*;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,6 +27,9 @@ public class Employee extends DBEntityTemplate {
     private String lastName;
     private String middleName;
     private String email;
+
+    @Embedded
+    private WebAppPermissionMap webAppPermissionMap = new WebAppPermissionMap();
 
     @JsonIgnore
     private String password;
@@ -301,6 +305,9 @@ public class Employee extends DBEntityTemplate {
         return securityId;
     }
 
+    public void setSecurityId(String securityId) {
+        this.securityId = securityId;
+    }
 
     public List<SecurityGroup> getMemberOfSecurityGroups() {
         return memberOfSecurityGroups;
@@ -318,7 +325,11 @@ public class Employee extends DBEntityTemplate {
         this.email = email;
     }
 
-    public void setSecurityId(String securityId) {
-        this.securityId = securityId;
+    public WebAppPermissionMap getWebAppPermissionMap() {
+        return webAppPermissionMap;
+    }
+
+    public void setWebAppPermissionMap(WebAppPermissionMap webAppPermissionMap) {
+        this.webAppPermissionMap = webAppPermissionMap;
     }
 }
