@@ -3,8 +3,10 @@ package capstone.is4103capstone.admin.service;
 import capstone.is4103capstone.admin.dto.RegionDto;
 import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.admin.repository.RegionRepository;
+import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Region;
+import capstone.is4103capstone.util.exception.CompanyFunctionNotFoundException;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -143,4 +145,12 @@ public class RegionService {
         return regions;
     }
 
+    public Boolean validateRegionId(String id){
+        Optional<Region> optionalRegion = regionRepository.findById(id);
+        if (!optionalRegion.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
+    }
 }

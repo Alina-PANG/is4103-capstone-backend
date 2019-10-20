@@ -225,27 +225,27 @@ public class SupplyChainInitialization {
         outsourcingAssessmentSectionRepository.saveAndFlush(outsourcingAssessmentSection);
     }
 
-    public void createOutsourcing() {
-        OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findOutsourcingAssessmentByCode("Outsourcing_Assessment1").get(0);
-        Employee employeeInCharge = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
-        Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
-
-        Outsourcing outsourcing = new Outsourcing();
-        outsourcing.setOutsourcingDescription("This is a ... outsourcing.");
-        outsourcing.setEmployeeInChargeOutsourcing(employeeInCharge);
-        outsourcing.setOutsourcedVendor(vendor);
-        outsourcing.getOutsourcingAssessmentList().add(outsourcingAssessment);
-        outsourcing.setCreatedBy("xuhong");
-        outsourcing.setCreatedDateTime(new Date());
-        outsourcing.setLastModifiedBy("xuhong");
-        outsourcing.setLastModifiedDateTime(new Date());
-        outsourcingRepository.save(outsourcing);
-
-        vendor.getOutsourcingList().add(outsourcing);
-        employeeInCharge.getOutsourcingInCharged().add(outsourcing);
-        outsourcingAssessment.setOutsourcing(outsourcing);
-        vendorRepository.saveAndFlush(vendor);
-        employeeRepository.saveAndFlush(employeeInCharge);
-        outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
-    }
+//    public void createOutsourcing() {
+//        OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findOutsourcingAssessmentByCode("Outsourcing_Assessment1").get(0);
+//        Employee employeeInCharge = employeeRepository.findEmployeeByCode("EMPLOYEE-xuhong");
+//        Vendor vendor = vendorRepository.findVendorByCode("Vendor-Lenovo");
+//
+//        Outsourcing outsourcing = new Outsourcing();
+//        outsourcing.setOutsourcingDescription("This is a ... outsourcing.");
+//        outsourcing.setEmployeeInChargeOutsourcing(employeeInCharge);
+//        outsourcing.setOutsourcedVendor(vendor);
+//        outsourcing.getOutsourcingAssessmentList().add(outsourcingAssessment);
+//        outsourcing.setCreatedBy("xuhong");
+//        outsourcing.setCreatedDateTime(new Date());
+//        outsourcing.setLastModifiedBy("xuhong");
+//        outsourcing.setLastModifiedDateTime(new Date());
+//        outsourcingRepository.save(outsourcing);
+//
+//        vendor.getOutsourcingList().add(outsourcing);
+//        employeeInCharge.getOutsourcingInCharged().add(outsourcing);
+//        outsourcingAssessment.setOutsourcing(outsourcing);
+//        vendorRepository.saveAndFlush(vendor);
+//        employeeRepository.saveAndFlush(employeeInCharge);
+//        outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
+//    }
 }

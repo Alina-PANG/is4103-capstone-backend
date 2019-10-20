@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.entities.finance.Service;
+import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.util.enums.MaterialityEnum;
 import capstone.is4103capstone.util.enums.OutsourcingCategoryEnum;
 import capstone.is4103capstone.util.enums.OutsourcingTypeEnum;
@@ -21,14 +22,16 @@ import java.util.List;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Outsourcing extends DBEntityTemplate {
-    private Region region;
-    private Country country;
-    private CompanyFunction department;
+    private String regionId;
+    private String countryId;
+    private String departmentId;
     private OutsourcingTypeEnum outsourcingType;
     private OutsourcingCategoryEnum outsourcingCategory;
     private MaterialityEnum materiality;
     private String outsourcingTitle;
-    private List<Service> serviceList;
+
+    @Convert(converter = StringListConverter.class)
+    private List<String> serviceIdList;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_vendor")
@@ -56,15 +59,15 @@ public class Outsourcing extends DBEntityTemplate {
     public Outsourcing() {
     }
 
-    public Outsourcing(Region region, Country country, CompanyFunction department, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, String outsourcingTitle, List<Service> serviceList, Vendor outsourcedVendor, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
-        this.region = region;
-        this.country = country;
-        this.department = department;
+    public Outsourcing(String regionId, String countryId, String departmentId, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, String outsourcingTitle, List<String> serviceIdList, Vendor outsourcedVendor, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
+        this.regionId = regionId;
+        this.countryId = countryId;
+        this.departmentId = departmentId;
         this.outsourcingType = outsourcingType;
         this.outsourcingCategory = outsourcingCategory;
         this.materiality = materiality;
         this.outsourcingTitle = outsourcingTitle;
-        this.serviceList = serviceList;
+        this.serviceIdList = serviceIdList;
         this.outsourcedVendor = outsourcedVendor;
         this.dueDiligenceDate = dueDiligenceDate;
         this.materialityAssessmentDate = materialityAssessmentDate;
@@ -73,28 +76,28 @@ public class Outsourcing extends DBEntityTemplate {
         this.independentAuditDate = independentAuditDate;
     }
 
-    public Region getRegion() {
-        return region;
+    public String getRegionId() {
+        return regionId;
     }
 
-    public void setRegion(Region region) {
-        this.region = region;
+    public void setRegionId(String regionId) {
+        this.regionId = regionId;
     }
 
-    public Country getCountry() {
-        return country;
+    public String getCountryId() {
+        return countryId;
     }
 
-    public void setCountry(Country country) {
-        this.country = country;
+    public void setCountryId(String countryId) {
+        this.countryId = countryId;
     }
 
-    public CompanyFunction getDepartment() {
-        return department;
+    public String getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartment(CompanyFunction department) {
-        this.department = department;
+    public void setDepartmentId(String departmentId) {
+        this.departmentId = departmentId;
     }
 
     public OutsourcingTypeEnum getOutsourcingType() {
@@ -129,12 +132,12 @@ public class Outsourcing extends DBEntityTemplate {
         this.outsourcingTitle = outsourcingTitle;
     }
 
-    public List<Service> getServiceList() {
-        return serviceList;
+    public List<String> getServiceIdList() {
+        return serviceIdList;
     }
 
-    public void setServiceList(List<Service> serviceList) {
-        this.serviceList = serviceList;
+    public void setServiceIdList(List<String> serviceIdList) {
+        this.serviceIdList = serviceIdList;
     }
 
     public Vendor getOutsourcedVendor() {

@@ -3,11 +3,15 @@ package capstone.is4103capstone.supplychain.service;
 import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.admin.repository.FunctionRepository;
 import capstone.is4103capstone.admin.repository.RegionRepository;
+import capstone.is4103capstone.admin.service.CompanyFunctionService;
+import capstone.is4103capstone.admin.service.CountryService;
+import capstone.is4103capstone.admin.service.RegionService;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
+import capstone.is4103capstone.finance.admin.service.ServiceServ;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -43,6 +47,15 @@ public class OutsourcingService {
     VendorRepository vendorRepository;
     @Autowired
     ServiceRepository serviceRepository;
+    @Autowired
+    RegionService regionService;
+    @Autowired
+    CountryService countryService;
+    @Autowired
+    CompanyFunctionService companyFunctionService;
+    @Autowired
+    ServiceServ serviceServ;
+
 
     public GeneralRes createOutsourcing(CreateOutsourcingReq createOutsourcingReq){
         try{
@@ -57,30 +70,42 @@ public class OutsourcingService {
             outsourcing.setMaterialityAssessmentDate(createOutsourcingReq.getMaterialityAssessmentDate());
             outsourcing.setAnnualSelfAssessmentDate(createOutsourcingReq.getAnnualSelfAssessmentDate());
 
+            if(regionService.validateRegionId(createOutsourcingReq.getRegionId())) {
+                outsourcing.setRegionId(createOutsourcingReq.getRegionId());
+            }else{
+                throw new Exception("This is not a valid region ID.");
+            }
+
+            if(countryService.validateCountryId(createOutsourcingReq.getCountryId())) {
+                outsourcing.setCountryId(createOutsourcingReq.getCountryId());
+            }else{
+                throw new Exception("This is not a valid country ID.");
+            }
+
+            if(companyFunctionService.validateFunctionId(createOutsourcingReq.getDepartmentId())) {
+                outsourcing.setDepartmentId(createOutsourcingReq.getDepartmentId());
+            }else{
+                throw new Exception("This is not a valid department ID.");
+            }
+
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currentEmployee = (Employee) auth.getPrincipal();
             outsourcing.setLastModifiedBy(currentEmployee.getUserName());
             outsourcing.setCreatedBy(currentEmployee.getUserName());
 
-            Region region = regionRepository.getOne(createOutsourcingReq.getRegionId());
-            outsourcing.setRegion(region);
-
-            Country country = countryRepository.getOne(createOutsourcingReq.getCountryId());
-            outsourcing.setCountry(country);
-
-            CompanyFunction department = functionRepository.getOne(createOutsourcingReq.getDepartmentId());
-            outsourcing.setDepartment(department);
-
             Vendor vendor = vendorRepository.getOne(createOutsourcingReq.getVendorId());
             outsourcing.setOutsourcedVendor(vendor);
             vendor.getOutsourcingList().add(outsourcing);
 
-            for(String serviceId : createOutsourcingReq.getServiceIdList()){
-                Service service = serviceRepository.getOne(serviceId);
-                outsourcing.getServiceList().add(service);
+            for(String id : createOutsourcingReq.getServiceIdList()){
+                if(serviceServ.validateServiceId(id)){
+                    outsourcing.getServiceIdList().add(id);
+                }else{
+                    throw new Exception("This is not a valid service ID.");
+                }
             }
 
-            outsourcing = outsourcingRepository.saveAndFlush(outsourcing);
+            outsourcing = outsourcingRepository.save(outsourcing);
             if(outsourcing.getSeqNo() == null){
                 outsourcing.setSeqNo(new Long(outsourcingRepository.findAll().size()));
             }
@@ -179,42 +204,51 @@ public class OutsourcingService {
                 outsourcing.setIndependentAuditDate(updateOutsourcingReq.getIndependentAuditDate());
             }
 
+            if(updateOutsourcingReq.getRegionId() != null){
+                if(regionService.validateRegionId(updateOutsourcingReq.getRegionId())) {
+                    outsourcing.setRegionId(updateOutsourcingReq.getRegionId());
+                }else{
+                    throw new Exception("This is not a valid region ID.");
+                }
+            }
+
+            if(updateOutsourcingReq.getCountryId() != null) {
+                if(countryService.validateCountryId(updateOutsourcingReq.getCountryId())) {
+                    outsourcing.setCountryId(updateOutsourcingReq.getCountryId());
+                }else{
+                    throw new Exception("This is not a valid country ID.");
+                }
+            }
+
+            if(updateOutsourcingReq.getDepartmentId() != null) {
+                if(companyFunctionService.validateFunctionId(updateOutsourcingReq.getDepartmentId())) {
+                    outsourcing.setDepartmentId(updateOutsourcingReq.getDepartmentId());
+                }else{
+                    throw new Exception("This is not a valid department ID.");
+                }
+            }
+
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currentEmployee = (Employee) auth.getPrincipal();
             outsourcing.setLastModifiedBy(currentEmployee.getUserName());
 
-            if(updateOutsourcingReq.getRegionId() != null){
-                Region region = regionRepository.getOne(updateOutsourcingReq.getRegionId());
-                outsourcing.setRegion(region);
-                outsourcing = outsourcingRepository.saveAndFlush(outsourcing);
-            }
 
-            if(updateOutsourcingReq.getCountryId() != null) {
-                Country country = countryRepository.getOne(updateOutsourcingReq.getCountryId());
-                outsourcing.setCountry(country);
-                outsourcing = outsourcingRepository.saveAndFlush(outsourcing);
-            }
-
-            if(updateOutsourcingReq.getDepartmentId() != null) {
-                CompanyFunction department = functionRepository.getOne(updateOutsourcingReq.getDepartmentId());
-                outsourcing.setDepartment(department);
-                outsourcing = outsourcingRepository.saveAndFlush(outsourcing);
+            if(updateOutsourcingReq.getServiceIdList() != null && updateOutsourcingReq.getServiceIdList().size() != 0) {
+                outsourcing.setServiceIdList(new ArrayList<>());
+                for(String servId : updateOutsourcingReq.getServiceIdList()){
+                    if(serviceServ.validateServiceId(servId)){
+                        outsourcing.getServiceIdList().add(servId);
+                    }else{
+                        throw new Exception("This is not a valid service ID.");
+                    }
+                }
             }
 
             if(updateOutsourcingReq.getVendorId() != null) {
                 Vendor vendor = vendorRepository.getOne(updateOutsourcingReq.getVendorId());
                 outsourcing.setOutsourcedVendor(vendor);
                 vendor.getOutsourcingList().add(outsourcing);
-                outsourcing = outsourcingRepository.saveAndFlush(outsourcing);
                 vendorRepository.saveAndFlush(vendor);
-            }
-
-            if(updateOutsourcingReq.getServiceIdList() != null && updateOutsourcingReq.getServiceIdList().size() != 0) {
-                for (String serviceId : updateOutsourcingReq.getServiceIdList()) {
-                    Service service = serviceRepository.getOne(serviceId);
-                    outsourcing.getServiceList().add(service);
-                    outsourcingRepository.saveAndFlush(outsourcing);
-                }
             }
 
             outsourcingRepository.saveAndFlush(outsourcing);
@@ -232,21 +266,25 @@ public class OutsourcingService {
         List<GeneralEntityModel> serviceList = new ArrayList<>();
         GeneralEntityModel vendor = null;
 
-        if(outsourcing.getRegion() != null){
-            region = new GeneralEntityModel(outsourcing.getRegion());
+        if(outsourcing.getRegionId() != null){
+            Region r = regionRepository.getOne(outsourcing.getRegionId());
+            region = new GeneralEntityModel(r);
         }
-        if(outsourcing.getCountry() != null){
-            country = new GeneralEntityModel(outsourcing.getCountry());
+        if(outsourcing.getCountryId() != null){
+            Country c = countryRepository.getOne(outsourcing.getCountryId());
+            country = new GeneralEntityModel(c);
         }
-        if(outsourcing.getDepartment() != null){
-            department = new GeneralEntityModel(outsourcing.getDepartment());
+        if(outsourcing.getDepartmentId() != null){
+            CompanyFunction d = functionRepository.getOne(outsourcing.getDepartmentId());
+            department = new GeneralEntityModel(d);
         }
         if(outsourcing.getOutsourcedVendor() != null){
             vendor = new GeneralEntityModel(outsourcing.getOutsourcedVendor());
         }
-        if(outsourcing.getServiceList() != null && outsourcing.getServiceList().size() != 0){
-            for(Service s : outsourcing.getServiceList()){
-                GeneralEntityModel serviceModel = new GeneralEntityModel(s);
+        if(outsourcing.getServiceIdList() != null && outsourcing.getServiceIdList().size() != 0){
+            for(String id : outsourcing.getServiceIdList()){
+                Service service = serviceRepository.getOne(id);
+                GeneralEntityModel serviceModel = new GeneralEntityModel(service);
                 serviceList.add(serviceModel);
             }
         }

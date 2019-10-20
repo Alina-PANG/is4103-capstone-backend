@@ -162,4 +162,13 @@ public class CountryService {
         }
         return countryDtos;
     }
+
+    public Boolean validateCountryId(String id){
+        Optional<Country> optionalCountry = countryRepository.findById(id);
+        if (!optionalCountry.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
+    }
 }
