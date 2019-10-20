@@ -37,10 +37,10 @@ public class ProjectController {
     public ResponseEntity<TTFormResponse> getProjectDetails(@PathVariable(name = "projectId") String projectId){
         try{
             EmployeeModel approverOfProject = ApprovalTicketService.getOpenTicketApproverByRequestedItem(projectId);
-            System.out.println(approverOfProject.getFullName()+" PROJECT "+projectId);
+//            System.out.println(approverOfProject.getFullName()+" PROJECT "+projectId);
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currEmployee = (Employee) auth.getPrincipal();
-            boolean currentUserCanApprove = approverOfProject.getId().equals(currEmployee.getId());
+            Boolean currentUserCanApprove = approverOfProject == null? null : approverOfProject.getId().equals(currEmployee.getId());
             return ResponseEntity.ok().body(new TTFormResponse("Successfully retrieved",false,
                     projectService.getProjectDetails(projectId),currentUserCanApprove));
         }catch (Exception ex){
