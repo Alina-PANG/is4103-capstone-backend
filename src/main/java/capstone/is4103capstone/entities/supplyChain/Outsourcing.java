@@ -31,7 +31,7 @@ public class Outsourcing extends DBEntityTemplate {
     private String outsourcingTitle;
 
     @Convert(converter = StringListConverter.class)
-    private List<String> serviceIdList;
+    private List<String> serviceIdList = new ArrayList();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_vendor")
