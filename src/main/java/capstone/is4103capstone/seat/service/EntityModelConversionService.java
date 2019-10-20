@@ -1,6 +1,7 @@
 package capstone.is4103capstone.seat.service;
 
 import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
+import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.service.CompanyFunctionService;
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.admin.service.TeamService;
@@ -49,6 +50,8 @@ public class EntityModelConversionService {
     private TeamService teamService;
     @Autowired
     private CompanyFunctionService companyFunctionService;
+    @Autowired
+    private  SeatAllocationRequestService seatAllocationRequestService;
 
 
     // ---------------------------------- Seat -----------------------------------
@@ -657,5 +660,30 @@ public class EntityModelConversionService {
         approvalTicketModel.setReviewedDateTime(approvalForRequest.getLastModifiedDateTime().toString());
         approvalTicketModel.setTicketResult(approvalForRequest.getApprovalStatus());
         return approvalTicketModel;
+    }
+
+    public ApprovalForRequest convertApprovalTicketModelToNewEntity (ApprovalTicketModel approvalTicketModel) {
+        ApprovalForRequest approvalForRequest = new ApprovalForRequest();
+
+        String approverUserName = approvalTicketModel.getReviewerUsername();
+        Employee approver = employeeService.getEmployeeByUsername(approverUserName);
+        approvalForRequest.setApprover(approver);
+        approvalForRequest.setCommentByApprover(approvalTicketModel.getApproverComment());
+
+        ApprovalTypeEnum requestType = approvalTicketModel.getRequestType();
+        approvalForRequest.setApprovalType(requestType);
+
+        if (!requestType.equals(ApprovalTypeEnum.SEAT_ALLOCATION)) {
+            throw new EntityModelConversionException("Mismatched approval type!");
+        }
+        if (approvalTicketModel.getRequestedItemId() == null || approvalTicketModel.getRequestedItemId().trim().length() == 0) {
+            throw new EntityModelConversionException("Missing request ID!");
+        }
+        SeatAllocationRequest seatAllocationRequest = seatAllocationRequestService.retrieveSeatAllocationRequestById(approvalTicketModel.getRequestedItemId());
+        approvalForRequest.setRequestedItemId(seatAllocationRequest.getId());
+        approvalForRequest.setCommentByRequester(approvalTicketModel.getRequesterComment());
+        approvalForRequest.setRequester(seatAllocationRequest.getRequester());
+        approvalForRequest.setApprovalStatus(approvalTicketModel.getTicketResult());
+        return approvalForRequest;
     }
 }

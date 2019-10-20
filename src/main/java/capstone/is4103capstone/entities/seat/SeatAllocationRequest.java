@@ -55,7 +55,8 @@ public class SeatAllocationRequest extends DBEntityTemplate {
             )
     )
     private List<ApprovalForRequest> approvalTickets = new ArrayList<>();
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_pending_ticket_id", referencedColumnName = "id")
     private ApprovalForRequest currentPendingTicket;
 
     private boolean resolved = false;

@@ -1,9 +1,11 @@
 package capstone.is4103capstone.seat.controller;
 
 import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
+import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.CreateSeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestModel;
@@ -12,6 +14,7 @@ import capstone.is4103capstone.seat.service.EntityModelConversionService;
 import capstone.is4103capstone.seat.service.SeatAllocationRequestService;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
 import capstone.is4103capstone.seat.service.SeatMapService;
+import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
 import capstone.is4103capstone.util.exception.EntityModelConversionException;
 import org.slf4j.Logger;
@@ -46,6 +49,18 @@ public class SeatAllocationRequestController {
     public ResponseEntity createNewSeatAllocationRequest(@RequestBody CreateSeatAllocationRequestModel createSeatAllocationRequestModel) {
         seatAllocationRequestService.createNewSeatAllocationRequest(createSeatAllocationRequestModel);
         return ResponseEntity.ok("Create seat allocation request successfully!");
+    }
+
+    @PostMapping("/review")
+    public ResponseEntity processSeatAllocationRequest(@RequestBody ApprovalTicketModel approvalTicketModel,
+                                                       @RequestParam(name="seatId", required=false) String seatId) {
+        ApprovalForRequest approvalForRequest = entityModelConversionService.convertApprovalTicketModelToNewEntity(approvalTicketModel);
+        if (approvalForRequest.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED)) {
+            seatAllocationRequestService.approveSeatAllocationRequest(approvalForRequest, seatId);
+        } else if (approvalForRequest.getApprovalStatus().equals(ApprovalStatusEnum.REJECTED)) {
+            seatAllocationRequestService.rejectSeatAllocationRequest(approvalForRequest);
+        }
+        return ResponseEntity.ok("Reviewed allocation request successfully!");
     }
 
     // ---------------------------------- GET: Retrieve ----------------------------------
@@ -85,4 +100,5 @@ public class SeatAllocationRequestController {
         SeatAllocationRequestModel seatAllocationRequestModel = entityModelConversionService.convertSeatAllocationRequestEntityToModel(seatAllocationRequest);
         return ResponseEntity.ok(seatAllocationRequestModel);
     }
+
 }

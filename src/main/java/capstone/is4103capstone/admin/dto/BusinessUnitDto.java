@@ -40,4 +40,12 @@ public class BusinessUnitDto implements Serializable {
     public void setCode(Optional<String> code) {
         this.code = code;
     }
+
+    public Optional<String> getCompanyFunctionUuid() {
+        return companyFunctionUuid;
+    }
+
+    public void setCompanyFunctionUuid(Optional<String> companyFunctionUuid) {
+        this.companyFunctionUuid = companyFunctionUuid;
+    }
 }

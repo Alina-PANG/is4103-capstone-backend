@@ -138,4 +138,13 @@ public class SeatManagementExceptionController {
         error.setStatus(HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = SeatAllocationRequestProcessingException.class)
+    public ResponseEntity handleSeatAllocationRequestProcessingException(SeatAllocationRequestProcessingException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

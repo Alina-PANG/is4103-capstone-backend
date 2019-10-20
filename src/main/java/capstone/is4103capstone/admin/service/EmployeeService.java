@@ -75,6 +75,17 @@ public class EmployeeService {
         }
     }
 
+    public Employee getEmployeeByUsername(String username) throws EmployeeNotFoundException {
+        if (username == null || username.trim().length() == 0) {
+            throw new EmployeeNotFoundException("Invalid username given!");
+        }
+        Optional<Employee> optionalEmployee = employeeRepository.findUndeletedEmployeeByUsername(username);
+        if (!optionalEmployee.isPresent()) {
+            throw new EmployeeNotFoundException("Employee with username " + username + " does not exist!");
+        }
+        return optionalEmployee.get();
+    }
+
     public EmployeeDto getEmployeeByUuid(String input) throws Exception {
         return entityToDto(getEmployeeEntityByUuid(input));
     }
