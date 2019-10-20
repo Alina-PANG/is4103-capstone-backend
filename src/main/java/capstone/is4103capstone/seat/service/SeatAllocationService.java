@@ -51,6 +51,8 @@ public class SeatAllocationService {
     private EmployeeService employeeService;
     @Autowired
     private TeamService teamService;
+    @Autowired
+    private ScheduleService scheduleService;
 
     // -----------------------------------------------Assumptions-----------------------------------------------
     // 1. the booking period is 1 year, meaning that the start date of the seat allocation cannot be later than 1 year from the current date.
@@ -181,33 +183,13 @@ public class SeatAllocationService {
                 throw new SeatAllocationException("Assigning hot desk failed: invalid end date of the seat allocation!");
             }
 
-            // Check whether there is any clash of allocation schedule
-            // - allocation with no occupancy end date: compare the start date of this one and the end date of the new one
-            // - allocation with an occupancy end date: compare the whole time frame
             List<SeatAllocation> activeAllocations = seat.getActiveSeatAllocations();
             for (SeatAllocation seatAllocation :
                     activeAllocations) {
-                Schedule allocationSchedule = seatAllocation.getSchedule();
-                if (allocationSchedule.getEndDateTime() == null) {
-                    if (allocationSchedule.getStartDateTime().before(endDateTime)) {
-                        throw new SeatAllocationException("Assigning hot desk failed: allocation schedule clash with another seat allocation of " +
-                                seatAllocation.getAllocationType().toString() + " type!");
-                    }
-                } else {
-                    if (startDateTime.before(allocationSchedule.getStartDateTime())) {
-                        if (!endDateTime.before(allocationSchedule.getStartDateTime())) {
-                            throw new SeatAllocationException("Assigning hot desk failed: allocation schedule clash with another seat allocation of " +
-                                    seatAllocation.getAllocationType().toString() + " type!");
-                        }
-                    }
-                    if (startDateTime.equals(allocationSchedule.getStartDateTime())) {
-                        throw new SeatAllocationException("Assigning hot desk failed: allocation schedule clash with another seat allocation of " +
-                                seatAllocation.getAllocationType().toString() + " type!");
-                    }
-                    if (startDateTime.after(allocationSchedule.getStartDateTime()) && startDateTime.before(allocationSchedule.getEndDateTime())) {
-                        throw new SeatAllocationException("Assigning hot desk failed: allocation schedule clash with another seat allocation of " +
-                                seatAllocation.getAllocationType().toString() + " type!");
-                    }
+                try {
+                    scheduleService.checkClashForHotDeskTypeAllocation(startDateTime, endDateTime, seatAllocation);
+                } catch (ScheduleClashException ex) {
+                    throw new SeatAllocationException("Assigning hot desk failed: " + ex.getMessage());
                 }
             }
 
@@ -271,35 +253,14 @@ public class SeatAllocationService {
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
             validateOccupancyDateTimeUsingToday(startDateTime, true);
 
-            // Check whether there is any clash of allocation schedule
-            // For both fixed & shared seats allocation:
-            // - allocation with no occupancy end date: directly reject
-            // - allocation with an occupancy end date: compare the end date of this one and the start date of the new one
             List<SeatAllocation> activeAllocations = seat.getActiveSeatAllocations();
             System.out.println("********** the number of active allocations: " + activeAllocations.size() + " **********");
             for (SeatAllocation seatAllocation :
                     activeAllocations) {
-                System.out.println("***** seat allocation: " + seatAllocation.getId() + " *****");
-                Schedule allocationSchedule = seatAllocation.getSchedule();
-                if (seatAllocation.getAllocationType() == SeatAllocationTypeEnum.FIXED) {
-                    if (allocationSchedule.getEndDateTime() == null) {
-                        throw new SeatAllocationException("Assigning fixed seat failed: allocation schedule clash with another fixed seat allocation " +
-                                "(for a permanent employee)!");
-                    } else {
-                        if (allocationSchedule.getEndDateTime().after(startDateTime)) {
-                            throw new SeatAllocationException("Assigning fixed seat failed: allocation schedule clash with another fixed seat allocation " +
-                                    "(for a temporary employee)!");
-                        }
-                    }
-                } else {
-                    if (allocationSchedule.getEndDateTime() == null) {
-                        throw new SeatAllocationException("Assigning fixed seat failed: allocation schedule clash with another shared seat allocation!");
-                    } else {
-                        if (allocationSchedule.getEndDateTime().after(startDateTime)) {
-                            throw new SeatAllocationException("Assigning fixed seat failed: allocation schedule clash with another shared seat allocation " +
-                                    "(for a working-from-home employee)!");
-                        }
-                    }
+                try {
+                    scheduleService.checkClashForPermanentFixedTypeAllocation(startDateTime, seatAllocation);
+                } catch (ScheduleClashException ex) {
+                    throw new SeatAllocationException("Assigning fixed seat failed: " + ex.getMessage());
                 }
             }
 
@@ -355,43 +316,25 @@ public class SeatAllocationService {
             }
 
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
-            System.out.println("********** Start Date Time: " + startDateTime.toString() + " **********");
-            validateOccupancyDateTimeUsingToday(startDateTime, true);
+            if (startDateTime == null) {
+                throw new SeatAllocationException("Assigning fixed seat failed: start date is required!");
+            }
             Date endDateTime = seatAllocationModel.getSchedule().getEndDateTime();
-            validateOccupancyDateTimeUsingToday(endDateTime, false);
-            System.out.println("********** End Date Time: " + endDateTime.toString() + " **********");
-
             if (endDateTime == null || startDateTime.after(endDateTime)) {
                 throw new SeatAllocationException("Assigning fixed seat failed: invalid end date of the seat allocation!");
             }
+            validateOccupancyDateTimeUsingToday(startDateTime, true);
+            validateOccupancyDateTimeUsingToday(endDateTime, false);
+            System.out.println("********** Start Date Time: " + startDateTime.toString() + " **********");
+            System.out.println("********** End Date Time: " + endDateTime.toString() + " **********");
 
-            // Check whether there is any clash of allocation schedule
-            // - allocation with no occupancy end date: compare the start date of this one and the end date of the new one
-            // - allocation with an occupancy end date: compare the whole time frame
             List<SeatAllocation> activeAllocations = seat.getActiveSeatAllocations();
             for (SeatAllocation seatAllocation :
                     activeAllocations) {
-                Schedule allocationSchedule = seatAllocation.getSchedule();
-                if (allocationSchedule.getEndDateTime() == null) {
-                    if (allocationSchedule.getStartDateTime().before(endDateTime)) {
-                        throw new SeatAllocationException("Assigning fixed seat failed: allocation schedule clash with another seat allocation of " +
-                                 seatAllocation.getAllocationType().toString() + " type!");
-                    }
-                } else {
-                    if (startDateTime.before(allocationSchedule.getStartDateTime())) {
-                        if (!endDateTime.before(allocationSchedule.getStartDateTime())) {
-                            throw new SeatAllocationException("Assigning fixed seat failed: allocation schedule clash with another seat allocation of " +
-                                    seatAllocation.getAllocationType().toString() + " type!");
-                        }
-                    }
-                    if (startDateTime.equals(allocationSchedule.getStartDateTime())) {
-                        throw new SeatAllocationException("Assigning fixed seat failed: allocation schedule clash with another seat allocation of " +
-                                seatAllocation.getAllocationType().toString() + " type!");
-                    }
-                    if (startDateTime.after(allocationSchedule.getStartDateTime()) && startDateTime.before(allocationSchedule.getEndDateTime())) {
-                        throw new SeatAllocationException("Assigning fixed seat failed: allocation schedule clash with another seat allocation of " +
-                                seatAllocation.getAllocationType().toString() + " type!");
-                    }
+                try {
+                    scheduleService.checkClashForTemporaryFixedTypeAllocation(startDateTime, endDateTime, seatAllocation);
+                } catch (ScheduleClashException ex) {
+                    throw new SeatAllocationException("Assigning fixed seat failed: " + ex.getMessage());
                 }
             }
 
@@ -446,13 +389,20 @@ public class SeatAllocationService {
                         " is not in team " + team.getCode() + "!");
             }
 
+
             Date startDateTime = seatAllocationModel.getSchedule().getStartDateTime();
+            if (startDateTime == null) {
+                throw new SeatAllocationException("Assigning shared seat failed: start date is required!");
+            }
             validateOccupancyDateTimeUsingToday(startDateTime, true);
             Date endDateTime = seatAllocationModel.getSchedule().getEndDateTime();
-            validateOccupancyDateTimeUsingToday(endDateTime, false);
-            if (endDateTime != null && startDateTime.after(endDateTime)) {
-                throw new SeatAllocationException("Assigning shared seat failed: invalid end date of the seat allocation!");
+            if (endDateTime != null) {
+                if (startDateTime.after(endDateTime)) {
+                    throw new SeatAllocationException("Assigning shared seat failed: invalid end date of the seat allocation!");
+                }
+                validateOccupancyDateTimeUsingToday(endDateTime, false);
             }
+
 
             // Create a new seat allocation between the seat and the employee
             Schedule newAllocationSchedule = new Schedule();
@@ -465,7 +415,7 @@ public class SeatAllocationService {
             }
 
             ScheduleRecurringBasisEnum recurringBasisEnum = ScheduleRecurringBasisEnum.valueOf(seatAllocationModel.getSchedule().getRecurringBasis());
-            validateScheduleRecurringBasis(recurringBasisEnum, seatAllocationModel.getSchedule());
+            scheduleService.validateScheduleRecurringBasis(recurringBasisEnum, seatAllocationModel.getSchedule());
             newAllocationSchedule.setRecurringBasis(recurringBasisEnum);
             if (seatAllocationModel.getSchedule().getRecurringDates() != null && seatAllocationModel.getSchedule().getRecurringDates().size() > 0) {
                 for (Date date :
@@ -486,78 +436,13 @@ public class SeatAllocationService {
             newAllocationSchedule.setRecurringStartTime(seatAllocationModel.getSchedule().getRecurringStartTime());
             newAllocationSchedule.setRecurringEndTime(seatAllocationModel.getSchedule().getRecurringEndTime());
 
-            // Check whether there is any clash of allocation schedule
-            // For fixed seat allocation:
-            // - for permanent employees (no occupancy end date): compare the start date of this one and the end date of the new one (if have any)
-            // - for temporary employees (with occupancy end date): compare the whole time period
             List<SeatAllocation> activeAllocations = seat.getActiveSeatAllocations();
             for (SeatAllocation seatAllocation :
                     activeAllocations) {
-                Schedule allocationSchedule = seatAllocation.getSchedule();
-                if (seatAllocation.getAllocationType() == SeatAllocationTypeEnum.FIXED) {
-
-                    // Two cases: fixed seat for permanent employees and temporary employees
-                    if (allocationSchedule.getEndDateTime() == null) { // permanent employees
-                        if (endDateTime == null) {
-                            // Both have no occupancy end date, reject
-                            throw new SeatAllocationException("Assigning shared seat failed due to a schedule clash with another fixed seat allocation " +
-                                    "for a permanent employee!");
-                        } else {
-                            // Compare the end date of the new one with the start date of the existing one
-                            if (!endDateTime.before(allocationSchedule.getStartDateTime())) {
-                                throw new SeatAllocationException("Assigning shared seat failed due to a schedule clash with another fixed seat allocation " +
-                                        "for a permanent employee!");
-                            }
-                        }
-                    } else { // temporary employees
-                        if (endDateTime == null) {
-                            // Compare the start date of the new one with the end date of the existing one
-                            if (!startDateTime.after(allocationSchedule.getEndDateTime())) {
-                                throw new SeatAllocationException("Assigning shared seat failed due to a schedule clash with another fixed seat allocation " +
-                                        "for a temporary employee!");
-                            }
-                        } else {
-                            // Both have a start date and an end date -> Compare the whole time frame
-                            if (startDateTime.before(allocationSchedule.getStartDateTime())) {
-                                if (!endDateTime.before(allocationSchedule.getStartDateTime())) {
-                                    throw new SeatAllocationException("Assigning shared seat failed: allocation schedule clash with another seat allocation of " +
-                                            seatAllocation.getAllocationType().toString() + " type!");
-                                }
-                            }
-                            if (startDateTime.equals(allocationSchedule.getStartDateTime())) {
-                                throw new SeatAllocationException("Assigning shared seat failed: allocation schedule clash with another seat allocation of " +
-                                        seatAllocation.getAllocationType().toString() + " type!");
-                            }
-                            if (startDateTime.after(allocationSchedule.getStartDateTime()) && startDateTime.before(allocationSchedule.getEndDateTime())) {
-                                throw new SeatAllocationException("Assigning shared seat failed: allocation schedule clash with another seat allocation of " +
-                                        seatAllocation.getAllocationType().toString() + " type!");
-                            }
-                        }
-                    }
-
-                } else { // shared seats
-
-                    // The checking can be bypassed if the time frames don't overlap
-                    if (allocationSchedule.getEndDateTime() != null) { // the existing allocation has an end date
-                        if (endDateTime == null) { // the new allocation does not have an end date, sliding on the time scale
-                            if (startDateTime.before(allocationSchedule.getEndDateTime())) {
-                                checkSharedSeatsScheduleClash(allocationSchedule, newAllocationSchedule);
-                            }
-                        } else { // both have an end date
-                            if (startDateTime.after(allocationSchedule.getStartDateTime()) && startDateTime.before(allocationSchedule.getEndDateTime())
-                             || endDateTime.after(allocationSchedule.getStartDateTime()) && endDateTime.before(allocationSchedule.getEndDateTime())) {
-                                checkSharedSeatsScheduleClash(allocationSchedule, newAllocationSchedule);
-                            }
-                        }
-                    } else { // the existing allocation does not have an end date
-                        if (endDateTime == null) {
-                            checkSharedSeatsScheduleClash(allocationSchedule, newAllocationSchedule);
-                        } else {
-                            if (endDateTime.after(allocationSchedule.getStartDateTime())) {
-                                checkSharedSeatsScheduleClash(allocationSchedule, newAllocationSchedule);
-                            }
-                        }
-                    }
+                try {
+                    scheduleService.checkClashForSharedTypeAllocation(startDateTime, endDateTime, newAllocationSchedule, seatAllocation);
+                } catch (ScheduleClashException ex) {
+                    throw new SeatAllocationException("Assigning shared seat failed: " + ex.getMessage());
                 }
             }
 
@@ -583,8 +468,133 @@ public class SeatAllocationService {
     }
 
 
+    // - 9am to 6pm, recurringWeekdays: [1,2]
+    //- 1pm to 6pm, rW: [3]
+    //- 9am to 6pm, rW: [4]
+    public void assignSharedSeatToEmployeeWithMultipleSchedules(SharedSeatAllocationModelForEmployee sharedSeatAllocationModelForEmployee) throws SeatAllocationException {
+        try {
+            Seat seat = seatService.retrieveSeatById(sharedSeatAllocationModelForEmployee.getSeatId());
+
+            if (seat.getTeamAssigned() == null || seat.getFunctionAssigned() == null) {
+                throw new SeatAllocationException("Assigning shared seat failed: the seat must be assigned to a function and a team first!");
+            }
+
+            // Check whether the employee who will occupy this seat belongs to the team this seat has been assigned to
+            Employee employee = employeeService.retrieveEmployeeById(sharedSeatAllocationModelForEmployee.getEmployee().getId());
+            Team team = seat.getTeamAssigned();
+            boolean isTeamMember = false;
+            for (Employee member :
+                    team.getMembers()) {
+                if (member.getId().equals(employee.getId())) {
+                    isTeamMember = true;
+                }
+            }
+            if (!isTeamMember) {
+                throw new SeatAllocationException("Employee " + employee.getFirstName() + " " + employee.getLastName() +
+                        " is not in team " + team.getCode() + "!");
+            }
+
+            List<SeatAllocation> seatAllocationsToSave = new ArrayList<>();
+            // Check each schedule inside the request
+            for (ScheduleModel scheduleModel :
+                    sharedSeatAllocationModelForEmployee.getSchedules()) {
+
+                Date startDateTime = scheduleModel.getStartDateTime();
+                if (startDateTime == null) {
+                    throw new SeatAllocationException("Assigning fixed seat failed: start date is required!");
+                }
+                validateOccupancyDateTimeUsingToday(startDateTime, true);
+                Date endDateTime = scheduleModel.getEndDateTime();
+                if (endDateTime != null) {
+                    if (startDateTime.after(endDateTime)) {
+                        throw new SeatAllocationException("Assigning fixed seat failed: invalid end date of the seat allocation!");
+                    }
+                    validateOccupancyDateTimeUsingToday(endDateTime, false);
+                }
+
+                // Create a new seat allocation between the seat and the employee
+                Schedule newAllocationSchedule = new Schedule();
+                newAllocationSchedule.setStartDateTime(startDateTime);
+                newAllocationSchedule.setEndDateTime(endDateTime);
+                newAllocationSchedule.setRecurring(true);
+                String recurringBasisString = scheduleModel.getRecurringBasis();
+                if (!recurringBasisString.equals("EVERYDAY") && !recurringBasisString.equals("EVERYWEEK")) {
+                    throw new SeatAllocationException("Assigning shared seat failed: invalid recurring basis!");
+                }
+
+                ScheduleRecurringBasisEnum recurringBasisEnum = ScheduleRecurringBasisEnum.valueOf(scheduleModel.getRecurringBasis());
+                scheduleService.validateScheduleRecurringBasis(recurringBasisEnum, scheduleModel);
+                newAllocationSchedule.setRecurringBasis(recurringBasisEnum);
+                if (scheduleModel.getRecurringDates() != null && scheduleModel.getRecurringDates().size() > 0) {
+                    for (Date date :
+                            scheduleModel.getRecurringDates()) {
+                        date = DateHelper.getDateWithoutTimeUsingCalendar(date);
+                    }
+                }
+                newAllocationSchedule.setRecurringDates(scheduleModel.getRecurringDates());
+                if (scheduleModel.getRecurringWeekdays() != null && scheduleModel.getRecurringWeekdays().size() > 0) {
+                    for (Integer weekDay :
+                            scheduleModel.getRecurringWeekdays()) {
+                        if (weekDay < 1 || weekDay > 7) {
+                            throw new SeatAllocationException("Assigning shared seat failed: invalid recurring weekday of " + weekDay + "!");
+                        }
+                        newAllocationSchedule.getRecurringWeekdays().add(DayOfWeek.of(weekDay));
+                    }
+                }
+                newAllocationSchedule.setRecurringStartTime(scheduleModel.getRecurringStartTime());
+                newAllocationSchedule.setRecurringEndTime(scheduleModel.getRecurringEndTime());
+
+                List<SeatAllocation> activeAllocations = seat.getActiveSeatAllocations();
+                for (SeatAllocation seatAllocation :
+                        activeAllocations) {
+                    try {
+                        scheduleService.checkClashForSharedTypeAllocation(startDateTime, endDateTime, newAllocationSchedule, seatAllocation);
+                    } catch (ScheduleClashException ex) {
+                        throw new SeatAllocationException("Assigning shared seat failed: " + ex.getMessage());
+                    }
+                }
+
+                // Create a new seat allocation between the seat and the employee
+                SeatAllocation newSeatAllocation = new SeatAllocation();
+                newSeatAllocation.setAllocationType(SeatAllocationTypeEnum.SHARED);
+                newSeatAllocation.setSeat(seat);
+                newSeatAllocation.setEmployee(employee);
+                newSeatAllocation.setSchedule(newAllocationSchedule);
+
+                // Check clashes between new schedules
+                for (SeatAllocation otherNewSeatAllocation :
+                        seatAllocationsToSave) {
+                    try {
+                        scheduleService.checkClashForSharedTypeAllocation(startDateTime, endDateTime, newAllocationSchedule, otherNewSeatAllocation);
+                    } catch (ScheduleClashException ex) {
+                        throw new SeatAllocationException("Assigning shared seat failed: " + ex.getMessage() + " (among the requested schedules)");
+                    }
+                }
+
+                seatAllocationsToSave.add(newSeatAllocation);
+            }
+
+            for (SeatAllocation newSeatAllocation :
+                    seatAllocationsToSave) {
+                Schedule newSchedule = newSeatAllocation.getSchedule();
+                newSchedule = scheduleRepository.save(newSchedule);
+                newSeatAllocation = seatAllocationRepository.saveAndFlush(newSeatAllocation);
+                seat.getActiveSeatAllocations().add(newSeatAllocation);
+
+                SeatAllocationInactivationLog log = new SeatAllocationInactivationLog();
+                log.setAllocation_id(newSeatAllocation.getId());
+                log.setInactivate_time(newSchedule.getEndDateTime());
+                seatAllocationInactivationLogRepository.save(log);
+            }
+            seatRepository.save(seat);
+        } catch (SeatNotFoundException | EmployeeNotFoundException | TeamNotFoundException ex) {
+            throw new SeatAllocationException("Assigning shared seat failed: " + ex.getMessage());
+        }
+    }
 
     // ---------------------------------- Other Services -----------------------------------
+
+    // ---------------------- Retrieval ----------------------
 
     public Seat retrieveSeatWithAllocationsBySeatId(String seatId) throws SeatNotFoundException, SeatAllocationException {
         Optional<Seat> optionalSeat = seatRepository.findUndeletedById(seatId);
@@ -595,6 +605,8 @@ public class SeatAllocationService {
         return optionalSeat.get();
     }
 
+
+    // ---------------------- Deallocation ----------------------
 
     public void deleteAllocationByAllocationId(String allocationId) throws SeatAllocationException {
 
@@ -608,6 +620,7 @@ public class SeatAllocationService {
         System.out.println("********** seat allocation (to be deleted) ID: " + seatAllocation.getId() + " **********");
         Seat seat = seatAllocation.getSeat();
         seatAllocation.setDeleted(true);
+        seatAllocation.getSchedule().setDeleted(true);
         Optional<SeatAllocationInactivationLog> optionalSeatAllocationInactivationLog = seatAllocationInactivationLogRepository.getUncancelledById(allocationId);
         if (optionalSeatAllocationInactivationLog.isPresent()) {
             SeatAllocationInactivationLog seatAllocationInactivationLog = optionalSeatAllocationInactivationLog.get();
@@ -643,6 +656,7 @@ public class SeatAllocationService {
                 seatAllocations) {
             Seat seat = seatAllocation.getSeat();
             seatAllocation.setDeleted(true);
+            seatAllocation.getSchedule().setDeleted(true);
             Optional<SeatAllocationInactivationLog> optionalSeatAllocationInactivationLog = seatAllocationInactivationLogRepository.getUncancelledById(seatAllocation.getId());
             if (optionalSeatAllocationInactivationLog.isPresent()) {
                 SeatAllocationInactivationLog seatAllocationInactivationLog = optionalSeatAllocationInactivationLog.get();
@@ -669,10 +683,12 @@ public class SeatAllocationService {
     public void deleteAllocationsBySeatId(String seatId) throws SeatNotFoundException {
         Seat seat = seatService.retrieveSeatById(seatId);
         List<SeatAllocation> seatAllocations = seat.getActiveSeatAllocations();
+        List<String> allocationIdsToRemove = new ArrayList<>();
 
         for (SeatAllocation seatAllocation :
                 seatAllocations) {
             seatAllocation.setDeleted(true);
+            seatAllocation.getSchedule().setDeleted(true);
             Optional<SeatAllocationInactivationLog> optionalSeatAllocationInactivationLog = seatAllocationInactivationLogRepository.getUncancelledById(seatAllocation.getId());
             if (optionalSeatAllocationInactivationLog.isPresent()) {
                 SeatAllocationInactivationLog seatAllocationInactivationLog = optionalSeatAllocationInactivationLog.get();
@@ -681,17 +697,21 @@ public class SeatAllocationService {
             }
 
             if (seatAllocation.isActive()) {
-                ListIterator<SeatAllocation> iterator = seat.getActiveSeatAllocations().listIterator();
-                while (iterator.hasNext()) {
-                    SeatAllocation thisOne = iterator.next();
-                    if (thisOne.getId().equals(seatAllocation.getId())) {
-                        iterator.remove();
-                    }
-                }
+                allocationIdsToRemove.add(seatAllocation.getId());
+
             }
-            seatRepository.save(seat);
+
             seatAllocationRepository.save(seatAllocation);
         }
+
+        ListIterator<SeatAllocation> iterator = seat.getActiveSeatAllocations().listIterator();
+        while (iterator.hasNext()) {
+            SeatAllocation thisOne = iterator.next();
+            if (allocationIdsToRemove.contains(thisOne.getId())) {
+                iterator.remove();
+            }
+        }
+        seatRepository.save(seat);
     }
 
 
@@ -859,92 +879,5 @@ public class SeatAllocationService {
             }
         }
     }
-
-
-    private void validateScheduleRecurringBasis(ScheduleRecurringBasisEnum recurringBasisEnum, ScheduleModel scheduleModel) throws SeatAllocationException {
-        if (recurringBasisEnum == ScheduleRecurringBasisEnum.EVERYDAY) {
-            if (scheduleModel.getRecurringStartTime() == null || scheduleModel.getRecurringEndTime() == null) {
-                throw new SeatAllocationException("Assigning shared seat failed: recurring start time or end time must be provided for EveryDay recurring basis!");
-            }
-        } else if (recurringBasisEnum == ScheduleRecurringBasisEnum.EVERYWEEK) {
-            if (scheduleModel.getRecurringWeekdays() == null || scheduleModel.getRecurringWeekdays().size() == 0) {
-                throw new SeatAllocationException("Assigning shared seat failed: there must be at least one recurring weekday provided for EveryWeek recurring basis!");
-            } else if  (scheduleModel.getRecurringStartTime() == null || scheduleModel.getRecurringEndTime() == null) {
-                throw new SeatAllocationException("Assigning shared seat failed: recurring start time or end time must be provided for EveryWeek recurring basis!");
-            }
-        } else {
-            if (scheduleModel.getRecurringDates() == null || scheduleModel.getRecurringDates().size() == 0) {
-                throw new SeatAllocationException("Assigning shared seat failed: there must be at least one recurring date provided for EveryYear recurring basis!");
-            } else if  (scheduleModel.getRecurringStartTime() == null || scheduleModel.getRecurringEndTime() == null) {
-                throw new SeatAllocationException("Assigning shared seat failed: recurring start time or end time must be provided for EveryYear recurring basis!");
-            }
-        }
-    }
-
-
-    // Pre-condition:
-    // - The two schedules were checked before hand to have overlapping time frame (based on date only)
-    private void checkSharedSeatsScheduleClash(Schedule schedule1, Schedule schedule2) throws SeatAllocationException {
-
-        // shared seats -> compare by recurring basis, one by one
-        // "EveryDay" (recurringStartTime, recurringEndTime),
-        // "EveryWeek" (recurringWeekdays, recurringStartTime, recurringEndTime),
-
-        try {
-            if (schedule1.getRecurringBasis() == ScheduleRecurringBasisEnum.EVERYDAY) {
-                checkHourlyClashes(schedule1, schedule2);
-            } else if (schedule1.getRecurringBasis() == ScheduleRecurringBasisEnum.EVERYWEEK) {
-                if (schedule2.getRecurringBasis() == ScheduleRecurringBasisEnum.EVERYDAY) {
-                    checkHourlyClashes(schedule1, schedule2);
-                } else if (schedule2.getRecurringBasis() == ScheduleRecurringBasisEnum.EVERYWEEK) {
-                    for (DayOfWeek dayOfWeek :
-                            schedule1.getRecurringWeekdays()) {
-                        for (DayOfWeek dayOfWeek2 :
-                                schedule2.getRecurringWeekdays()) {
-                            if (dayOfWeek.equals(dayOfWeek2)) {
-                                checkHourlyClashes(schedule1, schedule2);
-                            }
-                        }
-                    }
-                } else {
-                    for (DayOfWeek dayOfWeek :
-                            schedule1.getRecurringWeekdays()) {
-                        for (Date date :
-                                schedule2.getRecurringDates()) {
-                            if (dayOfWeek == DateHelper.getDayOfWeekFromDate(date)) {
-                                checkHourlyClashes(schedule1, schedule2);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (ScheduleClashException ex) {
-            throw new SeatAllocationException("Assigning shared seat failed: " + ex.getMessage());
-        }
-    }
-
-
-    private void checkHourlyClashes(Schedule schedule1, Schedule schedule2) throws ScheduleClashException {
-
-        System.out.println("******************** Check Hourly Clashes ********************");
-        LocalTime startTime1 = schedule1.getRecurringStartTime();
-        LocalTime endTime1 = schedule1.getRecurringEndTime();
-        LocalTime startTime2 = schedule2.getRecurringStartTime();
-        LocalTime endTime2 = schedule2.getRecurringEndTime();
-
-        if (startTime1.compareTo(startTime2) < 0) {
-            System.out.println("********** " + startTime1.toString() + " is before " + startTime2.toString() + " **********");
-            if (!(endTime1.compareTo(startTime2) < 0)) {
-                throw new ScheduleClashException("There is hourly schedule clash!");
-            }
-        }
-        if (startTime1.equals(startTime2)) {
-            throw new ScheduleClashException("There is hourly schedule clash!");
-        }
-        if (startTime1.compareTo(startTime2) > 0 && startTime1.compareTo(endTime2) < 0) {
-            throw new ScheduleClashException("There is hourly schedule clash!");
-        }
-    }
-
 
 }

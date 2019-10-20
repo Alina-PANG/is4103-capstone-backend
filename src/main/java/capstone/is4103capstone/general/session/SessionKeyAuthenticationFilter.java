@@ -66,6 +66,7 @@ public class SessionKeyAuthenticationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
 
             } catch (Exception ex) {
+                ex.printStackTrace();
                 throw new SecurityException("INVALID_SESSION_KEY - The session key provided could have already expired. Please try again.");
             }
         }

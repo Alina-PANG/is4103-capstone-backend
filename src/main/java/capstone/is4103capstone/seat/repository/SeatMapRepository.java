@@ -31,4 +31,22 @@ public interface SeatMapRepository extends JpaRepository<SeatMap, String> {
             "b.employee_id=?2 AND b.is_active=true AND b.is_deleted=false)", nativeQuery = true)
     Optional<SeatMap> findBySeatMapIdAndActiveEmployeeSeatAllocation(String seatMapId, String employeeId);
 
+    @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.id IN (" +
+            "SELECT a.seatmap_id FROM seat a JOIN team b ON a.team_id=b.id WHERE " +
+            "a.seatmap_id=s.id AND a.is_deleted=false AND " +
+            "b.id=?1 AND b.is_deleted=false)", nativeQuery = true)
+    List<SeatMap> findOnesWithSeatsAllocatedToTeam(String teamId);
+
+    @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.id IN (" +
+            "SELECT a.seatmap_id FROM seat a JOIN business_unit b ON a.business_unit_id=b.id WHERE " +
+            "a.seatmap_id=s.id AND a.is_deleted=false AND " +
+            "b.id=?1 AND b.is_deleted=false)", nativeQuery = true)
+    List<SeatMap> findOnesWithSeatsAllocatedToBusinessUnit(String businessUnitId);
+
+    @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.id IN (" +
+            "SELECT a.seatmap_id FROM seat a JOIN company_function b ON a.function_id=b.id WHERE " +
+            "a.seatmap_id=s.id AND a.is_deleted=false AND " +
+            "b.id=?1 AND b.is_deleted=false)", nativeQuery = true)
+    List<SeatMap> findOnesWithSeatsAllocatedToFunction(String functionId);
+
 }
