@@ -26,7 +26,8 @@ public class Team extends DBEntityTemplate {
     @JsonIgnore
     private Office office;
 
-    @OneToOne(mappedBy = "team")
+    @OneToOne(mappedBy = "team",optional = true)
+    @JsonIgnore
     private CostCenter costCenter;
 
     @OneToMany(mappedBy = "team")
@@ -37,6 +38,7 @@ public class Team extends DBEntityTemplate {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="team_leader_id")
+    @JsonIgnore
     private Employee teamLeader;
 
     public Team() {

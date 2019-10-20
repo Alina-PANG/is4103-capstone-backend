@@ -64,6 +64,7 @@ public class ProjectService {
         p.setProjectOwner(projectOwner);
         p.setRequester(projectRequester);
         p.setProjectSupervisor(projectSupervisory);
+        p.setApprover(projectSupervisory);
         for (String member:req.getTeamMembers())
             employeeService.validateUser(member);
 
@@ -118,6 +119,7 @@ public class ProjectService {
             if (req.getProjectSupervisor() != null)
                 projectSupervisory = employeeService.validateUser(req.getProjectSupervisor());
                 p.setProjectSupervisor(projectSupervisory);
+                p.setApprover(projectSupervisory);
 
             for (String member:req.getTeamMembers())
                 employeeService.validateUser(member);
@@ -152,11 +154,12 @@ public class ProjectService {
                 throw new Exception("Team member not found in database.");
             members.add(e);
         }
-        p.getRequester();
-        p.getProjectOwner();
-        p.getProjectSupervisor();
+//        p.getRequester();
+//        p.getProjectOwner();
+//        p.getProjectSupervisor();
         return new ProjectModel(p,members);
     }
+
     public void projectApproval(ApprovalForRequest ticket) throws Exception{
         Project p = validateProject(ticket.getRequestedItemId());
         p.setApprovalStatus(ticket.getApprovalStatus());
@@ -177,10 +180,14 @@ public class ProjectService {
             CostCenter newCC = new CostCenter();
             newCC.setBmApprover(p.getProjectOwner());
             newCC.setFunctionApprover(p.getProjectSupervisor());
+            newCC.setCostCenterManager(p.getProjectOwner());
             newCC = costCenterRepository.save(newCC);
             String code = EntityCodeHPGeneration.getCode(costCenterRepository,newCC,"project");
             newCC.setCode(code);
+            newCC.setCreatedBy("project-auto");
+            newCC.setHierachyPath(code);
             p.setCostCenter(newCC);
+            costCenterRepository.save(newCC);
             projectRepository.save(p);
         }catch (Exception ex){
             ex.printStackTrace();
@@ -248,7 +255,6 @@ public class ProjectService {
                 return e;
             else
                 throw new EntityNotFoundException("Project already deleted.");
-
 
         Optional<Project> project = projectRepository.findById(idOrCode);
         if (project.isPresent())

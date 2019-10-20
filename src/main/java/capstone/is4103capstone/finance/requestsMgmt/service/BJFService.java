@@ -50,7 +50,9 @@ public class BJFService {
 
     //TODO: can't same person created another request for same item before approval
     public BJFModel createBJF(CreateBJFReq req, boolean isUpdate) throws Exception{
+
         BJF newBjf = null;
+        boolean changeFromReject = false;
         if (isUpdate){
             System.out.println("Updating BJF");
             newBjf = validateBJF(req.getBjfId());
@@ -60,7 +62,9 @@ public class BJFService {
                 throw new Exception("The status of the bjf is "+newBjf.getBjfStatus()+", you are not able to modify at this state.");
             }else if (newBjf.getBjfStatus().equals(BJFStatusEnum.REJECTED)){
                 newBjf.setBjfStatus(BJFStatusEnum.PENDING_APPROVAL);
+                changeFromReject = true;
             }
+            req.cleanFields(newBjf);
         }else{
             newBjf = new BJF();
         }
@@ -71,7 +75,7 @@ public class BJFService {
         Service service = serviceServ.validateService(req.getServiceOrProduct());
 //        BjfTypeEnum type = req.getRequestType().equalsIgnoreCase("BAU")?BjfTypeEnum.BAU:BjfTypeEnum.PROJECT;
 
-        Employee approver = cc.getBmApprover();
+        Employee approver = null;//= employeeService.getEmployeeEntityBySid(cc.getCostCenterManager().getSecurityId());
         if (req.getApprover() != null)
             approver = employeeService.validateUser(req.getApprover());
         if (approver == null)
@@ -107,8 +111,10 @@ public class BJFService {
         newBjf = bjfRepository.save(newBjf);
         String code = EntityCodeHPGeneration.getCode(bjfRepository,newBjf);
         newBjf.setCode(code);
+
         //create approval request
-        ApprovalTicketService.createTicketAndSendEmail(requester,approver,newBjf,"New BJF Submitted, please have a look", ApprovalTypeEnum.BJF);
+        if (!isUpdate || changeFromReject)
+            ApprovalTicketService.createTicketAndSendEmail(requester,approver,newBjf,"BJF Submitted / Updated, please have a look", ApprovalTypeEnum.BJF);
 
         return new BJFModel(newBjf,service,vendor,null,p);
     }
@@ -121,16 +127,20 @@ public class BJFService {
             bjf.setBjfStatus(BJFStatusEnum.APPROVED);
         }else{
             bjf.setBjfStatus(BJFStatusEnum.REJECTED);
-
         }
+        bjfRepository.saveAndFlush(bjf);
 
-//can be approve or reject
+    //TODO: can be approve or reject
         //approve -> go to outsourcing steps
     }
 
-    public List<BJFAggregateModel> getBJFByApprover(String idOrUsername){
+    public List<BJFAggregateModel> getBJFByApprover(String idOrUsername) throws Exception{
+        Employee user = employeeService.validateUser(idOrUsername);
+        List<BJFAggregateModel> myRequests = bjfRepository.getSimpleBJFsByApprover(user.getId());
+        if (myRequests.isEmpty())
+            throw new Exception("No records found.");
 
-        return null;
+        return myRequests;
     }
 
     //TODO: collaborate with Outsourcing

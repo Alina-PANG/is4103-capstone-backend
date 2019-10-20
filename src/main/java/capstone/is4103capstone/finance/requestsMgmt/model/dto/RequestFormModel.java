@@ -5,9 +5,10 @@ import capstone.is4103capstone.entities.RequestFormTemplate;
 import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.Tools;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class RequestFormModel {
+public class RequestFormModel implements Serializable {
 
     private EmployeeModel requester;
     private String costCenterCode;

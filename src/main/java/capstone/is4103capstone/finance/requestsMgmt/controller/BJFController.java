@@ -5,8 +5,8 @@ import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
 import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
+import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
-import capstone.is4103capstone.seat.model.EmployeeModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,8 +43,16 @@ public class BJFController {
     @GetMapping("/{bjfId}")
     public ResponseEntity<TTFormResponse> getBJFDetails(@PathVariable(name = "bjfId") String bjfId){
         try{
-            boolean hasApprovalRight = ApprovalTicketService.checkCurrentUserHasApprovalFor(bjfId);
-            return ResponseEntity.ok().body(new TTFormResponse("Successfully retrieved",false,bjfService.getBJFDetails(bjfId),hasApprovalRight));
+            ApprovalTicketModel ticket = ApprovalTicketService.getLatestTicketByRequestedItem(bjfId);
+//            System.out.println(approverOfProject.getFullName()+" PROJECT "+projectId);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Employee currEmployee = (Employee) auth.getPrincipal();
+
+            Boolean currentUserCanApprove = ticket == null? null : ticket.getReviewerUsername().equals(currEmployee.getUserName());
+
+
+            return ResponseEntity.ok().body(new TTFormResponse("Successfully retrieved",false
+                    ,bjfService.getBJFDetails(bjfId),currentUserCanApprove,ticket));
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));

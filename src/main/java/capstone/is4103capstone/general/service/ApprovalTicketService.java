@@ -197,6 +197,30 @@ public class ApprovalTicketService {
         return new EmployeeModel(models.get(0).getApprover());
     }
 
+    public static ApprovalTicketModel getLatestTicketByRequestedItem(String requestedItemId) throws Exception{
+        List<ApprovalForRequest> list = approvalForRequestRepo.findTicketsByRequestedItemId(requestedItemId);
+
+        ApprovalForRequest latest = list.get(0);
+        for (ApprovalForRequest f:list){
+            if (latest.getLastModifiedDateTime().after(latest.getLastModifiedDateTime())){
+                latest = f;
+            }
+        }
+        return new ApprovalTicketModel(latest);
+//        List<ApprovalForRequest> models = new ArrayList<>();
+//        for (ApprovalForRequest a: list){
+//            if (a.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
+//                models.add(a);
+//        }
+//        if (models.size() > 1){
+//            logger.error("Internal error, multiple open tickets for item");
+//            return null;
+//        }
+//        if (models.size() == 0)
+//            return null;
+//        return new ApprovalTicketModel(models.get(0));
+    }
+
     public static boolean approveTicketByEntity(DBEntityTemplate requestedItem, String comment, String approverUsername){
         String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityIdAndApproverId(requestedItem.getId(),approverId);

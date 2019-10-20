@@ -15,15 +15,15 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CostCenter extends DBEntityTemplate {
 
-    @OneToMany(mappedBy = "defaultCostCenter")
+    @OneToMany(mappedBy = "defaultCostCenter",fetch = FetchType.LAZY)
     private List<Employee> employees = new ArrayList<>();
 
-    @OneToMany(mappedBy = "costCenter")
+    @OneToMany(mappedBy = "costCenter",fetch = FetchType.LAZY)
     private List<Plan> plans = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ccmanager")
-    @JsonIgnore
+//    @JsonIgnore
     private Employee costCenterManager;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
@@ -33,11 +33,13 @@ public class CostCenter extends DBEntityTemplate {
 //    @JoinColumn(name = "country_id")
 //    private Country country;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,optional = true)
     @JoinColumn(name = "team_id")
+    @JsonIgnore
     private Team team;
 
-    @OneToMany(mappedBy = "costCenter")
+    @OneToMany(mappedBy = "costCenter",fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<ActualsTable> actuals = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,6 +51,7 @@ public class CostCenter extends DBEntityTemplate {
 
     public CostCenter() {
     }
+
 
     public Team getTeam() {
         return team;
@@ -121,4 +124,5 @@ public class CostCenter extends DBEntityTemplate {
     public void setCostCenterManager(Employee costCenterManager) {
         this.costCenterManager = costCenterManager;
     }
+
 }

@@ -1,5 +1,7 @@
 package capstone.is4103capstone.finance.requestsMgmt.model.req;
 
+import capstone.is4103capstone.entities.finance.BJF;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -24,6 +26,16 @@ public class CreateBJFReq implements Serializable {
     private String bjfId;
 
     public CreateBJFReq() {
+    }
+
+    //TODO: Clean fields
+    public void cleanFields(BJF ori){
+        if (getApprover() == null) setApprover(ori.getApprover().getId());
+        if (getProject() == null) setProject(ori.getProjectCode());
+        if (getCompetitiveQuotesAvailable() == null) setCompetitiveQuotesAvailable(ori.getCompetitiveQuotesAvailable());
+        if (getTotalBudget() == null) setTotalBudget(ori.getEstimatedBudget());
+
+
     }
 
     public String getBjfId() {
