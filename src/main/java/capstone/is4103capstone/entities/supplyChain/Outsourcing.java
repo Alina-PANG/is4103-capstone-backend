@@ -1,49 +1,140 @@
 package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.CompanyFunction;
+import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Region;
+import capstone.is4103capstone.entities.finance.Service;
+import capstone.is4103capstone.util.enums.MaterialityEnum;
+import capstone.is4103capstone.util.enums.OutsourcingCategoryEnum;
+import capstone.is4103capstone.util.enums.OutsourcingTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Outsourcing extends DBEntityTemplate {
-    private String outsourcingDescription;
+    private Region region;
+    private Country country;
+    private CompanyFunction department;
+    private OutsourcingTypeEnum outsourcingType;
+    private OutsourcingCategoryEnum outsourcingCategory;
+    private MaterialityEnum materiality;
+    private String outsourcingTitle;
+    private List<Service> serviceList;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "outsourcing_vendor")
     @JsonIgnore
     private Vendor outsourcedVendor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_inCharge_outsourcing")
-    @JsonIgnore
-    private Employee employeeInChargeOutsourcing;
+    @Temporal(TemporalType.DATE)
+    private Date dueDiligenceDate;
 
-    @OneToMany(mappedBy = "outsourcing",fetch = FetchType.EAGER)
-    private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
+    @Temporal(TemporalType.DATE)
+    private Date materialityAssessmentDate;
 
-    public Outsourcing(String outsourcingDescription, Vendor outsourcedVendor, Employee employeeInChargeOutsourcing, List<OutsourcingAssessment> outsourcingAssessmentList) {
-        this.outsourcingDescription = outsourcingDescription;
-        this.outsourcedVendor = outsourcedVendor;
-        this.employeeInChargeOutsourcing = employeeInChargeOutsourcing;
-        this.outsourcingAssessmentList = outsourcingAssessmentList;
-    }
+    @Temporal(TemporalType.DATE)
+    private Date bcpTestDate;
+
+    //can be empty when creating outsourcing
+    //after annual self-assessment is done, this date will be updated manually
+    @Temporal(TemporalType.DATE)
+    private Date annualSelfAssessmentDate;
+
+    //the date that the vendor is audited
+    @Temporal(TemporalType.DATE)
+    private Date independentAuditDate;
 
     public Outsourcing() {
     }
 
-    public String getOutsourcingDescription() {
-        return outsourcingDescription;
+    public Outsourcing(Region region, Country country, CompanyFunction department, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, String outsourcingTitle, List<Service> serviceList, Vendor outsourcedVendor, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
+        this.region = region;
+        this.country = country;
+        this.department = department;
+        this.outsourcingType = outsourcingType;
+        this.outsourcingCategory = outsourcingCategory;
+        this.materiality = materiality;
+        this.outsourcingTitle = outsourcingTitle;
+        this.serviceList = serviceList;
+        this.outsourcedVendor = outsourcedVendor;
+        this.dueDiligenceDate = dueDiligenceDate;
+        this.materialityAssessmentDate = materialityAssessmentDate;
+        this.bcpTestDate = bcpTestDate;
+        this.annualSelfAssessmentDate = annualSelfAssessmentDate;
+        this.independentAuditDate = independentAuditDate;
     }
 
-    public void setOutsourcingDescription(String outsourcingDescription) {
-        this.outsourcingDescription = outsourcingDescription;
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    public CompanyFunction getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(CompanyFunction department) {
+        this.department = department;
+    }
+
+    public OutsourcingTypeEnum getOutsourcingType() {
+        return outsourcingType;
+    }
+
+    public void setOutsourcingType(OutsourcingTypeEnum outsourcingType) {
+        this.outsourcingType = outsourcingType;
+    }
+
+    public OutsourcingCategoryEnum getOutsourcingCategory() {
+        return outsourcingCategory;
+    }
+
+    public void setOutsourcingCategory(OutsourcingCategoryEnum outsourcingCategory) {
+        this.outsourcingCategory = outsourcingCategory;
+    }
+
+    public MaterialityEnum getMateriality() {
+        return materiality;
+    }
+
+    public void setMateriality(MaterialityEnum materiality) {
+        this.materiality = materiality;
+    }
+
+    public String getOutsourcingTitle() {
+        return outsourcingTitle;
+    }
+
+    public void setOutsourcingTitle(String outsourcingTitle) {
+        this.outsourcingTitle = outsourcingTitle;
+    }
+
+    public List<Service> getServiceList() {
+        return serviceList;
+    }
+
+    public void setServiceList(List<Service> serviceList) {
+        this.serviceList = serviceList;
     }
 
     public Vendor getOutsourcedVendor() {
@@ -54,19 +145,43 @@ public class Outsourcing extends DBEntityTemplate {
         this.outsourcedVendor = outsourcedVendor;
     }
 
-    public Employee getEmployeeInChargeOutsourcing() {
-        return employeeInChargeOutsourcing;
+    public Date getDueDiligenceDate() {
+        return dueDiligenceDate;
     }
 
-    public void setEmployeeInChargeOutsourcing(Employee employeeInChargeOutsourcing) {
-        this.employeeInChargeOutsourcing = employeeInChargeOutsourcing;
+    public void setDueDiligenceDate(Date dueDiligenceDate) {
+        this.dueDiligenceDate = dueDiligenceDate;
     }
 
-    public List<OutsourcingAssessment> getOutsourcingAssessmentList() {
-        return outsourcingAssessmentList;
+    public Date getMaterialityAssessmentDate() {
+        return materialityAssessmentDate;
     }
 
-    public void setOutsourcingAssessmentList(List<OutsourcingAssessment> outsourcingAssessmentList) {
-        this.outsourcingAssessmentList = outsourcingAssessmentList;
+    public void setMaterialityAssessmentDate(Date materialityAssessmentDate) {
+        this.materialityAssessmentDate = materialityAssessmentDate;
+    }
+
+    public Date getBcpTestDate() {
+        return bcpTestDate;
+    }
+
+    public void setBcpTestDate(Date bcpTestDate) {
+        this.bcpTestDate = bcpTestDate;
+    }
+
+    public Date getAnnualSelfAssessmentDate() {
+        return annualSelfAssessmentDate;
+    }
+
+    public void setAnnualSelfAssessmentDate(Date annualSelfAssessmentDate) {
+        this.annualSelfAssessmentDate = annualSelfAssessmentDate;
+    }
+
+    public Date getIndependentAuditDate() {
+        return independentAuditDate;
+    }
+
+    public void setIndependentAuditDate(Date independentAuditDate) {
+        this.independentAuditDate = independentAuditDate;
     }
 }
