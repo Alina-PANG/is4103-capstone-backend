@@ -114,13 +114,13 @@ public class AuditTrailActivityService {
 
     public AuditTrailActivityDto entityToDto(AuditTrailActivity input) {
         AuditTrailActivityDto auditTrailActivityDto = new AuditTrailActivityDto();
-        auditTrailActivityDto.setId(Optional.of(input.getId()));
-        auditTrailActivityDto.setActivity(Optional.of(input.getActivity()));
-        auditTrailActivityDto.setUserUuid(Optional.of(input.getUserUuid()));
-        auditTrailActivityDto.setTimeStamp(Optional.of(datetimeFormatter.format(input.getTimeStamp())));
+        auditTrailActivityDto.setId(Optional.ofNullable(input.getId()));
+        auditTrailActivityDto.setActivity(Optional.ofNullable(input.getActivity()));
+        auditTrailActivityDto.setUserUuid(Optional.ofNullable(input.getUserUuid()));
+        auditTrailActivityDto.setTimeStamp(Optional.ofNullable(datetimeFormatter.format(input.getTimeStamp())));
 
         String username = es.getUsernameByUuid(input.getUserUuid());
-        auditTrailActivityDto.setUsername(Optional.of(username));
+        auditTrailActivityDto.setUsername(Optional.ofNullable(username));
         return auditTrailActivityDto;
     }
 

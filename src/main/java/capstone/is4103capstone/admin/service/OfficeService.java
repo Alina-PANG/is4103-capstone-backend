@@ -110,16 +110,16 @@ public class OfficeService {
     public OfficeDto entityToDto(Office input) {
         OfficeDto officeDto = new OfficeDto();
         // standard attributes
-        officeDto.setId(Optional.of(input.getId()));
-        officeDto.setCode(Optional.of(input.getCode()));
-        officeDto.setObjectName(Optional.of(input.getObjectName()));
+        officeDto.setId(Optional.ofNullable(input.getId()));
+        officeDto.setCode(Optional.ofNullable(input.getCode()));
+        officeDto.setObjectName(Optional.ofNullable(input.getObjectName()));
         // non-standard
-        officeDto.setAddressLine1(Optional.of(input.getAddress().getAddressLine1()));
-        officeDto.setAddressLine2(Optional.of(input.getAddress().getAddressLine2()));
-        officeDto.setPostalCode(Optional.of(input.getAddress().getPostalCode()));
-        officeDto.setCountryCode(Optional.of(input.getAddress().getCountryCode()));
-        officeDto.setCountryId(Optional.of(input.getCountry().getId()));
-        officeDto.setFloors(Optional.of(input.getFloors()));
+        officeDto.setAddressLine1(Optional.ofNullable(input.getAddress().getAddressLine1()));
+        officeDto.setAddressLine2(Optional.ofNullable(input.getAddress().getAddressLine2()));
+        officeDto.setPostalCode(Optional.ofNullable(input.getAddress().getPostalCode()));
+        officeDto.setCountryCode(Optional.ofNullable(input.getAddress().getCountryCode()));
+        officeDto.setCountryId(Optional.ofNullable(input.getCountry().getId()));
+        officeDto.setFloors(Optional.ofNullable(input.getFloors()));
         return officeDto;
     }
 

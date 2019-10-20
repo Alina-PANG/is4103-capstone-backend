@@ -153,14 +153,14 @@ public class EmployeeService {
     // ===== ENTITY TO DTO CONVERTER METHODS =====
     public EmployeeDto entityToDto(Employee input) {
         EmployeeDto employeeDto = new EmployeeDto();
-        employeeDto.setId(Optional.of(input.getId()));
-        employeeDto.setCode(Optional.of(input.getCode()));
-        employeeDto.setFirstName(Optional.of(input.getFirstName()));
-        employeeDto.setMiddleName(Optional.of(input.getMiddleName()));
-        employeeDto.setLastName(Optional.of(input.getLastName()));
-        employeeDto.setUserName(Optional.of(input.getUserName()));
-        employeeDto.setSecurityId(Optional.of(input.getSecurityId()));
-        employeeDto.setEmail(Optional.of(input.getEmail()));
+        employeeDto.setId(Optional.ofNullable(input.getId()));
+        employeeDto.setCode(Optional.ofNullable(input.getCode()));
+        employeeDto.setFirstName(Optional.ofNullable(input.getFirstName()));
+        employeeDto.setMiddleName(Optional.ofNullable(input.getMiddleName()));
+        employeeDto.setLastName(Optional.ofNullable(input.getLastName()));
+        employeeDto.setUserName(Optional.ofNullable(input.getUserName()));
+        employeeDto.setSecurityId(Optional.ofNullable(input.getSecurityId()));
+        employeeDto.setEmail(Optional.ofNullable(input.getEmail()));
         employeeDto.setPermissions(Optional.ofNullable(input.getWebAppPermissionMap()));
         return employeeDto;
     }

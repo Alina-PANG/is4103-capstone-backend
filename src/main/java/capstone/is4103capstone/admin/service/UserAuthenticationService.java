@@ -46,11 +46,11 @@ public class UserAuthenticationService {
             sessionKeyRepo.save(sk);
             // write the DTO object
             SessionKeyDto sessionKeyDto = new SessionKeyDto();
-            sessionKeyDto.setSessionKey(Optional.of(sk.getSessionKey()));
-            sessionKeyDto.setLinkedUserName(Optional.of(sk.getLinkedUser().getUserName()));
-            sessionKeyDto.setLinkedUserSid(Optional.of(sk.getLinkedUser().getSecurityId()));
-            sessionKeyDto.setLinkedUserUuid(Optional.of(sk.getLinkedUser().getId()));
-            sessionKeyDto.setLinkedUserFullName(Optional.of(sk.getLinkedUser().getFullName()));
+            sessionKeyDto.setSessionKey(Optional.ofNullable(sk.getSessionKey()));
+            sessionKeyDto.setLinkedUserName(Optional.ofNullable(sk.getLinkedUser().getUserName()));
+            sessionKeyDto.setLinkedUserSid(Optional.ofNullable(sk.getLinkedUser().getSecurityId()));
+            sessionKeyDto.setLinkedUserUuid(Optional.ofNullable(sk.getLinkedUser().getId()));
+            sessionKeyDto.setLinkedUserFullName(Optional.ofNullable(sk.getLinkedUser().getFullName()));
             return sessionKeyDto;
         } else {
             throw new Exception("Invalid Username or Password. Please check your input and try again.");
