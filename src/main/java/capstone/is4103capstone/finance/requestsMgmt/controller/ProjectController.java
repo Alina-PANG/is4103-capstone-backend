@@ -5,10 +5,8 @@ import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateProjectReq;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
 import capstone.is4103capstone.finance.requestsMgmt.service.ProjectService;
-import capstone.is4103capstone.general.model.GeneralEntityModel;
-import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
-import capstone.is4103capstone.seat.model.EmployeeModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -36,13 +34,15 @@ public class ProjectController {
     @GetMapping("/{projectId}")
     public ResponseEntity<TTFormResponse> getProjectDetails(@PathVariable(name = "projectId") String projectId){
         try{
-            EmployeeModel approverOfProject = ApprovalTicketService.getOpenTicketApproverByRequestedItem(projectId);
+            ApprovalTicketModel ticket = ApprovalTicketService.getLatestTicketByRequestedItem(projectId);
 //            System.out.println(approverOfProject.getFullName()+" PROJECT "+projectId);
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currEmployee = (Employee) auth.getPrincipal();
-            Boolean currentUserCanApprove = approverOfProject == null? null : approverOfProject.getId().equals(currEmployee.getId());
+
+            Boolean currentUserCanApprove = ticket == null? null : ticket.getReviewerUsername().equals(currEmployee.getUserName());
+
             return ResponseEntity.ok().body(new TTFormResponse("Successfully retrieved",false,
-                    projectService.getProjectDetails(projectId),currentUserCanApprove));
+                    projectService.getProjectDetails(projectId),currentUserCanApprove,ticket));
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
@@ -71,6 +71,7 @@ public class ProjectController {
         }
     }
 
+    //TODO
     @GetMapping("/view-my/{userId}")
     public ResponseEntity<TTListResponse> getProjectsManagedBy(@PathVariable(name = "userId") String ownerId){
         try{

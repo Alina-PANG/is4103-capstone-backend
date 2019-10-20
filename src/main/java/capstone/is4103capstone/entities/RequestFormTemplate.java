@@ -27,6 +27,9 @@ public class RequestFormTemplate extends DBEntityTemplate {
     private String currency;
 
     private ApprovalStatusEnum approvalStatus = ApprovalStatusEnum.PENDING;
+    @ManyToOne
+    @JoinColumn(name = "approver_id")
+    private Employee approver;
 
     public RequestFormTemplate() {
     }
@@ -39,6 +42,14 @@ public class RequestFormTemplate extends DBEntityTemplate {
         this.additionalInfo = additionalInfo;
         this.estimatedBudget = estimatedBudget;
         this.currency = currency;
+    }
+
+    public Employee getApprover() {
+        return approver;
+    }
+
+    public void setApprover(Employee approver) {
+        this.approver = approver;
     }
 
     public ApprovalStatusEnum getApprovalStatus() {

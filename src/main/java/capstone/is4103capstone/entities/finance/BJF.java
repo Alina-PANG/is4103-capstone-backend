@@ -33,11 +33,20 @@ public class BJF extends RequestFormTemplate {
     private String businessApprovalTicketCode;
     // link to the unique code from the approval
     private String budgetApprovalTicketCode;
+    private BigDecimal totalSpending;
 
     private BJFStatusEnum bjfStatus = BJFStatusEnum.PENDING_APPROVAL;
 
 
     public BJF() {
+    }
+
+    public BigDecimal getTotalSpending() {
+        return totalSpending;
+    }
+
+    public void setTotalSpending(BigDecimal totalSpending) {
+        this.totalSpending = totalSpending;
     }
 
     public String getCapexCurrency() {
