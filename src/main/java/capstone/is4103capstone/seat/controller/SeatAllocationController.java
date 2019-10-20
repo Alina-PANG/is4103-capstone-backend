@@ -87,6 +87,12 @@ public class SeatAllocationController {
         return ResponseEntity.ok("Assigned shared seat successfully");
     }
 
+    @PostMapping("/shared/multiple")
+    public ResponseEntity assignSharedSeatToEmployeeWithMultipleSchedules(@RequestBody SharedSeatAllocationModelForEmployee sharedSeatAllocationModelForEmployee) {
+        seatAllocationService.assignSharedSeatToEmployeeWithMultipleSchedules(sharedSeatAllocationModelForEmployee);
+        return ResponseEntity.ok("Assigned shared seat successfully");
+    }
+
     // ---------------------------------- GET: Retrieve ----------------------------------
 
     @GetMapping("/seat/{id}")

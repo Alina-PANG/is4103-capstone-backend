@@ -253,7 +253,7 @@ public class ScheduleService {
 
         if (startTime1.compareTo(startTime2) < 0) {
             System.out.println("********** " + startTime1.toString() + " is before " + startTime2.toString() + " **********");
-            if (!(endTime1.compareTo(startTime2) < 0)) {
+            if (!(endTime1.compareTo(startTime2) <= 0)) {
                 throw new ScheduleClashException("There is hourly schedule clash!");
             }
         }
