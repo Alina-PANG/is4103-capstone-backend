@@ -25,6 +25,7 @@ public class ApprovalTicketModel implements Serializable {
     }
 
     public ApprovalTicketModel(ApprovalForRequest a) {
+        setId(a.getId());
         setReviewerUsername(a.getApprover().getUserName());
         setRequestedItemId(a.getRequestedItemId());
         setApproverComment(a.getCommentByApprover());
@@ -35,7 +36,6 @@ public class ApprovalTicketModel implements Serializable {
         setRequestType(a.getApprovalType());
     }
 
-    public ApprovalTicketModel(String reviewerUsername, String requestedItemId, String approverComment, String requesterComment, String createdDateTime, String reviewedDateTime, ApprovalStatusEnum ticketResult, ApprovalTypeEnum requestType) {
     public ApprovalTicketModel(String id, String reviewerUsername, String requestedItemId, String approverComment, String requesterComment, String createdDateTime, String reviewedDateTime, ApprovalStatusEnum ticketResult, ApprovalTypeEnum requestType) {
         this.id = id;
         this.reviewerUsername = reviewerUsername;
