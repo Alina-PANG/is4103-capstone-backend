@@ -17,16 +17,17 @@ import capstone.is4103capstone.finance.admin.service.ServiceServ;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFAggregateModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
-import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
-import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.service.VendorService;
+import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
+import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
+import capstone.is4103capstone.util.enums.BJFStatusEnum;
 import capstone.is4103capstone.util.enums.BjfTypeEnum;
-import capstone.is4103capstone.util.enums.ProjectStatus;
+import org.hibernate.envers.configuration.internal.metadata.EntityXmlMappingData;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,62 +49,108 @@ public class BJFService {
     PurchaseOrderRepository poRepository;
 
     //TODO: can't same person created another request for same item before approval
-    public BJFModel createBJF(CreateBJFReq req) throws Exception{
+    public BJFModel createBJF(CreateBJFReq req, boolean isUpdate) throws Exception{
+
+        BJF newBjf = null;
+        boolean changeFromReject = false;
+        if (isUpdate){
+            System.out.println("Updating BJF");
+            newBjf = validateBJF(req.getBjfId());
+            if (!(newBjf.getBjfStatus().equals(BJFStatusEnum.REJECTED) &&
+                    newBjf.getBjfStatus().equals(BJFStatusEnum.PENDING_APPROVAL))){
+                //ALLOW Updating fields of the bjf
+                throw new Exception("The status of the bjf is "+newBjf.getBjfStatus()+", you are not able to modify at this state.");
+            }else if (newBjf.getBjfStatus().equals(BJFStatusEnum.REJECTED)){
+                newBjf.setBjfStatus(BJFStatusEnum.PENDING_APPROVAL);
+                changeFromReject = true;
+            }
+            req.cleanFields(newBjf);
+        }else{
+            newBjf = new BJF();
+        }
+
         Employee requester = employeeService.validateUser(req.getRequester());
         Vendor vendor = vendorService.validateVendor(req.getVendor());
         CostCenter cc = costCenterService.validateCostCenter(req.getCostCenter());
         Service service = serviceServ.validateService(req.getServiceOrProduct());
 //        BjfTypeEnum type = req.getRequestType().equalsIgnoreCase("BAU")?BjfTypeEnum.BAU:BjfTypeEnum.PROJECT;
 
-        BJF newBjf = new BJF();
-        newBjf.setBjfType(req.getRequestType().equalsIgnoreCase("BAU")?BjfTypeEnum.BAU:BjfTypeEnum.PROJECT);
+        Employee approver = null;//= employeeService.getEmployeeEntityBySid(cc.getCostCenterManager().getSecurityId());
+        if (req.getApprover() != null)
+            approver = employeeService.validateUser(req.getApprover());
+        if (approver == null)
+            throw new Exception("Please select business approver!");
+
         newBjf.setServiceId(service.getId());
         newBjf.setCostCenter(cc);
         newBjf.setVendorId(vendor.getId());
         newBjf.setRequester(requester);
+        newBjf.setApprover(approver);
         newBjf.setObjectName(service.getObjectName()+"-"+vendor.getObjectName());
 
         newBjf.setRequestDescription(req.getJustification());
-        newBjf.setAdditionalInfo(req.getAdditionalInfo());
-        newBjf.setCurrency(req.getCurrency());
+        newBjf.setAdditionalInfo(req.getSponsor());
+        newBjf.setCurrency("GBP");
         newBjf.setEstimatedBudget(req.getTotalBudget());
+
+        newBjf.setSponsor(req.getSponsor());
+        newBjf.setCapex(req.getCapex());
+        newBjf.setCapexCurrency(req.getCapexCurr());
+        newBjf.setRevex(req.getRevex());
+        newBjf.setRevexCurrency(req.getRevexCurr());
+
         Project p = null;
-        if (req.getRequestType().equalsIgnoreCase("Project")){
-            if (req.getOngoingCost().add(req.getProjectCost()).compareTo(req.getTotalBudget()) != 0){
-                throw new Exception("Ongoing Cost + Project Cost not equal to total amount");
-            }
+        if (req.getProject() == null || !req.getProject().isEmpty()){
             p = projectService.validateProject(req.getProject());
             newBjf.setProjectCode(p.getCode());
-            newBjf.setOngoingCost(req.getOngoingCost());
-            newBjf.setProjectCost(req.getProjectCost());
-        }
+            newBjf.setBjfType(BjfTypeEnum.PROJECT);
+        }else
+            newBjf.setBjfType(BjfTypeEnum.BAU);
+
 
         newBjf = bjfRepository.save(newBjf);
         String code = EntityCodeHPGeneration.getCode(bjfRepository,newBjf);
         newBjf.setCode(code);
-        //or go to outsourcing
-        //wait for outsourcing result.
+
+        //create approval request
+        if (!isUpdate || changeFromReject)
+            ApprovalTicketService.createTicketAndSendEmail(requester,approver,newBjf,"BJF Submitted / Updated, please have a look", ApprovalTypeEnum.BJF);
 
         return new BJFModel(newBjf,service,vendor,null,p);
     }
 
     public void bjfApproval(ApprovalForRequest ticket){
-//can be approve or reject
+        BJF bjf = validateBJF(ticket.getRequestedItemId());
+        bjf.setApprovalStatus(ticket.getApprovalStatus());
+        boolean isApproved = ticket.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED);
+        if (isApproved){
+            bjf.setBjfStatus(BJFStatusEnum.APPROVED);
+        }else{
+            bjf.setBjfStatus(BJFStatusEnum.REJECTED);
+        }
+        bjfRepository.saveAndFlush(bjf);
+
+    //TODO: can be approve or reject
+        //approve -> go to outsourcing steps
     }
 
-    public List<BJFAggregateModel> getBJFByApprover(String idOrUsername){
+    public List<BJFAggregateModel> getBJFByApprover(String idOrUsername) throws Exception{
+        Employee user = employeeService.validateUser(idOrUsername);
+        List<BJFAggregateModel> myRequests = bjfRepository.getSimpleBJFsByApprover(user.getId());
+        if (myRequests.isEmpty())
+            throw new Exception("No records found.");
 
-        return null;
+        return myRequests;
     }
 
     //TODO: collaborate with Outsourcing
     public void afterOutsourcing(String bjfId){
-        //start approval process;
+        //start purchase order steps
     }
 
     //TODO: Collaborate with Purchase Order
     public void afterPOUpdated(String poId){
-
+        //need to update bjf purchase value.
     }
 
     public BJFModel getBJFDetails(String idOrCode) throws Exception{

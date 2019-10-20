@@ -1,23 +1,65 @@
 package capstone.is4103capstone.finance.requestsMgmt.model.req;
 
+import capstone.is4103capstone.entities.finance.BJF;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class CreateBJFReq implements Serializable {
     private String requester;
-    private String requestType;  //BAU:
+//    private String requestType;  //BAU:
     private String costCenter;
     private String project;
     private String vendor;
     private String serviceOrProduct;
     private String justification;
-    private BigDecimal projectCost;
-    private BigDecimal ongoingCost;
     private String currency;
     private BigDecimal totalBudget;// not required, because can calcuated
-    private String additionalInfo;
+    private String sponsor;
+    private String coverage;
+    private String revexCurr;
+    private String capexCurr;
+    private BigDecimal revex;
+    private BigDecimal capex;
+    private Boolean competitiveQuotesAvailable;
+    private String approver;
+    private String bjfId;
 
     public CreateBJFReq() {
+    }
+
+    //TODO: Clean fields
+    public void cleanFields(BJF ori){
+        if (getApprover() == null) setApprover(ori.getApprover().getId());
+        if (getProject() == null) setProject(ori.getProjectCode());
+        if (getCompetitiveQuotesAvailable() == null) setCompetitiveQuotesAvailable(ori.getCompetitiveQuotesAvailable());
+        if (getTotalBudget() == null) setTotalBudget(ori.getEstimatedBudget());
+
+
+    }
+
+    public String getBjfId() {
+        return bjfId;
+    }
+
+    public void setBjfId(String bjfId) {
+        this.bjfId = bjfId;
+    }
+
+    public String getApprover() {
+        return approver;
+    }
+
+    public void setApprover(String approver) {
+        this.approver = approver;
+    }
+
+    public Boolean getCompetitiveQuotesAvailable() {
+        return competitiveQuotesAvailable;
+    }
+
+    public void setCompetitiveQuotesAvailable(Boolean competitiveQuotesAvailable) {
+        this.competitiveQuotesAvailable = competitiveQuotesAvailable;
     }
 
     public String getRequester() {
@@ -28,13 +70,13 @@ public class CreateBJFReq implements Serializable {
         this.requester = requester;
     }
 
-    public String getRequestType() {
-        return requestType;
-    }
-
-    public void setRequestType(String requestType) {
-        this.requestType = requestType;
-    }
+//    public String getRequestType() {
+//        return requestType;
+//    }
+//
+//    public void setRequestType(String requestType) {
+//        this.requestType = requestType;
+//    }
 
     public String getCostCenter() {
         return costCenter;
@@ -76,20 +118,44 @@ public class CreateBJFReq implements Serializable {
         this.justification = justification;
     }
 
-    public BigDecimal getProjectCost() {
-        return projectCost;
+    public String getCoverage() {
+        return coverage;
     }
 
-    public void setProjectCost(BigDecimal projectCost) {
-        this.projectCost = projectCost;
+    public void setCoverage(String coverage) {
+        this.coverage = coverage;
     }
 
-    public BigDecimal getOngoingCost() {
-        return ongoingCost;
+    public String getRevexCurr() {
+        return revexCurr;
     }
 
-    public void setOngoingCost(BigDecimal ongoingCost) {
-        this.ongoingCost = ongoingCost;
+    public void setRevexCurr(String revexCurr) {
+        this.revexCurr = revexCurr;
+    }
+
+    public String getCapexCurr() {
+        return capexCurr;
+    }
+
+    public void setCapexCurr(String capexCurr) {
+        this.capexCurr = capexCurr;
+    }
+
+    public BigDecimal getRevex() {
+        return revex;
+    }
+
+    public void setRevex(BigDecimal revex) {
+        this.revex = revex;
+    }
+
+    public BigDecimal getCapex() {
+        return capex;
+    }
+
+    public void setCapex(BigDecimal capex) {
+        this.capex = capex;
     }
 
     public String getCurrency() {
@@ -108,11 +174,11 @@ public class CreateBJFReq implements Serializable {
         this.totalBudget = totalBudget;
     }
 
-    public String getAdditionalInfo() {
-        return additionalInfo;
+    public String getSponsor() {
+        return sponsor;
     }
 
-    public void setAdditionalInfo(String additionalInfo) {
-        this.additionalInfo = additionalInfo;
+    public void setSponsor(String sponsor) {
+        this.sponsor = sponsor;
     }
 }

@@ -4,5 +4,6 @@ public enum  BJFStatusEnum {
     PENDING_APPROVAL,
     APPROVED,
     POVALUE_UPDATED,
-    DELIVERED
+    DELIVERED,
+    REJECTED
 }

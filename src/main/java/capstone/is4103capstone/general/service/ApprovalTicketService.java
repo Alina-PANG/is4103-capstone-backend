@@ -14,6 +14,7 @@ import capstone.is4103capstone.finance.requestsMgmt.service.TravelService;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import org.json.JSONObject;
@@ -54,6 +55,8 @@ public class ApprovalTicketService {
 
     @Value("${spring.mail.username}")
     private static String senderEmailAddr;
+    @Value("${frontend.server.address}")
+    private static String serverAddress;
 
     static EmployeeRepository employeeRepo;
     static ApprovalForRequestRepository approvalForRequestRepo;
@@ -143,6 +146,7 @@ public class ApprovalTicketService {
             sendEmail(ticket);
         }catch (Exception e){
             e.printStackTrace();
+            logger.error("Internal error in creating ticket for item ["+requestedItem.getClass().getSimpleName()+"] id:"+requestedItem.getId());
             return false;
         }
         return true;
@@ -177,6 +181,46 @@ public class ApprovalTicketService {
         return models;
     }
 
+    public static EmployeeModel getOpenTicketApproverByRequestedItem(String requestedItemId) throws Exception{
+        List<ApprovalForRequest> list = approvalForRequestRepo.findTicketsByRequestedItemId(requestedItemId);
+        List<ApprovalForRequest> models = new ArrayList<>();
+        for (ApprovalForRequest a: list){
+            if (a.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
+                models.add(a);
+        }
+        if (models.size() > 1){
+            logger.error("Internal error, multiple open tickets for item");
+            return null;
+        }
+        if (models.size() == 0)
+            return null;
+        return new EmployeeModel(models.get(0).getApprover());
+    }
+
+    public static ApprovalTicketModel getLatestTicketByRequestedItem(String requestedItemId) throws Exception{
+        List<ApprovalForRequest> list = approvalForRequestRepo.findTicketsByRequestedItemId(requestedItemId);
+
+        ApprovalForRequest latest = list.get(0);
+        for (ApprovalForRequest f:list){
+            if (latest.getLastModifiedDateTime().after(latest.getLastModifiedDateTime())){
+                latest = f;
+            }
+        }
+        return new ApprovalTicketModel(latest);
+//        List<ApprovalForRequest> models = new ArrayList<>();
+//        for (ApprovalForRequest a: list){
+//            if (a.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
+//                models.add(a);
+//        }
+//        if (models.size() > 1){
+//            logger.error("Internal error, multiple open tickets for item");
+//            return null;
+//        }
+//        if (models.size() == 0)
+//            return null;
+//        return new ApprovalTicketModel(models.get(0));
+    }
+
     public static boolean approveTicketByEntity(DBEntityTemplate requestedItem, String comment, String approverUsername){
         String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityIdAndApproverId(requestedItem.getId(),approverId);
@@ -197,6 +241,13 @@ public class ApprovalTicketService {
         return modifyRequest(ApprovalStatusEnum.REJECTED, ticket);
     }
 
+    public static boolean checkCurrentUserHasApprovalFor(String requestedItemId) throws  Exception{
+        EmployeeModel approverOfProject = getOpenTicketApproverByRequestedItem(requestedItemId);
+        System.out.println(approverOfProject.getFullName()+" PROJECT "+requestedItemId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currEmployee = (Employee) auth.getPrincipal();
+        return  approverOfProject.getId().equals(currEmployee.getId());
+    }
 
     public static boolean rejectTicket(String ticketId, String comment){
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findById(ticketId);
@@ -240,7 +291,7 @@ public class ApprovalTicketService {
 
         ApprovalForRequest ticket = availableTickets.get(0);
 
-        if (!currentEmployee.getId().equals(ticket.getRequester().getId()))
+        if (!currentEmployee.getId().equals(ticket.getApprover().getId()))
             throw new Exception("You don't have the right to approve the tickets;");
 
 
@@ -284,21 +335,26 @@ public class ApprovalTicketService {
     }
 
     public static void sendEmail(ApprovalForRequest ticket){
-        String subject = "Request for Approval: "+ ticket.getCode();
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("requestor_username", ticket.getRequester().getUserName());
-        map.put("requestor_email", ticket.getRequester().getEmail());
-        map.put("requestor_name", ticket.getRequester().getFullName());
-        map.put("requestor_type", ticket.getRequester().getEmployeeType());
+        try{
+            String subject = "Request for Approval: ["+ticket.getApprovalType().name()+"] "+ ticket.getCode();
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("requestor_username", ticket.getRequester().getUserName());
+            map.put("requestor_email", ticket.getRequester().getEmail());
+            map.put("requestor_name", ticket.getRequester().getFullName());
+            map.put("requestor_type", ticket.getRequester().getEmployeeType());
 
-        map.put("comment", ticket.getCommentByRequester());
-        map.put("ticket_code", ticket.getCode());
-        map.put("request_item_id", ticket.getRequestedItemId());
-        map.put("created_datetime", ticket.getCreatedDateTime());
+            map.put("comment", ticket.getCommentByRequester());
+            map.put("ticket_code", ticket.getCode());
+            map.put("request_item_id", ticket.getRequestedItemId());
+            map.put("created_datetime", ticket.getCreatedDateTime());
 
-        map.put("url", "http://localhost:3000/ticket/id/"+ticket.getId());
+            map.put("url", serverAddress+"/ticket/id/"+ticket.getId());
 
-        Mail mail = new Mail(senderEmailAddr == null? "is4103.capstone@gmail.com":senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
-        mailSenderService.sendEmail(mail, "approveBudgetMailTemplate");
+            Mail mail = new Mail(senderEmailAddr == null? "is4103.capstone@gmail.com":senderEmailAddr, ticket.getApprover().getEmail(), subject, map);
+            mailSenderService.sendEmail(mail, "approveBudgetMailTemplate");
+        }catch (Exception e){
+            logger.error("Sending email error Ticket ID"+ticket.getId());
+        }
+
     }
 }

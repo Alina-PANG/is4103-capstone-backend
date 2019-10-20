@@ -163,9 +163,7 @@ public class ChildContractService {
         Boolean canUpdate = false;
         ContractStatusEnum contractStatus = childContract.getMasterContract().getContractStatus();
 
-        if(contractStatus.equals(ContractStatusEnum.PENDING_APPROVAL)
-            ||contractStatus.equals(ContractStatusEnum.REJECTED)
-            ||contractStatus.equals(ContractStatusEnum.DRAFT)){
+        if(contractStatus.equals(ContractStatusEnum.REJECTED)||contractStatus.equals(ContractStatusEnum.DRAFT)){
             canUpdate = true;
         }
 

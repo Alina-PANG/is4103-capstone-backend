@@ -19,23 +19,74 @@ public class BJF extends RequestFormTemplate {
 
     private BjfTypeEnum BjfType;
 
-    private BigDecimal ongoingCost;
-
-    private BigDecimal projectCost = null; // if type == project
-
+    private BigDecimal capex;
+    private String capexCurrency;
+    private String revexCurrency;
+    private Boolean competitiveQuotesAvailable;
+    private BigDecimal revex; // if type == project
+    private String sponsor;
     private String projectCode = null; // string/id both should word: if type == project
-
+    private String coverage;
     private String purchaseOrderNumber;
 
     // link to the unique code from the approval
     private String businessApprovalTicketCode;
     // link to the unique code from the approval
     private String budgetApprovalTicketCode;
+    private BigDecimal totalSpending;
 
     private BJFStatusEnum bjfStatus = BJFStatusEnum.PENDING_APPROVAL;
 
 
     public BJF() {
+    }
+
+    public BigDecimal getTotalSpending() {
+        return totalSpending;
+    }
+
+    public void setTotalSpending(BigDecimal totalSpending) {
+        this.totalSpending = totalSpending;
+    }
+
+    public String getCapexCurrency() {
+        return capexCurrency;
+    }
+
+    public void setCapexCurrency(String capexCurrency) {
+        this.capexCurrency = capexCurrency;
+    }
+
+    public String getRevexCurrency() {
+        return revexCurrency;
+    }
+
+    public void setRevexCurrency(String revexCurrency) {
+        this.revexCurrency = revexCurrency;
+    }
+
+    public Boolean getCompetitiveQuotesAvailable() {
+        return competitiveQuotesAvailable;
+    }
+
+    public void setCompetitiveQuotesAvailable(Boolean competitiveQuotesAvailable) {
+        this.competitiveQuotesAvailable = competitiveQuotesAvailable;
+    }
+
+    public String getSponsor() {
+        return sponsor;
+    }
+
+    public void setSponsor(String sponsor) {
+        this.sponsor = sponsor;
+    }
+
+    public String getCoverage() {
+        return coverage;
+    }
+
+    public void setCoverage(String coverage) {
+        this.coverage = coverage;
     }
 
     public BJFStatusEnum getBjfStatus() {
@@ -70,21 +121,21 @@ public class BJF extends RequestFormTemplate {
         BjfType = bjfType;
     }
 
-    public BigDecimal getOngoingCost() {
-        return ongoingCost;
+    public BigDecimal getCapex() {
+        return capex;
     }
 
-    public void setOngoingCost(BigDecimal ongoingCost) {
-        this.ongoingCost = ongoingCost;
+    public void setCapex(BigDecimal capex) {
+        this.capex = capex;
     }
 
 
-    public BigDecimal getProjectCost() {
-        return projectCost;
+    public BigDecimal getRevex() {
+        return revex;
     }
 
-    public void setProjectCost(BigDecimal projectCost) {
-        this.projectCost = projectCost;
+    public void setRevex(BigDecimal revex) {
+        this.revex = revex;
     }
 
     public String getProjectCode() {

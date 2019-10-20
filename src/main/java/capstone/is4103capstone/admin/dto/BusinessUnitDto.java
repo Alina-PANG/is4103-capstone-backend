@@ -7,8 +7,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Optional;
 
-@Getter
-@Setter
+
 @JsonInclude(JsonInclude.Include.NON_EMPTY) // don't serialize nulls since there are optional classes
 public class BusinessUnitDto implements Serializable {
 

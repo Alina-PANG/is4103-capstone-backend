@@ -1,5 +1,6 @@
 package capstone.is4103capstone.general.model;
 
+import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 
@@ -23,6 +24,18 @@ public class ApprovalTicketModel implements Serializable {
     public ApprovalTicketModel() {
     }
 
+    public ApprovalTicketModel(ApprovalForRequest a) {
+        setReviewerUsername(a.getApprover().getUserName());
+        setRequestedItemId(a.getRequestedItemId());
+        setApproverComment(a.getCommentByApprover());
+        setRequesterComment(a.getCommentByRequester());
+        setCreatedDateTime(datetimeFormatter.format(a.getCreatedDateTime()));
+        setReviewedDateTime(datetimeFormatter.format(a.getLastModifiedDateTime()));
+        setTicketResult(a.getApprovalStatus());
+        setRequestType(a.getApprovalType());
+    }
+
+    public ApprovalTicketModel(String reviewerUsername, String requestedItemId, String approverComment, String requesterComment, String createdDateTime, String reviewedDateTime, ApprovalStatusEnum ticketResult, ApprovalTypeEnum requestType) {
     public ApprovalTicketModel(String id, String reviewerUsername, String requestedItemId, String approverComment, String requesterComment, String createdDateTime, String reviewedDateTime, ApprovalStatusEnum ticketResult, ApprovalTypeEnum requestType) {
         this.id = id;
         this.reviewerUsername = reviewerUsername;
