@@ -16,9 +16,11 @@ public interface BJFAggregateModel {
     String getTotalBudget();//currency + amt
     @Value("#{target.requester}")
     String getRequesterUsername();
+    @Value("#{target.approver}")
+    String getApproverUsername();
     @Value("#{target.created_date_time}")
     String getCreatedDateTime();
-    @Value("#{target.status}")
+    @Value("#{target.bjf_status}")
     BJFStatusEnum getBjfStatus();
     @Value("#{target.id}")
     String getId();

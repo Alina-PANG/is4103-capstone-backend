@@ -30,9 +30,9 @@ public class CostCenterController {
     @GetMapping("/view-my")
     public ResponseEntity<GetCostCenterListRes> retrieveCostCenterByUser(){
         try{
-            return new ResponseEntity<GetCostCenterListRes>(ccService.getCostCentersByUser(""), HttpStatus.OK);
+            return new ResponseEntity<>(ccService.getCostCentersByUser(""), HttpStatus.OK);
         }catch (Exception ex){
-            return new ResponseEntity<GetCostCenterListRes>(new GetCostCenterListRes(ex.getMessage(),true), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetCostCenterListRes(ex.getMessage(),true), HttpStatus.BAD_REQUEST);
         }
     }
     @GetMapping
