@@ -14,9 +14,11 @@ import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
+import capstone.is4103capstone.finance.requestsMgmt.model.BjfAnalysisModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFAggregateModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
+import capstone.is4103capstone.finance.requestsMgmt.model.res.BjfAnalysisResponse;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.service.VendorService;
@@ -142,6 +144,16 @@ public class BJFService {
 
         return myRequests;
     }
+
+    public BjfAnalysisResponse bjfAnalysis(String bjfId){
+        BJF bjf = validateBJF(bjfId);
+
+
+
+
+        return new BjfAnalysisResponse();
+    }
+
 
     //TODO: collaborate with Outsourcing
     public void afterOutsourcing(String bjfId){
