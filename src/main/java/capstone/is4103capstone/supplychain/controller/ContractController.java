@@ -19,7 +19,7 @@ public class ContractController {
     private static final Logger logger = LoggerFactory.getLogger(ContractController.class);
 
     @Autowired
-    private ContractService contractService;
+    ContractService contractService;
 
     @PostMapping("/create-contract")
     public ResponseEntity<GeneralRes> createContract(@RequestBody CreateContractReq createContractReq) {

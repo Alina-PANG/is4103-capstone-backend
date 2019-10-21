@@ -18,7 +18,7 @@ public class ChildContractController {
     private static final Logger logger = LoggerFactory.getLogger(ContractController.class);
 
     @Autowired
-    private ChildContractService childContractService;
+    ChildContractService childContractService;
 
     @PostMapping("/create-child-contract")
     public ResponseEntity<GeneralRes> createChildContract(@RequestBody CreateChildContractReq createChildContractReq) {

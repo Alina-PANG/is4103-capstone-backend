@@ -78,17 +78,11 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "creator")
     private List<Dispute> disputesCreated = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employeeInChargeOutsourcing")
-    private List<Outsourcing> outsourcingInCharged = new ArrayList<>();
-
     @OneToMany(mappedBy = "employeeInChargeContract")
     private List<Contract> contractInCharged = new ArrayList<>();
 
     @OneToMany(mappedBy = "approver")
     private List<Contract> contractsApproved = new ArrayList<>();
-
-//    @OneToMany(mappedBy = "approver")
-//    private List<ChildContract> childContractsApproved = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
@@ -267,14 +261,6 @@ public class Employee extends DBEntityTemplate {
 
     public void setDisputesCreated(List<Dispute> disputesCreated) {
         this.disputesCreated = disputesCreated;
-    }
-
-    public List<Outsourcing> getOutsourcingInCharged() {
-        return outsourcingInCharged;
-    }
-
-    public void setOutsourcingInCharged(List<Outsourcing> outsourcingInCharged) {
-        this.outsourcingInCharged = outsourcingInCharged;
     }
 
     public List<Contract> getContractInCharged() {

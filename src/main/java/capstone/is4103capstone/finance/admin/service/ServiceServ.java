@@ -1,5 +1,6 @@
 package capstone.is4103capstone.finance.admin.service;
 
+import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.finance.BudgetSub2;
 import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.Contract;
@@ -218,5 +219,14 @@ public class ServiceServ {
 
     private void logProblem(String message){
 
+    }
+
+    public Boolean validateServiceId(String id){
+        Optional<Service> optionalService = serviceRepository.findById(id);
+        if (!optionalService.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
     }
 }

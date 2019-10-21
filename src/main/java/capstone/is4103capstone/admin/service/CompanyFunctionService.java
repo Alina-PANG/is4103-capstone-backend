@@ -2,6 +2,7 @@ package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.repository.FunctionRepository;
 import capstone.is4103capstone.entities.CompanyFunction;
+import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.util.exception.CompanyFunctionNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,14 @@ public class CompanyFunctionService {
         }
 
         return optionalCompanyFunction.get();
+    }
+
+    public Boolean validateFunctionId(String id){
+        Optional<CompanyFunction> optionalFunction = functionRepository.findById(id);
+        if (!optionalFunction.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
     }
 }

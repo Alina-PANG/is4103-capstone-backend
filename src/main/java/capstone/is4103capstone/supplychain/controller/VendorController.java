@@ -18,7 +18,7 @@ public class VendorController {
     private static final Logger logger = LoggerFactory.getLogger(VendorController.class);
 
     @Autowired
-    private VendorService vendorService;
+    VendorService vendorService;
 
     @PostMapping("/create-vendor")
     public ResponseEntity<GeneralRes> createVendor(@RequestBody CreateVendorReq createVendorReq) {
