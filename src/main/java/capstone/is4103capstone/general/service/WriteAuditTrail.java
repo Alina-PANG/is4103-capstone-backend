@@ -29,7 +29,7 @@ public class WriteAuditTrail {
 
     public static void createBasicAuditRecord() {
         try {
-            audit.createNewRecordUsingUserUuid(AUTO_DETECT_FLAG, SecurityTools.getLoggedInUser().getId());
+            audit.createNewRecordUsingUserUuid(AUTO_DETECT_FLAG, AuthenticationTools.getCurrentUser().getId());
         } catch (Exception ex) {
             logger.error("WriteAuditTrail - autoAuditUsingSpringSecurity: Exception thrown. The exception was: " + ex.getMessage());
         }
