@@ -99,40 +99,68 @@ public class AdminInitialization {
         newEmployee2 = employeeRepository.save(newEmployee2);
         admin = employeeRepository.save(admin);
 
-        Team team = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
+        Team team1 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
 
-        newEmployee.setTeam(team);
-        newEmployee2.setTeam(team);
-        team.getMembers().add(newEmployee);
-        team.getMembers().add(newEmployee2);
+        newEmployee.setTeam(team1);
+        newEmployee2.setTeam(team1);
+        team1.getMembers().add(newEmployee);
+        team1.getMembers().add(newEmployee2);
         newEmployee.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-yingshi2502");
         newEmployee2.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-caiyuqian");
 
         newEmployee2.setManager(newEmployee);
         newEmployee.getSubordinates().add(newEmployee2);
 
+        Team team2 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
+        Team team3 = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
+        Team team4 = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
+
         // Seat admin setup for different hierarchies
         SeatRequestAdminMatch seatRequestAdminMatch1 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch1.setHierarchyId(team.getId());
+        seatRequestAdminMatch1.setHierarchyId(team1.getId());
         seatRequestAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
         seatRequestAdminMatch1.setSeatAdmin(newEmployee);
 
         SeatRequestAdminMatch seatRequestAdminMatch2 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch2.setHierarchyId(team.getBusinessUnit().getId());
+        seatRequestAdminMatch2.setHierarchyId(team1.getBusinessUnit().getId());
         seatRequestAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
         seatRequestAdminMatch2.setSeatAdmin(admin);
 
         SeatRequestAdminMatch seatRequestAdminMatch3 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch3.setHierarchyId(team.getBusinessUnit().getFunction().getId());
+        seatRequestAdminMatch3.setHierarchyId(team1.getBusinessUnit().getFunction().getId());
         seatRequestAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
         seatRequestAdminMatch3.setSeatAdmin(admin);
 
-        teamRepository.saveAndFlush(team);
+        SeatRequestAdminMatch seatRequestAdminMatch4 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch4.setHierarchyId(team2.getId());
+        seatRequestAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch4.setSeatAdmin(admin);
+
+        SeatRequestAdminMatch seatRequestAdminMatch5 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch5.setHierarchyId(team3.getId());
+        seatRequestAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch5.setSeatAdmin(admin);
+
+        SeatRequestAdminMatch seatRequestAdminMatch6 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch6.setHierarchyId(team4.getId());
+        seatRequestAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch6.setSeatAdmin(admin);
+
+        SeatRequestAdminMatch seatRequestAdminMatch7 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch7.setHierarchyId(team4.getBusinessUnit().getId());
+        seatRequestAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatRequestAdminMatch7.setSeatAdmin(admin);
+
+        teamRepository.saveAndFlush(team1);
         employeeRepository.saveAndFlush(newEmployee);
         employeeRepository.saveAndFlush(newEmployee2);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch1);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch2);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch3);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch4);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch5);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch6);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch7);
     }
 
     public void createGeo() {

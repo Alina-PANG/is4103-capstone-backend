@@ -13,12 +13,12 @@ import capstone.is4103capstone.seat.model.seatAllocation.*;
 import capstone.is4103capstone.seat.repository.*;
 import capstone.is4103capstone.util.enums.ScheduleRecurringBasisEnum;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
+import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import capstone.is4103capstone.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
-import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -68,6 +68,15 @@ public class SeatAllocationService {
 
         for (Seat seat :
                 seats) {
+            if (seat.getActiveSeatAllocations().size() > 0) {
+                throw new SeatAllocationException("Allocating seats to function failed: some seat has active allocations!");
+            }
+        }
+
+        for (Seat seat :
+                seats) {
+            // Need to change the seat type because the seat may have been a hot desk previously
+            seat.setType(SeatTypeEnum.FIXED);
             seat.setFunctionAssigned(function);
             seatRepository.save(seat);
         }
@@ -77,9 +86,9 @@ public class SeatAllocationService {
 
     // Pre-conditions:
     // 1. A seat can only be deallocated from a function when it is not assigned to a team/business unit / does not have any active employee allocation.
-    public void deallocateSeatsFromFunction(BulkDeallocationModel bulkDeallocationModel) throws SeatAllocationException {
+    public void deallocateSeatsFromFunction(BulkSeatIdsModel bulkSeatIdsModel) throws SeatAllocationException {
 
-        List<Seat> seats = validateSeatsInformationForDeallocation(bulkDeallocationModel.getSeatIds(), "FUNCTION");
+        List<Seat> seats = validateSeatsInformationForDeallocation(bulkSeatIdsModel.getSeatIds(), "FUNCTION");
 
         for (Seat seat :
                 seats) {
@@ -105,9 +114,9 @@ public class SeatAllocationService {
 
     // Pre-conditions:
     // 1. A seat can only be deallocated from a business unit when it is not assigned to a team / does not have any active employee allocation.
-    public void deallocateSeatsFromBusinessUnit(BulkDeallocationModel bulkDeallocationModel) throws SeatAllocationException {
+    public void deallocateSeatsFromBusinessUnit(BulkSeatIdsModel bulkSeatIdsModel) throws SeatAllocationException {
 
-        List<Seat> seats = validateSeatsInformationForDeallocation(bulkDeallocationModel.getSeatIds(), "BUSINESS_UNIT");
+        List<Seat> seats = validateSeatsInformationForDeallocation(bulkSeatIdsModel.getSeatIds(), "BUSINESS_UNIT");
 
         for (Seat seat :
                 seats) {
@@ -134,9 +143,9 @@ public class SeatAllocationService {
 
     // Pre-conditions:
     // 1. A seat can only be deallocated from a team when it does not have any active employee allocation.
-    public void deallocateSeatsFromTeam(BulkDeallocationModel bulkDeallocationModel) throws SeatAllocationException {
+    public void deallocateSeatsFromTeam(BulkSeatIdsModel bulkSeatIdsModel) throws SeatAllocationException {
 
-        List<Seat> seats = validateSeatsInformationForDeallocation(bulkDeallocationModel.getSeatIds(), "TEAM");
+        List<Seat> seats = validateSeatsInformationForDeallocation(bulkSeatIdsModel.getSeatIds(), "TEAM");
 
         for (Seat seat :
                 seats) {
@@ -145,31 +154,60 @@ public class SeatAllocationService {
         }
     }
 
+    // Pre-conditions:
+    // 1. A seat can only be marked as a hot desk if it does not have any active employee allocation.
+    // 2. A hot desk is assigned at the floor level, which means a seat does not have to be pre-assigned to a function/team to become a hot desk.
+    public void markSeatsAsHotDesk(BulkSeatIdsModel bulkSeatIdsModel) {
+        List<Seat> seats = validateSeatsInformationForAllocation(bulkSeatIdsModel.getSeatIds(), "HOT_DESK");
+        // Check whether any seat has active seat allocation
+        for (Seat seat :
+                seats) {
+            if (seat.getActiveSeatAllocations().size() > 0) {
+                throw new SeatAllocationException("Marking seat as hot desk failed: seat with ID " + seat.getId() + " has active allocations!");
+            }
+            if (seat.isUnderOffice()) {
+                throw new SeatAllocationException("Marking seat as hot desk failed: seat under office cannot be allocated as hot desk!");
+            }
+        }
+
+        // Disassociate each seat with the team, business unit and company function assigned
+        for (Seat seat :
+                seats) {
+            seat.setTeamAssigned(null);
+            seat.setBusinessUnitAssigned(null);
+            seat.setFunctionAssigned(null);
+            seat.setType(SeatTypeEnum.HOTDESK);
+            seatRepository.save(seat);
+        }
+    }
 
 
     // ---------------------------------- Employee Level -----------------------------------
 
     // Assumptions:
     // 1. A hot desk is like a fixed seat to a temporary employee, and it's directly allocated to an individual employee.
-    // 2. A seat can only be assigned as a fixed seat to a temporary employee when it does not have any allocation schedule that clashes with the schedule set
-    //    in the required allocation.
-    // 3. A hot desk is assigned at the floor level, which means a seat does not have to be pre-assigned to a function/team to become a hot desk.
-    // 4. The allocation schedule must have an end date.
-    // 5. Seats under office cannot be allocated as hot desks.
-    public void assignHotDesk(SeatAllocationModelForEmployee seatAllocationModelForEmployee) throws SeatAllocationException {
+    // 2. The allocation schedule must have an end date.
+    // 3. Seats under office cannot be allocated as hot desks.
+    public void assignHotDeskToAnEmployee(SeatAllocationModelForEmployee seatAllocationModelForEmployee) throws SeatAllocationException {
         try {
             Seat seat = seatService.retrieveSeatById(seatAllocationModelForEmployee.getSeatId());
 
             if (seat.isUnderOffice()) {
                 throw new SeatAllocationException("Assigning hot desk failed: seat under office cannot be allocated as hot desk!");
             }
-
             if (seatAllocationModelForEmployee.getSchedule().getStartDateTime() == null) {
                 throw new SeatAllocationException("Assigning hot desk failed: start date of the seat allocation is required!");
             }
-
             if (seatAllocationModelForEmployee.getSchedule().getEndDateTime() == null) {
                 throw new SeatAllocationException("Assigning hot desk failed: end date of the seat allocation is required!");
+            }
+            if (seatAllocationModelForEmployee.getType() == null ||
+                    seatAllocationModelForEmployee.getType().trim().length() == 0 ||
+                    !seatAllocationModelForEmployee.getType().equals("HOTDESK")) {
+                throw new SeatAllocationException("Assigning hot desk failed: invalid or mismatching allocation type!");
+            }
+            if (!seat.getType().equals(SeatTypeEnum.HOTDESK)) {
+                throw new SeatAllocationException("Assigning hot desk failed: the seat is not a hot desk!");
             }
 
             Date startDateTime = seatAllocationModelForEmployee.getSchedule().getStartDateTime();
@@ -192,7 +230,6 @@ public class SeatAllocationService {
                     throw new SeatAllocationException("Assigning hot desk failed: " + ex.getMessage());
                 }
             }
-
 
             // Create a new seat allocation between the seat and the employee
             Employee employee = employeeService.retrieveEmployeeById(seatAllocationModelForEmployee.getEmployee().getId());

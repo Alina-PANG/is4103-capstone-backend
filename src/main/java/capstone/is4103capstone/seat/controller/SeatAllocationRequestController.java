@@ -8,13 +8,14 @@ import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.CreateSeatAllocationRequestModel;
+import capstone.is4103capstone.seat.model.seatAllocationRequest.ApproveSeatAllocationRequestModel;
+import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestGroupModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocationWithHighlight;
 import capstone.is4103capstone.seat.service.EntityModelConversionService;
 import capstone.is4103capstone.seat.service.SeatAllocationRequestService;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
 import capstone.is4103capstone.seat.service.SeatMapService;
-import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
 import capstone.is4103capstone.util.exception.EntityModelConversionException;
 import org.slf4j.Logger;
@@ -23,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -51,20 +54,13 @@ public class SeatAllocationRequestController {
         return ResponseEntity.ok("Create seat allocation request successfully!");
     }
 
-    @PostMapping("/review")
-    public ResponseEntity processSeatAllocationRequest(@RequestBody ApprovalTicketModel approvalTicketModel,
-                                                       @RequestParam(name="seatId", required=false) String seatId) {
-        ApprovalForRequest approvalForRequest = entityModelConversionService.convertApprovalTicketModelToNewEntity(approvalTicketModel);
-        if (approvalForRequest.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED)) {
-            seatAllocationRequestService.approveSeatAllocationRequest(approvalForRequest, seatId);
-        } else if (approvalForRequest.getApprovalStatus().equals(ApprovalStatusEnum.REJECTED)) {
-            seatAllocationRequestService.rejectSeatAllocationRequest(approvalForRequest);
-        }
-        return ResponseEntity.ok("Reviewed allocation request successfully!");
-    }
+
 
     // ---------------------------------- GET: Retrieve ----------------------------------
 
+    // Return the seat maps that have seats which are available for the seat allocation request. The seat map will highlight
+    //  the seats which fulfill the requests. The reviewer of the request can then choose a seat to allocate through the processing
+    //  functions.
     @GetMapping("/availability")
     public ResponseEntity retrieveAvailableSeatMapsForAllocationByHierarchy(@RequestParam(name="hierarchy", required=true) String hierarchy,
                                                          @RequestParam(name="hierarchyId", required=true) String hierarchyId,
@@ -91,6 +87,10 @@ public class SeatAllocationRequestController {
         seatAllocation.setSchedule(entityModelConversionService.convertScheduleModelToSchedule(seatAllocationModelForEmployee.getSchedule(),
                 seatAllocation.getAllocationType().toString()));
         List<SeatMapModelForAllocationWithHighlight> seatMapModels = seatMapService.retrieveAvailableSeatMapsForAllocationByHierarchy(hierarchy, hierarchyId, seatAllocation);
+        for (SeatMapModelForAllocationWithHighlight seatMapModel :
+                seatMapModels) {
+            Collections.sort(seatMapModel.getSeatModelsForAllocationViaSeatMap());
+        }
         return ResponseEntity.ok(seatMapModels);
     }
 
@@ -101,4 +101,66 @@ public class SeatAllocationRequestController {
         return ResponseEntity.ok(seatAllocationRequestModel);
     }
 
+    // Return all the approval tickets assigned to a particular employee, including ones that have already been processed and the pending ones
+    // The return type will be seat allocation request including the required approval tickets
+    //  The employee has access to lower-level approval tickets under the same seat allocation request
+    //  The employee has NO access to higher-level approval tickets under the same seat allocation request
+    @GetMapping("/assigned")
+    public ResponseEntity retrieveSeatAllocationRequestsWithApprovalTicketsByReviewerId(@RequestParam(name="reviewerId", required=true) String reviewerId) {
+        List<SeatAllocationRequest> seatAllocationRequests = seatAllocationRequestService.retrieveSeatAllocationRequestsWithApprovalTicketsByReviewerId(reviewerId);
+        SeatAllocationRequestGroupModel seatAllocationRequestGroupModel = new SeatAllocationRequestGroupModel();
+        List<SeatAllocationRequestModel> seatAllocationRequestModels = new ArrayList<>();
+        for (SeatAllocationRequest requestEntity :
+                seatAllocationRequests) {
+            seatAllocationRequestModels.add(entityModelConversionService.convertSeatAllocationRequestEntityToModel(requestEntity));
+        }
+        seatAllocationRequestGroupModel.setSeatAllocationRequestModels(seatAllocationRequestModels);
+        return ResponseEntity.ok(seatAllocationRequestGroupModel);
+    }
+
+    @GetMapping("/owned")
+    public ResponseEntity retrieveSeatAllocationRequestsWithApprovalTicketsByRequesterId(@RequestParam(name="requesterId", required=true) String requesterId) {
+        List<SeatAllocationRequest> seatAllocationRequests = seatAllocationRequestService.retrieveSeatAllocationRequestsWithApprovalTicketsByRequesterId(requesterId);
+        SeatAllocationRequestGroupModel seatAllocationRequestGroupModel = new SeatAllocationRequestGroupModel();
+        List<SeatAllocationRequestModel> seatAllocationRequestModels = new ArrayList<>();
+        for (SeatAllocationRequest requestEntity :
+                seatAllocationRequests) {
+            seatAllocationRequestModels.add(entityModelConversionService.convertSeatAllocationRequestEntityToModel(requestEntity));
+        }
+        seatAllocationRequestGroupModel.setSeatAllocationRequestModels(seatAllocationRequestModels);
+        return ResponseEntity.ok(seatAllocationRequestGroupModel);
+    }
+
+
+
+    // ---------------------------------- PUT: Update ----------------------------------
+
+    @PutMapping("/escalate")
+    public ResponseEntity escalateNewSeatAllocationRequest(@RequestBody ApprovalTicketModel approvalTicketModel) {
+        seatAllocationRequestService.escalateSeatAllocationRequest(approvalTicketModel);
+        return ResponseEntity.ok("Escalated seat allocation request successfully!");
+    }
+
+    // The approval ticket model passed in should already exists, i.e., a user should see the approval ticket pending and then
+    //  decide to either approve, reject or escalate.
+    @PutMapping("/approve")
+    public ResponseEntity approveSeatAllocationRequest(@RequestBody ApproveSeatAllocationRequestModel approveSeatAllocationRequestModel) {
+        seatAllocationRequestService.approveSeatAllocationRequest(approveSeatAllocationRequestModel);
+        return ResponseEntity.ok("Approved allocation request successfully!");
+    }
+
+    @PutMapping("/reject")
+    public ResponseEntity rejectSeatAllocationRequest(@RequestBody ApprovalTicketModel approvalTicketModel) {
+        seatAllocationRequestService.rejectSeatAllocationRequest(approvalTicketModel);
+        return ResponseEntity.ok("Rejected allocation request successfully!");
+    }
+
+
+    // ---------------------------------- DELETE: Delete ----------------------------------
+
+    @DeleteMapping
+    public ResponseEntity deletePendingSeatAllocationRequest(@RequestParam(name="requestId", required=true) String requestId) {
+        seatAllocationRequestService.deletePendingSeatAllocationRequest(requestId);
+        return ResponseEntity.ok("Deleted allocation request successfully!");
+    }
 }

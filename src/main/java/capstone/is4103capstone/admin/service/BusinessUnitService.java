@@ -4,6 +4,7 @@ import capstone.is4103capstone.admin.dto.BusinessUnitDto;
 import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.general.StandardStatusMessages;
+import capstone.is4103capstone.util.exception.BusinessUnitNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,14 @@ public class BusinessUnitService {
 
     @Autowired
     BusinessUnitRepository businessUnitRepository;
+
+    public BusinessUnit retrieveBusinessUnitById(String businessUnitId) throws BusinessUnitNotFoundException {
+        Optional<BusinessUnit> optionalBusinessUnit = businessUnitRepository.findByIdNonDeleted(businessUnitId);
+        if(!optionalBusinessUnit.isPresent()) {
+            throw new BusinessUnitNotFoundException("Business unit with ID " + businessUnitId + " does not exist!");
+        }
+        return optionalBusinessUnit.get();
+    }
 
     // GET ALL BUSINESS UNITS
     public List<BusinessUnitDto> getAllBusinessUnits(boolean suppressDeleted) throws Exception {

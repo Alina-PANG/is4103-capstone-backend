@@ -25,6 +25,7 @@ public class SeatAllocationRequestModel implements Serializable {
     private List<ApprovalTicketModel> approvalTickets = new ArrayList<>();
     private ApprovalTicketModel currentPendingTicket;
     private boolean resolved;
+    private String resultedSeatAllocationId;
 
     public SeatAllocationRequestModel() {
     }
@@ -32,7 +33,7 @@ public class SeatAllocationRequestModel implements Serializable {
     public SeatAllocationRequestModel(String id, GroupModel team, String escalatedHierarchyLevel, String escalatedHierarchyId,
                                       ScheduleModel seatAllocationSchedule, EmployeeModel employeeOfAllocation, String allocationType,
                                       EmployeeModel requester, List<ApprovalTicketModel> approvalTickets,
-                                      ApprovalTicketModel currentPendingTicket, boolean resolved) {
+                                      ApprovalTicketModel currentPendingTicket, boolean resolved, String resultedSeatAllocationId) {
         this.id = id;
         this.team = team;
         this.escalatedHierarchyLevel = escalatedHierarchyLevel;
@@ -44,6 +45,7 @@ public class SeatAllocationRequestModel implements Serializable {
         this.approvalTickets = approvalTickets;
         this.currentPendingTicket = currentPendingTicket;
         this.resolved = resolved;
+        this.resultedSeatAllocationId = resultedSeatAllocationId;
     }
 
     public String getId() {
@@ -132,5 +134,13 @@ public class SeatAllocationRequestModel implements Serializable {
 
     public void setResolved(boolean resolved) {
         this.resolved = resolved;
+    }
+
+    public String getResultedSeatAllocationId() {
+        return resultedSeatAllocationId;
+    }
+
+    public void setResultedSeatAllocationId(String resultedSeatAllocationId) {
+        this.resultedSeatAllocationId = resultedSeatAllocationId;
     }
 }
