@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
+import capstone.is4103capstone.entities.finance.StatementOfAcctLineItem;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
@@ -87,6 +88,8 @@ public class PurchaseOrderService {
             for(String bjfId: bjfList){
                 BJF bjf = bjfRepository.getOne(bjfId);
                 bjfCode.add(bjf.getCode());
+            }
+            for(StatementOfAcctLineItem l: po.getStatementOfAccount()){
             }
             if(po == null) return ResponseEntity
                     .notFound().build();
