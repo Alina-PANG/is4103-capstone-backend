@@ -32,7 +32,7 @@ public class CurrencyController {
     @GetMapping
     public ResponseEntity<CurrencyRes> getAllCurrencies(@RequestHeader(name = "Authorization", required = false) String headerUsername) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity.ok().body(new CurrencyRes(null, false, Optional.of(currencyService.getAllCurrencies())));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(new CurrencyRes(ex.getMessage(), true, Optional.empty()));
