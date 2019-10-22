@@ -80,8 +80,12 @@ public class BJFService {
         Employee approver = null;//= employeeService.getEmployeeEntityBySid(cc.getCostCenterManager().getSecurityId());
         if (req.getApprover() != null)
             approver = employeeService.validateUser(req.getApprover());
-        if (approver == null)
+        if (approver == null){
+            approver = cc.getCostCenterManager();
+        }
+        if (approver == null){
             throw new Exception("Please select business approver!");
+        }
 
         newBjf.setServiceId(service.getId());
         newBjf.setCostCenter(cc);
@@ -94,6 +98,8 @@ public class BJFService {
         newBjf.setAdditionalInfo(req.getSponsor());
         newBjf.setCurrency("GBP");
         newBjf.setEstimatedBudget(req.getTotalBudget());
+        newBjf.setCoverage(req.getCoverage());
+        newBjf.setCompetitiveQuotesAvailable(req.getCompetitiveQuotesAvailable());
 
         newBjf.setSponsor(req.getSponsor());
         newBjf.setCapex(req.getCapex());
