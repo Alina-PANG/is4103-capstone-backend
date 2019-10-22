@@ -1,11 +1,7 @@
 package capstone.is4103capstone.supplychain.controller;
 
-import capstone.is4103capstone.general.AuthenticationTools;
-import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
-import capstone.is4103capstone.supplychain.model.req.ApproveContractReq;
 import capstone.is4103capstone.supplychain.model.req.ApproveOutsourcingSelfAssessmentReq;
-import capstone.is4103capstone.supplychain.model.req.CreateOutsourcingReq;
 import capstone.is4103capstone.supplychain.model.req.CreateOutsourcingSelfAssessmentReq;
 import capstone.is4103capstone.supplychain.service.OutsourcingSelfAssessmentService;
 import org.slf4j.Logger;
