@@ -1,29 +1,33 @@
 package capstone.is4103capstone.admin.service;
 
-import capstone.is4103capstone.admin.model.res.AuditTrailRes;
 import capstone.is4103capstone.admin.dto.AuditTrailActivityDto;
 import capstone.is4103capstone.admin.model.AuditTrailModel;
+import capstone.is4103capstone.admin.model.res.AuditTrailRes;
 import capstone.is4103capstone.admin.repository.AuditTrailActivityRepo;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.AuditTrailActivity;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.util.enums.OperationTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class AuditTrailActivityService {
-    
+
+    private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     @Autowired
     AuditTrailActivityRepo auditTrailActivityRepo;
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
     EmployeeService es;
-
-    private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public AuditTrailActivity createNewRecordUsingUserUuid(String activityName, String userUuid) {
         AuditTrailActivity ata;
@@ -51,6 +55,11 @@ public class AuditTrailActivityService {
         return auditTrailActivityRepo.save(ata);
     }
 
+    public AuditTrailActivity createExtendedRecordUsingUserUuidAndObject(String userUuid, DBEntityTemplate dbObject, OperationTypeEnum operationType) {
+        AuditTrailActivity ata = new AuditTrailActivity(userUuid, getActivityName(), dbObject, operationType);
+        return auditTrailActivityRepo.save(ata);
+    }
+
     private String getActivityName() {//[TODO: not done]
         return Thread.currentThread().getStackTrace()[4].getMethodName();
     }
@@ -63,12 +72,12 @@ public class AuditTrailActivityService {
     }
 
     //!!using Spring JPA Projection
-    public AuditTrailRes getAllAuditTrailWithUsername(){
+    public AuditTrailRes getAllAuditTrailWithUsername() {
         try {
             List<AuditTrailModel> models = auditTrailActivityRepo.findAuditTrailActivityWithUsername();
-            return new AuditTrailRes("Retrieved " +models.size()+" records.",false,models);
-        }catch (Exception e){
-            return new AuditTrailRes(e.getMessage(),true);
+            return new AuditTrailRes("Retrieved " + models.size() + " records.", false, models);
+        } catch (Exception e) {
+            return new AuditTrailRes(e.getMessage(), true);
         }
     }
 
@@ -102,9 +111,9 @@ public class AuditTrailActivityService {
         input.getId().ifPresent(auditTrailActivity::setId);
         input.getActivity().ifPresent(auditTrailActivity::setActivity);
         input.getUserUuid().ifPresent(auditTrailActivity::setUserUuid);
-        try{
+        try {
             auditTrailActivity.setTimeStamp(datetimeFormatter.parse(input.getTimeStamp().get()));
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
 
