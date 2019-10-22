@@ -17,4 +17,5 @@ public class SessionKeyDto implements Serializable {
     private Optional<String> linkedUserName = Optional.empty();
     private Optional<String> linkedUserFullName = Optional.empty();
     private Optional<String> linkedUserSid = Optional.empty();
+    private Optional<WebAppPermissionMapDto> webAppPermissions = Optional.empty();
 }
