@@ -20,9 +20,9 @@ public class CurrencyController {
     CurrencyService currencyService;
 
     @PostMapping
-    public ResponseEntity<CurrencyRes> createCurrency(@RequestBody CurrencyDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CurrencyRes> createCurrency(@RequestBody CurrencyDto input) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity.ok().body(new CurrencyRes(null, false, Optional.of(Collections.singletonList(currencyService.createCurrency(input)))));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(new CurrencyRes(ex.getMessage(), true, Optional.empty()));
@@ -30,7 +30,7 @@ public class CurrencyController {
     }
 
     @GetMapping
-    public ResponseEntity<CurrencyRes> getAllCurrencies(@RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CurrencyRes> getAllCurrencies() {
         try {
             WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity.ok().body(new CurrencyRes(null, false, Optional.of(currencyService.getAllCurrencies())));
@@ -40,9 +40,9 @@ public class CurrencyController {
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CurrencyRes> getAllCurrencies(@PathVariable(name = "uuid") String input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CurrencyRes> getAllCurrencies(@PathVariable(name = "uuid") String input) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity.ok().body(new CurrencyRes(null, false, Optional.of(Collections.singletonList(currencyService.getCurrencyByUuid(input)))));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(new CurrencyRes(ex.getMessage(), true, Optional.empty()));
@@ -50,9 +50,9 @@ public class CurrencyController {
     }
 
     @PutMapping
-    public ResponseEntity<CurrencyRes> updateCurrency(@RequestBody CurrencyDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CurrencyRes> updateCurrency(@RequestBody CurrencyDto input) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity.ok().body(new CurrencyRes(null, false, Optional.of(Collections.singletonList(currencyService.updateCurrency(input)))));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(new CurrencyRes(ex.getMessage(), true, Optional.empty()));
@@ -60,9 +60,9 @@ public class CurrencyController {
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<CurrencyRes> deleteCurrency(@PathVariable(name = "uuid") String input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CurrencyRes> deleteCurrency(@PathVariable(name = "uuid") String input) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             currencyService.deleteCurrency(input);
             return ResponseEntity.ok().body(new CurrencyRes("Currency with UUID " + input + " has been successfully deleted.", false, Optional.empty()));
         } catch (Exception ex) {
