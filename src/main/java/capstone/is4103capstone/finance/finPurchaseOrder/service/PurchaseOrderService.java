@@ -1,10 +1,12 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.finance.Plan;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
+import capstone.is4103capstone.entities.finance.StatementOfAcctLineItem;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
@@ -38,6 +40,8 @@ public class PurchaseOrderService {
     VendorRepository vendorRepository;
     @Autowired
     BjfRepository bjfRepository;
+    @Autowired
+    EmployeeService employeeService;
 
     public ResponseEntity<GeneralRes> createPO(CreatePOReq createPOReq, String id){
         logger.info("Creating new purchase order...");
@@ -56,10 +60,11 @@ public class PurchaseOrderService {
             purchaseOrder.setStatus(ApprovalStatusEnum.PENDING);
             purchaseOrder.setTotalAmount(createPOReq.getAmount());
             purchaseOrder.setCurrencyCode(createPOReq.getCurrencyCode());
-            purchaseOrder.setCreatedBy(createPOReq.getUsername());
+            purchaseOrder.setCreatedBy(employeeService.getCurrentLoginUsername());
             purchaseOrder.setCreatedDateTime(new Date());
             purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
+            purchaseOrder.setApprover(createPOReq.getApproverUsername());
 
             logger.info("Creating purchase order with related BJF: "+createPOReq.getRelatedBJF());
             purchaseOrderRepository.saveAndFlush(purchaseOrder);
@@ -84,9 +89,11 @@ public class PurchaseOrderService {
                 BJF bjf = bjfRepository.getOne(bjfId);
                 bjfCode.add(bjf.getCode());
             }
+            for(StatementOfAcctLineItem l: po.getStatementOfAccount()){
+            }
             if(po == null) return ResponseEntity
                     .notFound().build();
-            else return ResponseEntity.ok().body(new GetPurchaseOrderRes("Successfully retrieved the purchase order!", true, po, bjfCode, bjfList));
+            else return ResponseEntity.ok().body(new GetPurchaseOrderRes("Successfully retrieved the purchase order!", true, po, bjfCode));
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -96,9 +103,9 @@ public class PurchaseOrderService {
         }
     }
 
-    public ResponseEntity<GeneralRes> getListPO(){
+    public ResponseEntity<GeneralRes> getPOAsApprover(String username){
         try{
-            List<PurchaseOrder> list = purchaseOrderRepository.findAll();
+            List<PurchaseOrder> list = purchaseOrderRepository.findAllByApprover(username);
             if(list == null) return ResponseEntity
                     .notFound().build();
             else return ResponseEntity.ok().body(new GetPurchaseOrderListRes("Successfully retrieved the purchase orders!", true, list));
@@ -112,7 +119,23 @@ public class PurchaseOrderService {
 
     }
 
-    public ResponseEntity<GeneralRes> approvePO(String id, Boolean approved, String username){
+    public ResponseEntity<GeneralRes> getPOAsRequestor(String username){
+        try{
+            List<PurchaseOrder> list = purchaseOrderRepository.findAllByCreatedBy(username);
+            if(list == null) return ResponseEntity
+                    .notFound().build();
+            else return ResponseEntity.ok().body(new GetPurchaseOrderListRes("Successfully retrieved the purchase orders!", true, list));
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+        }
+
+    }
+
+    public ResponseEntity<GeneralRes> approvePO(String id, Boolean approved){
         try{
             logger.info("Getting purchase order with id "+id);
             Optional<PurchaseOrder> poOptional = purchaseOrderRepository.findById(id);

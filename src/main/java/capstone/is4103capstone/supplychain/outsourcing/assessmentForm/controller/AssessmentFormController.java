@@ -1,16 +1,11 @@
 package capstone.is4103capstone.supplychain.outsourcing.assessmentForm.controller;
 
-import capstone.is4103capstone.finance.budget.controller.BudgetController;
-import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
-import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
-import capstone.is4103capstone.finance.budget.service.BudgetService;
-import capstone.is4103capstone.finance.budget.service.PlansComparisonService;
+import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
-import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.ApproveReq;
-import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateAssessmentFromReq;
-import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateSchedulerReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateResponseReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateTemplateReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service.AssessmentFormService;
 
 import org.slf4j.Logger;
@@ -27,17 +22,19 @@ import java.util.Date;
 @RequestMapping("/api/assessmentForm")
 @CrossOrigin(origins = "http://localhost:3000")
 public class AssessmentFormController {
+    @Autowired
+    EmployeeService employeeService;
     private static final Logger logger = LoggerFactory.getLogger(AssessmentFormController.class);
 
     @Autowired
     private AssessmentFormService assessmentFormService;
 
 
-    @PostMapping("/create/{isTemplate}")
-    public ResponseEntity<GeneralRes> createAssessmentForm(@PathVariable("isTemplate") int isTemplate, @RequestBody CreateAssessmentFromReq createAssessmentFromReq) {
+    @PostMapping("/createResponse")
+    public ResponseEntity<GeneralRes> createResponse(@RequestBody CreateResponseReq createResponseReq) {
         logger.info("*************** Creating Assessment Form *****************");
-        if(AuthenticationTools.authenticateUser(createAssessmentFromReq.getUsername())) {
-            return assessmentFormService.createForm(isTemplate == 1, createAssessmentFromReq, null);
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
+            return assessmentFormService.createResponseForm(createResponseReq, null, employeeService.getCurrentLoginUsername());
         }
         else
             return ResponseEntity
@@ -45,11 +42,23 @@ public class AssessmentFormController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @PostMapping("/update/{id}/{isTemplate}")
-    public ResponseEntity<GeneralRes> updateForm(@PathVariable("isTemplate") int isTemplate, @RequestBody CreateAssessmentFromReq createAssessmentFromReq,  @PathVariable("id") String id) {
+    @PostMapping("/updateTemplate")
+    public ResponseEntity<GeneralRes> updateForm(@RequestBody CreateTemplateReq createTemplateReq) {
         logger.info("*************** Updating Assessment Form *****************");
-        if(AuthenticationTools.authenticateUser(createAssessmentFromReq.getUsername())){
-            return assessmentFormService.createForm(isTemplate == 1, createAssessmentFromReq, id);
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())){
+            return assessmentFormService.createTemplateForm( createTemplateReq, employeeService.getCurrentLoginUsername());
+        }
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @PostMapping("/update/{id}")
+    public ResponseEntity<GeneralRes> updateForm(@RequestBody CreateResponseReq createTemplateReq, @PathVariable("id") String id) {
+        logger.info("*************** Updating Assessment Form *****************");
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())){
+            return assessmentFormService.createResponseForm(createTemplateReq,id, employeeService.getCurrentLoginUsername());
         }
         else
             return ResponseEntity
@@ -58,9 +67,9 @@ public class AssessmentFormController {
     }
 
     @GetMapping("/getDetails/{id}")
-    public ResponseEntity<GeneralRes> getForm(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username){
+    public ResponseEntity<GeneralRes> getForm(@PathVariable("id") String id){
         logger.info("*************** Getting Outsourcing Assessment Form Details "+id+"*****************");
-        if(AuthenticationTools.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
             return assessmentFormService.getForm(id);
         else
             return ResponseEntity
@@ -69,9 +78,9 @@ public class AssessmentFormController {
     }
 
     @GetMapping("/getTemplate")
-    public ResponseEntity<GeneralRes> getTemplateForm(@RequestParam(name="username", required=true) String username){
+    public ResponseEntity<GeneralRes> getTemplateForm(){
         logger.info("*************** Getting Outsourcing Assessment Form Template *****************");
-        if(AuthenticationTools.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
             return assessmentFormService.getTemplateForm();
         else
             return ResponseEntity
@@ -79,21 +88,24 @@ public class AssessmentFormController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @PostMapping("/approve/{id}")
-    public ResponseEntity<GeneralRes> approve(@PathVariable("id") String id, ApproveReq approveReq){
-        logger.info("*************** Approving Outsourcing Assessment Form "+id+" *****************");
-        if(AuthenticationTools.authenticateUser(approveReq.getUsername()))
-            return assessmentFormService.approve(id, approveReq.getApproved());
-        else
+    @PostMapping("/approve/{id}") // TODO: approve the assessment form
+    public ResponseEntity<GeneralRes> approveA(@PathVariable("id") String id, @RequestParam(name="approved", required=true) int approved, @RequestParam(name="type", required=true) int type){
+        logger.info("*************** Approving Outsourcing Assessment Form 1st Level"+id+" *****************");
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
+            return assessmentFormService.approve(id, approved == 1, type == 0, employeeService.getCurrentLoginUsername());
+        }
+        else{
+            logger.info("authentication error");
             return ResponseEntity
                     .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        }
     }
 
-    @PostMapping("/notification/{id}")
-    public ResponseEntity<GeneralRes> setTimer(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, Date date){
+    @PostMapping("/notification/{id}") // TODO: notification of assessment form
+    public ResponseEntity<GeneralRes> setTimer(@PathVariable("id") String id, Date date){
         logger.info("*************** Creating Outsourcing Assessment Form Notification *****************");
-        if(AuthenticationTools.authenticateUser(username))
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
             return assessmentFormService.setTimer(date, id);
         else
             return ResponseEntity

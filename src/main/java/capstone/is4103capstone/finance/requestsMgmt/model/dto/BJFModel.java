@@ -31,19 +31,19 @@ public class BJFModel extends RequestFormModel {
 
     public BJFModel() {
     }
-    public BJFModel(BJF e, Service s, Vendor v) {
-        setCostCenterCode(e.getCostCenter().getCode());
-        setId(e.getId());
-        setStatus(e.getBjfStatus().name());
-        setRequester(new EmployeeModel(e.getRequester()));
-        setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
-        setEstimatedBudget(e.getEstimatedBudget());
-        setBjfType(e.getBjfType().name());
-        if (v != null)
-            setVendor(new GeneralEntityModel(v));
-        if (s != null)
-            setService(new GeneralEntityModel(s));
-    }
+//    public BJFModel(BJF e, Service s, Vendor v) {
+//        setCostCenterCode(e.getCostCenter().getCode());
+//        setId(e.getId());
+//        setStatus(e.getBjfStatus().name());
+//        setRequester(new EmployeeModel(e.getRequester()));
+//        setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
+//        setEstimatedBudget(e.getEstimatedBudget());
+//        setBjfType(e.getBjfType().name());
+//        if (v != null)
+//            setVendor(new GeneralEntityModel(v));
+//        if (s != null)
+//            setService(new GeneralEntityModel(s));
+//    }
 
     public BJFModel(BJF e, Service s, Vendor v, PurchaseOrder po, Project p) {
         if (po != null)
@@ -70,10 +70,11 @@ public class BJFModel extends RequestFormModel {
         setAdditionalInfo(e.getAdditionalInfo());
         setDescription(e.getRequestDescription());
         setRequester(new EmployeeModel(e.getRequester()));
+        setApprover(new EmployeeModel(e.getApprover()));
+        setApprovalStatus(e.getApprovalStatus().name());
         setId(e.getId());
         setCostCenterCode(e.getCostCenter().getCode());
         setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
-
     }
 
     public String getCapexCurr() {

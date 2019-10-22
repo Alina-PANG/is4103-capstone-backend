@@ -14,9 +14,11 @@ import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
+import capstone.is4103capstone.finance.requestsMgmt.model.BjfAnalysisModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFAggregateModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
+import capstone.is4103capstone.finance.requestsMgmt.model.res.BjfAnalysisResponse;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.service.VendorService;
@@ -78,8 +80,12 @@ public class BJFService {
         Employee approver = null;//= employeeService.getEmployeeEntityBySid(cc.getCostCenterManager().getSecurityId());
         if (req.getApprover() != null)
             approver = employeeService.validateUser(req.getApprover());
-        if (approver == null)
+        if (approver == null){
+            approver = cc.getCostCenterManager();
+        }
+        if (approver == null){
             throw new Exception("Please select business approver!");
+        }
 
         newBjf.setServiceId(service.getId());
         newBjf.setCostCenter(cc);
@@ -92,6 +98,8 @@ public class BJFService {
         newBjf.setAdditionalInfo(req.getSponsor());
         newBjf.setCurrency("GBP");
         newBjf.setEstimatedBudget(req.getTotalBudget());
+        newBjf.setCoverage(req.getCoverage());
+        newBjf.setCompetitiveQuotesAvailable(req.getCompetitiveQuotesAvailable());
 
         newBjf.setSponsor(req.getSponsor());
         newBjf.setCapex(req.getCapex());
@@ -142,6 +150,16 @@ public class BJFService {
 
         return myRequests;
     }
+
+    public BjfAnalysisResponse bjfAnalysis(String bjfId){
+        BJF bjf = validateBJF(bjfId);
+
+
+
+
+        return new BjfAnalysisResponse();
+    }
+
 
     //TODO: collaborate with Outsourcing
     public void afterOutsourcing(String bjfId){

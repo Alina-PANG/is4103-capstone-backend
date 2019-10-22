@@ -14,9 +14,6 @@ import java.util.List;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OutsourcingAssessment extends DBEntityTemplate {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "outsourcing")
-    @JsonIgnore
     private Outsourcing outsourcing;
 
     private String businessCaseDescription;
@@ -42,8 +39,6 @@ public class OutsourcingAssessment extends DBEntityTemplate {
         this.employeeAssess = employeeAssess;
         this.outsourcingAssessmentStatus = outsourcingAssessmentStatus;
     }
-
-
 
     public Outsourcing getOutsourcing() {
         return outsourcing;

@@ -1,5 +1,6 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.controller;
 
+import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.finance.finPurchaseOrder.service.PurchaseOrderService;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreatePOReq;
 import capstone.is4103capstone.general.AuthenticationTools;
@@ -19,10 +20,12 @@ public class PurchaseOrderController {
     private static final Logger logger = LoggerFactory.getLogger(PurchaseOrderController.class);
     @Autowired
     PurchaseOrderService purchaseOrderService;
+    @Autowired
+    EmployeeService employeeService;
 
     @PostMapping("/createPO")
     public ResponseEntity<GeneralRes> createPO(@RequestBody CreatePOReq createPOReq) {
-        if(AuthenticationTools.authenticateUser(createPOReq.getUsername())) {
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
                 return purchaseOrderService.createPO(createPOReq, null);
         }
         else
@@ -33,7 +36,7 @@ public class PurchaseOrderController {
 
     @PostMapping("/updatePO/{id}")
     public ResponseEntity<GeneralRes> updatePO(@RequestBody CreatePOReq createPOReq, @PathVariable("id") String id) {
-        if(AuthenticationTools.authenticateUser(createPOReq.getUsername()))
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
             return purchaseOrderService.createPO(createPOReq, id);
         else
             return ResponseEntity
@@ -42,8 +45,8 @@ public class PurchaseOrderController {
     }
 
     @GetMapping("/getPO/{id}")
-    public ResponseEntity<GeneralRes> getPO(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username){
-        if(AuthenticationTools.authenticateUser(username))
+    public ResponseEntity<GeneralRes> getPO(@PathVariable("id") String id){
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
             return purchaseOrderService.getPO(id);
         else
             return ResponseEntity
@@ -51,11 +54,22 @@ public class PurchaseOrderController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @GetMapping("/getListPO")
-    public ResponseEntity<GeneralRes> getListPO(@RequestParam(name="username", required=true) String username){
+    @GetMapping("/getPOAsApprover")
+    public ResponseEntity<GeneralRes> getPOAsApprover(){
         ApprovalStatusEnum inputStatus;
-        if(AuthenticationTools.authenticateUser(username))
-            return purchaseOrderService.getListPO();
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
+            return purchaseOrderService.getPOAsApprover(employeeService.getCurrentLoginUsername());
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @GetMapping("/getPOAsRequestor")
+    public ResponseEntity<GeneralRes> getPOAsRequestor(){
+        ApprovalStatusEnum inputStatus;
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
+            return purchaseOrderService.getPOAsRequestor(employeeService.getCurrentLoginUsername());
         else
             return ResponseEntity
                     .badRequest()
@@ -64,9 +78,10 @@ public class PurchaseOrderController {
 
 
     @PostMapping("/approvePO/{id}")
-    public ResponseEntity<GeneralRes> getListPO(@PathVariable("id") String id, @RequestParam(name="username", required=true) String username, @RequestParam(name="approved", required=true) Boolean approved){
-        if(AuthenticationTools.authenticateUser(username))
-            return purchaseOrderService.approvePO(id, approved, username);
+    public ResponseEntity<GeneralRes> getListPO(@PathVariable("id") String id, @RequestParam(name="approved", required=true) int approved){
+        System.out.println("reached!");
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
+            return purchaseOrderService.approvePO(id, approved == 1);
         else
             return ResponseEntity
                     .badRequest()

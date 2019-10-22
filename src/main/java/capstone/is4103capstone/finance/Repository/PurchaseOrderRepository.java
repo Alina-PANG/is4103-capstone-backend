@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder,String> {
-    @Query(value = "SELECT * FROM purchase_order p WHERE p.is_deleted=false AND p.status=?1",nativeQuery = true)
-    public List<PurchaseOrder> findPurchaseOrderByStatus(int status);
+    @Query(value = "SELECT * FROM purchase_order p WHERE p.is_deleted=false AND p.approver=?1",nativeQuery = true)
+    public List<PurchaseOrder> findAllByApprover(String approver);
+
+    @Query(value = "SELECT * FROM purchase_order p WHERE p.is_deleted=false AND p.created_by=?1",nativeQuery = true)
+    public List<PurchaseOrder> findAllByCreatedBy(String requestor);
 }

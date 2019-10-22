@@ -33,12 +33,23 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     private Double totalAmount;
 
+    private String approver;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchaseOrder_vendor")
     @JsonIgnore
     private Vendor vendor;
 
     public PurchaseOrder() {
+    }
+
+
+    public String getApprover() {
+        return approver;
+    }
+
+    public void setApprover(String approver) {
+        this.approver = approver;
     }
 
     public List<String> getRelatedBJF() {

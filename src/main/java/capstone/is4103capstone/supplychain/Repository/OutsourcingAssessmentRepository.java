@@ -10,6 +10,6 @@ import java.util.List;
 public interface OutsourcingAssessmentRepository extends JpaRepository<OutsourcingAssessment, String> {
     public List<OutsourcingAssessment> findOutsourcingAssessmentByCode(String Code);
 
-    @Query(value = "SELECT * FROM outsourcing_assessment p WHERE p.is_deleted=false AND p.outsourcing_assessment_status=?1",nativeQuery = true)
-    public OutsourcingAssessment findFormByStatus(int status);
+    @Query(value = "SELECT * FROM outsourcing_assessment p WHERE p.is_deleted=false AND p.outsourcing_assessment_status=0",nativeQuery = true)
+    public OutsourcingAssessment findFormByStatus();
 }
