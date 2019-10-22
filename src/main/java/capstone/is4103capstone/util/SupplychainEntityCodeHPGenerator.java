@@ -16,6 +16,7 @@ public class SupplychainEntityCodeHPGenerator {
     private final String CONTRACT_TEMPLATE = "Contract-%1$s";
     private final String CHILD_CONTRACT_TEMPLATE = "ChildContract-%1$s";
     private final String OUTSOURCING_TEMPLATE = "Outsourcing-%1$s";
+    private final String OUTSOURCING_SELF_ASSESSMENT_TEMPLATE = "OutsourcingSelfAssessment-%1$s";
 
     public String generateCode(JpaRepository repo, DBEntityTemplate entity) throws Exception {
         Optional<DBEntityTemplate> entityOptional = repo.findById(entity.getId());
@@ -47,6 +48,8 @@ public class SupplychainEntityCodeHPGenerator {
                         code = String.format(CHILD_CONTRACT_TEMPLATE, seqNoStr);
                     case "Outsourcing":
                         code = String.format(OUTSOURCING_TEMPLATE, seqNoStr);
+                    case "outsourcingSelfAssessment":
+                        code = String.format(OUTSOURCING_SELF_ASSESSMENT_TEMPLATE, seqNoStr);
                     default:
                         System.out.println("Not found");
                 }

@@ -3,6 +3,7 @@ package capstone.is4103capstone.admin.service;
 import capstone.is4103capstone.admin.dto.EmployeeDto;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
@@ -223,6 +224,15 @@ public class EmployeeService {
             return e;
 
         throw new EntityNotFoundException("username or id not valid");
+    }
+
+    public Boolean validateEmployeeId(String id){
+        Optional<Employee> employee = employeeRepository.findUndeletedEmployeeById(id);
+        if (!employee.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
     }
 
 }
