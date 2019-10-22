@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class CreateResponseReq implements Serializable {
-    List<Boolean> reponses;
+    List<Boolean> responses;
     List<String> comments;
     private String businessCaseDescription;
 
@@ -16,12 +16,12 @@ public class CreateResponseReq implements Serializable {
         this.businessCaseDescription = businessCaseDescription;
     }
 
-    public List<Boolean> getReponses() {
-        return reponses;
+    public List<Boolean> getResponses() {
+        return responses;
     }
 
-    public void setReponses(List<Boolean> reponses) {
-        this.reponses = reponses;
+    public void setResponses(List<Boolean> responses) {
+        this.responses = responses;
     }
 
     public List<String> getComments() {

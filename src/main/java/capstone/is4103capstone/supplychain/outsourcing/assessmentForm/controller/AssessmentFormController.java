@@ -92,7 +92,6 @@ public class AssessmentFormController {
     public ResponseEntity<GeneralRes> approveA(@PathVariable("id") String id, @RequestParam(name="approved", required=true) int approved, @RequestParam(name="type", required=true) int type){
         logger.info("*************** Approving Outsourcing Assessment Form 1st Level"+id+" *****************");
         if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
-            logger.info("test");
             return assessmentFormService.approve(id, approved == 1, type == 0, employeeService.getCurrentLoginUsername());
         }
         else{

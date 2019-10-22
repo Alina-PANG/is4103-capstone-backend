@@ -125,7 +125,7 @@ public class AssessmentFormService {
                 for (int i = 0; i < outsourcingAssessmentLine.size(); i ++) {
                     OutsourcingAssessmentLine o = new OutsourcingAssessmentLine();
                     o.setQuestion(outsourcingAssessmentLine.get(i).getQuestion());
-                    o.setAnswer(createResponseReq.getReponses().get(i));
+                    o.setAnswer(createResponseReq.getResponses().get(i));
                     o.setComment(createResponseReq.getComments().get(i));
                     o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
@@ -227,7 +227,7 @@ public class AssessmentFormService {
 
     public ResponseEntity<GeneralRes> approve(String id, boolean approved, boolean isBMApproval, String username){
         try{
-            logger.info("****************** Getting assessment form with id "+id+" *********************");
+            logger.info("****************** Approving assessment form with id "+id+" *********************");
             Optional<OutsourcingAssessment> formOptional= outsourcingAssessmentRepository.findById(id);
             if (!formOptional.isPresent()) {
                 logger.info("Assessment Form Not Found!");
