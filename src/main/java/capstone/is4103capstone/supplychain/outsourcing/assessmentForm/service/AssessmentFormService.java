@@ -2,40 +2,31 @@ package capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.finance.Plan;
-import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentLine;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentSection;
-import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderRes;
-import capstone.is4103capstone.finance.finPurchaseOrder.service.PurchaseOrderService;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
+import capstone.is4103capstone.general.service.MailService;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentLineRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentSectionRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingRepository;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.configuration.ThreadPoolTaskSchedulerConfig;
-import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateAssessmentFromReq;
-import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateSchedulerReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateTemplateReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateResponseReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.res.GetAssessmentFormRes;
-import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.task.TaskSchedulerBuilder;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.Trigger;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.ScheduledFuture;
 
 @Service
 public class AssessmentFormService {
@@ -50,6 +41,8 @@ public class AssessmentFormService {
     EmployeeRepository employeeRepository;
     @Autowired
     OutsourcingRepository outsourcingRepository;
+    @Autowired
+    MailService mailService;
 
     public ResponseEntity<GeneralRes> getForm(String id){
         try{
@@ -73,7 +66,7 @@ public class AssessmentFormService {
 
     public ResponseEntity<GeneralRes> getTemplateForm(){
         try{
-            OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findFormByStatus(0);
+            OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.findFormByStatus();
             for(OutsourcingAssessmentSection s: outsourcingAssessment.getSectionList()){
                 for(OutsourcingAssessmentLine o: s.getOutsourcingAssessmentLines()){
                     logger.info("Fetching line item question"+o.getQuestion());
@@ -91,20 +84,15 @@ public class AssessmentFormService {
         }
     }
 
-    public ResponseEntity<GeneralRes> createForm(boolean isTemplate, CreateAssessmentFromReq createAssessmentFromReq, String id, String username){
+    public ResponseEntity<GeneralRes> createResponseForm(CreateResponseReq createResponseReq, String id, String username){
         try {
-
             logger.info("Action performed by: "+username+" on "+new Date());
-
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
-
             Employee creater = employeeRepository.findEmployeeByUserName(username);
-
             if(creater == null) {
                 logger.info("Cannot find the user!");
                 return ResponseEntity.notFound().build();
             }
-
             if(id != null){
                 OutsourcingAssessment temp = outsourcingAssessmentRepository.getOne(id);
                 if(temp != null){
@@ -123,11 +111,84 @@ public class AssessmentFormService {
                 }
             }
 
-            List<OutsourcingAssessmentSection> sections = createAssessmentFromReq.getSectionList();
+            OutsourcingAssessment template = outsourcingAssessmentRepository.findFormByStatus();
+            List<OutsourcingAssessmentSection> sections = template.getSectionList();
+            outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL);
+            outsourcingAssessment.setBusinessCaseDescription(createResponseReq.getBusinessCaseDescription());
+            OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
 
-            if(isTemplate)  outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.TEMPLATE);
-            else outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL);
-            outsourcingAssessment.setBusinessCaseDescription(createAssessmentFromReq.getBusinessCaseDescription());
+            for (OutsourcingAssessmentSection s : sections) {
+                OutsourcingAssessmentSection newS = new OutsourcingAssessmentSection();
+                newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
+                List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
+                List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
+                for (int i = 0; i < outsourcingAssessmentLine.size(); i ++) {
+                    OutsourcingAssessmentLine o = new OutsourcingAssessmentLine();
+                    o.setQuestion(outsourcingAssessmentLine.get(i).getQuestion());
+                    o.setAnswer(createResponseReq.getResponses().get(i));
+                    o.setComment(createResponseReq.getComments().get(i));
+                    o.setCreatedBy(username);
+                    o.setCreatedDateTime(new Date());
+                    o.setOutsourcingAssessmentSection(newS);
+                    linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
+                }
+                newS.setOutsourcingAssessmentLines(linesSaved);
+                newS.setOutsourcingAssessment(newAssess);
+                newS.setCreatedBy(username);
+                newS.setCreatedDateTime(new Date());
+                outsourcingAssessmentSectionRepository.saveAndFlush(newS);
+            }
+            newAssess.setSectionList(sections);
+            newAssess.setCreatedBy(username);
+            newAssess.setCreatedDateTime(new Date());
+
+            outsourcingAssessmentRepository.saveAndFlush(newAssess);
+            Employee approverA = creater.getManager();
+            createApprovalTicket(creater.getUserName(), approverA,newAssess,"Please review and approve the outsourcing assessment form.");
+            return ResponseEntity
+                    .ok()
+                    .body(new GeneralRes("Successfully created the outsourcing assessment form!", false));
+        } catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+        }
+    }
+
+    public ResponseEntity<GeneralRes> createTemplateForm(CreateTemplateReq createTemplateReq, String username){
+        try {
+
+            logger.info("Action performed by: "+username+" on "+new Date());
+
+            OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
+
+            Employee creater = employeeRepository.findEmployeeByUserName(username);
+
+            if(creater == null) {
+                logger.info("Cannot find the user!");
+                return ResponseEntity.notFound().build();
+            }
+
+            OutsourcingAssessment temp = outsourcingAssessmentRepository.findFormByStatus();
+            if(temp != null){
+                temp.setDeleted(true);
+                outsourcingAssessmentRepository.saveAndFlush(temp);
+                List<OutsourcingAssessmentSection> sections = temp.getSectionList();
+                for(OutsourcingAssessmentSection s: sections){
+                    s.setDeleted(true);
+                    outsourcingAssessmentSectionRepository.saveAndFlush(s);
+                    List<OutsourcingAssessmentLine> lines = s.getOutsourcingAssessmentLines();
+                    for(OutsourcingAssessmentLine l: lines){
+                        l.setDeleted(true);
+                        outsourcingAssessmentLineRepository.saveAndFlush(l);
+                    }
+                }
+            }
+
+            List<OutsourcingAssessmentSection> sections = createTemplateReq.getSectionList();
+
+            outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.TEMPLATE);
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
 
             for (OutsourcingAssessmentSection s : sections) {
@@ -155,7 +216,7 @@ public class AssessmentFormService {
             createApprovalTicket(creater.getUserName(), approverA,newAssess,"Please review and approve the outsourcing assessment form.");
             return ResponseEntity
                     .ok()
-                    .body(new GeneralRes("Successfully created the outsourcing assessment form!", true));
+                    .body(new GeneralRes("Successfully created the outsourcing assessment form!", false));
         } catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity
@@ -164,9 +225,9 @@ public class AssessmentFormService {
         }
     }
 
-    public ResponseEntity<GeneralRes> approve(String id, boolean approved, boolean isBMApproval){
+    public ResponseEntity<GeneralRes> approve(String id, boolean approved, boolean isBMApproval, String username){
         try{
-            logger.info("****************** Getting assessment form with id "+id+" *********************");
+            logger.info("****************** Approving assessment form with id "+id+" *********************");
             Optional<OutsourcingAssessment> formOptional= outsourcingAssessmentRepository.findById(id);
             if (!formOptional.isPresent()) {
                 logger.info("Assessment Form Not Found!");
@@ -177,8 +238,17 @@ public class AssessmentFormService {
             if(form.getDeleted()) return ResponseEntity
                     .notFound().build();
             if(approved) {
-                if(isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
-                else if(!isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
+                if(isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL) {
+                    form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
+                    Employee manager = employeeRepository.findEmployeeByUserName(username);
+                    createApprovalTicket(form.getCreatedBy(), manager,form,"Please review and approve the outsourcing assessment form.");
+                }
+                else if(!isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) {
+                    form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
+                    String sender = "is4103.capstone@gmail.com";
+                    String receiver = employeeRepository.findEmployeeByUserName(form.getCreatedBy()).getEmail();
+                    mailService.sendGeneralEmail(sender, receiver, "Your Outsourcing Assessment Form Has Been Approved!", "Outsourcing Assessment Form "+form.getCode()+" has been successfully approved!");
+                }
                 else {
                     logger.error("approve type is not consistent with the pending status!");
                     return ResponseEntity.badRequest().build();
@@ -187,7 +257,7 @@ public class AssessmentFormService {
             else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
             outsourcingAssessmentRepository.saveAndFlush(form);
             logger.info("Approving/Rejecting the assessment form created by "+ form.getCreatedBy());
-            return ResponseEntity.ok().body(new GeneralRes("Successfully approved/rejected the purchase orders!", true));
+            return ResponseEntity.ok().body(new GeneralRes("Successfully approved/rejected the purchase orders!", false));
         }catch(Exception ex){
             ex.printStackTrace();
             return ResponseEntity
@@ -195,35 +265,6 @@ public class AssessmentFormService {
                     .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
         }
     }
-
-//    public ResponseEntity<GeneralRes> approveA(String id, boolean approved){
-//        try{
-//            logger.info("****************** Getting assessment form with id "+id+" *********************");
-//            Optional<OutsourcingAssessment> formOptional= outsourcingAssessmentRepository.findById(id);
-//            if (!formOptional.isPresent()) {
-//                logger.info("Assessment Form Not Found!");
-//                return ResponseEntity
-//                        .notFound().build();
-//            }
-//            OutsourcingAssessment form = formOptional.get();
-//            if(form.getDeleted()) return ResponseEntity
-//                    .notFound().build();
-//            if(approved) {
-//                if(form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL);
-//                else return ResponseEntity.notFound().build();
-//            }
-//            else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
-//
-//            outsourcingAssessmentRepository.saveAndFlush(form);
-//            logger.info("Approving/Rejecting the assessment form created by "+ form.getCreatedBy());
-//            return ResponseEntity.ok().body(new GeneralRes("Successfully approved/rejected the purchase orders!", true));
-//        }catch(Exception ex){
-//            ex.printStackTrace();
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
-//        }
-//    }
 
     private void createApprovalTicket(String requesterUsername, Employee receiver, OutsourcingAssessment outsourcingAssessment, String content){
         Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
@@ -241,7 +282,7 @@ public class AssessmentFormService {
                 ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig = new ThreadPoolTaskSchedulerConfig();
                 AssessmentRunnableTask assessmentRunnableTask = new AssessmentRunnableTask(mail);
                 threadPoolTaskSchedulerConfig.threadPoolTaskScheduler().schedule(assessmentRunnableTask, date);
-                return ResponseEntity.ok().body(new GeneralRes("Successfully set the alert for the outsourcing!", true));
+                return ResponseEntity.ok().body(new GeneralRes("Successfully set the alert for the outsourcing!", false));
             }
         }
         catch (Exception ex){
