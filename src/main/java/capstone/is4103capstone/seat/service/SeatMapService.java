@@ -210,7 +210,7 @@ public class SeatMapService {
             BusinessUnit businessUnit = optionalBusinessUnit.get();
             seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByBusinessUnit(businessUnit,
                     seatAllocation.getSchedule(), seatAllocation.getAllocationType(), office));
-        } else if (hierarchy.equals("FUNCTION")) {
+        } else if (hierarchy.equals("COMPANY_FUNCTION")) {
             CompanyFunction function = companyFunctionService.retrieveCompanyFunctionById(hierarchyId);
             seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByFunction(function,
                     seatAllocation.getSchedule(), seatAllocation.getAllocationType(), office));

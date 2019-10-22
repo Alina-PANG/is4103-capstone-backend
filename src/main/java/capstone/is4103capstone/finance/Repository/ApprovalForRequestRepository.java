@@ -15,4 +15,7 @@ public interface ApprovalForRequestRepository extends JpaRepository<ApprovalForR
 
     @Query(value = "SELECT * FROM approval_for_request a WHERE a.requested_item_id=?1 and a.is_deleted=false ORDER BY a.last_modified_date_time",nativeQuery = true)
     List<ApprovalForRequest> findTicketsByRequestedItemId(String id);
+
+    @Query(value = "SELECT * FROM approval_for_request a WHERE a.id = ?1 and a.is_deleted=false", nativeQuery = true)
+    Optional<ApprovalForRequest> findUndeletedTicketById(String ticketId);
 }

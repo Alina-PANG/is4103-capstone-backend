@@ -64,8 +64,14 @@ public class SeatAllocationController {
     }
 
     @PostMapping("/hotdesk")
-    public ResponseEntity assignHotDesks(@RequestBody SeatAllocationModelForEmployee seatAllocationModelForEmployee) {
-        seatAllocationService.assignHotDesk(seatAllocationModelForEmployee);
+    public ResponseEntity markSeatsAsHotDesks(@RequestBody BulkSeatIdsModel bulkSeatIdsModel) {
+        seatAllocationService.markSeatsAsHotDesk(bulkSeatIdsModel);
+        return ResponseEntity.ok("Mark seats as hot desks successfully");
+    }
+
+    @PostMapping("/hotdesk/employee")
+    public ResponseEntity assignHotDesksToEmployee(@RequestBody SeatAllocationModelForEmployee seatAllocationModelForEmployee) {
+        seatAllocationService.assignHotDeskToAnEmployee(seatAllocationModelForEmployee);
         return ResponseEntity.ok("Assigned hot desk successfully");
     }
 
@@ -167,20 +173,20 @@ public class SeatAllocationController {
     // ---------------------------------- DELETE: Delete ----------------------------------
 
     @DeleteMapping("/function")
-    public ResponseEntity deallocateSeatsFromFunction(@RequestBody BulkDeallocationModel bulkDeallocationModel) {
-        seatAllocationService.deallocateSeatsFromFunction(bulkDeallocationModel);
+    public ResponseEntity deallocateSeatsFromFunction(@RequestBody BulkSeatIdsModel bulkSeatIdsModel) {
+        seatAllocationService.deallocateSeatsFromFunction(bulkSeatIdsModel);
         return ResponseEntity.ok("Deallocated seats from the function successfully");
     }
 
     @DeleteMapping("/businessUnit")
-    public ResponseEntity deallocateSeatsFromBusinessUnit(@RequestBody BulkDeallocationModel bulkDeallocationModel) {
-        seatAllocationService.deallocateSeatsFromBusinessUnit(bulkDeallocationModel);
+    public ResponseEntity deallocateSeatsFromBusinessUnit(@RequestBody BulkSeatIdsModel bulkSeatIdsModel) {
+        seatAllocationService.deallocateSeatsFromBusinessUnit(bulkSeatIdsModel);
         return ResponseEntity.ok("Deallocated seats from the business unit successfully");
     }
 
     @DeleteMapping("/team")
-    public ResponseEntity deallocateSeatsFromTeam(@RequestBody BulkDeallocationModel bulkDeallocationModel) {
-        seatAllocationService.deallocateSeatsFromTeam(bulkDeallocationModel);
+    public ResponseEntity deallocateSeatsFromTeam(@RequestBody BulkSeatIdsModel bulkSeatIdsModel) {
+        seatAllocationService.deallocateSeatsFromTeam(bulkSeatIdsModel);
         return ResponseEntity.ok("Deallocated seats from the team successfully");
     }
 

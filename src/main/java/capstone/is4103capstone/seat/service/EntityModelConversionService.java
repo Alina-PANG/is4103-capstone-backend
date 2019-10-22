@@ -616,10 +616,12 @@ public class EntityModelConversionService {
         Team team = seatAllocationRequest.getTeam();
         GroupModel teamModel = new GroupModel();
         teamModel.setId(team.getId());
+        teamModel.setCode(team.getCode());
         teamModel.setName(team.getObjectName());
 
         seatAllocationRequestModel.setEscalatedHierarchyLevel(seatAllocationRequest.getEscalatedHierarchyLevel().toString());
         seatAllocationRequestModel.setEscalatedHierarchyId(seatAllocationRequest.getEscalatedHierarchyId());
+        seatAllocationRequestModel.setTeam(teamModel);
 
         Employee employeeOfAllocation = seatAllocationRequest.getEmployeeOfAllocation();
         EmployeeModel employeeModelOfAllocation = new EmployeeModel();
@@ -642,10 +644,16 @@ public class EntityModelConversionService {
                 seatAllocationRequest.getApprovalTickets()) {
             seatAllocationRequestModel.getApprovalTickets().add(convertExistingApprovalTicketEntityToModel(approvalForRequest));
         }
-        ApprovalTicketModel currentPendingApprovalTicketModel = convertExistingApprovalTicketEntityToModel(seatAllocationRequest.getCurrentPendingTicket());
-        seatAllocationRequestModel.setCurrentPendingTicket(currentPendingApprovalTicketModel);
+
+        if (seatAllocationRequest.getCurrentPendingTicket() != null) {
+            ApprovalTicketModel currentPendingApprovalTicketModel = convertExistingApprovalTicketEntityToModel(seatAllocationRequest.getCurrentPendingTicket());
+            seatAllocationRequestModel.setCurrentPendingTicket(currentPendingApprovalTicketModel);
+        }
 
         seatAllocationRequestModel.setResolved(seatAllocationRequest.isResolved());
+        if (seatAllocationRequest.getResultedSeatAllocation() != null) {
+            seatAllocationRequestModel.setResultedSeatAllocationId(seatAllocationRequest.getResultedSeatAllocation().getId());
+        }
 
         return seatAllocationRequestModel;
     }
@@ -659,23 +667,27 @@ public class EntityModelConversionService {
         approvalTicketModel.setReviewerUsername(approvalForRequest.getApprover().getUserName());
         approvalTicketModel.setReviewedDateTime(approvalForRequest.getLastModifiedDateTime().toString());
         approvalTicketModel.setTicketResult(approvalForRequest.getApprovalStatus());
+        approvalTicketModel.setRequestedItemId(approvalForRequest.getRequestedItemId());
+        approvalTicketModel.setRequestType(approvalForRequest.getApprovalType());
         return approvalTicketModel;
     }
 
     public ApprovalForRequest convertApprovalTicketModelToNewEntity (ApprovalTicketModel approvalTicketModel) {
         ApprovalForRequest approvalForRequest = new ApprovalForRequest();
 
-        String approverUserName = approvalTicketModel.getReviewerUsername();
-        Employee approver = employeeService.getEmployeeByUsername(approverUserName);
-        approvalForRequest.setApprover(approver);
-        approvalForRequest.setCommentByApprover(approvalTicketModel.getApproverComment());
-
         ApprovalTypeEnum requestType = approvalTicketModel.getRequestType();
         approvalForRequest.setApprovalType(requestType);
-
         if (!requestType.equals(ApprovalTypeEnum.SEAT_ALLOCATION)) {
             throw new EntityModelConversionException("Mismatched approval type!");
         }
+
+        if (approvalTicketModel.getReviewerUsername() == null) {
+            throw new EntityModelConversionException("Missing reviewer username!");
+        }
+        String approverUserName = approvalTicketModel.getReviewerUsername();
+        Employee approver = employeeService.getEmployeeByUsername(approverUserName);
+        approvalForRequest.setApprover(approver);
+
         if (approvalTicketModel.getRequestedItemId() == null || approvalTicketModel.getRequestedItemId().trim().length() == 0) {
             throw new EntityModelConversionException("Missing request ID!");
         }
@@ -686,4 +698,5 @@ public class EntityModelConversionService {
         approvalForRequest.setApprovalStatus(approvalTicketModel.getTicketResult());
         return approvalForRequest;
     }
+
 }
