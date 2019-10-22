@@ -7,12 +7,20 @@ import java.util.List;
 public class CreatePOReq implements Serializable {
     private String currencyCode;
     private List<String> relatedBJF;
-    private String username;
     private Double amount;
     private String vendorid;
+    private String approverUsername;
 
 
     public CreatePOReq() {
+    }
+
+    public String getApproverUsername() {
+        return approverUsername;
+    }
+
+    public void setApproverUsername(String approverUsername) {
+        this.approverUsername = approverUsername;
     }
 
     public String getVendorid() {
@@ -47,11 +55,4 @@ public class CreatePOReq implements Serializable {
         this.relatedBJF = relatedBJF;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 }

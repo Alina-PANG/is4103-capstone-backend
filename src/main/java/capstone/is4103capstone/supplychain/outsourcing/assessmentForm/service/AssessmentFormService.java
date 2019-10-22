@@ -91,17 +91,17 @@ public class AssessmentFormService {
         }
     }
 
-    public ResponseEntity<GeneralRes> createForm(boolean isTemplate, CreateAssessmentFromReq createAssessmentFromReq, String id){
+    public ResponseEntity<GeneralRes> createForm(boolean isTemplate, CreateAssessmentFromReq createAssessmentFromReq, String id, String username){
         try {
 
-            logger.info("Action performed by: "+createAssessmentFromReq.getUsername()+" on "+new Date());
+            logger.info("Action performed by: "+username+" on "+new Date());
 
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
 
-            Employee approverA = employeeRepository.findEmployeeByUserName(createAssessmentFromReq.getApproverAUsername());
-            Employee approverB = employeeRepository.findEmployeeByUserName(createAssessmentFromReq.getApproverBUsername());
-            if(approverA == null || approverB == null) {
-                logger.info("Cannot find approvers!");
+            Employee creater = employeeRepository.findEmployeeByUserName(username);
+
+            if(creater == null) {
+                logger.info("Cannot find the user!");
                 return ResponseEntity.notFound().build();
             }
 
@@ -135,25 +135,24 @@ public class AssessmentFormService {
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
                 for (OutsourcingAssessmentLine o : outsourcingAssessmentLine) {
-                    o.setCreatedBy(createAssessmentFromReq.getUsername());
+                    o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);
                     linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
                 }
                 newS.setOutsourcingAssessmentLines(linesSaved);
                 newS.setOutsourcingAssessment(newAssess);
-                newS.setCreatedBy(createAssessmentFromReq.getUsername());
+                newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
                 outsourcingAssessmentSectionRepository.saveAndFlush(newS);
             }
             newAssess.setSectionList(sections);
-            newAssess.setCreatedBy(createAssessmentFromReq.getUsername());
+            newAssess.setCreatedBy(username);
             newAssess.setCreatedDateTime(new Date());
 
             outsourcingAssessmentRepository.saveAndFlush(newAssess);
-            createApprovalTicket(createAssessmentFromReq.getUsername(), approverA,newAssess,"Please review and approve the outsourcing assessment form.");
-            createApprovalTicket(createAssessmentFromReq.getUsername(), approverB,newAssess,"Please review and approve the outsourcing assessment form.");
-
+            Employee approverA = creater.getManager();
+            createApprovalTicket(creater.getUserName(), approverA,newAssess,"Please review and approve the outsourcing assessment form.");
             return ResponseEntity
                     .ok()
                     .body(new GeneralRes("Successfully created the outsourcing assessment form!", true));
@@ -165,7 +164,7 @@ public class AssessmentFormService {
         }
     }
 
-    public ResponseEntity<GeneralRes> approve(String id, boolean approved){
+    public ResponseEntity<GeneralRes> approve(String id, boolean approved, boolean isBMApproval){
         try{
             logger.info("****************** Getting assessment form with id "+id+" *********************");
             Optional<OutsourcingAssessment> formOptional= outsourcingAssessmentRepository.findById(id);
@@ -178,8 +177,12 @@ public class AssessmentFormService {
             if(form.getDeleted()) return ResponseEntity
                     .notFound().build();
             if(approved) {
-                if(form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
-                else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
+                if(isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
+                else if(!isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
+                else {
+                    logger.error("approve type is not consistent with the pending status!");
+                    return ResponseEntity.badRequest().build();
+                }
             }
             else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
             outsourcingAssessmentRepository.saveAndFlush(form);
@@ -192,6 +195,35 @@ public class AssessmentFormService {
                     .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
         }
     }
+
+//    public ResponseEntity<GeneralRes> approveA(String id, boolean approved){
+//        try{
+//            logger.info("****************** Getting assessment form with id "+id+" *********************");
+//            Optional<OutsourcingAssessment> formOptional= outsourcingAssessmentRepository.findById(id);
+//            if (!formOptional.isPresent()) {
+//                logger.info("Assessment Form Not Found!");
+//                return ResponseEntity
+//                        .notFound().build();
+//            }
+//            OutsourcingAssessment form = formOptional.get();
+//            if(form.getDeleted()) return ResponseEntity
+//                    .notFound().build();
+//            if(approved) {
+//                if(form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL);
+//                else return ResponseEntity.notFound().build();
+//            }
+//            else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
+//
+//            outsourcingAssessmentRepository.saveAndFlush(form);
+//            logger.info("Approving/Rejecting the assessment form created by "+ form.getCreatedBy());
+//            return ResponseEntity.ok().body(new GeneralRes("Successfully approved/rejected the purchase orders!", true));
+//        }catch(Exception ex){
+//            ex.printStackTrace();
+//            return ResponseEntity
+//                    .badRequest()
+//                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+//        }
+//    }
 
     private void createApprovalTicket(String requesterUsername, Employee receiver, OutsourcingAssessment outsourcingAssessment, String content){
         Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
