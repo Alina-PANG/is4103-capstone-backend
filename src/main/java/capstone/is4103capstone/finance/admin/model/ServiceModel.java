@@ -12,10 +12,18 @@ public class ServiceModel implements Serializable {
 //    String vendorName;
     String measureUnit;
     boolean hasActiveContract;
-
+    String id;
 
     BigDecimal referencePrice;
     String currency;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getServiceName() {
         return serviceName;
@@ -55,7 +63,7 @@ public class ServiceModel implements Serializable {
         setReferencePrice(s.getReferencePrice());
         setCurrency(s.getCurrencyCode());
         setMeasureUnit(s.getMeasureUnit());
-
+        setId(s.getId());
     }
 
     public ServiceModel(String serviceName, String serviceCode) {
