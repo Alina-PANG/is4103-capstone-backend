@@ -2,7 +2,6 @@ package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.dto.AuditTrailActivityDto;
 import capstone.is4103capstone.admin.model.AuditTrailModel;
-import capstone.is4103capstone.admin.model.res.AuditTrailRes;
 import capstone.is4103capstone.admin.repository.AuditTrailActivityRepo;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
@@ -10,6 +9,9 @@ import capstone.is4103capstone.entities.AuditTrailActivity;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.util.enums.OperationTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -72,13 +74,11 @@ public class AuditTrailActivityService {
     }
 
     //!!using Spring JPA Projection
-    public AuditTrailRes getAllAuditTrailWithUsername() {
-        try {
-            List<AuditTrailModel> models = auditTrailActivityRepo.findAuditTrailActivityWithUsername();
-            return new AuditTrailRes("Retrieved " + models.size() + " records.", false, models);
-        } catch (Exception e) {
-            return new AuditTrailRes(e.getMessage(), true);
-        }
+    public List<AuditTrailModel> getAllAuditTrailWithUsername() {
+        Pageable resultPageOptions =
+                PageRequest.of(0, 100, Sort.by("time_stamp").ascending());
+        List<AuditTrailModel> auditTrailActivities = auditTrailActivityRepo.findAuditTrailActivityWithUsernamePageable(resultPageOptions);
+        return auditTrailActivities;
     }
 
     public List<AuditTrailActivity> getAuditTrailRecordsByActivity(String activity) throws Exception {
