@@ -1,7 +1,9 @@
 package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.model.res.AuditTrailRes;
+import capstone.is4103capstone.admin.model.res.GenericObjectRes;
 import capstone.is4103capstone.admin.service.AuditTrailActivityService;
+import capstone.is4103capstone.general.StandardStatusMessages;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +34,14 @@ public class AuditTrailController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<AuditTrailRes> getAllAuditTrailRecordsWithUsername() {
+    public ResponseEntity<GenericObjectRes> getAllAuditTrailRecordsWithUsername() {
         try {
             WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
-                    .body(atas.getAllAuditTrailWithUsername());
+                    .body(new GenericObjectRes(StandardStatusMessages.OPERATION_COMPLETED_SUCCESSFULLY, false, Optional.of(atas.getAllAuditTrailWithUsername())));
         } catch (Exception ex) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new AuditTrailRes(ex.getMessage(), true, Optional.empty()));
+            return ResponseEntity.badRequest().body(new GenericObjectRes(ex.getMessage(), true, Optional.empty()));
         }
     }
 
