@@ -39,7 +39,7 @@ public class OutsourcingSelfAssessmentController {
     }
 
     @PostMapping("/update-outsourcing-self-assessment/{id}")
-    public ResponseEntity<GeneralRes> updateOutsourcingSelfAssessment(CreateOutsourcingSelfAssessmentReq updateOutsourcingSelfAssessmentReq, @PathVariable("id") String id) {
+    public ResponseEntity<GeneralRes> updateOutsourcingSelfAssessment(@RequestBody CreateOutsourcingSelfAssessmentReq updateOutsourcingSelfAssessmentReq, @PathVariable("id") String id) {
         try {
             return ResponseEntity.ok().body(outsourcingSelfAssessmentService.updateOutsourcingSelfAssessment(updateOutsourcingSelfAssessmentReq, id));
         } catch (Exception ex) {

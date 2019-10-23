@@ -16,7 +16,7 @@ public class CreateOutsourcingSelfAssessmentReq  implements Serializable {
     private String functionHeadId; //approver
 
     @Temporal(TemporalType.DATE)
-    private Date AnnualAssessmentDate;
+    private Date annualAssessmentDate;
 
     private List<OutsourcingSelfAssessmentQuestion> outsourcingSelfAssessmentQuestionList = new ArrayList<>();
 
@@ -28,7 +28,7 @@ public class CreateOutsourcingSelfAssessmentReq  implements Serializable {
         this.outsourcingManagerId = outsourcingManagerId;
         this.designationId = designationId;
         this.functionHeadId = functionHeadId;
-        AnnualAssessmentDate = annualAssessmentDate;
+        this.annualAssessmentDate = annualAssessmentDate;
         this.outsourcingSelfAssessmentQuestionList = outsourcingSelfAssessmentQuestionList;
     }
 
@@ -65,11 +65,11 @@ public class CreateOutsourcingSelfAssessmentReq  implements Serializable {
     }
 
     public Date getAnnualAssessmentDate() {
-        return AnnualAssessmentDate;
+        return annualAssessmentDate;
     }
 
     public void setAnnualAssessmentDate(Date annualAssessmentDate) {
-        AnnualAssessmentDate = annualAssessmentDate;
+        this.annualAssessmentDate = annualAssessmentDate;
     }
 
     public List<OutsourcingSelfAssessmentQuestion> getOutsourcingSelfAssessmentQuestionList() {

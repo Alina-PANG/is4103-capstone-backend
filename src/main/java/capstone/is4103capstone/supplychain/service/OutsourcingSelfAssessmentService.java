@@ -33,7 +33,7 @@ import java.util.Optional;
 
 @Service
 public class OutsourcingSelfAssessmentService {
-    private static final Logger logger = LoggerFactory.getLogger(ContractService.class);
+    private static final Logger logger = LoggerFactory.getLogger(OutsourcingSelfAssessmentService.class);
 
     @Autowired
     OutsourcingService outsourcingService;
@@ -88,8 +88,17 @@ public class OutsourcingSelfAssessmentService {
                 newQuestion.setQuestion(question.getQuestion());
                 newQuestion.setAnswer(question.getAnswer());
                 newQuestion.setComment(question.getComment());
+                newQuestion.setCreatedBy(currentEmployee.getUserName());
+                newQuestion.setLastModifiedBy(currentEmployee.getUserName());
 
                 outsourcingSelfAssessmentQuestionRepository.saveAndFlush(newQuestion);
+                if (newQuestion.getSeqNo() == null) {
+                    newQuestion.setSeqNo(new Long(outsourcingSelfAssessmentQuestionRepository.findAll().size()));
+                }
+
+                AuthenticationTools.configurePermissionMap(newQuestion);
+                newQuestion.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingSelfAssessmentQuestionRepository, newQuestion));
+                outsourcingSelfAssessmentQuestionRepository.save(newQuestion);
                 outsourcingSelfAssessment.getOutsourcingSelfAssessmentQuestionIdList().add(newQuestion.getId());
             }
 
@@ -103,7 +112,7 @@ public class OutsourcingSelfAssessmentService {
             outsourcingSelfAssessmentRepository.save(outsourcingSelfAssessment);
 
             logger.info("Successfully created new outsourcing annual self assessment! -- " + outsourcingSelfAssessment.getId());
-            return new GeneralRes("Successfully created new outsourcing!", false);
+            return new GeneralRes("Successfully created new outsourcing annual self assessment!", false);
         } catch (Exception ex) {
             ex.printStackTrace();
             return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
@@ -194,34 +203,37 @@ public class OutsourcingSelfAssessmentService {
                 }
             }
 
-            if(updateOutsourcingSelfAssessmentReq.getOutsourcingId() != null){
-                if(outsourcingService.validateOutsourcingId(updateOutsourcingSelfAssessmentReq.getOutsourcingId())){
-                    outsourcingSelfAssessment.setOutsourcingId(updateOutsourcingSelfAssessmentReq.getOutsourcingId());
-                }else{
-                    throw new Exception("This is not a valid outsourcing ID.");
-                }
-            }
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Employee currentEmployee = (Employee) auth.getPrincipal();
+            outsourcingSelfAssessment.setLastModifiedBy(currentEmployee.getUserName());
 
             if(updateOutsourcingSelfAssessmentReq.getOutsourcingSelfAssessmentQuestionList() != null
-                    ||updateOutsourcingSelfAssessmentReq.getOutsourcingSelfAssessmentQuestionList().size() != 0){
+                    && updateOutsourcingSelfAssessmentReq.getOutsourcingSelfAssessmentQuestionList().size() != 0){
 
                 outsourcingSelfAssessment.setOutsourcingSelfAssessmentQuestionIdList(new ArrayList<>());
+
                 for (OutsourcingSelfAssessmentQuestion question : updateOutsourcingSelfAssessmentReq.getOutsourcingSelfAssessmentQuestionList()) {
                     OutsourcingSelfAssessmentQuestion newQuestion = new OutsourcingSelfAssessmentQuestion();
                     newQuestion.setQuestion(question.getQuestion());
                     newQuestion.setAnswer(question.getAnswer());
                     newQuestion.setComment(question.getComment());
+                    newQuestion.setCreatedBy(currentEmployee.getUserName());
+                    newQuestion.setLastModifiedBy(currentEmployee.getUserName());
 
                     outsourcingSelfAssessmentQuestionRepository.saveAndFlush(newQuestion);
+                    if (newQuestion.getSeqNo() == null) {
+                        newQuestion.setSeqNo(new Long(outsourcingSelfAssessmentQuestionRepository.findAll().size()));
+                    }
+
+                    AuthenticationTools.configurePermissionMap(newQuestion);
+                    newQuestion.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingSelfAssessmentQuestionRepository, newQuestion));
+                    outsourcingSelfAssessmentQuestionRepository.save(newQuestion);
                     outsourcingSelfAssessment.getOutsourcingSelfAssessmentQuestionIdList().add(newQuestion.getId());
                 }
             }
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Employee currentEmployee = (Employee) auth.getPrincipal();
-            outsourcingSelfAssessment.setLastModifiedBy(currentEmployee.getUserName());
-
             outsourcingSelfAssessmentRepository.saveAndFlush(outsourcingSelfAssessment);
+            logger.info("Successfully created new outsourcing annual self assessment! -- " + outsourcingSelfAssessment.getId());
             return new GeneralRes("Successfully updated the outsourcing self assessment!", false);
         } catch (Exception ex) {
             ex.printStackTrace();
