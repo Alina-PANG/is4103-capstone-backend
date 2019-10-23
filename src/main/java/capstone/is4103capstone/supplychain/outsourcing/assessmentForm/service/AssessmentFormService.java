@@ -144,7 +144,7 @@ public class AssessmentFormService {
 
             outsourcingAssessmentRepository.saveAndFlush(newAssess);
             Employee approverA = creater.getManager();
-            createApprovalTicket(creater.getUserName(), approverA,newAssess,"Please review and approve the outsourcing assessment form.");
+            createApprovalTicket(creater.getUserName(), approverA, newAssess,"Please review and approve the outsourcing assessment form.");
             return ResponseEntity
                     .ok()
                     .body(new GeneralRes("Successfully created the outsourcing assessment form!", false));
