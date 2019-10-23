@@ -6,10 +6,10 @@ import java.io.Serializable;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BulkDeallocationModel implements Serializable {
+public class BulkSeatIdsModel implements Serializable {
     private List<String> seatIds;
 
-    public BulkDeallocationModel() {
+    public BulkSeatIdsModel() {
     }
 
     public List<String> getSeatIds() {

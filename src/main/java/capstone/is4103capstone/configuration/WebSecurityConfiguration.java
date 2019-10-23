@@ -32,7 +32,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.anonymous().and().cors().and().csrf().disable()
                 .addFilterBefore(exceptionHandlerFilterBean(), SecurityContextPersistenceFilter.class)
                 .authorizeRequests()
-                .antMatchers("/api/ua/**").permitAll()
+                .antMatchers("/api/session/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterAfter(sessionKeyAuthenticationFilterBean(), BasicAuthenticationFilter.class)

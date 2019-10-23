@@ -97,10 +97,10 @@ public class CurrencyService {
 
     public CurrencyDto entityToDto(Currency input) {
         CurrencyDto currencyDto = new CurrencyDto();
-        currencyDto.setId(Optional.of(input.getId()));
-        currencyDto.setCode(Optional.of(input.getCode()));
-        currencyDto.setCountryCode(Optional.of(input.getCountryCode()));
-        currencyDto.setObjectName(Optional.of(input.getObjectName()));
+        currencyDto.setId(Optional.ofNullable(input.getId()));
+        currencyDto.setCode(Optional.ofNullable(input.getCode()));
+        currencyDto.setCountryCode(Optional.ofNullable(input.getCountryCode()));
+        currencyDto.setObjectName(Optional.ofNullable(input.getObjectName()));
         return currencyDto;
     }
 

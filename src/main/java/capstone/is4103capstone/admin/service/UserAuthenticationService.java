@@ -1,10 +1,13 @@
 package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.dto.SessionKeyDto;
+import capstone.is4103capstone.admin.dto.WebAppPermissionMapDto;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.repository.SessionKeyRepo;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.SessionKey;
+import capstone.is4103capstone.entities.helper.WebAppPermissionMap;
+import capstone.is4103capstone.general.StandardStatusMessages;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import capstone.is4103capstone.util.exception.SessionKeyNotValidException;
 import capstone.is4103capstone.util.exception.UserAuthenticationFailedException;
@@ -46,11 +49,12 @@ public class UserAuthenticationService {
             sessionKeyRepo.save(sk);
             // write the DTO object
             SessionKeyDto sessionKeyDto = new SessionKeyDto();
-            sessionKeyDto.setSessionKey(Optional.of(sk.getSessionKey()));
-            sessionKeyDto.setLinkedUserName(Optional.of(sk.getLinkedUser().getUserName()));
-            sessionKeyDto.setLinkedUserSid(Optional.of(sk.getLinkedUser().getSecurityId()));
-            sessionKeyDto.setLinkedUserUuid(Optional.of(sk.getLinkedUser().getId()));
-            sessionKeyDto.setLinkedUserFullName(Optional.of(sk.getLinkedUser().getFullName()));
+            sessionKeyDto.setSessionKey(Optional.ofNullable(sk.getSessionKey()));
+            sessionKeyDto.setLinkedUserName(Optional.ofNullable(sk.getLinkedUser().getUserName()));
+            sessionKeyDto.setLinkedUserSid(Optional.ofNullable(sk.getLinkedUser().getSecurityId()));
+            sessionKeyDto.setLinkedUserUuid(Optional.ofNullable(sk.getLinkedUser().getId()));
+            sessionKeyDto.setLinkedUserFullName(Optional.ofNullable(sk.getLinkedUser().getFullName()));
+            sessionKeyDto.setWebAppPermissions(Optional.ofNullable(WebAppPermissionMapDto.fromEntity(sk.getLinkedUser().getWebAppPermissionMap())));
             return sessionKeyDto;
         } else {
             throw new Exception("Invalid Username or Password. Please check your input and try again.");
@@ -118,10 +122,10 @@ public class UserAuthenticationService {
                 invalidateAllSessionKeys(userName);
                 return true;
             } else {
-                throw new UserAuthenticationFailedException("Invalid Username or Password.");
+                throw new UserAuthenticationFailedException(StandardStatusMessages.INVALID_USERNAME_PASSWORD);
             }
         } catch (DbObjectNotFoundException ex) {
-            throw new UserAuthenticationFailedException("Invalid Username or Password.");
+            throw new UserAuthenticationFailedException(StandardStatusMessages.INVALID_USERNAME_PASSWORD);
         }
     }
 
@@ -134,9 +138,21 @@ public class UserAuthenticationService {
     public boolean invalidateSessionKey(String sessionKey) {
         // does key exist
         SessionKey skey = sessionKeyRepo.findSessionKeyBySessionKey(sessionKey);
-        if (Objects.isNull(skey)) throw new DbObjectNotFoundException("Session key not found!");
+        if (Objects.isNull(skey)) throw new DbObjectNotFoundException(StandardStatusMessages.INVALID_SESSION_KEY);
         sessionKeyRepo.delete(skey);
         return true;
+    }
+
+    @Transactional
+    public WebAppPermissionMapDto updateWebAppPermissions(String userUuid, WebAppPermissionMapDto webAppPermissionMapDto) throws Exception {
+        Optional<Employee> employee = er.findById(userUuid);
+        if (employee.isPresent()) {
+            employee.get().setWebAppPermissionMap(webAppPermissionMapDto.thisToEntity());
+
+            return WebAppPermissionMapDto.fromEntity(employee.get().getWebAppPermissionMap());
+        } else {
+            throw new Exception(StandardStatusMessages.NO_SEARCH_RESULTS_FOUND);
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import capstone.is4103capstone.admin.dto.BusinessUnitDto;
 import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.general.StandardStatusMessages;
+import capstone.is4103capstone.util.exception.BusinessUnitNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,14 @@ public class BusinessUnitService {
 
     @Autowired
     BusinessUnitRepository businessUnitRepository;
+
+    public BusinessUnit retrieveBusinessUnitById(String businessUnitId) throws BusinessUnitNotFoundException {
+        Optional<BusinessUnit> optionalBusinessUnit = businessUnitRepository.findByIdNonDeleted(businessUnitId);
+        if(!optionalBusinessUnit.isPresent()) {
+            throw new BusinessUnitNotFoundException("Business unit with ID " + businessUnitId + " does not exist!");
+        }
+        return optionalBusinessUnit.get();
+    }
 
     // GET ALL BUSINESS UNITS
     public List<BusinessUnitDto> getAllBusinessUnits(boolean suppressDeleted) throws Exception {
@@ -47,10 +56,10 @@ public class BusinessUnitService {
     // Entity to DTO conversion
     public BusinessUnitDto entityToDto(BusinessUnit input) {
         BusinessUnitDto businessUnitDto = new BusinessUnitDto();
-        businessUnitDto.setId(Optional.of(input.getId()));
-        businessUnitDto.setObjectName(Optional.of(input.getObjectName()));
-        businessUnitDto.setCode(Optional.of(input.getCode()));
-        businessUnitDto.setCompanyFunctionUuid(Optional.of(input.getFunction().getId()));
+        businessUnitDto.setId(Optional.ofNullable(input.getId()));
+        businessUnitDto.setObjectName(Optional.ofNullable(input.getObjectName()));
+        businessUnitDto.setCode(Optional.ofNullable(input.getCode()));
+        businessUnitDto.setCompanyFunctionUuid(Optional.ofNullable(input.getFunction().getId()));
         return businessUnitDto;
     }
 

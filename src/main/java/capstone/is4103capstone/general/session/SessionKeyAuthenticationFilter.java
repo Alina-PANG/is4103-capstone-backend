@@ -30,7 +30,7 @@ public class SessionKeyAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return new AntPathMatcher().match("/api/ua/**", request.getServletPath());
+        return new AntPathMatcher().match("/api/session/**", request.getServletPath());
     }
 
     @Override

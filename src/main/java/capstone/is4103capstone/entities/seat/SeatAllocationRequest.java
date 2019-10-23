@@ -60,6 +60,9 @@ public class SeatAllocationRequest extends DBEntityTemplate {
     private ApprovalForRequest currentPendingTicket;
 
     private boolean resolved = false;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resulted_seat_allocation_id", referencedColumnName = "id")
+    private SeatAllocation resultedSeatAllocation;
 
     public SeatAllocationRequest() {
     }
@@ -158,5 +161,13 @@ public class SeatAllocationRequest extends DBEntityTemplate {
 
     public void setResolved(boolean resolved) {
         this.resolved = resolved;
+    }
+
+    public SeatAllocation getResultedSeatAllocation() {
+        return resultedSeatAllocation;
+    }
+
+    public void setResultedSeatAllocation(SeatAllocation resultedSeatAllocation) {
+        this.resultedSeatAllocation = resultedSeatAllocation;
     }
 }
