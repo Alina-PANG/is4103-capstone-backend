@@ -2,19 +2,19 @@ package capstone.is4103capstone.supplychain.model.req;
 
 import java.io.Serializable;
 
-public class ApproveChildContractReq implements Serializable {
+public class ApproveOutsourcingSelfAssessmentReq implements Serializable {
     private Boolean approved;
     private String username;
-    private String childContractId;
+    private String outsourcingSelfAssessmentId;
     private String comment;
 
-    public ApproveChildContractReq() {
+    public ApproveOutsourcingSelfAssessmentReq() {
     }
 
-    public ApproveChildContractReq(Boolean approved, String username, String childContractId, String comment) {
+    public ApproveOutsourcingSelfAssessmentReq(Boolean approved, String username, String outsourcingSelfAssessmentId, String comment) {
         this.approved = approved;
         this.username = username;
-        this.childContractId = childContractId;
+        this.outsourcingSelfAssessmentId = outsourcingSelfAssessmentId;
         this.comment = comment;
     }
 
@@ -34,12 +34,12 @@ public class ApproveChildContractReq implements Serializable {
         this.username = username;
     }
 
-    public String getChildContractId() {
-        return childContractId;
+    public String getOutsourcingSelfAssessmentId() {
+        return outsourcingSelfAssessmentId;
     }
 
-    public void setChildContractId(String childContractId) {
-        this.childContractId = childContractId;
+    public void setOutsourcingSelfAssessmentId(String outsourcingSelfAssessmentId) {
+        this.outsourcingSelfAssessmentId = outsourcingSelfAssessmentId;
     }
 
     public String getComment() {

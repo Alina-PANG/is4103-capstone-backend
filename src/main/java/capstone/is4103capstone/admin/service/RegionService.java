@@ -146,7 +146,7 @@ public class RegionService {
     }
 
     public Boolean validateRegionId(String id){
-        Optional<Region> optionalRegion = regionRepository.findById(id);
+        Optional<Region> optionalRegion = regionRepository.findUndeletedRegionById(id);
         if (!optionalRegion.isPresent()) {
             return false;
         }else{

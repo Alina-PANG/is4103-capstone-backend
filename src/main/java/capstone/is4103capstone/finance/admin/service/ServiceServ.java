@@ -222,7 +222,7 @@ public class ServiceServ {
     }
 
     public Boolean validateServiceId(String id){
-        Optional<Service> optionalService = serviceRepository.findById(id);
+        Optional<Service> optionalService = serviceRepository.findUndeletedServiceById(id);
         if (!optionalService.isPresent()) {
             return false;
         }else{

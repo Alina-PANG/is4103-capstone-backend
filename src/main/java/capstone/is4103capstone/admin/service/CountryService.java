@@ -164,7 +164,7 @@ public class CountryService {
     }
 
     public Boolean validateCountryId(String id){
-        Optional<Country> optionalCountry = countryRepository.findById(id);
+        Optional<Country> optionalCountry = countryRepository.findUndeletedCountryById(id);
         if (!optionalCountry.isPresent()) {
             return false;
         }else{
