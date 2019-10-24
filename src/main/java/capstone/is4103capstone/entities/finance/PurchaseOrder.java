@@ -41,6 +41,7 @@ public class PurchaseOrder extends DBEntityTemplate {
     private Vendor vendor;
 
     public PurchaseOrder() {
+
     }
 
 

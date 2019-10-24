@@ -44,6 +44,17 @@ public class StatementOfAccountController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
+    @PostMapping("/updateSoA/{id}")
+    public ResponseEntity<GeneralRes> createByInvoice(@PathVariable("id") String id, @RequestBody CreateSoAByInvoiceReq createSoAByInvoiceReq) {
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
+            return statementOfAccountService.updateSoa(createSoAByInvoiceReq, employeeService.getCurrentLoginUsername(), id);
+        }
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
     @GetMapping("/getSoaByPO/{id}")
     public ResponseEntity<GeneralRes> getSoaByPO(@PathVariable("id") String id){
         if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))

@@ -64,6 +64,8 @@ public class StatementOfAccountService {
                 statementOfAcctLineItem.setActualPmt(actualPmt);
                 statementOfAcctLineItem.setPurchaseOrder(po);
                 statementOfAcctLineItem.setScheduleDate(current);
+                statementOfAcctLineItem.setCreatedBy(username);
+                statementOfAcctLineItem.setCreatedDateTime(new Date());
                 items.add(statementOfAccountLineItemRepository.saveAndFlush(statementOfAcctLineItem));
                 calendar.setTime(current);
                 calendar.add(toAdd, createSoAByScheduleReq.getNumFrequency());
@@ -89,6 +91,14 @@ public class StatementOfAccountService {
 
             StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem(createSoAByInvoiceReq.getReceiveDate(), createSoAByInvoiceReq.getPaidAmt(), createSoAByInvoiceReq.getActualPmt(), createSoAByInvoiceReq.getAccruals());
             statementOfAcctLineItem.setPurchaseOrder(po);
+            statementOfAcctLineItem.setCreatedBy(username);
+            statementOfAcctLineItem.setCreatedDateTime(new Date());
+
+            statementOfAcctLineItem = statementOfAccountLineItemRepository.saveAndFlush(statementOfAcctLineItem);
+
+            if(po.getStatementOfAccount() == null) po.setStatementOfAccount(new ArrayList<StatementOfAcctLineItem>());
+            po.getStatementOfAccount().add(statementOfAcctLineItem);
+            purchaseOrderRepository.saveAndFlush(po);
 
            return ResponseEntity.ok().body(new GeneralRes("Successfully created the statement of accounts!", false));
         }
@@ -100,12 +110,20 @@ public class StatementOfAccountService {
         }
     }
 
-    public ResponseEntity<GeneralRes> updateSoa(String id){
+    public ResponseEntity<GeneralRes> updateSoa(CreateSoAByInvoiceReq createSoAByInvoiceReq, String username, String id){
         try{
             StatementOfAcctLineItem statementOfAcctLineItem = statementOfAccountLineItemRepository.getOne(id);
             if(statementOfAcctLineItem == null) return ResponseEntity.notFound().build();
 
-            return ResponseEntity.ok().body(new GeneralRes("Successfully retrieved the purchase orders!", false));
+            if(createSoAByInvoiceReq.getAccruals() != null) statementOfAcctLineItem.setAccruals(createSoAByInvoiceReq.getAccruals());
+            if(createSoAByInvoiceReq.getActualPmt() != null) statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
+            if(createSoAByInvoiceReq.getPaidAmt() != null) statementOfAcctLineItem.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
+            if(createSoAByInvoiceReq.getReceiveDate() != null) statementOfAcctLineItem.setScheduleDate(createSoAByInvoiceReq.getReceiveDate());
+            statementOfAcctLineItem.setLastModifiedBy(username);
+            statementOfAcctLineItem.setLastModifiedDateTime(new Date());
+
+            statementOfAccountLineItemRepository.saveAndFlush(statementOfAcctLineItem);
+            return ResponseEntity.ok().body(new GeneralRes("Successfully updated the statement of account!", false));
         }
         catch (Exception ex){
             ex.printStackTrace();
