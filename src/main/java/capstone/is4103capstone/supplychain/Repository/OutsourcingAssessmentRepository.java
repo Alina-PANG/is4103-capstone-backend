@@ -14,13 +14,13 @@ public interface OutsourcingAssessmentRepository extends JpaRepository<Outsourci
     @Query(value = "SELECT * FROM outsourcing_assessment p WHERE p.is_deleted=false AND p.outsourcing_assessment_status=0",nativeQuery = true)
     public OutsourcingAssessment findFormByStatus();
 
-    @Query(value = "select o.id as form_id,o.code as form_code,b.code as bjf_code,b.id as bjf_id,o.created_by as requester, e2.user_name as bm_approver, " +
+    @Query(value = "select o.last_modified_date_time as last_modified_dt, o.id as form_id,o.code as form_code,b.code as bjf_code,b.id as bjf_id,o.created_by as requester, e2.user_name as bm_approver, " +
             "o.business_case_description as description,o.outsourcing_assessment_status as form_status,o.outsourcing as outsourcing_id " +
             "from bjf b join outsourcing_assessment o join employee e join employee e2 join approval_for_request a " +
             "where b.id=o.related_bjf_id and e.user_name=o.created_by and o.is_deleted=0 and a.requested_item_id=o.id and e2.id=a.approver_id",nativeQuery = true)
     public List<AssessmentFormSimpleModel> getAllAssessmentsForms();  // for outsourcing staff
 
-    @Query(value = "select o.id as form_id,o.code as form_code,b.code as bjf_code,b.id as bjf_id,o.created_by as requester, e2.user_name as bm_approver, " +
+    @Query(value = "select o.last_modified_date_time as last_modified_dt,o.id as form_id,o.code as form_code,b.code as bjf_code,b.id as bjf_id,o.created_by as requester, e2.user_name as bm_approver, " +
             "o.business_case_description as description,o.outsourcing_assessment_status as form_status,o.outsourcing as outsourcing_id  " +
             "from bjf b join outsourcing_assessment o join employee e join employee e2 join approval_for_request a " +
             "where b.id=o.related_bjf_id and e.user_name=o.created_by and o.is_deleted=0 and a.requested_item_id=o.id and e2.id=a.approver_id " +

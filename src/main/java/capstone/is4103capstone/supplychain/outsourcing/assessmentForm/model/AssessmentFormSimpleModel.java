@@ -5,6 +5,7 @@ import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public interface AssessmentFormSimpleModel{
 
@@ -26,6 +27,8 @@ public interface AssessmentFormSimpleModel{
     String getOutsourcingRecordId();
     @Value("#{target.bm_approver}")
     String getBMApprover();
+    @Value("#{target.last_modified_dt}")
+    Date getLastModifiedDateTime();
 
 
 }
