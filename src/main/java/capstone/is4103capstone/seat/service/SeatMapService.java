@@ -9,6 +9,7 @@ import capstone.is4103capstone.admin.service.TeamService;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
+import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
@@ -179,7 +180,9 @@ public class SeatMapService {
     // Retrieve seat maps that have seats available for a required allocation under a specific function/business unit/team
     // This step is done when an approver tries to see whether the request can be fulfilled; when a request is escalated to a higher hierarchy,
     //    there is no checking done
-    public List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByHierarchy(String hierarchy, String hierarchyId, SeatAllocation seatAllocation)
+    public List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByHierarchy(String hierarchy,
+                                                                                                          String hierarchyId,
+                                                                                                          SeatAllocationRequest seatAllocationRequest)
             throws SeatMapNotFoundException, TeamNotFoundException, CompanyFunctionNotFoundException {
 
         List<SeatMapModelForAllocationWithHighlight> seatMapModelsOfAvailableSeatMaps = new ArrayList<>();
@@ -192,16 +195,12 @@ public class SeatMapService {
             throw new SeatMapNotFoundException("Fail to retrieve seat maps: hierarchy detail is required!");
         }
 
-        if (seatAllocation.getSchedule() == null) {
-            throw new SeatMapNotFoundException("Fail to retrieve seat maps: schedule info is required!");
-        }
-
-        Office office = seatAllocation.getEmployee().getTeam().getOffice();
+        Office office = seatAllocationRequest.getEmployeeOfAllocation().getTeam().getOffice();
 
         // Retrieve the corresponding hierarchy level
         if (hierarchy.equals("TEAM")) {
             Team team = teamService.retrieveTeamById(hierarchyId);
-            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByTeam(team, seatAllocation.getSchedule(), seatAllocation.getAllocationType()));
+            seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByTeam(team, seatAllocationRequest.getSeatAllocationSchedules(), seatAllocationRequest.getAllocationType()));
         } else if (hierarchy.equals("BUSINESS_UNIT")) {
             Optional<BusinessUnit> optionalBusinessUnit = businessUnitRepository.findById(hierarchyId);
             if (!optionalBusinessUnit.isPresent()) {
@@ -209,11 +208,11 @@ public class SeatMapService {
             }
             BusinessUnit businessUnit = optionalBusinessUnit.get();
             seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByBusinessUnit(businessUnit,
-                    seatAllocation.getSchedule(), seatAllocation.getAllocationType(), office));
+                    seatAllocationRequest.getSeatAllocationSchedules(), seatAllocationRequest.getAllocationType(), office));
         } else if (hierarchy.equals("COMPANY_FUNCTION")) {
             CompanyFunction function = companyFunctionService.retrieveCompanyFunctionById(hierarchyId);
             seatMapModelsOfAvailableSeatMaps.addAll(retrieveAvailableSeatMapsForAllocationByFunction(function,
-                    seatAllocation.getSchedule(), seatAllocation.getAllocationType(), office));
+                    seatAllocationRequest.getSeatAllocationSchedules(), seatAllocationRequest.getAllocationType(), office));
         } else {
             throw new SeatMapNotFoundException("Fail to retrieve seat maps: hierarchy type is invalid!");
         }
@@ -222,7 +221,7 @@ public class SeatMapService {
     }
 
 
-    private List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByTeam(Team team, Schedule schedule, SeatAllocationTypeEnum seatAllocationTypeEnum) {
+    private List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByTeam(Team team, List<Schedule> schedules, SeatAllocationTypeEnum seatAllocationTypeEnum) {
 
         List<SeatMapModelForAllocationWithHighlight> seatMapModels = new ArrayList<>();
         List<SeatMap> availableSeatMaps = seatMapRepository.findOnesWithSeatsAllocatedToTeam(team.getId());
@@ -238,17 +237,25 @@ public class SeatMapService {
             List<SeatModelWithHighlighting> seatModels = new ArrayList<>();
 
             boolean shouldBeIncluded = false;
+            boolean hasFoundClash = false;
 
             for (Seat seat :
                     seatMap.getSeats()) {
                 if (seat.getTeamAssigned() != null && seat.getTeamAssigned().getId().equals(team.getId())) {
                     // Check schedule clashes
-                    if (!seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
-                        // its seat map should be included; need to convert the seat as well
+                    for (Schedule schedule :
+                            schedules) {
+                        if (seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
+                            // its seat map should be included; need to convert the seat as well
+                            hasFoundClash = true;
+
+                        }
+                    }
+                    if (hasFoundClash) {
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
+                    } else {
                         shouldBeIncluded = true;
                         seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, true));
-                    } else {
-                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
                     }
                 }
             }
@@ -264,7 +271,7 @@ public class SeatMapService {
 
     // TODO: must ensure that the user does the checking has access to the office where the teams are located
     private List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByBusinessUnit(BusinessUnit businessUnit,
-                                                                                                              Schedule schedule,
+                                                                                                              List<Schedule> schedules,
                                                                                                               SeatAllocationTypeEnum seatAllocationTypeEnum,
                                                                                                               Office office) {
 
@@ -283,17 +290,25 @@ public class SeatMapService {
                 continue;
             }
             boolean shouldBeIncluded = false;
+            boolean hasFoundClash = false;
 
             for (Seat seat :
                     seatMap.getSeats()) {
                 if (seat.getBusinessUnitAssigned() != null && seat.getBusinessUnitAssigned().getId().equals(businessUnit.getId())) {
                     // Check schedule clashes
-                    if (!seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
-                        // its seat map should be included; need to convert the seat as well
+                    for (Schedule schedule :
+                            schedules) {
+                        if (seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
+                            // its seat map should be included; need to convert the seat as well
+                            hasFoundClash = true;
+
+                        }
+                    }
+                    if (hasFoundClash) {
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
+                    } else {
                         shouldBeIncluded = true;
                         seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, true));
-                    } else {
-                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
                     }
                 }
             }
@@ -309,7 +324,7 @@ public class SeatMapService {
 
 
     private List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByFunction(CompanyFunction function,
-                                                                                                          Schedule schedule,
+                                                                                                          List<Schedule> schedules,
                                                                                                           SeatAllocationTypeEnum seatAllocationTypeEnum,
                                                                                                           Office office) {
 
@@ -328,17 +343,25 @@ public class SeatMapService {
                 continue;
             }
             boolean shouldBeIncluded = false;
+            boolean hasFoundClash = false;
 
             for (Seat seat :
                     seatMap.getSeats()) {
                 if (seat.getFunctionAssigned() != null && seat.getFunctionAssigned().getId().equals(function.getId())) {
                     // Check schedule clashes
-                    if (!seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
-                        // its seat map should be included; need to convert the seat as well
+                    for (Schedule schedule :
+                            schedules) {
+                        if (seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
+                            // its seat map should be included; need to convert the seat as well
+                            hasFoundClash = true;
+
+                        }
+                    }
+                    if (hasFoundClash) {
+                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
+                    } else {
                         shouldBeIncluded = true;
                         seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, true));
-                    } else {
-                        seatModels.add(entityModelConversionService.convertSeatToSeatModelWithHighlighting(seat, false));
                     }
                 }
             }

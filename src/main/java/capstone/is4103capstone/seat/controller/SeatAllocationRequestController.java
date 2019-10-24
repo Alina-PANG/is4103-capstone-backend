@@ -2,9 +2,12 @@ package capstone.is4103capstone.seat.controller;
 
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Schedule;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
+import capstone.is4103capstone.seat.model.BulkScheduleModel;
+import capstone.is4103capstone.seat.model.ScheduleModel;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.CreateSeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.ApproveSeatAllocationRequestModel;
@@ -63,29 +66,11 @@ public class SeatAllocationRequestController {
     @GetMapping("/availability")
     public ResponseEntity retrieveAvailableSeatMapsForAllocationByHierarchy(@RequestParam(name="hierarchy", required=true) String hierarchy,
                                                          @RequestParam(name="hierarchyId", required=true) String hierarchyId,
-                                                         @RequestBody SeatAllocationModelForEmployee seatAllocationModelForEmployee) {
+                                                         @RequestParam(name="requestId", required=true) String requestId) {
 
-        // Convert the seat allocation model to seat allocation object
-        SeatAllocation seatAllocation = new SeatAllocation();
-        Employee employee = employeeService.retrieveEmployeeById(seatAllocationModelForEmployee.getEmployee().getId());
-        seatAllocation.setEmployee(employee);
-        seatAllocation.setActive(false);
-        if (seatAllocationModelForEmployee.getType() == null || seatAllocationModelForEmployee.getType().trim().length() == 0) {
-            throw new EntityModelConversionException("Seat Allocation Validation failed: seat allocation type is required!");
-        }
-        if (seatAllocationModelForEmployee.getType().equals("FIXED")) {
-            seatAllocation.setAllocationType(SeatAllocationTypeEnum.FIXED);
-        } else if (seatAllocationModelForEmployee.getType().equals("SHARED")) {
-            seatAllocation.setAllocationType(SeatAllocationTypeEnum.SHARED);
-        } else if (seatAllocationModelForEmployee.getType().equals("HOTDESK")) {
-            seatAllocation.setAllocationType(SeatAllocationTypeEnum.HOTDESK);
-        } else {
-            throw new EntityModelConversionException("Seat Allocation Validation failed: invalid seat allocation type!");
-        }
-
-        seatAllocation.setSchedule(entityModelConversionService.convertScheduleModelToSeatAllocationSchedule(seatAllocationModelForEmployee.getSchedule(),
-                seatAllocation.getAllocationType().toString()));
-        List<SeatMapModelForAllocationWithHighlight> seatMapModels = seatMapService.retrieveAvailableSeatMapsForAllocationByHierarchy(hierarchy, hierarchyId, seatAllocation);
+        SeatAllocationRequest seatAllocationRequest = seatAllocationRequestService.retrieveSeatAllocationRequestById(requestId);
+        List<SeatMapModelForAllocationWithHighlight> seatMapModels = seatMapService.retrieveAvailableSeatMapsForAllocationByHierarchy(
+                hierarchy, hierarchyId, seatAllocationRequest);
         for (SeatMapModelForAllocationWithHighlight seatMapModel :
                 seatMapModels) {
             Collections.sort(seatMapModel.getSeatModelsForAllocationViaSeatMap());
