@@ -2,23 +2,28 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OutsourcingAssessment extends DBEntityTemplate {
+    @OneToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "outsourcing_id")
+    @JsonIgnore
     private Outsourcing outsourcing;
 
     private String businessCaseDescription;
 
-    @OneToMany(mappedBy = "outsourcingAssessment",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "outsourcingAssessment",fetch = FetchType.LAZY)
     private List<OutsourcingAssessmentSection> sectionList;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,7 +31,10 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     @JsonIgnore
     private Employee employeeAssess;
 
-
+    @OneToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "related_bjf_id")
+    @JsonIgnore
+    private BJF related_BJF;
 
     private OutsourcingAssessmentStatusEnum outsourcingAssessmentStatus;
 
@@ -40,6 +48,14 @@ public class OutsourcingAssessment extends DBEntityTemplate {
         this.outsourcingAssessmentStatus = outsourcingAssessmentStatus;
     }
 
+    public BJF getRelated_BJF() {
+        return related_BJF;
+    }
+
+    public void setRelated_BJF(BJF related_BJF) {
+        this.related_BJF = related_BJF;
+    }
+
     public Outsourcing getOutsourcing() {
         return outsourcing;
     }
@@ -49,7 +65,8 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     }
 
     public List<OutsourcingAssessmentSection> getSectionList() {
-        return sectionList;
+        Collections.sort(this.sectionList, (a, b) -> a.getNumber() - b.getNumber());
+        return this.sectionList;
     }
 
     public void setSectionList(List<OutsourcingAssessmentSection> sectionList) {

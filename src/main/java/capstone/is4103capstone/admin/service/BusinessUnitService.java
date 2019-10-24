@@ -56,10 +56,10 @@ public class BusinessUnitService {
     // Entity to DTO conversion
     public BusinessUnitDto entityToDto(BusinessUnit input) {
         BusinessUnitDto businessUnitDto = new BusinessUnitDto();
-        businessUnitDto.setId(Optional.of(input.getId()));
-        businessUnitDto.setObjectName(Optional.of(input.getObjectName()));
-        businessUnitDto.setCode(Optional.of(input.getCode()));
-        businessUnitDto.setCompanyFunctionUuid(Optional.of(input.getFunction().getId()));
+        businessUnitDto.setId(Optional.ofNullable(input.getId()));
+        businessUnitDto.setObjectName(Optional.ofNullable(input.getObjectName()));
+        businessUnitDto.setCode(Optional.ofNullable(input.getCode()));
+        businessUnitDto.setCompanyFunctionUuid(Optional.ofNullable(input.getFunction().getId()));
         return businessUnitDto;
     }
 

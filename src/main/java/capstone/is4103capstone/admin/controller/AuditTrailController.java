@@ -1,7 +1,9 @@
 package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.model.res.AuditTrailRes;
+import capstone.is4103capstone.admin.model.res.GenericObjectRes;
 import capstone.is4103capstone.admin.service.AuditTrailActivityService;
+import capstone.is4103capstone.general.StandardStatusMessages;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +20,9 @@ public class AuditTrailController {
     AuditTrailActivityService atas;
 
     @GetMapping
-    public ResponseEntity<AuditTrailRes> getAllAuditTrailRecords(@RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<AuditTrailRes> getAllAuditTrailRecords() {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new AuditTrailRes(null, false, Optional.of(atas.entityToDto(atas.getAllAuditTrailRecords()))));
@@ -32,23 +34,21 @@ public class AuditTrailController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<AuditTrailRes> getAllAuditTrailRecordsWithUsername(@RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<GenericObjectRes> getAllAuditTrailRecordsWithUsername() {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
-                    .body(atas.getAllAuditTrailWithUsername());
+                    .body(new GenericObjectRes(StandardStatusMessages.OPERATION_COMPLETED_SUCCESSFULLY, false, Optional.of(atas.getAllAuditTrailWithUsername())));
         } catch (Exception ex) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new AuditTrailRes(ex.getMessage(), true, Optional.empty()));
+            return ResponseEntity.badRequest().body(new GenericObjectRes(ex.getMessage(), true, Optional.empty()));
         }
     }
 
     @GetMapping("/byActivity/{activityName}")
-    public ResponseEntity<AuditTrailRes> getAuditTrailActivitiesByActivityName(@PathVariable(name = "activityName") String activityName, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<AuditTrailRes> getAuditTrailActivitiesByActivityName(@PathVariable(name = "activityName") String activityName) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new AuditTrailRes(null, false, Optional.of(atas.entityToDto(atas.getAuditTrailRecordsByActivity(activityName)))));
@@ -60,9 +60,9 @@ public class AuditTrailController {
     }
 
     @GetMapping("/byUsername/{userName}")
-    public ResponseEntity<AuditTrailRes> getAuditTrailActivitiesByUsername(@PathVariable(name = "userName") String userName, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<AuditTrailRes> getAuditTrailActivitiesByUsername(@PathVariable(name = "userName") String userName) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new AuditTrailRes(null, false, Optional.of(atas.entityToDto(atas.getAuditTrailRecordsByUsername(userName)))));
@@ -74,9 +74,9 @@ public class AuditTrailController {
     }
 
     @GetMapping("/byUserUuid/{userUuid}")
-    public ResponseEntity<AuditTrailRes> getAuditTrailActivitiesByUserUuid(@PathVariable(name = "userUuid") String userUuid, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<AuditTrailRes> getAuditTrailActivitiesByUserUuid(@PathVariable(name = "userUuid") String userUuid) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new AuditTrailRes(null, false, Optional.of(atas.entityToDto(atas.getAuditTrailRecordsByUserUuid(userUuid)))));

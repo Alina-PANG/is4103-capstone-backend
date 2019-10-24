@@ -30,7 +30,7 @@ public class SessionKeyAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return new AntPathMatcher().match("/api/ua/**", request.getServletPath());
+        return new AntPathMatcher().match("/api/session/**", request.getServletPath());
     }
 
     @Override
@@ -54,7 +54,10 @@ public class SessionKeyAuthenticationFilter extends OncePerRequestFilter {
                     employee = employeeRepository.findEmployeeByUserName("admin");
                 } else if (xAuth.equalsIgnoreCase("yingshi2502")) {
                     employee = employeeRepository.findEmployeeByUserName("yingshi2502");
-                } else {
+                } else if (xAuth.equalsIgnoreCase("outsourcing1")){
+                    employee = employeeRepository.findEmployeeByUserName("outsourcing1");
+                }
+                else {
                     if (!userAuthenticationService.checkSessionKeyValidity(xAuth))
                         throw new SecurityException("INVALID_SESSION_KEY - The session key provided could have already expired. Please try again.");
                     // Let's get the employee object from the authtoken

@@ -12,6 +12,9 @@ public class Tools {
         Calendar c = Calendar.getInstance();
         c.setTime(today);
         c.add(Calendar.DATE,-1);
+
+
+
         return c.getTime();
     }
 

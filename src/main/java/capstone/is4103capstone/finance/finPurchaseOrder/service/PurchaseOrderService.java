@@ -13,6 +13,7 @@ import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreatePOReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderRes;
+import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
@@ -41,6 +42,8 @@ public class PurchaseOrderService {
     @Autowired
     BjfRepository bjfRepository;
     @Autowired
+    BJFService bjfService;
+    @Autowired
     EmployeeService employeeService;
 
     public ResponseEntity<GeneralRes> createPO(CreatePOReq createPOReq, String id){
@@ -65,9 +68,9 @@ public class PurchaseOrderService {
             purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
             purchaseOrder.setApprover(createPOReq.getApproverUsername());
-
             logger.info("Creating purchase order with related BJF: "+createPOReq.getRelatedBJF());
-            purchaseOrderRepository.saveAndFlush(purchaseOrder);
+            purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
+            bjfService.afterPOUpdated(purchaseOrder);
 
             return ResponseEntity
                     .ok()
@@ -86,7 +89,7 @@ public class PurchaseOrderService {
             List<String> bjfList = po.getRelatedBJF();
             List<String> bjfCode = new ArrayList<>();
             for(String bjfId: bjfList){
-                BJF bjf = bjfRepository.getOne(bjfId);
+                BJF bjf = bjfService.validateBJF(bjfId);
                 bjfCode.add(bjf.getCode());
             }
             for(StatementOfAcctLineItem l: po.getStatementOfAccount()){
@@ -151,7 +154,10 @@ public class PurchaseOrderService {
             else po.setStatus(ApprovalStatusEnum.REJECTED);
             purchaseOrderRepository.saveAndFlush(po);
             logger.info("Approving/Rejecting the purchase order created by "+po.getCreatedBy());
+            bjfService.purchaseOrderApproved(po);
+
             return ResponseEntity.ok().body(new GeneralRes("Successfully approved/rejected the purchase orders!", true));
+
         }catch(Exception ex){
             ex.printStackTrace();
             return ResponseEntity

@@ -1,5 +1,6 @@
 package capstone.is4103capstone.admin.dto;
 
+import capstone.is4103capstone.util.enums.OperationTypeEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Optional;
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY) // don't serialize nulls since there are optional classes
+@Getter
+@Setter
+//@JsonInclude(JsonInclude.Include.NON_EMPTY) // don't serialize nulls since there are optional classes
 public class AuditTrailActivityDto implements Serializable {
 
     private Optional<Integer> id = Optional.empty();
@@ -16,44 +19,8 @@ public class AuditTrailActivityDto implements Serializable {
     private Optional<String> username = Optional.empty();
     private Optional<String> activity = Optional.empty();
     private Optional<String> timeStamp = Optional.empty();
+    private Optional<String> modifiedObjectUuid = Optional.empty();
+    private Optional<String> modifiedObjectType = Optional.empty();
+    private Optional<OperationTypeEnum> operationTypeEnum = Optional.empty();
 
-    public Optional<String> getUsername() {
-        return username;
-    }
-
-    public void setUsername(Optional<String> username) {
-        this.username = username;
-    }
-
-    public Optional<Integer> getId() {
-        return id;
-    }
-
-    public void setId(Optional<Integer> id) {
-        this.id = id;
-    }
-
-    public Optional<String> getUserUuid() {
-        return userUuid;
-    }
-
-    public void setUserUuid(Optional<String> userUuid) {
-        this.userUuid = userUuid;
-    }
-
-    public Optional<String> getActivity() {
-        return activity;
-    }
-
-    public void setActivity(Optional<String> activity) {
-        this.activity = activity;
-    }
-
-    public Optional<String> getTimeStamp() {
-        return timeStamp;
-    }
-
-    public void setTimeStamp(Optional<String> timeStamp) {
-        this.timeStamp = timeStamp;
-    }
 }

@@ -94,9 +94,9 @@ public class RegionService {
     public RegionDto entityToDto(Region input) {
 
         RegionDto regionDto = new RegionDto();
-        regionDto.setId(Optional.of(input.getId()));
-        regionDto.setCode(Optional.of(input.getCode()));
-        regionDto.setObjectName(Optional.of(input.getObjectName()));
+        regionDto.setId(Optional.ofNullable(input.getId()));
+        regionDto.setCode(Optional.ofNullable(input.getCode()));
+        regionDto.setObjectName(Optional.ofNullable(input.getObjectName()));
 
         // convert all country list objects
         List<String> countryList = new ArrayList<>();
@@ -146,7 +146,7 @@ public class RegionService {
     }
 
     public Boolean validateRegionId(String id){
-        Optional<Region> optionalRegion = regionRepository.findById(id);
+        Optional<Region> optionalRegion = regionRepository.findUndeletedRegionById(id);
         if (!optionalRegion.isPresent()) {
             return false;
         }else{

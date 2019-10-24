@@ -32,7 +32,7 @@ public class BusinessUnitController {
     @GetMapping("/{uuid}")
     public ResponseEntity<GenericObjectRes> getBusinessUnitsByUuid(@PathVariable(name = "uuid") String input) {
         try {
-            WriteAuditTrail.autoAuditUsingSpringSecurity();
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity.ok().body(new GenericObjectRes(null, false, Optional.of(Collections.singletonList(businessUnitService.getBusinessUnitByUuid(input)))));
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -43,7 +43,7 @@ public class BusinessUnitController {
     @GetMapping("/byCountryUuid/{uuid}")
     public ResponseEntity<GenericObjectRes> getBusinessUnitsByCountryUuid(@PathVariable(name = "uuid") String input) {
         try {
-            WriteAuditTrail.autoAuditUsingSpringSecurity();
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity.ok().body(new GenericObjectRes(null, false, Optional.of(businessUnitService.getBusinessUnitsByCountryUuid(input))));
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(new GenericObjectRes(ex.getMessage(), true, Optional.empty()));

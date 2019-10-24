@@ -133,11 +133,11 @@ public class CountryService {
     @Transactional
     public CountryDto entityToDto(Country input) {
         CountryDto countryDto = new CountryDto();
-        countryDto.setId(Optional.of(input.getId()));
-        countryDto.setCode(Optional.of(input.getCode()));
-        countryDto.setObjectName(Optional.of(input.getObjectName()));
+        countryDto.setId(Optional.ofNullable(input.getId()));
+        countryDto.setCode(Optional.ofNullable(input.getCode()));
+        countryDto.setObjectName(Optional.ofNullable(input.getObjectName()));
         if (!Objects.isNull(input.getRegion()))
-            countryDto.setRegionId(Optional.of(input.getRegion().getId()));
+            countryDto.setRegionId(Optional.ofNullable(input.getRegion().getId()));
         input.getFunctions().size();
         if (!Objects.isNull(input.getFunctions()) && !input.getFunctions().isEmpty()) {
 //            List<String> functionIds = new ArrayList<>();
@@ -146,7 +146,7 @@ public class CountryService {
                 functions.add(new GeneralEntityModel(function));
 //                functionIds.add(function.getId());
             }
-            countryDto.setFunctions(Optional.of(functions));
+            countryDto.setFunctions(Optional.ofNullable(functions));
         }
         return countryDto;
     }
@@ -164,7 +164,7 @@ public class CountryService {
     }
 
     public Boolean validateCountryId(String id){
-        Optional<Country> optionalCountry = countryRepository.findById(id);
+        Optional<Country> optionalCountry = countryRepository.findUndeletedCountryById(id);
         if (!optionalCountry.isPresent()) {
             return false;
         }else{
