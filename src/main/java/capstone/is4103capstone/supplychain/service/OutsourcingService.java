@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -306,5 +307,12 @@ public class OutsourcingService {
         }else{
             return true;
         }
+    }
+
+    public Outsourcing getOutsourcingRecordByServiceAndVendor(String serviceId, String vendorId) throws EntityNotFoundException {
+        Optional<Outsourcing> outsourcing = outsourcingRepository.findOutsourcingRecordByServiceAndVendor(serviceId,vendorId);
+        if (!outsourcing.isPresent())
+            throw new EntityNotFoundException("Outsourcing with serivce "+serviceId+" under vendor "+vendorId+" is not found");
+        return outsourcing.get();
     }
 }

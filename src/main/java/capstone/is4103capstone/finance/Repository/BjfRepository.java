@@ -35,4 +35,8 @@ public interface BjfRepository extends JpaRepository<BJF,String> {
             " ON f.service_id=s.id and f.vendor_id=v.id and f.requester_id=e1.id and f.approver_id=e2.id and c.id=f.cost_center_id and f.is_deleted=0 and f.vendor_id=?1 and f.approval_status=1 and f.purchase_order_number is null",nativeQuery = true)
     public List<BJFAggregateModel> getBjfByVendorWithoutPurchaseOrder(String vendorId);
 
+    public List<BJF> getBJFByVendorIdAndServiceId(String serviceId, String vendorId);
+
+    public List<BJF> getBJFByServiceIdAndCostCenterId(String serviceId, String costCenterId);
+
 }

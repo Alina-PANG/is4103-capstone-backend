@@ -31,7 +31,6 @@ public class AssessmentFormController {
     @Autowired
     private AssessmentFormService assessmentFormService;
 
-
     @PostMapping("/createResponse")
     public ResponseEntity<GeneralRes> createResponse(@RequestBody CreateResponseReq createResponseReq) {
         logger.info("*************** Creating Assessment Form *****************");
@@ -48,6 +47,15 @@ public class AssessmentFormController {
     public ResponseEntity<GetAsseFormListRes> retrieveAllFormsUserCanAccess(){
         try{
             return ResponseEntity.ok().body(assessmentFormService.retrieveAssessmentForms());
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GetAsseFormListRes(ex.getMessage(),true));
+        }
+    }
+    @GetMapping("/view-approved")
+    public ResponseEntity<GetAsseFormListRes> retrieveApprovedAssessmentForms(){
+        try{
+            return ResponseEntity.ok().body(assessmentFormService.retrieveAllApprovedAssessmentForms());
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new GetAsseFormListRes(ex.getMessage(),true));

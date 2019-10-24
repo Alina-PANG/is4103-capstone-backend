@@ -27,7 +27,7 @@ public class BJF extends RequestFormTemplate {
     private Boolean competitiveQuotesAvailable;
     private BigDecimal revex; // if type == project
     private String sponsor;
-    private String projectCode = null; // string/id both should word: if type == project
+    private String projectCode = null; // string/id both should work: if type == project
     private String coverage;
     private String purchaseOrderNumber;
 
