@@ -29,6 +29,7 @@ public class Outsourcing extends DBEntityTemplate {
     private OutsourcingCategoryEnum outsourcingCategory;
     private MaterialityEnum materiality;
     private String outsourcingTitle;
+    private String outsourcingAssessmentId;
 
     @Convert(converter = StringListConverter.class)
     private List<String> serviceIdList = new ArrayList();
@@ -59,7 +60,7 @@ public class Outsourcing extends DBEntityTemplate {
     public Outsourcing() {
     }
 
-    public Outsourcing(String regionId, String countryId, String departmentId, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, String outsourcingTitle, List<String> serviceIdList, Vendor outsourcedVendor, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
+    public Outsourcing(String regionId, String countryId, String departmentId, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, String outsourcingTitle, String outsourcingAssessmentId, List<String> serviceIdList, Vendor outsourcedVendor, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
         this.regionId = regionId;
         this.countryId = countryId;
         this.departmentId = departmentId;
@@ -67,6 +68,7 @@ public class Outsourcing extends DBEntityTemplate {
         this.outsourcingCategory = outsourcingCategory;
         this.materiality = materiality;
         this.outsourcingTitle = outsourcingTitle;
+        this.outsourcingAssessmentId = outsourcingAssessmentId;
         this.serviceIdList = serviceIdList;
         this.outsourcedVendor = outsourcedVendor;
         this.dueDiligenceDate = dueDiligenceDate;
@@ -186,5 +188,13 @@ public class Outsourcing extends DBEntityTemplate {
 
     public void setIndependentAuditDate(Date independentAuditDate) {
         this.independentAuditDate = independentAuditDate;
+    }
+
+    public String getOutsourcingAssessmentId() {
+        return outsourcingAssessmentId;
+    }
+
+    public void setOutsourcingAssessmentId(String outsourcingAssessmentId) {
+        this.outsourcingAssessmentId = outsourcingAssessmentId;
     }
 }

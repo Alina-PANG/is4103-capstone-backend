@@ -1,6 +1,7 @@
 package capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service;
 
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
@@ -303,5 +304,14 @@ public class AssessmentFormService {
         String link = "http://localhost:3000/api/assessmentForm/getDetails/"+outsourcing.getId();
         model.put("link", link);
         return new Mail(from, to, subject, model);
+    }
+
+    public Boolean validateAssessmentFormId(String id){
+        Optional<OutsourcingAssessment> optionalOutsourcingAssessment = outsourcingAssessmentRepository.findUndeletedAssessmentFormById(id);
+        if (!optionalOutsourcingAssessment.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
     }
 }

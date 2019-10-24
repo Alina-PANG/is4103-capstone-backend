@@ -23,6 +23,7 @@ public class OutsourcingModel implements Serializable {
     private MaterialityEnum materiality;
     private List<GeneralEntityModel> serviceList;
     private GeneralEntityModel outsourcedVendor;
+    private GeneralEntityModel outsourcingAssessment;
 
     @Temporal(TemporalType.DATE)
     private Date dueDiligenceDate;
@@ -42,7 +43,7 @@ public class OutsourcingModel implements Serializable {
     public OutsourcingModel() {
     }
 
-    public OutsourcingModel(String code, String id, Long seqNo, String outsourcingTitle, GeneralEntityModel region, GeneralEntityModel country, GeneralEntityModel department, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, List<GeneralEntityModel> serviceList, GeneralEntityModel outsourcedVendor, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
+    public OutsourcingModel(String code, String id, Long seqNo, String outsourcingTitle, GeneralEntityModel region, GeneralEntityModel country, GeneralEntityModel department, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, List<GeneralEntityModel> serviceList, GeneralEntityModel outsourcedVendor, GeneralEntityModel outsourcingAssessment, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
         this.code = code;
         this.id = id;
         this.seqNo = seqNo;
@@ -55,6 +56,7 @@ public class OutsourcingModel implements Serializable {
         this.materiality = materiality;
         this.serviceList = serviceList;
         this.outsourcedVendor = outsourcedVendor;
+        this.outsourcingAssessment = outsourcingAssessment;
         this.dueDiligenceDate = dueDiligenceDate;
         this.materialityAssessmentDate = materialityAssessmentDate;
         this.bcpTestDate = bcpTestDate;
@@ -196,5 +198,13 @@ public class OutsourcingModel implements Serializable {
 
     public void setIndependentAuditDate(Date independentAuditDate) {
         this.independentAuditDate = independentAuditDate;
+    }
+
+    public GeneralEntityModel getOutsourcingAssessment() {
+        return outsourcingAssessment;
+    }
+
+    public void setOutsourcingAssessment(GeneralEntityModel outsourcingAssessment) {
+        this.outsourcingAssessment = outsourcingAssessment;
     }
 }

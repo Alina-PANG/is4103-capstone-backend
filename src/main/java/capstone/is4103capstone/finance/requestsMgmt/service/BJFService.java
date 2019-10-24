@@ -9,6 +9,8 @@ import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.finance.Project;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.finance.Service;
+import capstone.is4103capstone.entities.supplyChain.Outsourcing;
+import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
@@ -162,7 +164,7 @@ public class BJFService {
 
 
     //TODO: collaborate with Outsourcing
-    public void afterOutsourcing(String bjfId){
+    public void afterOutsourcing(OutsourcingAssessment assessment){
         //start purchase order steps
     }
 
