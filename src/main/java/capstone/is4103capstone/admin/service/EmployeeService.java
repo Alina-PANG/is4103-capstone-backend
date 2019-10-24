@@ -91,6 +91,22 @@ public class EmployeeService {
         }
     }
 
+    public List<EmployeeDto> getTeamMembersByTeamLeadUuid(String teamLeadUuid) throws Exception {
+        Optional<Employee> optionalEmployee = employeeRepository.findUndeletedEmployeeById(teamLeadUuid);
+        if (optionalEmployee.isPresent()) {
+            Employee teamLead = optionalEmployee.get();
+            Team team = teamLead.getTeam();
+            if (!team.getTeamLeader().getId().equals(teamLeadUuid)) {
+                throw new Exception("Employee with UUID " + teamLeadUuid + " is not a team lead!");
+            } else {
+                List<EmployeeDto> employeeDtos = entityToDto(team.getMembers(), true);
+                return  employeeDtos;
+            }
+        } else {
+            throw new Exception("Employee with UUID " + teamLeadUuid + " not found!");
+        }
+    }
+
     public Employee getEmployeeByUsername(String username) throws EmployeeNotFoundException {
         if (username == null || username.trim().length() == 0) {
             throw new EmployeeNotFoundException("Invalid username given!");
