@@ -15,6 +15,7 @@ import java.util.List;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OutsourcingAssessment extends DBEntityTemplate {
+
     private Outsourcing outsourcing;
 
     private String businessCaseDescription;
