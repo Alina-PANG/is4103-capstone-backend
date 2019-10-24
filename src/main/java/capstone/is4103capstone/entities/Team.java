@@ -15,7 +15,6 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Team extends DBEntityTemplate {
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_unit_id")
     @JsonIgnore

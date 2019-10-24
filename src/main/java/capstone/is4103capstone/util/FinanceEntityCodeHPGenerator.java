@@ -20,7 +20,7 @@ public class FinanceEntityCodeHPGenerator {
     private final String FX_RECORD_TEMPLATE = "FX-%1$s-%2$s";
     private final String MERCHANDISE_TEMPALTE = "SP-%1$s-%2$s";
     private final String PLAN_TEMPLATE = "%1$s-%2$s";
-    private final String PLAN_ITEM_TEMPLATE = "PLINE-%1$s";
+    private final String PLAN_ITEM_TEMPLATE = "PLINE-%1$s-%2$s";
     private final String PROJECT_TEMPLATE = "PJ-%1$s";
     private final String INVOICE_TEMPLATE = "INV-%1$s-%2$s";
     private final String STATEMENT_OF_ACCT_TEMPLATE = "SOA-%1$s-%2$s";
@@ -112,7 +112,7 @@ public class FinanceEntityCodeHPGenerator {
                         code = String.format(PLAN_TEMPLATE, objectName, seqNoStr);
                         break;
                     case "PlanLineItem":
-                        code = String.format(PLAN_ITEM_TEMPLATE, seqNoStr);
+                        code = String.format(PLAN_ITEM_TEMPLATE, additionalInfo, seqNoStr);
                         break;
                     case "Project":
                         code = String.format(PROJECT_TEMPLATE, seqNoStr);
