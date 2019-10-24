@@ -51,26 +51,31 @@ public class MailService {
     }
 
     public void sendOscAssForm(String from, String to, String subject, String urlA, String urlATitle, OutsourcingAssessment outsourcingAssessment){
-        HashMap<String, Object> map = new HashMap<>();
-        List<AssessmentFormEmailModel> list = new ArrayList<>();
-        for(OutsourcingAssessmentSection s: outsourcingAssessment.getSectionList()){
-            AssessmentFormEmailModel assessmentFormEmailModel = new AssessmentFormEmailModel();
-            List<AssessmentFormLineEmailModel> lines = new ArrayList<>();
-            for(OutsourcingAssessmentLine l: s.getOutsourcingAssessmentLines()){
-                AssessmentFormLineEmailModel line = new AssessmentFormLineEmailModel();
-                line.setQuestion(l.getQuestion());
-                line.setAnswer(l.getAnswer()? "Y":"N");
-                line.setComment(l.getComment());
-                lines.add(line);
+        try{
+            HashMap<String, Object> map = new HashMap<>();
+            List<AssessmentFormEmailModel> list = new ArrayList<>();
+            for(OutsourcingAssessmentSection s: outsourcingAssessment.getSectionList()){
+                AssessmentFormEmailModel assessmentFormEmailModel = new AssessmentFormEmailModel();
+                List<AssessmentFormLineEmailModel> lines = new ArrayList<>();
+                for(OutsourcingAssessmentLine l: s.getOutsourcingAssessmentLines()){
+                    AssessmentFormLineEmailModel line = new AssessmentFormLineEmailModel();
+                    line.setQuestion(l.getQuestion());
+                    line.setAnswer(l.getAnswer()? "Y":"N");
+                    line.setComment(l.getComment());
+                    lines.add(line);
+                }
+                assessmentFormEmailModel.setLines(lines);
+                assessmentFormEmailModel.setSeqNo(s.getNumber());
+                list.add(assessmentFormEmailModel);
             }
-            assessmentFormEmailModel.setLines(lines);
-            assessmentFormEmailModel.setSeqNo(s.getNumber());
-            list.add(assessmentFormEmailModel);
+            map.put("sections", list);
+            map.put("urlA_title", urlATitle);
+            map.put("urlA", urlA);
+            Mail mail = new Mail(from, to, subject, map);
+            mailSenderService.sendEmail(mail, "osrcAssFormNotification");
+        }catch (Exception ex){
+            logger.error("[Internal Error]Email Sending got problem");
         }
-        map.put("sections", list);
-        map.put("urlA_title", urlATitle);
-        map.put("urlA", urlA);
-        Mail mail = new Mail(from, to, subject, map);
-        mailSenderService.sendEmail(mail, "osrcAssFormNotification");
+
     }
 }
