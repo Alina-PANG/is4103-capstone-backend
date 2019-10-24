@@ -71,6 +71,13 @@ public class AssessmentFormService {
         }
     }
 
+    /*
+    Retrieve:
+    1) if the current log in user belongs to outsourcing team(now: employee code/hierachy contains'OUTSOURCING':
+        we return the full list,
+    2) If not, we assume he is the directly manager, so we retrieve the assessment forms under his management
+
+     */
     public GetAsseFormListRes retrieveAssessmentForms(){
         Employee currentUser = employeeService.getCurrentLoginEmployee();
         if (currentUser.getCode().toUpperCase().contains("OUTSOURCING")){
