@@ -90,6 +90,17 @@ public class AssessmentFormController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
+    @GetMapping("/getAssByBjfID/{id}")
+    public ResponseEntity<GeneralRes> getFormByBjfId(@PathVariable("id") String id){
+        logger.info("*************** Getting Outsourcing Assessment Form Details "+id+"*****************");
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
+            return assessmentFormService.getFormByBjfId(id);
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
     @GetMapping("/getTemplate")
     public ResponseEntity<GeneralRes> getTemplateForm(){
         logger.info("*************** Getting Outsourcing Assessment Form Template *****************");
@@ -101,7 +112,7 @@ public class AssessmentFormController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @PostMapping("/approve/{id}") // TODO: approve the assessment form
+    @PostMapping("/approve/{id}")
     public ResponseEntity<GeneralRes> approveA(@PathVariable("id") String id, @RequestParam(name="approved", required=true) int approved, @RequestParam(name="type", required=true) int type){
         logger.info("*************** Approving Outsourcing Assessment Form 1st Level"+id+" *****************");
         if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {

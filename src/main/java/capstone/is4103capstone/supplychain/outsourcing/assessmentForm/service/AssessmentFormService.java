@@ -3,12 +3,15 @@ package capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentLine;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentSection;
+import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
+import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
@@ -49,6 +52,8 @@ public class AssessmentFormService {
     OutsourcingRepository outsourcingRepository;
     @Autowired
     MailService mailService;
+    @Autowired
+    BjfRepository bjfRepository;
 
     @Value("${spring.mail.username}")
     private String senderEmailAddr;
@@ -56,6 +61,29 @@ public class AssessmentFormService {
     public ResponseEntity<GeneralRes> getForm(String id){
         try{
             OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.getOne(id);
+            for(OutsourcingAssessmentSection s: outsourcingAssessment.getSectionList()){
+                for(OutsourcingAssessmentLine o: s.getOutsourcingAssessmentLines()){
+                    logger.info("Fetching line item question"+o.getQuestion());
+                }
+            }
+            if(outsourcingAssessment == null) return ResponseEntity
+                    .notFound().build();
+            else return ResponseEntity.ok().body(new GetAssessmentFormRes("Successfully retrieved the assessment form!", true, outsourcingAssessment));
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+        }
+    }
+
+    public ResponseEntity<GeneralRes> getFormByBjfId(String id){
+        try{
+            BJF bjf = bjfRepository.getOne(id);
+            if(bjf == null || bjf.getDeleted())  return ResponseEntity
+                    .notFound().build();
+            OutsourcingAssessment outsourcingAssessment = bjf.getRelated_outsourcing_assessment();
             for(OutsourcingAssessmentSection s: outsourcingAssessment.getSectionList()){
                 for(OutsourcingAssessmentLine o: s.getOutsourcingAssessmentLines()){
                     logger.info("Fetching line item question"+o.getQuestion());
@@ -116,7 +144,8 @@ public class AssessmentFormService {
             logger.info("Action performed by: "+username+" on "+new Date());
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
             Employee creater = employeeService.validateUser(username);
-            if(creater == null) {
+            BJF b = bjfRepository.getOne(createResponseReq.getBjfId());
+            if(creater == null || b == null) {
                 logger.info("Cannot find the user!");
                 return ResponseEntity.notFound().build();
             }
@@ -172,6 +201,7 @@ public class AssessmentFormService {
             newAssess.setSectionList(sections);
             newAssess.setCreatedBy(username);
             newAssess.setCreatedDateTime(new Date());
+            newAssess.setRelated_BJF(b);
 
             outsourcingAssessmentRepository.saveAndFlush(newAssess);
             Employee approverA = creater.getManager();
