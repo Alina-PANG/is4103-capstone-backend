@@ -7,4 +7,5 @@ public enum OutsourcingAssessmentStatusEnum {
     APPROVED,
     OUTSOURCING_RECORD_CREATED,
     REJECTED
+
 }

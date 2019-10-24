@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>hello</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+    <!-- use the font -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 48px;
+        }
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+    </style>
+</head>
+<body>
+<h3>Outsourcing Assessment Form</h3>
+<table>
+    <thead>
+    <tr>
+        <th> Questions </th>
+        <th> Answers </th>
+        <th> Comments </th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr th:if="${sections.empty}">
+            <td colspan="3"> No Form Available </td>
+        </tr>
+        <div th:each="s : ${sections}">
+            <tr>
+                <td colspan="3">Section <span th:text="${s.seqNo}"></span></td>
+            </tr>
+            <tr th:each="line: ${s.lines}">
+                <td><span th:text="${line.question}">  </span></td>
+                <td><span th:text="${line.answer}">  </span></td>
+                <td><span th:text="${line.comment}">  </span></td>
+            </tr>
+        </div>
+    </tbody>
+</table>
+<br/>
+<br/>
+<p th:text="${urlA_title}"></p>
+<a th:href="${urlA}" />
+</body>
+</html>

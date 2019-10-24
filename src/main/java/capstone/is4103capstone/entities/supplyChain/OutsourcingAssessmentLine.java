@@ -18,6 +18,7 @@ public class OutsourcingAssessmentLine extends DBEntityTemplate {
     private String question;
     private Boolean answer;
     private String comment;
+    private int number;
 
     public OutsourcingAssessmentLine(String question) {
         this.question = question;
@@ -32,6 +33,14 @@ public class OutsourcingAssessmentLine extends DBEntityTemplate {
     }
 
     public OutsourcingAssessmentLine() {
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     public String getQuestion() {
