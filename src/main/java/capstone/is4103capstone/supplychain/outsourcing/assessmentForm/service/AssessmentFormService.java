@@ -112,13 +112,39 @@ public class AssessmentFormService {
     2) If not, we assume he is the directly manager, so we retrieve the assessment forms under his management
 
      */
-    public GetAsseFormListRes retrieveAssessmentForms(){
+    public GetAsseFormListRes retrieveAssessmentForms() throws Exception{
+        Employee currentUser = employeeService.getCurrentLoginEmployee();
+        List<AssessmentFormSimpleModel> allForms = new ArrayList<>();
+        if (currentUser.getCode().toUpperCase().contains("OUTSOURCING")){
+            //it's an outsourcing manager
+            allForms = outsourcingAssessmentRepository.getAllAssessmentsForms();
+        }else{
+            allForms = outsourcingAssessmentRepository.getAssessmentsUnderMyApproval(currentUser.getId());
+        }
+        if (allForms.isEmpty())
+            throw new Exception("No assessment forms available.");
+
+        return new GetAsseFormListRes("Succesffully retrieved",false,allForms,false);
+
+    }
+
+    public GetAsseFormListRes retrieveAllApprovedAssessmentForms() throws Exception{
         Employee currentUser = employeeService.getCurrentLoginEmployee();
         if (currentUser.getCode().toUpperCase().contains("OUTSOURCING")){
             //it's an outsourcing manager
-            return new GetAsseFormListRes("Succesffully retrieved",false,outsourcingAssessmentRepository.getAllAssessmentsForms(),true);
+            List<AssessmentFormSimpleModel> allForms = outsourcingAssessmentRepository.getAllAssessmentsForms();
+            List<AssessmentFormSimpleModel> approvedForms = new ArrayList<>();
+            for (AssessmentFormSimpleModel m:allForms){
+                if (m.getAssessmentFormStatus().equals(OutsourcingAssessmentStatusEnum.APPROVED)){
+                    approvedForms.add(m);
+                }
+            }
+            if (approvedForms.isEmpty()){
+                throw new Exception("No approved assessment forms currently.");
+            }
+            return new GetAsseFormListRes("Succesffully retrieved",false,approvedForms,true);
         }else{
-            return new GetAsseFormListRes("Succesffully retrieved",false,outsourcingAssessmentRepository.getAssessmentsUnderMyApproval(currentUser.getId()),false);
+            throw new Exception("You don't have the right to view the assessment forms.");
         }
     }
 
