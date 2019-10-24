@@ -1,7 +1,9 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.controller;
 
+import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.finance.Invoice;
 import capstone.is4103capstone.finance.budget.service.BudgetService;
+import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateInvoiceReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.service.InvoiceService;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
@@ -37,20 +39,32 @@ public class InvoiceController {
     FileStorageService fileStorageService;
     @Autowired
     InvoiceService invoiceService;
+    @Autowired
+    EmployeeService employeeService;
 
-    @PostMapping("/upload")
-    public ResponseEntity<GeneralRes> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam(name="username", required=true) String username) {
-        if(AuthenticationTools.authenticateUser(username))
-            return invoiceService.storeFile(file);
+    @PostMapping("/upload/{soaId}")
+    public ResponseEntity<GeneralRes> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable("soaId") String id) {
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
+            return invoiceService.storeFile(file, id, employeeService.getCurrentLoginUsername());
         else
             return ResponseEntity
                     .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
-    @GetMapping("/download/{id}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String id, @RequestParam(name="username", required=true) String username) {
-        if (AuthenticationTools.authenticateUser(username))
+    @PostMapping("/update/{soaId}")
+    public ResponseEntity<GeneralRes> uploadFile(@PathVariable("soaId") String id, CreateInvoiceReq createInvoiceReq) {
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
+            return invoiceService.update(createInvoiceReq, id, employeeService.getCurrentLoginUsername());
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @GetMapping("/download/{invoiceId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("invoiceId") String id) {
+        if (AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
             return invoiceService.getFile(id);
         else
             return ResponseEntity
