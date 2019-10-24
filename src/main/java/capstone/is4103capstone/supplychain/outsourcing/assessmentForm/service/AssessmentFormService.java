@@ -175,14 +175,14 @@ public class AssessmentFormService {
 
             int j = 0;
             for (OutsourcingAssessmentSection s : sections) {
-                s.setCode(String.valueOf(String.valueOf(j)));
+                s.setNumber(j);
                 OutsourcingAssessmentSection newS = new OutsourcingAssessmentSection();
                 newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
                 for (int i = 0; i < outsourcingAssessmentLine.size(); i ++) {
                     OutsourcingAssessmentLine o = new OutsourcingAssessmentLine();
-                    o.setCode(String.valueOf(i));
+                    o.setNumber(i);
                     o.setQuestion(outsourcingAssessmentLine.get(i).getQuestion());
                     o.setAnswer(createResponseReq.getResponses().get(i));
                     o.setComment(createResponseReq.getComments().get(i));
@@ -255,13 +255,13 @@ public class AssessmentFormService {
 
             Integer i = 1;
             for (OutsourcingAssessmentSection s : sections) {
-                s.setCode(i.toString());
+                s.setNumber(i);
                 OutsourcingAssessmentSection newS = outsourcingAssessmentSectionRepository.saveAndFlush(s);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
                 Integer j = 1;
                 for (OutsourcingAssessmentLine o : outsourcingAssessmentLine) {
-                    o.setCode(j.toString());
+                    o.setNumber(j);
                     o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);

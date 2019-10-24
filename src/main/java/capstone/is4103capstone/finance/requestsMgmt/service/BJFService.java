@@ -167,7 +167,7 @@ public class BJFService {
     }
 
     //TODO: Collaborate with Purchase Order
-    public void afterPOUpdated(String poId){
+    public void afterPOUpdated(PurchaseOrder po){
         //need to update bjf purchase value.
     }
 

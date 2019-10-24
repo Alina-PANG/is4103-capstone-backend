@@ -62,7 +62,7 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     }
 
     public List<OutsourcingAssessmentSection> getSectionList() {
-        Collections.sort(this.sectionList, (a, b) -> Integer.parseInt(a.getCode()) - Integer.parseInt(b.getCode()));
+        Collections.sort(this.sectionList, (a, b) -> a.getNumber() - b.getNumber());
         return this.sectionList;
     }
 

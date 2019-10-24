@@ -18,6 +18,16 @@ public class OutsourcingAssessmentSection extends DBEntityTemplate {
     @JsonIgnore
     private OutsourcingAssessment outsourcingAssessment;
 
+    private int number;
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     @OneToMany(mappedBy = "outsourcingAssessmentSection",fetch = FetchType.LAZY)
     private List<OutsourcingAssessmentLine> outsourcingAssessmentLines = new ArrayList<>();
 
@@ -37,7 +47,7 @@ public class OutsourcingAssessmentSection extends DBEntityTemplate {
     }
 
     public List<OutsourcingAssessmentLine> getOutsourcingAssessmentLines() {
-        Collections.sort(this.outsourcingAssessmentLines, (a, b) -> Integer.parseInt(a.getCode()) - Integer.parseInt(b.getCode()));
+        Collections.sort(this.outsourcingAssessmentLines, (a, b) -> a.getNumber() - b.getNumber());
         return this.outsourcingAssessmentLines;
     }
 

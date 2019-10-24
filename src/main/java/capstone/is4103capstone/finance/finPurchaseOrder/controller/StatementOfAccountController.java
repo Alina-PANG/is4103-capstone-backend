@@ -1,7 +1,9 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.controller;
 
 import capstone.is4103capstone.admin.service.EmployeeService;
-import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreatePOReq;
+import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoAByInvoiceReq;
+import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoAByScheduleReq;
+import capstone.is4103capstone.finance.finPurchaseOrder.service.StatementOfAccountService;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -16,38 +18,39 @@ import org.springframework.web.bind.annotation.*;
 public class StatementOfAccountController {
     @Autowired
     EmployeeService employeeService;
+    @Autowired
+    StatementOfAccountService statementOfAccountService;
+
+    @PostMapping("/createBySchedule")
+    public ResponseEntity<GeneralRes> createBySchedule(@RequestBody CreateSoAByScheduleReq createSoAByScheduleReq) {
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
+            return statementOfAccountService.createBySchedule(createSoAByScheduleReq, employeeService.getCurrentLoginUsername());
+        }
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
 
 
-//    @PostMapping("/createBySchedule")
-//    public ResponseEntity<GeneralRes> createPO(@RequestBody CreatePOReq createPOReq) {
-//        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
-//            return purchaseOrderService.createPO(createPOReq, null);
-//        }
-//        else
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-//    }
-//
-//    @PostMapping("/createByInvoice")
-//    public ResponseEntity<GeneralRes> createPO(@RequestBody CreatePOReq createPOReq) {
-//        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
-//            return purchaseOrderService.createPO(createPOReq, null);
-//        }
-//        else
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-//    }
-//
-//    @GetMapping("/getSoaByPO/{id}")
-//    public ResponseEntity<GeneralRes> getPOAsApprover(@PathVariable("id") String id, @RequestParam(name="approved", required=true) Boolean approved){
-//        ApprovalStatusEnum inputStatus;
-//        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
-//            return purchaseOrderService.getPOAsApprover(employeeService.getCurrentLoginUsername());
-//        else
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-//    }
+    @PostMapping("/createByInvoice")
+    public ResponseEntity<GeneralRes> createByInvoice(@RequestBody CreateSoAByInvoiceReq createSoAByInvoiceReq) {
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
+            return statementOfAccountService.createByInvoice(createSoAByInvoiceReq, employeeService.getCurrentLoginUsername());
+        }
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
+
+    @GetMapping("/getSoaByPO/{id}")
+    public ResponseEntity<GeneralRes> getSoaByPO(@PathVariable("id") String id){
+        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
+            return statementOfAccountService.getSoaByPo(id);
+        else
+            return ResponseEntity
+                    .badRequest()
+                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    }
 }
