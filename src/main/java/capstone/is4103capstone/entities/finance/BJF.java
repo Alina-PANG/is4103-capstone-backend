@@ -1,8 +1,10 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.entities.RequestFormTemplate;
+import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.util.enums.BJFStatusEnum;
 import capstone.is4103capstone.util.enums.BjfTypeEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -37,8 +39,19 @@ public class BJF extends RequestFormTemplate {
 
     private BJFStatusEnum bjfStatus = BJFStatusEnum.PENDING_APPROVAL;
 
+    @OneToOne(mappedBy = "related_BJF")
+    @JsonIgnore
+    private OutsourcingAssessment related_outsourcing_assessment;
 
     public BJF() {
+    }
+
+    public OutsourcingAssessment getRelated_outsourcing_assessment() {
+        return related_outsourcing_assessment;
+    }
+
+    public void setRelated_outsourcing_assessment(OutsourcingAssessment related_outsourcing_assessment) {
+        this.related_outsourcing_assessment = related_outsourcing_assessment;
     }
 
     public BigDecimal getTotalSpending() {

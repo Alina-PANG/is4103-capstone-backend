@@ -2,6 +2,7 @@ package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -18,7 +19,7 @@ public class OutsourcingAssessment extends DBEntityTemplate {
 
     private String businessCaseDescription;
 
-    @OneToMany(mappedBy = "outsourcingAssessment",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "outsourcingAssessment",fetch = FetchType.LAZY)
     private List<OutsourcingAssessmentSection> sectionList;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,7 +27,10 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     @JsonIgnore
     private Employee employeeAssess;
 
-
+    @OneToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "related_bjf_id")
+    @JsonIgnore
+    private BJF related_BJF;
 
     private OutsourcingAssessmentStatusEnum outsourcingAssessmentStatus;
 
@@ -38,6 +42,14 @@ public class OutsourcingAssessment extends DBEntityTemplate {
         this.sectionList = sectionList;
         this.employeeAssess = employeeAssess;
         this.outsourcingAssessmentStatus = outsourcingAssessmentStatus;
+    }
+
+    public BJF getRelated_BJF() {
+        return related_BJF;
+    }
+
+    public void setRelated_BJF(BJF related_BJF) {
+        this.related_BJF = related_BJF;
     }
 
     public Outsourcing getOutsourcing() {

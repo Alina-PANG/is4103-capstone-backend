@@ -6,6 +6,7 @@ import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateResponseReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateTemplateReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.res.GetAsseFormListRes;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service.AssessmentFormService;
 
 import org.slf4j.Logger;
@@ -41,6 +42,16 @@ public class AssessmentFormController {
                     .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
+    @GetMapping
+    public ResponseEntity<GetAsseFormListRes> retrieveAllFormsUserCanAccess(){
+        try{
+            return ResponseEntity.ok().body(assessmentFormService.retrieveAssessmentForms());
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GetAsseFormListRes(ex.getMessage(),true));
+        }
+    }
+
 
     @PostMapping("/updateTemplate")
     public ResponseEntity<GeneralRes> updateForm(@RequestBody CreateTemplateReq createTemplateReq) {
