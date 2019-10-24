@@ -5,14 +5,13 @@ import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.finance.BJF;
-import capstone.is4103capstone.entities.finance.Project;
-import capstone.is4103capstone.entities.finance.PurchaseOrder;
-import capstone.is4103capstone.entities.finance.Service;
+import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
+import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
+import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
@@ -24,21 +23,22 @@ import capstone.is4103capstone.finance.requestsMgmt.model.res.BjfAnalysisRespons
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.general.service.MailService;
+import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
+import capstone.is4103capstone.supplychain.model.ContractAndChildAggre;
 import capstone.is4103capstone.supplychain.service.OutsourcingService;
 import capstone.is4103capstone.supplychain.service.VendorService;
-import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
-import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
-import capstone.is4103capstone.util.enums.BJFStatusEnum;
-import capstone.is4103capstone.util.enums.BjfTypeEnum;
+import capstone.is4103capstone.util.enums.*;
 import org.hibernate.envers.configuration.internal.metadata.EntityXmlMappingData;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityNotFoundException;
+import javax.tools.Tool;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @org.springframework.stereotype.Service
 public class BJFService {
@@ -61,6 +61,12 @@ public class BJFService {
     MailService mailService;
     @Autowired
     OutsourcingService outsourcingService;
+    @Autowired
+    PlanRepository planRepository;
+    @Autowired
+    PlanLineItemRepository planLineItemRepository;
+    @Autowired
+    ChildContractRepository childContractRepository;
 
     //TODO: can't same person created another request for same item before approval
     public BJFModel createBJF(CreateBJFReq req, boolean isUpdate) throws Exception{
@@ -127,7 +133,6 @@ public class BJFService {
         }else
             newBjf.setBjfType(BjfTypeEnum.BAU);
 
-
         newBjf = bjfRepository.save(newBjf);
         String code = EntityCodeHPGeneration.getCode(bjfRepository,newBjf);
         newBjf.setCode(code);
@@ -176,12 +181,42 @@ public class BJFService {
     }
 
     public BjfAnalysisResponse bjfAnalysis(String bjfId){
+        int thisYear = (new Date()).getYear();
+        JSONObject response = new JSONObject();
         BJF bjf = validateBJF(bjfId);
         Service service = serviceServ.validateService(bjf.getServiceId());
         Vendor vendor = vendorService.validateVendor(bjf.getVendorId());
         CostCenter cc = bjf.getCostCenter();
+        response.put("Analysis Title","BJF and related spending summary: Service["+service.getObjectName()+
+                "], Vendor["+vendor.getObjectName()+"], Cost Center["+cc.getCode()+"].");
+
+        //Contract and Service and Vendor
         //这里应该只需要check committed，也就是related，approved且已经有purchase order，
-        // 也就是说到了PENDING_PAYMENTS的status的所有bjf里，
+        // 也就是说到了PENDING_PAYMENTS & DELIVERED的status的今年的所有bjf里，
+
+        List<PlanLineItem> allPlanItemsThisYear = planLineItemRepository.findItemsByServiceAndCostCenter(thisYear,service.getCode(),cc.getId());
+        JSONObject budgetHistory = new JSONObject();
+        for (PlanLineItem pl: allPlanItemsThisYear){
+            if (pl.getItemType().equals(BudgetPlanEnum.BUDGET)){
+                budgetHistory.put(thisYear+" Budget Amount",pl.getBudgetAmount());
+            }else{
+                budgetHistory.put(getUsefulInfoInPlanItemCode(pl.getCode()),pl.getBudgetAmount());
+            }
+        }
+        response.put("Budget History",budgetHistory);
+
+        // for checking budget plan; committed:
+        List<BJF> bjfsOfServiceInCC = bjfRepository.getBJFByServiceIdAndCostCenterId(service.getId(),cc.getId());
+        BigDecimal commitedBudget = BigDecimal.ZERO;
+        for (BJF e:bjfsOfServiceInCC){
+            if (e.getDeleted() || e.getCreatedDateTime().getYear() != thisYear)
+                continue;
+            if (e.getBjfStatus().equals(BJFStatusEnum.PENDING_PAYMENTS) || e.getBjfStatus().equals(BJFStatusEnum.DELIVERED)){
+                commitedBudget.add(e.getTotalSpending() == null?e.getEstimatedBudget():e.getTotalSpending());
+            }
+        }
+
+        response.put(thisYear+" Commited Value",commitedBudget);
 
         // current year
         // bjf status
@@ -190,8 +225,11 @@ public class BJFService {
         // only bjf by this cost center: check spending again budget planning;
         List<BJF> bjfsWithServiceVendor = bjfRepository.getBJFByVendorIdAndServiceId(service.getId(),vendor.getId());
 
+        List<ContractAndChildAggre> contractInfos = childContractRepository.getContractInformationByServiceAndVendor(service.getCode(),vendor.getId());
 
-        List<BJF> bjfsOfServiceInCC = bjfRepository.getBJFByServiceIdAndCostCenterId(service.getId(),cc.getId());
+
+
+
 
         // check previuos purchase -> compare against contract value;
         // check budget plan money;
@@ -201,7 +239,6 @@ public class BJFService {
 
         return new BjfAnalysisResponse();
     }
-
 
     //TODO: collaborate with Outsourcing haven't talk to XuHong
     public void afterOutsourcing(OutsourcingAssessment assessment){
@@ -305,5 +342,11 @@ public class BJFService {
 
         throw new EntityNotFoundException("BJF Code or Id not valid");
 
+    }
+
+
+    private String getUsefulInfoInPlanItemCode(String code){
+        String[] parts = code.split("-");
+        return String.join("-",Arrays.copyOfRange(parts,1,4));
     }
 }

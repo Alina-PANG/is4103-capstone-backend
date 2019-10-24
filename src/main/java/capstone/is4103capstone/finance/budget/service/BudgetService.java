@@ -9,6 +9,7 @@ import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
+import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
 import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
@@ -66,8 +67,11 @@ public class BudgetService {
         for(PlanLineItem i: items){
             i.setPlanBelongsTo(plan);
             i.setHierachyPath(g.getPlanItemHP(i));
+            i.setItemType(plan.getPlanType());
             newItems.add(planLineItemRepository.saveAndFlush(i));
-            generateCode(planLineItemRepository,i);
+//            generateCode(planLineItemRepository,i);
+            i.setCode(EntityCodeHPGeneration.getCode(planLineItemRepository,i,plan.getCode()));
+            i.setHierachyPath(EntityCodeHPGeneration.setPlanItemHP(i));
         }
         return newItems;
     }
@@ -89,7 +93,6 @@ public class BudgetService {
             if (!isValidPlan(createBudgetReq.getItems()))
                 throw new Exception("Submitted budget plan not valid, duplicate service fields!");
             CostCenter cc = costCenterRepository.findCostCenterByCode(createBudgetReq.getCostCenterCode());
-
 
             if(id != null){
                 Plan existingPlan = planRepository.getOne(id);
@@ -126,10 +129,12 @@ public class BudgetService {
 //                if (createBudgetReq.getMonth() == null){
 //                    throw new Exception("You must select the month of reforecast!");
 //                }
+
+                if (createBudgetReq.getMonth() < (new Date()).getMonth()+1)
+                    throw new Exception("You cannot create reforecast plan for past months!");
                 createBudgetReq.setMonth((new Date()).getMonth()+1);
                 newPlan.setObjectName(createBudgetReq.getYear()+"-"+new SimpleDateFormat("MMM").format(new Date())+"-REFORECAST");
             }
-
 
             newPlan.setCostCenter(cc);
             newPlan.setPlanDescription(createBudgetReq.getDescription());
@@ -139,6 +144,8 @@ public class BudgetService {
             newPlan.setCreatedBy(createBudgetReq.getUsername());
 
             newPlan = planRepository.saveAndFlush(newPlan);
+            newPlan.setCode(EntityCodeHPGeneration.getCode(planRepository,newPlan));
+
             if(createBudgetReq.getItems() != null && createBudgetReq.getItems().size() != 0){
                     List<PlanLineItem> newItems = saveLineItem(createBudgetReq.getItems(), newPlan);
                     newPlan.setLineItems(newItems);
@@ -146,8 +153,13 @@ public class BudgetService {
 
 
             newPlan.setHierachyPath(g.getPlanHP(newPlan,cc));
+            for (PlanLineItem pl:newPlan.getLineItems()){
+                pl.setCode(EntityCodeHPGeneration.getCode(planLineItemRepository,pl,newPlan.getCode()));
+                pl.setHierachyPath(EntityCodeHPGeneration.setPlanItemHP(pl,newPlan.getHierachyPath()));
+                planLineItemRepository.save(pl);
+            }
             planRepository.saveAndFlush(newPlan);
-            generateCode(planRepository,newPlan);
+//            generateCode(planRepository,newPlan);
 
             logger.info("Successully submitted the new plan! -- "+createBudgetReq.getUsername()+" "+new Date());
 

@@ -28,6 +28,8 @@ public interface PlanRepository extends JpaRepository<Plan,String> {
     @Query(value = "select * from plan where cost_center_id=?1 and for_year=?2 and is_deleted=0 and plan_type=?4 and budget_plan_status=?3",nativeQuery = true)
     Optional<Plan> findBudgetByCCAndYear(String ccId, int year, int status, int planType);
 
+    @Query(value = "select * from plan where cost_center_id=?1 and for_year=?2 and is_deleted=0 and budget_plan_status=?3",nativeQuery = true)
+    List<Plan> findAllByCCAndYear(String ccId, int year, int status);
 
     @Query(value = "select m.code,m.object_name as service_name,i.object_name as plan_name, i.budget_amount,i.currency_abbr,i.comment from plan_line_item i join service m on i.service_code=m.code where i.in_plan=?1"
             ,nativeQuery = true)

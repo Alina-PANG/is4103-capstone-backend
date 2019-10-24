@@ -51,4 +51,9 @@ public class EntityCodeHPGeneration {
         pl.setHierachyPath(hp);
         return hp;
     }
+    public static String setPlanItemHP(PlanLineItem pl,String planHierachyPath){
+        String hp = planHierachyPath + "-"+pl.getserviceCode();
+        pl.setHierachyPath(hp);
+        return hp;
+    }
 }

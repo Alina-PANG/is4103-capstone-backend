@@ -1,5 +1,6 @@
 package capstone.is4103capstone.finance.requestsMgmt.model.dto;
 
+import capstone.is4103capstone.finance.requestsMgmt.model.BjfAnalysisModel;
 import capstone.is4103capstone.util.enums.BJFStatusEnum;
 import capstone.is4103capstone.util.enums.BjfTypeEnum;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,4 +29,6 @@ public interface BJFAggregateModel {
     String costCenterCode();
     @Value("#{target.bjf_type}")
     BjfTypeEnum getBjfType();
+    @Value("#{target.assessment_form_id}")
+    String getAssessmentFormId();
 }
