@@ -117,13 +117,16 @@ public class AssessmentFormService {
             outsourcingAssessment.setBusinessCaseDescription(createResponseReq.getBusinessCaseDescription());
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
 
+            int j = 0;
             for (OutsourcingAssessmentSection s : sections) {
+                s.setCode(String.valueOf(String.valueOf(j)));
                 OutsourcingAssessmentSection newS = new OutsourcingAssessmentSection();
                 newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
                 for (int i = 0; i < outsourcingAssessmentLine.size(); i ++) {
                     OutsourcingAssessmentLine o = new OutsourcingAssessmentLine();
+                    o.setCode(String.valueOf(i));
                     o.setQuestion(outsourcingAssessmentLine.get(i).getQuestion());
                     o.setAnswer(createResponseReq.getResponses().get(i));
                     o.setComment(createResponseReq.getComments().get(i));
@@ -137,6 +140,7 @@ public class AssessmentFormService {
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
                 outsourcingAssessmentSectionRepository.saveAndFlush(newS);
+                j ++;
             }
             newAssess.setSectionList(sections);
             newAssess.setCreatedBy(username);
@@ -191,21 +195,27 @@ public class AssessmentFormService {
             outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.TEMPLATE);
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
 
+            Integer i = 1;
             for (OutsourcingAssessmentSection s : sections) {
+                s.setCode(i.toString());
                 OutsourcingAssessmentSection newS = outsourcingAssessmentSectionRepository.saveAndFlush(s);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
+                Integer j = 1;
                 for (OutsourcingAssessmentLine o : outsourcingAssessmentLine) {
+                    o.setCode(j.toString());
                     o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);
                     linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
+                    j ++;
                 }
                 newS.setOutsourcingAssessmentLines(linesSaved);
                 newS.setOutsourcingAssessment(newAssess);
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
                 outsourcingAssessmentSectionRepository.saveAndFlush(newS);
+                i ++;
             }
             newAssess.setSectionList(sections);
             newAssess.setCreatedBy(username);
@@ -239,11 +249,9 @@ public class AssessmentFormService {
                     .notFound().build();
             if(approved) {
                 if(isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL) {
-                    form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
-                    Employee manager = employeeRepository.findEmployeeByUserName(username);
-                    createApprovalTicket(form.getCreatedBy(), manager,form,"Please review and approve the outsourcing assessment form.");
+                    form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_ORC_APPROVAL);
                 }
-                else if(!isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) {
+                else if(!isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_ORC_APPROVAL) {
                     form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
                     String sender = "is4103.capstone@gmail.com";
                     String receiver = employeeRepository.findEmployeeByUserName(form.getCreatedBy()).getEmail();

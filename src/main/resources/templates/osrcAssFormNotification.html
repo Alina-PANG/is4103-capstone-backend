@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>hello</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+    <!-- use the font -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 48px;
+        }
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+    </style>
+</head>
+<body>
+<h3>Outsourcing Assessment Form</h3>
+<table>
+    <thead>
+    <tr>
+        <th> Questions </th>
+        <th> Answers </th>
+        <th> Comments </th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr th:if="${lines.empty}">
+            <td colspan="2"> No Form Available </td>
+        </tr>
+        <tr th:each="line : ${lines}">
+            <td><span th:text="${line.question}"> Question </span></td>
+            <td><span th:text="${line.answer}"> Answer </span></td>
+            <td><span th:text="${line.comment}"> Comment </span></td>
+        </tr>
+    </tbody>
+</table>
+<br/>
+<br/>
+<p th:text="${urlA_title}"></p>
+<a th:href="${urlA}" />
+<p th:text="${urlB_title}"></p>
+<a th:href="${urlB}" />
+</body>
+</html>
