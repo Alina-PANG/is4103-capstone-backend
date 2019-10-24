@@ -36,7 +36,7 @@ public class AssessmentFormController {
     public ResponseEntity<GeneralRes> createResponse(@RequestBody CreateResponseReq createResponseReq) {
         logger.info("*************** Creating Assessment Form *****************");
         if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
-            return assessmentFormService.createResponseForm(createResponseReq, null, employeeService.getCurrentLoginUsername());
+            return assessmentFormService.createResponseForm(createResponseReq,  employeeService.getCurrentLoginUsername());
         }
         else
             return ResponseEntity
@@ -60,18 +60,6 @@ public class AssessmentFormController {
         logger.info("*************** Updating Assessment Form *****************");
         if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())){
             return assessmentFormService.createTemplateForm( createTemplateReq, employeeService.getCurrentLoginUsername());
-        }
-        else
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
-    }
-
-    @PostMapping("/update/{id}")
-    public ResponseEntity<GeneralRes> updateForm(@RequestBody CreateResponseReq createTemplateReq, @PathVariable("id") String id) {
-        logger.info("*************** Updating Assessment Form *****************");
-        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())){
-            return assessmentFormService.createResponseForm(createTemplateReq,id, employeeService.getCurrentLoginUsername());
         }
         else
             return ResponseEntity

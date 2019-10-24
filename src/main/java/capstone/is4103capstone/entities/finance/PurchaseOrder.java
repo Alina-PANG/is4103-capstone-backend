@@ -21,9 +21,6 @@ public class PurchaseOrder extends DBEntityTemplate {
     private List<String> relatedBJF;
 
     @OneToMany(mappedBy = "purchaseOrder")
-    private List<Invoice> invoices = new ArrayList<>();
-
-    @OneToMany(mappedBy = "purchaseOrder")
     private List<StatementOfAcctLineItem> statementOfAccount = new ArrayList<>();
 
     @Column(name = "status")
@@ -59,14 +56,6 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public void setRelatedBJF(List<String> relatedBJF) {
         this.relatedBJF = relatedBJF;
-    }
-
-    public List<Invoice> getInvoices() {
-        return invoices;
-    }
-
-    public void setInvoices(List<Invoice> invoices) {
-        this.invoices = invoices;
     }
 
     public List<StatementOfAcctLineItem> getStatementOfAccount() {

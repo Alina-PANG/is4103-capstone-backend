@@ -40,12 +40,12 @@ th, td {
         </tr>
         <div th:each="s : ${sections}">
             <tr>
-                <td colspan="3">Section <span th:text="${s.code}"></span></td>
+                <td colspan="3">Section <span th:text="${s.seqNo}"></span></td>
             </tr>
-            <tr th:each="line: ${s.outsourcingAssessmentLines}">
-                <td><span th:text="${line.question}"> Question </span></td>
-                <td><span th:text="${line.answer}"> Answer </span></td>
-                <td><span th:text="${line.comment}"> Comment </span></td>
+            <tr th:each="line: ${s.lines}">
+                <td><span th:text="${line.question}">  </span></td>
+                <td><span th:text="${line.answer}">  </span></td>
+                <td><span th:text="${line.comment}">  </span></td>
             </tr>
         </div>
     </tbody>
@@ -54,7 +54,5 @@ th, td {
 <br/>
 <p th:text="${urlA_title}"></p>
 <a th:href="${urlA}" />
-<p th:text="${urlB_title}"></p>
-<a th:href="${urlB}" />
 </body>
 </html>

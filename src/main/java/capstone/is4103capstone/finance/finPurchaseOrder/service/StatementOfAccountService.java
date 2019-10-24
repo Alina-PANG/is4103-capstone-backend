@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,7 +33,8 @@ public class StatementOfAccountService {
 
     public ResponseEntity<GeneralRes> createBySchedule(CreateSoAByScheduleReq createSoAByScheduleReq, String username){
         try{
-            Date current = createSoAByScheduleReq.getStartDate();
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+            Date current = dateFormatter.parse(createSoAByScheduleReq.getStartDate());
             List<StatementOfAcctLineItem> items = new ArrayList<>();
             Calendar calendar = Calendar.getInstance();
             PurchaseOrder po = purchaseOrderRepository.getOne(createSoAByScheduleReq.getPoId());
@@ -59,7 +61,9 @@ public class StatementOfAccountService {
             numberOfLoops /= createSoAByScheduleReq.getNumFrequency();
             BigDecimal actualPmt = createSoAByScheduleReq.getTotalAmount().divide(BigDecimal.valueOf(numberOfLoops));
 
-            while (current.before(createSoAByScheduleReq.getEndDate())) {
+            Date endDate = dateFormatter.parse(createSoAByScheduleReq.getEndDate());
+
+            while (current.before(endDate)) {
                 StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem();
                 statementOfAcctLineItem.setActualPmt(actualPmt);
                 statementOfAcctLineItem.setPurchaseOrder(po);

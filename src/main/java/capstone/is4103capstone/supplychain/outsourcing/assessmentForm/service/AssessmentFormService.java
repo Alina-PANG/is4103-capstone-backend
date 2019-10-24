@@ -11,6 +11,7 @@ import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentLine;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentSection;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
+import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
 import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
@@ -54,6 +55,8 @@ public class AssessmentFormService {
     MailService mailService;
     @Autowired
     BjfRepository bjfRepository;
+    @Autowired
+    BJFService bjfService;
 
     @Value("${spring.mail.username}")
     private String senderEmailAddr;
@@ -66,9 +69,10 @@ public class AssessmentFormService {
                     logger.info("Fetching line item question"+o.getQuestion());
                 }
             }
+            BJFModel bjf = bjfService.getBJFDetails(outsourcingAssessment.getRelated_BJF().getId());
             if(outsourcingAssessment == null) return ResponseEntity
                     .notFound().build();
-            else return ResponseEntity.ok().body(new GetAssessmentFormRes("Successfully retrieved the assessment form!", true, outsourcingAssessment));
+            else return ResponseEntity.ok().body(new GetAssessmentFormRes("Successfully retrieved the assessment form!", true, outsourcingAssessment, bjf));
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -83,6 +87,7 @@ public class AssessmentFormService {
             BJF bjf = bjfRepository.getOne(id);
             if(bjf == null || bjf.getDeleted())  return ResponseEntity
                     .notFound().build();
+            BJFModel bjfModel = bjfService.getBJFDetails(bjf.getId());
             OutsourcingAssessment outsourcingAssessment = bjf.getRelated_outsourcing_assessment();
             for(OutsourcingAssessmentSection s: outsourcingAssessment.getSectionList()){
                 for(OutsourcingAssessmentLine o: s.getOutsourcingAssessmentLines()){
@@ -91,7 +96,8 @@ public class AssessmentFormService {
             }
             if(outsourcingAssessment == null) return ResponseEntity
                     .notFound().build();
-            else return ResponseEntity.ok().body(new GetAssessmentFormRes("Successfully retrieved the assessment form!", true, outsourcingAssessment));
+
+            else return ResponseEntity.ok().body(new GetAssessmentFormRes("Successfully retrieved the assessment form!", true, outsourcingAssessment, bjfModel));
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -139,7 +145,7 @@ public class AssessmentFormService {
         }
     }
 
-    public ResponseEntity<GeneralRes> createResponseForm(CreateResponseReq createResponseReq, String id, String username){
+    public ResponseEntity<GeneralRes> createResponseForm(CreateResponseReq createResponseReq, String username){
         try {
             logger.info("Action performed by: "+username+" on "+new Date());
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
@@ -149,8 +155,8 @@ public class AssessmentFormService {
                 logger.info("Cannot find the user!");
                 return ResponseEntity.notFound().build();
             }
-            if(id != null){
-                OutsourcingAssessment temp = outsourcingAssessmentRepository.getOne(id);
+            if(b.getRelated_outsourcing_assessment() != null){
+                OutsourcingAssessment temp = b.getRelated_outsourcing_assessment();
                 if(temp != null){
                     temp.setDeleted(true);
                     outsourcingAssessmentRepository.saveAndFlush(temp);
@@ -174,6 +180,7 @@ public class AssessmentFormService {
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
 
             int j = 0;
+            List<OutsourcingAssessmentSection> newSections = new ArrayList<>();
             for (OutsourcingAssessmentSection s : sections) {
                 s.setNumber(j);
                 OutsourcingAssessmentSection newS = new OutsourcingAssessmentSection();
@@ -195,18 +202,20 @@ public class AssessmentFormService {
                 newS.setOutsourcingAssessment(newAssess);
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
-                outsourcingAssessmentSectionRepository.saveAndFlush(newS);
+                newSections.add(outsourcingAssessmentSectionRepository.saveAndFlush(newS));
                 j ++;
             }
-            newAssess.setSectionList(sections);
+            newAssess.setSectionList(newSections);
             newAssess.setCreatedBy(username);
             newAssess.setCreatedDateTime(new Date());
             newAssess.setRelated_BJF(b);
 
             outsourcingAssessmentRepository.saveAndFlush(newAssess);
+            b.setRelated_outsourcing_assessment(newAssess);
+            bjfRepository.saveAndFlush(b);
             Employee approverA = creater.getManager();
             createApprovalTicket(creater.getUserName(), approverA, newAssess,"Please review and approve the outsourcing assessment form.");
-            mailService.sendOscAssForm("noreply@gmail.com", "hangzhipang@u.nus.edu", "test the outsourcing form", "xxxA", "xxxB", "xxxTitleA", "xxxTitleB", outsourcingAssessment);
+            mailService.sendOscAssForm("noreply@gmail.com", "hangzhipang@u.nus.edu", "test the outsourcing form", "www.google.com", "xxxTitleA",  newAssess);
             return ResponseEntity
                     .ok()
                     .body(new GeneralRes("Successfully created the outsourcing assessment form!", false));
@@ -315,7 +324,7 @@ public class AssessmentFormService {
                     mailService.sendGeneralEmail(senderEmailAddr, receiver, "Your Outsourcing Assessment Form Has Been Approved!", "Outsourcing Assessment Form "+form.getCode()+" has been successfully approved!");
                 }
                 else {
-                    logger.error("approve type is not consistent with the pending status!");
+                    logger.error("approve type is BM Approval: "+isBMApproval+" is not consistent with the pending status: "+form.getOutsourcingAssessmentStatus()+"!");
                     return ResponseEntity.badRequest().build();
                 }
             }
