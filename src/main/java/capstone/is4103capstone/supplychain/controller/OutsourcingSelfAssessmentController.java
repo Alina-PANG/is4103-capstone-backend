@@ -48,10 +48,10 @@ public class OutsourcingSelfAssessmentController {
         }
     }
 
-    @GetMapping("/get-all-outsourcing-self-assessments")
-    public ResponseEntity<GeneralRes> getAllOutsourcingSelfAssessments() {
+    @GetMapping("/get-all-outsourcing-self-assessments-by-outsourcing-id/{id}")
+    public ResponseEntity<GeneralRes> getAllOutsourcingSelfAssessmentsByOutsourcingId(@PathVariable("id") String id) {
         try {
-            return ResponseEntity.ok().body(outsourcingSelfAssessmentService.getAllOutsourcingSelfAssessments());
+            return ResponseEntity.ok().body(outsourcingSelfAssessmentService.getAllOutsourcingSelfAssessmentsByOutsourcingId(id));
         } catch (Exception ex) {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(), true));

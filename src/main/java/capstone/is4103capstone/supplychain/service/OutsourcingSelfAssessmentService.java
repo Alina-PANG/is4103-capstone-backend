@@ -140,11 +140,11 @@ public class OutsourcingSelfAssessmentService {
         }
     }
 
-    public GetOutsourcingSelfAssessmentsRes getAllOutsourcingSelfAssessments(){
+    public GetOutsourcingSelfAssessmentsRes getAllOutsourcingSelfAssessmentsByOutsourcingId(String outsourcingId){
         try {
-            logger.info("Getting all outsourcing self assessments");
+            logger.info("Getting all outsourcing self assessments by outsourcing ID");
             List<OutsourcingSelfAssessmentModel> returnList = new ArrayList<>();
-            List<OutsourcingSelfAssessment> outsourcingSelfAssessmentList = outsourcingSelfAssessmentRepository.findAll();
+            List<OutsourcingSelfAssessment> outsourcingSelfAssessmentList = outsourcingSelfAssessmentRepository.findOutsourcingSelfAssessmentsByOutsourcingId(outsourcingId);
 
             for(OutsourcingSelfAssessment outsourcingSelfAssessment: outsourcingSelfAssessmentList){
                 if(outsourcingSelfAssessment.getDeleted()){
