@@ -23,7 +23,9 @@ public class Invoice extends DBEntityTemplate {
     private String fileName;
 
     @OneToOne(fetch = FetchType.LAZY)
-    StatementOfAcctLineItem statementOfAcctLineItem;
+    @JoinColumn(name = "soa_id")
+    @JsonIgnore
+    private StatementOfAcctLineItem statementOfAcctLineItem;
 
 
     @Lob

@@ -10,6 +10,7 @@ import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.InvoiceRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.Repository.StatementOfAccountLineItemRepository;
+import capstone.is4103capstone.finance.finPurchaseOrder.model.InvoiceModel;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateInvoiceReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetInvoiceRes;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -52,10 +53,12 @@ public class InvoiceService {
         try {
             StatementOfAcctLineItem soa = statementOfAccountLineItemRepository.getOne(soaId);
 
-            if(soa == null) return ResponseEntity.notFound().build();
+            if(soa == null)
+                return ResponseEntity.notFound().build();
 
             Invoice invoice = soa.getInvoice();
-            if(invoice == null) invoice = new Invoice();
+            if(invoice == null)
+                invoice = new Invoice();
 
             invoice.setCurrencyCode(createInvoiceReq.getCurrencyCode());
             invoice.setDescription(createInvoiceReq.getDescription());
@@ -68,7 +71,6 @@ public class InvoiceService {
             invoice = invoiceRepository.saveAndFlush(invoice);
             soa.setInvoice(invoice);
             soa.setPaidAmt(invoice.getPaymentAmount());
-            if(soa.getActualPmt() != null) soa.setAccruals(soa.getActualPmt().subtract(soa.getPaidAmt()));
             statementOfAccountLineItemRepository.saveAndFlush(soa);
             logger.info("Successfully updated the invoice!");
             return ResponseEntity.ok().body(new GeneralRes("Successfully updated the invoice information!", false));
@@ -100,7 +102,6 @@ public class InvoiceService {
             soa.setInvoice(invoice);
             if(invoice.getPaymentAmount() != null) {
                 soa.setPaidAmt(invoice.getPaymentAmount());
-                if(soa.getActualPmt() != null)  soa.setAccruals(soa.getActualPmt().subtract(soa.getPaidAmt()));
             }
             statementOfAccountLineItemRepository.saveAndFlush(soa);
             logger.info("Successfully saved the invoice!");
@@ -124,6 +125,27 @@ public class InvoiceService {
                     .contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity
+                    .badRequest().build();
+        }
+    }
+
+    public ResponseEntity<GeneralRes> getDetail(String id) {
+        try{
+            Invoice invoice = invoiceRepository.getOne(id);
+            if(invoice == null) return ResponseEntity
+                    .notFound().build();
+            InvoiceModel model = new InvoiceModel();
+            model.setCurrencyCode(invoice.getCurrencyCode());
+            model.setDescription(invoice.getDescription());
+            model.setFileName(invoice.getFileName());
+            model.setPaymentAmount(invoice.getPaymentAmount());
+            model.setId(invoice.getId());
+            return ResponseEntity.ok()
+                    .body(new GetInvoiceRes("Successfully retrieved the invoice!", false, model));
         }
         catch (Exception ex){
             ex.printStackTrace();

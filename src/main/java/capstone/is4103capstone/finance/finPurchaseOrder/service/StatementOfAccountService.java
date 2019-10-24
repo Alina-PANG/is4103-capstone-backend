@@ -14,6 +14,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.joda.time.Weeks;
 import org.joda.time.Years;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ import java.util.List;
 
 @Service
 public class StatementOfAccountService {
+    private static final Logger logger = LoggerFactory.getLogger(StatementOfAccountService.class);
     @Autowired
     PurchaseOrderRepository purchaseOrderRepository;
     @Autowired
@@ -61,6 +64,7 @@ public class StatementOfAccountService {
             }
 
             numberOfLoops /= createSoAByScheduleReq.getNumFrequency() + 1;
+            logger.info("There will be "+numberOfLoops+" loops.");
             BigDecimal actualPmt = createSoAByScheduleReq.getTotalAmount().divide(BigDecimal.valueOf(numberOfLoops));
 
             Date endDate = dateFormatter.parse(createSoAByScheduleReq.getEndDate());
@@ -95,7 +99,10 @@ public class StatementOfAccountService {
             PurchaseOrder po = purchaseOrderRepository.getOne(createSoAByInvoiceReq.getPoId());
             if(po == null) return ResponseEntity.notFound().build();
 
-            StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem(dateFormatter.parse(createSoAByInvoiceReq.getReceiveDate()), createSoAByInvoiceReq.getPaidAmt(), createSoAByInvoiceReq.getActualPmt(), createSoAByInvoiceReq.getActualPmt().subtract(createSoAByInvoiceReq.getPaidAmt()));
+            StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem();
+            statementOfAcctLineItem.setScheduleDate(dateFormatter.parse(createSoAByInvoiceReq.getReceiveDate()));
+            statementOfAcctLineItem.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
+            statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
             statementOfAcctLineItem.setPurchaseOrder(po);
             statementOfAcctLineItem.setCreatedBy(username);
             statementOfAcctLineItem.setCreatedDateTime(new Date());
@@ -128,7 +135,6 @@ public class StatementOfAccountService {
                     statementOfAcctLineItem.getInvoice().setPaymentAmount(createSoAByInvoiceReq.getPaidAmt());
                 }
             }
-            statementOfAcctLineItem.setAccruals(createSoAByInvoiceReq.getActualPmt().subtract(createSoAByInvoiceReq.getPaidAmt()));
             if(createSoAByInvoiceReq.getReceiveDate() != null) statementOfAcctLineItem.setScheduleDate(dateFormatter.parse(createSoAByInvoiceReq.getReceiveDate()));
             statementOfAcctLineItem.setLastModifiedBy(username);
             statementOfAcctLineItem.setLastModifiedDateTime(new Date());

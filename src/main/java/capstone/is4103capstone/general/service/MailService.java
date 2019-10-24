@@ -40,7 +40,7 @@ public class MailService {
                 lines.add(line);
             }
             assessmentFormEmailModel.setLines(lines);
-            assessmentFormEmailModel.setSeqNo(s.getNumber());
+            assessmentFormEmailModel.setSeqNo(s.getNumber() + 1);
             list.add(assessmentFormEmailModel);
         }
         map.put("sections", list);
