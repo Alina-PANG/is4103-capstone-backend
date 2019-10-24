@@ -1,6 +1,7 @@
 package capstone.is4103capstone.general.service;
 
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
+import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentLine;
 import capstone.is4103capstone.general.model.Mail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,14 @@ public class MailService {
         mailSenderService.sendEmail(mail, "mailTemplate");
     }
 
-    public void sendOscAssForm(String from, String to, String subject, String urlA, String urlB, OutsourcingAssessment outsourcingAssessment){
-
+    public void sendOscAssForm(String from, String to, String subject, String urlA, String urlB, String urlATitle, String urlBTitle, OutsourcingAssessment outsourcingAssessment){
         HashMap<String, Object> map = new HashMap<>();
-        map.put("lines", message);
-        map.put("name", from);
+        map.put("sections", outsourcingAssessment.getSectionList());
+        map.put("urlA_title", urlATitle);
+        map.put("urlA", urlA);
+        map.put("urlB_title", urlBTitle);
+        map.put("urlB", urlB);
         Mail mail = new Mail(from, to, subject, map);
-        mailSenderService.sendEmail(mail, "mailTemplate");
+        mailSenderService.sendEmail(mail, "osrcAssFormNotification");
     }
 }

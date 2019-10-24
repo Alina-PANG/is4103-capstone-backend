@@ -3,8 +3,9 @@ package capstone.is4103capstone.util.enums;
 public enum OutsourcingAssessmentStatusEnum {
     TEMPLATE,
     PENDING_BM_APPROVAL,
-    PENDING_ORC_APPROVAL,
+    PENDING_OUTSOURCING_APPROVAL,
     APPROVED,
-    REJECTED,
-    CLOSED
+    OUTSOURCING_RECORD_CREATED,
+    REJECTED
+
 }

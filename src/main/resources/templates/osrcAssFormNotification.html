@@ -35,14 +35,19 @@ th, td {
     </tr>
     </thead>
     <tbody>
-        <tr th:if="${lines.empty}">
-            <td colspan="2"> No Form Available </td>
+        <tr th:if="${sections.empty}">
+            <td colspan="3"> No Form Available </td>
         </tr>
-        <tr th:each="line : ${lines}">
-            <td><span th:text="${line.question}"> Question </span></td>
-            <td><span th:text="${line.answer}"> Answer </span></td>
-            <td><span th:text="${line.comment}"> Comment </span></td>
-        </tr>
+        <div th:each="s : ${sections}">
+            <tr>
+                <td colspan="3">Section <span th:text="${s.code}"></span></td>
+            </tr>
+            <tr th:each="line: ${s.outsourcingAssessmentLines}">
+                <td><span th:text="${line.question}"> Question </span></td>
+                <td><span th:text="${line.answer}"> Answer </span></td>
+                <td><span th:text="${line.comment}"> Comment </span></td>
+            </tr>
+        </div>
     </tbody>
 </table>
 <br/>
