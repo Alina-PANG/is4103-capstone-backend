@@ -68,6 +68,7 @@ public class MailService {
                 assessmentFormEmailModel.setSeqNo(s.getNumber());
                 list.add(assessmentFormEmailModel);
             }
+
             map.put("sections", list);
             map.put("urlA_title", urlATitle);
             map.put("urlA", urlA);
@@ -75,6 +76,7 @@ public class MailService {
             mailSenderService.sendEmail(mail, "osrcAssFormNotification");
         }catch (Exception ex){
             logger.error("[Internal Error]Email Sending got problem");
+
         }
 
     }

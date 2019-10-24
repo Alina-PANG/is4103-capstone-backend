@@ -40,7 +40,7 @@ th, td {
         </tr>
         <div th:each="s : ${sections}">
             <tr>
-                <td colspan="3">Section <span th:text="${s.seqNo}"></span></td>
+                <td colspan="3" bgcolor="#e1e6e2">Section <span th:text="${s.seqNo}"></span></td>
             </tr>
             <tr th:each="line: ${s.lines}">
                 <td><span th:text="${line.question}">  </span></td>
