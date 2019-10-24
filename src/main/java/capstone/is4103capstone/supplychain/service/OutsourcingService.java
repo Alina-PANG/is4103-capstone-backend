@@ -106,7 +106,7 @@ public class OutsourcingService {
                     throw new Exception("This is not a APPROVED outsourcing assessment form. You are not allowed to create new outsourcing based on this assessment form!");
                 }else{
                     outsourcing.setOutsourcingAssessmentId(createOutsourcingReq.getOutsourcingAssessmentId());
-                    outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.git CLOSED);
+                    outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.OUTSOURCING_RECORD_CREATED);
                     outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
                     bjfService.afterOutsourcing(outsourcingAssessment);
                 }
