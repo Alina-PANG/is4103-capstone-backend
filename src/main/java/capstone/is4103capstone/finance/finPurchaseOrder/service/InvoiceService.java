@@ -51,8 +51,8 @@ public class InvoiceService {
     public ResponseEntity<GeneralRes> update(CreateInvoiceReq createInvoiceReq, String soaId, String username) {
         try {
             StatementOfAcctLineItem soa = statementOfAccountLineItemRepository.getOne(soaId);
-            Vendor vendor = vendorRepository.getOne(createInvoiceReq.getVendorId());
-            if(soa == null || vendor == null) return ResponseEntity.notFound().build();
+
+            if(soa == null) return ResponseEntity.notFound().build();
 
             Invoice invoice = soa.getInvoice();
             if(invoice == null) invoice = new Invoice();
@@ -60,7 +60,7 @@ public class InvoiceService {
             invoice.setCurrencyCode(createInvoiceReq.getCurrencyCode());
             invoice.setDescription(createInvoiceReq.getDescription());
             invoice.setPaymentAmount(createInvoiceReq.getTotalAmt());
-            invoice.setVendor(vendor);
+
             invoice.setStatementOfAcctLineItem(soa);
             invoice.setLastModifiedBy(username);
             invoice.setLastModifiedDateTime(new Date());
@@ -68,7 +68,7 @@ public class InvoiceService {
             invoice = invoiceRepository.saveAndFlush(invoice);
             soa.setInvoice(invoice);
             soa.setPaidAmt(invoice.getPaymentAmount());
-            soa.setAccruals(soa.getActualPmt().subtract(soa.getPaidAmt()));
+            if(soa.getActualPmt() != null) soa.setAccruals(soa.getActualPmt().subtract(soa.getPaidAmt()));
             statementOfAccountLineItemRepository.saveAndFlush(soa);
             logger.info("Successfully updated the invoice!");
             return ResponseEntity.ok().body(new GeneralRes("Successfully updated the invoice information!", false));
@@ -100,7 +100,7 @@ public class InvoiceService {
             soa.setInvoice(invoice);
             if(invoice.getPaymentAmount() != null) {
                 soa.setPaidAmt(invoice.getPaymentAmount());
-                soa.setAccruals(soa.getActualPmt().subtract(soa.getPaidAmt()));
+                if(soa.getActualPmt() != null)  soa.setAccruals(soa.getActualPmt().subtract(soa.getPaidAmt()));
             }
             statementOfAccountLineItemRepository.saveAndFlush(soa);
             logger.info("Successfully saved the invoice!");
