@@ -30,6 +30,10 @@ public class Outsourcing extends DBEntityTemplate {
     private MaterialityEnum materiality;
     private String outsourcingTitle;
 
+    @OneToOne(mappedBy = "outsourcing",optional = true)
+    @JsonIgnore
+    private OutsourcingAssessment outsourcingAssessment;
+
     @Convert(converter = StringListConverter.class)
     private List<String> serviceIdList = new ArrayList();
 
@@ -74,6 +78,14 @@ public class Outsourcing extends DBEntityTemplate {
         this.bcpTestDate = bcpTestDate;
         this.annualSelfAssessmentDate = annualSelfAssessmentDate;
         this.independentAuditDate = independentAuditDate;
+    }
+
+    public OutsourcingAssessment getOutsourcingAssessment() {
+        return outsourcingAssessment;
+    }
+
+    public void setOutsourcingAssessment(OutsourcingAssessment outsourcingAssessment) {
+        this.outsourcingAssessment = outsourcingAssessment;
     }
 
     public String getRegionId() {

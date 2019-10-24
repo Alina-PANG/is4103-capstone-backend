@@ -9,12 +9,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OutsourcingAssessment extends DBEntityTemplate {
+    @OneToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "outsourcing_id")
+    @JsonIgnore
     private Outsourcing outsourcing;
 
     private String businessCaseDescription;
@@ -61,7 +65,8 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     }
 
     public List<OutsourcingAssessmentSection> getSectionList() {
-        return sectionList;
+        Collections.sort(this.sectionList, (a, b) -> a.getNumber() - b.getNumber());
+        return this.sectionList;
     }
 
     public void setSectionList(List<OutsourcingAssessmentSection> sectionList) {

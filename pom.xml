@@ -89,6 +89,13 @@
             <version>2.1.8.RELEASE</version>
         </dependency>
 
+        <!-- Joda Time -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10</version>
+        </dependency>
+
 
         <!-- DB Auditing (Hibernate Envers) -->
         <dependency>
