@@ -9,6 +9,7 @@ import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoABySch
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetSoARes;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.util.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.joda.time.Weeks;
@@ -30,10 +31,11 @@ public class StatementOfAccountService {
     PurchaseOrderRepository purchaseOrderRepository;
     @Autowired
     StatementOfAccountLineItemRepository statementOfAccountLineItemRepository;
+    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     public ResponseEntity<GeneralRes> createBySchedule(CreateSoAByScheduleReq createSoAByScheduleReq, String username){
         try{
-            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
             Date current = dateFormatter.parse(createSoAByScheduleReq.getStartDate());
             List<StatementOfAcctLineItem> items = new ArrayList<>();
             Calendar calendar = Calendar.getInstance();
@@ -46,7 +48,7 @@ public class StatementOfAccountService {
 
             // 0: weekly, 1: monthly, 2: yearly
             if(createSoAByScheduleReq.getFrequency() == 0){
-                toAdd = Calendar.DAY_OF_WEEK;
+                toAdd = Calendar.WEEK_OF_YEAR;
                 numberOfLoops = Weeks.weeksBetween(dateTime1, dateTime2).getWeeks();
             }
             else if(createSoAByScheduleReq.getFrequency() == 1) {
@@ -58,7 +60,7 @@ public class StatementOfAccountService {
                 numberOfLoops = Years.yearsBetween(dateTime1, dateTime2).getYears();
             }
 
-            numberOfLoops /= createSoAByScheduleReq.getNumFrequency();
+            numberOfLoops /= createSoAByScheduleReq.getNumFrequency() + 1;
             BigDecimal actualPmt = createSoAByScheduleReq.getTotalAmount().divide(BigDecimal.valueOf(numberOfLoops));
 
             Date endDate = dateFormatter.parse(createSoAByScheduleReq.getEndDate());
@@ -78,7 +80,7 @@ public class StatementOfAccountService {
 
             po.setStatementOfAccount(items);
             purchaseOrderRepository.saveAndFlush(po);
-            return ResponseEntity.ok().body(new GeneralRes("Successfully saved the statement of accounts!", false));
+            return ResponseEntity.ok().body(new GetSoARes("Successfully saved the statement of accounts!", false, items));
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -93,7 +95,7 @@ public class StatementOfAccountService {
             PurchaseOrder po = purchaseOrderRepository.getOne(createSoAByInvoiceReq.getPoId());
             if(po == null) return ResponseEntity.notFound().build();
 
-            StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem(createSoAByInvoiceReq.getReceiveDate(), createSoAByInvoiceReq.getPaidAmt(), createSoAByInvoiceReq.getActualPmt(), createSoAByInvoiceReq.getAccruals());
+            StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem(dateFormatter.parse(createSoAByInvoiceReq.getReceiveDate()), createSoAByInvoiceReq.getPaidAmt(), createSoAByInvoiceReq.getActualPmt(), createSoAByInvoiceReq.getActualPmt().subtract(createSoAByInvoiceReq.getPaidAmt()));
             statementOfAcctLineItem.setPurchaseOrder(po);
             statementOfAcctLineItem.setCreatedBy(username);
             statementOfAcctLineItem.setCreatedDateTime(new Date());
@@ -119,10 +121,15 @@ public class StatementOfAccountService {
             StatementOfAcctLineItem statementOfAcctLineItem = statementOfAccountLineItemRepository.getOne(id);
             if(statementOfAcctLineItem == null) return ResponseEntity.notFound().build();
 
-            if(createSoAByInvoiceReq.getAccruals() != null) statementOfAcctLineItem.setAccruals(createSoAByInvoiceReq.getAccruals());
             if(createSoAByInvoiceReq.getActualPmt() != null) statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
-            if(createSoAByInvoiceReq.getPaidAmt() != null) statementOfAcctLineItem.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
-            if(createSoAByInvoiceReq.getReceiveDate() != null) statementOfAcctLineItem.setScheduleDate(createSoAByInvoiceReq.getReceiveDate());
+            if(createSoAByInvoiceReq.getPaidAmt() != null) {
+                statementOfAcctLineItem.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
+                if(statementOfAcctLineItem.getInvoice() != null){
+                    statementOfAcctLineItem.getInvoice().setPaymentAmount(createSoAByInvoiceReq.getPaidAmt());
+                }
+            }
+            statementOfAcctLineItem.setAccruals(createSoAByInvoiceReq.getActualPmt().subtract(createSoAByInvoiceReq.getPaidAmt()));
+            if(createSoAByInvoiceReq.getReceiveDate() != null) statementOfAcctLineItem.setScheduleDate(dateFormatter.parse(createSoAByInvoiceReq.getReceiveDate()));
             statementOfAcctLineItem.setLastModifiedBy(username);
             statementOfAcctLineItem.setLastModifiedDateTime(new Date());
 

@@ -4,20 +4,19 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class CreateSoAByInvoiceReq {
-    private Date receiveDate;
+    private String receiveDate;
     private BigDecimal paidAmt;
     private BigDecimal actualPmt;
-    private BigDecimal accruals;
     private String poId;
 
     public CreateSoAByInvoiceReq() {
     }
 
-    public Date getReceiveDate() {
+    public String getReceiveDate() {
         return receiveDate;
     }
 
-    public void setReceiveDate(Date receiveDate) {
+    public void setReceiveDate(String receiveDate) {
         this.receiveDate = receiveDate;
     }
 
@@ -35,14 +34,6 @@ public class CreateSoAByInvoiceReq {
 
     public void setActualPmt(BigDecimal actualPmt) {
         this.actualPmt = actualPmt;
-    }
-
-    public BigDecimal getAccruals() {
-        return accruals;
-    }
-
-    public void setAccruals(BigDecimal accruals) {
-        this.accruals = accruals;
     }
 
     public String getPoId() {

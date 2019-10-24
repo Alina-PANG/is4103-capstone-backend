@@ -62,9 +62,13 @@ public class InvoiceService {
             invoice.setPaymentAmount(createInvoiceReq.getTotalAmt());
             invoice.setVendor(vendor);
             invoice.setStatementOfAcctLineItem(soa);
+            invoice.setLastModifiedBy(username);
+            invoice.setLastModifiedDateTime(new Date());
 
             invoice = invoiceRepository.saveAndFlush(invoice);
             soa.setInvoice(invoice);
+            soa.setPaidAmt(invoice.getPaymentAmount());
+            soa.setAccruals(soa.getActualPmt().subtract(soa.getPaidAmt()));
             statementOfAccountLineItemRepository.saveAndFlush(soa);
             logger.info("Successfully updated the invoice!");
             return ResponseEntity.ok().body(new GeneralRes("Successfully updated the invoice information!", false));
@@ -76,7 +80,7 @@ public class InvoiceService {
         }
     }
 
-    public ResponseEntity<GeneralRes> storeFile(MultipartFile file, String username, String soaId) {
+    public ResponseEntity<GeneralRes> storeFile(MultipartFile file, String soaId, String username) {
         try {
             StatementOfAcctLineItem soa = statementOfAccountLineItemRepository.getOne(soaId);
             if(soa == null) return ResponseEntity.notFound().build();
@@ -94,6 +98,10 @@ public class InvoiceService {
 
             invoice = invoiceRepository.saveAndFlush(invoice);
             soa.setInvoice(invoice);
+            if(invoice.getPaymentAmount() != null) {
+                soa.setPaidAmt(invoice.getPaymentAmount());
+                soa.setAccruals(soa.getActualPmt().subtract(soa.getPaidAmt()));
+            }
             statementOfAccountLineItemRepository.saveAndFlush(soa);
             logger.info("Successfully saved the invoice!");
             return ResponseEntity.ok().body(new GeneralRes("Successfully uploaded the invoice!", false));
