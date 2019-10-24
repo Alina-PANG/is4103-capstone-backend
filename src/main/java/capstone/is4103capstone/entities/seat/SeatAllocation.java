@@ -107,6 +107,6 @@ public class SeatAllocation extends DBEntityTemplate implements Comparable<SeatA
 
     @Override
     public int compareTo(SeatAllocation anotherSeatAllocation) {
-        return this.schedule.getStartDateTime().compareTo(anotherSeatAllocation.schedule.getStartDateTime());
+        return this.schedule.compareTo(anotherSeatAllocation.schedule);
     }
 }

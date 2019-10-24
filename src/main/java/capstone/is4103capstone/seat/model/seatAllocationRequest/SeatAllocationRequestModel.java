@@ -9,43 +9,56 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SeatAllocationRequestModel implements Serializable {
 
     private String id;
+    private String requestNumber;
+
     private GroupModel team;
+    private GroupModel office;
+
+    private Date createdDateTime;
     private String escalatedHierarchyLevel;
     private String escalatedHierarchyId;
-    private ScheduleModel seatAllocationSchedule;
+
+    private List<ScheduleModel> seatAllocationSchedules = new ArrayList<>();
     private EmployeeModel employeeOfAllocation;
     private String allocationType;
+
     private EmployeeModel requester;
     private List<ApprovalTicketModel> approvalTickets = new ArrayList<>();
     private ApprovalTicketModel currentPendingTicket;
+
     private boolean resolved;
-    private String resultedSeatAllocationId;
+    private List<SeatAllocationModelForEmployee> resultedSeatAllocations = new ArrayList<>();
 
     public SeatAllocationRequestModel() {
     }
 
-    public SeatAllocationRequestModel(String id, GroupModel team, String escalatedHierarchyLevel, String escalatedHierarchyId,
-                                      ScheduleModel seatAllocationSchedule, EmployeeModel employeeOfAllocation, String allocationType,
+    public SeatAllocationRequestModel(String id, String requestNumber, GroupModel team, GroupModel office, Date createdDateTime,
+                                      String escalatedHierarchyLevel, String escalatedHierarchyId,
+                                      List<ScheduleModel> seatAllocationSchedules, EmployeeModel employeeOfAllocation, String allocationType,
                                       EmployeeModel requester, List<ApprovalTicketModel> approvalTickets,
-                                      ApprovalTicketModel currentPendingTicket, boolean resolved, String resultedSeatAllocationId) {
+                                      ApprovalTicketModel currentPendingTicket, boolean resolved, List<SeatAllocationModelForEmployee> resultedSeatAllocations) {
         this.id = id;
+        this.requestNumber = requestNumber;
         this.team = team;
+        this.office = office;
+        this.createdDateTime = createdDateTime;
         this.escalatedHierarchyLevel = escalatedHierarchyLevel;
         this.escalatedHierarchyId = escalatedHierarchyId;
-        this.seatAllocationSchedule = seatAllocationSchedule;
+        this.seatAllocationSchedules = seatAllocationSchedules;
         this.employeeOfAllocation = employeeOfAllocation;
         this.allocationType = allocationType;
         this.requester = requester;
         this.approvalTickets = approvalTickets;
         this.currentPendingTicket = currentPendingTicket;
         this.resolved = resolved;
-        this.resultedSeatAllocationId = resultedSeatAllocationId;
+        this.resultedSeatAllocations = resultedSeatAllocations;
     }
 
     public String getId() {
@@ -54,6 +67,30 @@ public class SeatAllocationRequestModel implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getRequestNumber() {
+        return requestNumber;
+    }
+
+    public void setRequestNumber(String requestNumber) {
+        this.requestNumber = requestNumber;
+    }
+
+    public Date getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public void setCreatedDateTime(Date createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
+
+    public GroupModel getOffice() {
+        return office;
+    }
+
+    public void setOffice(GroupModel office) {
+        this.office = office;
     }
 
     public String getEscalatedHierarchyLevel() {
@@ -80,12 +117,12 @@ public class SeatAllocationRequestModel implements Serializable {
         this.team = team;
     }
 
-    public ScheduleModel getSeatAllocationSchedule() {
-        return seatAllocationSchedule;
+    public List<ScheduleModel> getSeatAllocationSchedules() {
+        return seatAllocationSchedules;
     }
 
-    public void setSeatAllocationSchedule(ScheduleModel seatAllocationSchedule) {
-        this.seatAllocationSchedule = seatAllocationSchedule;
+    public void setSeatAllocationSchedules(List<ScheduleModel> seatAllocationSchedules) {
+        this.seatAllocationSchedules = seatAllocationSchedules;
     }
 
     public EmployeeModel getEmployeeOfAllocation() {
@@ -136,11 +173,11 @@ public class SeatAllocationRequestModel implements Serializable {
         this.resolved = resolved;
     }
 
-    public String getResultedSeatAllocationId() {
-        return resultedSeatAllocationId;
+    public List<SeatAllocationModelForEmployee> getResultedSeatAllocations() {
+        return resultedSeatAllocations;
     }
 
-    public void setResultedSeatAllocationId(String resultedSeatAllocationId) {
-        this.resultedSeatAllocationId = resultedSeatAllocationId;
+    public void setResultedSeatAllocations(List<SeatAllocationModelForEmployee> resultedSeatAllocations) {
+        this.resultedSeatAllocations = resultedSeatAllocations;
     }
 }

@@ -126,6 +126,19 @@ public class EmployeeService {
         return employeeDtos;
     }
 
+    public List<EmployeeDto> getTeamMembersByTeamLeadUuid(String teamLeadUuid) throws Exception {
+        Employee teamLead = getEmployeeEntityByUuid(teamLeadUuid);
+        Team team = teamLead.getTeam();
+        if (team.getTeamLeader() == null || !team.getTeamLeader().getId().equals(teamLeadUuid)) {
+            throw new Exception("The employee is a team lead!");
+        }
+        List<EmployeeDto> employeeDtos = new ArrayList<>();
+        for (Employee employee : team.getMembers()) {
+            employeeDtos.add(entityToDto(employee));
+        }
+        return employeeDtos;
+    }
+
     // === UPDATE ===
     @Transactional
     public Employee updateEmployeeEntity(Employee input) throws Exception {

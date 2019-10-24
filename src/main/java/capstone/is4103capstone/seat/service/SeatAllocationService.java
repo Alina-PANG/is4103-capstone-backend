@@ -400,9 +400,7 @@ public class SeatAllocationService {
     }
 
 
-    // Pre-conditions:
-    // 1. A seat can only be assigned as a shared seat to an employee when it does not have any schedule clash with other active allocations.
-    // 2. A seat must be pre-assigned to a function and a team in order to be assigned to an employee as a fixed seat.
+
     public void assignSharedSeatToEmployee(SeatAllocationModelForEmployee seatAllocationModel) throws SeatAllocationException {
         try {
             Seat seat = seatService.retrieveSeatById(seatAllocationModel.getSeatId());
@@ -505,9 +503,13 @@ public class SeatAllocationService {
     }
 
 
+    // Pre-conditions:
+    // 1. A seat can only be assigned as a shared seat to an employee when it does not have any schedule clash with other active allocations.
+    // 2. A seat must be pre-assigned to a function and a team in order to be assigned to an employee as a fixed seat.
+    // Schedules example in a single allocation:
     // - 9am to 6pm, recurringWeekdays: [1,2]
-    //- 1pm to 6pm, rW: [3]
-    //- 9am to 6pm, rW: [4]
+    // - 1pm to 6pm, recurringWeekdays: [3]
+    // - 9am to 6pm, recurringWeekdays: [4]
     public void assignSharedSeatToEmployeeWithMultipleSchedules(SharedSeatAllocationModelForEmployee sharedSeatAllocationModelForEmployee) throws SeatAllocationException {
         try {
             Seat seat = seatService.retrieveSeatById(sharedSeatAllocationModelForEmployee.getSeatId());
@@ -641,6 +643,7 @@ public class SeatAllocationService {
 
         return optionalSeat.get();
     }
+
 
 
     // ---------------------- Deallocation ----------------------

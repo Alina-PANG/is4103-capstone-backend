@@ -78,6 +78,16 @@ public class EmployeeController {
         }
     }
 
+    @GetMapping("/byTeamLeadUuid/{teamLeadUuid}")
+    public ResponseEntity<EmployeeRes> getTeamMembersByTeamLeadUuid(@PathVariable(name = "teamLeadUuid") String input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+        try {
+            WriteAuditTrail.autoAudit(headerUsername);
+            return ResponseEntity.ok().body(new EmployeeRes(null, false, Optional.of(employeeService.getTeamMembersByTeamLeadUuid(input))));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new EmployeeRes(ex.getMessage(), true, Optional.empty()));
+        }
+    }
+
     // UPDATE (PUT)
     @PutMapping
     public ResponseEntity<EmployeeRes> updateEmployee(@RequestBody EmployeeDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {

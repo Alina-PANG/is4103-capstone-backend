@@ -15,4 +15,5 @@ public interface SeatAllocationRepository extends JpaRepository<SeatAllocation, 
 
     @Query(value = "SELECT * From seat_allocation s WHERE s.is_deleted=false AND s.employee_id=?1 AND s.is_active=true", nativeQuery = true)
     List<SeatAllocation> findActiveOnesByEmployeeId(String employeeId);
+
 }

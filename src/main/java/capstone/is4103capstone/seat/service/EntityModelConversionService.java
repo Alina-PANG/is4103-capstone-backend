@@ -1,38 +1,35 @@
 package capstone.is4103capstone.seat.service;
 
 import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
-import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.service.CompanyFunctionService;
 import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.admin.service.OfficeService;
 import capstone.is4103capstone.admin.service.TeamService;
 import capstone.is4103capstone.entities.*;
-import capstone.is4103capstone.entities.seat.Seat;
-import capstone.is4103capstone.entities.seat.SeatAllocation;
-import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.entities.seat.*;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.seat.model.EmployeeModel;
+import capstone.is4103capstone.seat.model.EmployeeOfficeWorkingScheduleModel;
 import capstone.is4103capstone.seat.model.GroupModel;
 import capstone.is4103capstone.seat.model.ScheduleModel;
 import capstone.is4103capstone.seat.model.seat.SeatModelForAllocation;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
-import capstone.is4103capstone.seat.model.seatAllocationRequest.CreateSeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestModel;
+import capstone.is4103capstone.seat.model.seatDemandForecast.MonthlySeatForecastModelForTeam;
 import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
-import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import capstone.is4103capstone.util.enums.ScheduleRecurringBasisEnum;
-import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
 import capstone.is4103capstone.util.exception.EntityModelConversionException;
 import capstone.is4103capstone.util.exception.ScheduleValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EntityModelConversionService {
@@ -50,6 +47,8 @@ public class EntityModelConversionService {
     private TeamService teamService;
     @Autowired
     private CompanyFunctionService companyFunctionService;
+    @Autowired
+    private OfficeService officeService;
     @Autowired
     private  SeatAllocationRequestService seatAllocationRequestService;
 
@@ -437,7 +436,7 @@ public class EntityModelConversionService {
     // ---------------------------------- Schedule -----------------------------------
 
     // Warning: The conversion does not check whether the start date time of the schedule is a historical date time
-    public Schedule convertScheduleModelToSchedule(ScheduleModel scheduleModel, String allocationType) throws EntityModelConversionException {
+    public Schedule convertScheduleModelToSeatAllocationSchedule(ScheduleModel scheduleModel, String allocationType) throws EntityModelConversionException {
         Schedule schedule = new Schedule();
         if (scheduleModel.getId() != null) {
             schedule.setId(scheduleModel.getId());
@@ -503,7 +502,7 @@ public class EntityModelConversionService {
                                 throw new EntityModelConversionException("Conversion from Schedule Model to Schedule failed: invalid recurring start time and end time!");
                             }
                             schedule.setRecurringStartTime(scheduleModel.getRecurringStartTime());
-                            scheduleModel.setRecurringEndTime(scheduleModel.getRecurringEndTime());
+                            schedule.setRecurringEndTime(scheduleModel.getRecurringEndTime());
                         } else {
                             throw new EntityModelConversionException("Conversion from Schedule Model to Schedule failed: both recurring start time and end time are required!");
                         }
@@ -558,60 +557,150 @@ public class EntityModelConversionService {
         return scheduleModel;
     }
 
-    // ---------------------------------- Seat Allocation -----------------------------------
+    public EmployeeOfficeWorkingSchedule convertNewEmployeeOfficeWorkingScheduleToEntity(EmployeeOfficeWorkingScheduleModel employeeOfficeWorkingScheduleModel)
+            throws EntityModelConversionException{
+        EmployeeOfficeWorkingSchedule employeeOfficeWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+
+        if (employeeOfficeWorkingSchedule.getEmployee() == null) {
+            throw new EntityModelConversionException("Incomplete input: employee info is missing!");
+        }
+        EmployeeModel employeeModel = employeeOfficeWorkingScheduleModel.getEmployee();
+        if (employeeModel.getId() == null || employeeModel.getId().trim().length() == 0) {
+            throw new EntityModelConversionException("Incomplete input: employee info is missing!");
+        }
+        Employee employee = employeeService.retrieveEmployeeById(employeeModel.getId());
+        employeeOfficeWorkingSchedule.setEmployee(employee);
+
+        if (employeeOfficeWorkingSchedule.getOffice() == null) {
+            throw new EntityModelConversionException("Incomplete input: office info is missing!");
+        }
+        GroupModel officeModel = employeeOfficeWorkingScheduleModel.getOffice();
+        if (officeModel.getId() == null || officeModel.getId().trim().length() == 0) {
+            throw new EntityModelConversionException("Incomplete input: office info is missing!");
+        }
+        try {
+            Office office = officeService.getOfficeEntityByUuid(officeModel.getId());
+            employeeOfficeWorkingSchedule.setOffice(office);
+
+            if (employeeOfficeWorkingSchedule.getSchedule() == null) {
+                throw new EntityModelConversionException("Incomplete input: schedule info is missing!");
+            }
+            ScheduleModel scheduleModel = employeeOfficeWorkingScheduleModel.getSchedule();
+            if (employeeOfficeWorkingScheduleModel.getEmployeeType() == null || employeeOfficeWorkingScheduleModel.getEmployeeType().trim().length() == 0) {
+                throw new EntityModelConversionException("Incomplete input: employee type is missing!");
+            }
+            Schedule schedule = convertNewScheduleModelToEmployeeOfficeWorkingSchedule(scheduleModel, employeeOfficeWorkingScheduleModel.getEmployeeType());
+            employeeOfficeWorkingSchedule.setSchedule(schedule);
+
+            return employeeOfficeWorkingSchedule;
+        } catch (Exception ex) {
+            throw new EntityModelConversionException(ex.getMessage());
+        }
+
+    }
+
+    public Schedule convertNewScheduleModelToEmployeeOfficeWorkingSchedule(ScheduleModel scheduleModel, String employeeType) {
+        Schedule schedule = new Schedule();
+        //    private boolean isRecurring = false;
+        //    private ScheduleRecurringBasisEnum recurringBasis;
+        //    @ElementCollection(targetClass=DayOfWeek.class)
+        //    private List<DayOfWeek> recurringWeekdays = new ArrayList<>();
+        //    @ElementCollection(targetClass=Date.class)
+        //    private List<Date> recurringDates = new ArrayList<>();
+        //    private LocalTime recurringStartTime;
+        //    private LocalTime recurringEndTime;
+        //    @Temporal(TemporalType.TIMESTAMP)
+        //    private Date startDateTime;
+        //    @Temporal(TemporalType.TIMESTAMP)
+        //    private Date endDateTime;
+
+        // Check employee type and assign attributes accordingly
+        if (scheduleModel.getStartDateTime() == null) {
+            throw new EntityModelConversionException("Incomplete input: schedule's start date time is missing!");
+        }
+        Date startDateTime = schedule.getStartDateTime();
+        schedule.setStartDateTime(startDateTime);
+        if (employeeType.equals("PERMANENT")) {
+
+            // Do nothing
+
+        } else if (employeeType.equals("TEMPORARY")) {
+
+            if (scheduleModel.getEndDateTime() == null) {
+                throw new EntityModelConversionException("Incomplete input: schedule's end date time is missing!");
+            }
+            Date endDateTime = schedule.getEndDateTime();
+            if (!endDateTime.after(startDateTime)) {
+                throw new EntityModelConversionException("Invalid input: schedule's end date time must be after the start date time!");
+            }
+            schedule.setEndDateTime(endDateTime);
+
+        } else if (employeeType.equals("WORKING_FROM_HOME")) {
+
+            if (scheduleModel.getRecurringBasis() == null || scheduleModel.getRecurringBasis().trim().length() == 0) {
+                throw new EntityModelConversionException("Incomplete input: schedule's recurring basis is missing!");
+            }
+            ScheduleRecurringBasisEnum recurringBasisEnum = ScheduleRecurringBasisEnum.valueOf(scheduleModel.getRecurringBasis());
+            scheduleService.validateScheduleRecurringBasis(recurringBasisEnum, scheduleModel);
+            schedule.setRecurring(true);
+            schedule.setRecurringBasis(recurringBasisEnum);
+
+            // May be permanent or temporary
+            if (scheduleModel.getEndDateTime() != null) {
+                if (scheduleModel.getStartDateTime().after(scheduleModel.getEndDateTime())) {
+                    throw new EntityModelConversionException("Invalid input: start date time cannot be after end date time!");
+                }
+                schedule.setEndDateTime(scheduleModel.getEndDateTime());
+            }
+
+            if (schedule.getRecurringBasis().equals(ScheduleRecurringBasisEnum.EVERYWEEK)) {
+                if (scheduleModel.getRecurringWeekdays() != null && scheduleModel.getRecurringWeekdays().size() > 0) {
+                    for (Integer weekDay :
+                            scheduleModel.getRecurringWeekdays()) {
+                        if (weekDay < 1 || weekDay > 7) {
+                            throw new EntityModelConversionException("Conversion from Schedule Model to Schedule failed: invalid recurring weekday of " + weekDay + "!");
+                        }
+                        schedule.getRecurringWeekdays().add(DayOfWeek.of(weekDay));
+                    }
+                }
+                if (scheduleModel.getRecurringStartTime() != null && scheduleModel.getRecurringEndTime() != null) {
+                    if (scheduleModel.getRecurringStartTime().isAfter(scheduleModel.getRecurringEndTime())) {
+                        throw new EntityModelConversionException("Conversion from Schedule Model to Schedule failed: recurring start time must be before the end time!");
+                    }
+                    schedule.setRecurringStartTime(scheduleModel.getRecurringStartTime());
+                    schedule.setRecurringEndTime(scheduleModel.getRecurringEndTime());
+                } else {
+                    throw new EntityModelConversionException("Incomplete input: either the recurring start time or end time is missing!");
+                }
+            } else if (schedule.getRecurringBasis().equals(ScheduleRecurringBasisEnum.EVERYDAY)) {
+                if (scheduleModel.getRecurringStartTime() != null && scheduleModel.getRecurringEndTime() != null) {
+                    if (scheduleModel.getRecurringStartTime().isAfter(scheduleModel.getRecurringEndTime())) {
+                        throw new EntityModelConversionException("Conversion from Schedule Model to Schedule failed: invalid recurring start time and end time!");
+                    }
+                    schedule.setRecurringStartTime(scheduleModel.getRecurringStartTime());
+                    scheduleModel.setRecurringEndTime(scheduleModel.getRecurringEndTime());
+                } else {
+                    throw new EntityModelConversionException("Conversion from Schedule Model to Schedule failed: both recurring start time and end time are required!");
+                }
+            }
+
+        } else {
+            throw new EntityModelConversionException("Invalid input: invalid employee type (must be either 'PERMANENT', 'TEMPORARY' or 'WORKING_FROM_HOME')!");
+        }
+
+        return  schedule;
+    }
 
 
 
     // ---------------------------------- Seat Allocation Request -----------------------------------
 
-    // Unfinished
-//    public SeatAllocationRequest convertSeatAllocationRequestModelToExistingEntity(SeatAllocationRequestModel seatAllocationRequestModel) {
-//        SeatAllocationRequest seatAllocationRequest = new SeatAllocationRequest();
-//        //     private String id;
-//        //    private GroupModel team;
-//        // private String escalatedHierarchyLevel;
-//        // private String escalatedHierarchyId;
-//        //    private SeatAllocationModelForEmployee seatAllocationRequested;
-//        //    private EmployeeModel requester;
-//        //    private List<ApprovalTicketModel> approvalTickets;
-//        //    private ApprovalTicketModel currentPendingTicket;
-//        //    private boolean resolved;
-//        if (seatAllocationRequestModel.getId() == null || seatAllocationRequestModel.getId().trim().length() == 0) {
-//            throw new EntityModelConversionException("Convert seat allocation request model to entity failed: seat allocation request ID is missing!");
-//        }
-//        seatAllocationRequest.setId(seatAllocationRequestModel.getId());
-//
-//        if (seatAllocationRequestModel.getTeam().getId() == null || seatAllocationRequestModel.getTeam().getId().trim().length() == 0) {
-//            throw new EntityModelConversionException("Convert seat allocation request model to entity failed: seat allocation request ID is missing!");
-//        }
-//        Team team = teamService.retrieveTeamById(seatAllocationRequestModel.getTeam().getId());
-//        seatAllocationRequest.setTeam(team);
-//
-//        if (seatAllocationRequestModel.getEscalatedHierarchyLevel() == null || seatAllocationRequestModel.getEscalatedHierarchyLevel().trim().length() == 0) {
-//            throw new EntityModelConversionException("Convert seat allocation request model to entity failed: escalated hierarchy level is missing!");
-//        }
-//        if (seatAllocationRequestModel.getEscalatedHierarchyLevel().equals("BUSINESS_UNIT")) {
-//            seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.BUSINESS_UNIT);
-//            Optional<BusinessUnit> optionalBusinessUnit = businessUnitRepository.findByIdNonDeleted(seatAllocationRequestModel.getEscalatedHierarchyId());
-//            if (!optionalBusinessUnit.isPresent()) {
-//                throw new EntityModelConversionException("Convert seat allocation request model to entity failed: invalid escalated hierarchy ID!");
-//            }
-//            seatAllocationRequest.setEscalatedHierarchyId(seatAllocationRequestModel.getEscalatedHierarchyId());
-//        } else if (seatAllocationRequestModel.getEscalatedHierarchyLevel().equals("COMPANY_FUNCTION")) {
-//            seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.COMPANY_FUNCTION);
-//            CompanyFunction companyFunction = companyFunctionService.retrieveCompanyFunctionById(seatAllocationRequestModel.getEscalatedHierarchyId());
-//            seatAllocationRequest.setEscalatedHierarchyId(companyFunction.getId());
-//        } else {
-//            throw new EntityModelConversionException("Convert seat allocation request model to entity failed: invalid escalated hierarchy level!");
-//        }
-//
-//        return seatAllocationRequest;
-//    }
-
     public SeatAllocationRequestModel convertSeatAllocationRequestEntityToModel(SeatAllocationRequest seatAllocationRequest) {
         SeatAllocationRequestModel seatAllocationRequestModel = new SeatAllocationRequestModel();
 
         seatAllocationRequestModel.setId(seatAllocationRequest.getId());
+        seatAllocationRequestModel.setRequestNumber(seatAllocationRequest.getCode());
+        seatAllocationRequestModel.setCreatedDateTime(seatAllocationRequest.getCreatedDateTime());
 
         Team team = seatAllocationRequest.getTeam();
         GroupModel teamModel = new GroupModel();
@@ -619,9 +708,16 @@ public class EntityModelConversionService {
         teamModel.setCode(team.getCode());
         teamModel.setName(team.getObjectName());
 
+        Office office = team.getOffice();
+        GroupModel officeModel = new GroupModel();
+        officeModel.setId(office.getId());
+        officeModel.setCode(office.getCode());
+        officeModel.setName(office.getObjectName());
+
         seatAllocationRequestModel.setEscalatedHierarchyLevel(seatAllocationRequest.getEscalatedHierarchyLevel().toString());
         seatAllocationRequestModel.setEscalatedHierarchyId(seatAllocationRequest.getEscalatedHierarchyId());
         seatAllocationRequestModel.setTeam(teamModel);
+        seatAllocationRequestModel.setOffice(officeModel);
 
         Employee employeeOfAllocation = seatAllocationRequest.getEmployeeOfAllocation();
         EmployeeModel employeeModelOfAllocation = new EmployeeModel();
@@ -630,7 +726,12 @@ public class EntityModelConversionService {
         employeeModelOfAllocation.setUsername(employeeOfAllocation.getUserName());
         seatAllocationRequestModel.setEmployeeOfAllocation(employeeModelOfAllocation);
 
-        seatAllocationRequestModel.setSeatAllocationSchedule(convertScheduleEntityToModel(seatAllocationRequest.getSeatAllocationSchedule()));
+        List<ScheduleModel> scheduleModels = new ArrayList<>();
+        for (Schedule schedule :
+                seatAllocationRequest.getSeatAllocationSchedules()) {
+            scheduleModels.add(convertScheduleEntityToModel(schedule));
+        }
+        seatAllocationRequestModel.setSeatAllocationSchedules(scheduleModels);
         seatAllocationRequestModel.setAllocationType(seatAllocationRequest.getAllocationType().toString());
 
         Employee requester = seatAllocationRequest.getRequester();
@@ -651,9 +752,46 @@ public class EntityModelConversionService {
         }
 
         seatAllocationRequestModel.setResolved(seatAllocationRequest.isResolved());
-        if (seatAllocationRequest.getResultedSeatAllocation() != null) {
-            seatAllocationRequestModel.setResultedSeatAllocationId(seatAllocationRequest.getResultedSeatAllocation().getId());
+        List<SeatAllocationModelForEmployee> seatAllocationModelsForEmployee = new ArrayList<>();
+        for (SeatAllocation allocation :
+                seatAllocationRequest.getResultedSeatAllocations()) {
+
+            SeatAllocationModelForEmployee allocationModelForEmployee = new SeatAllocationModelForEmployee();
+            allocationModelForEmployee.setId(allocation.getId());
+            allocationModelForEmployee.setType(allocation.getAllocationType().toString());
+
+            EmployeeModel employeeModel2 = new EmployeeModel(allocation.getEmployee().getId(), allocation.getEmployee().getFullName());
+            allocationModelForEmployee.setEmployee(employeeModel2);
+
+            ScheduleModel scheduleModel = new ScheduleModel();
+            Schedule schedule = allocation.getSchedule();
+            scheduleModel.setId(schedule.getId());
+            scheduleModel.setRecurring(schedule.isRecurring());
+            scheduleModel.setStartDateTime(schedule.getStartDateTime());
+            if (schedule.getEndDateTime() != null) {
+                scheduleModel.setEndDateTime(schedule.getEndDateTime());
+            }
+            if (schedule.getRecurringBasis() != null) {
+                scheduleModel.setRecurringBasis(schedule.getRecurringBasis().toString());
+            }
+            scheduleModel.setRecurringDates(schedule.getRecurringDates());
+            List<Integer> recurringWeekdays = new ArrayList<>();
+            for (DayOfWeek dayOfWeek :
+                    schedule.getRecurringWeekdays()) {
+                recurringWeekdays.add(dayOfWeek.getValue());
+            }
+            scheduleModel.setRecurringWeekdays(recurringWeekdays);
+            if (schedule.getRecurringStartTime() != null) {
+                scheduleModel.setRecurringStartTime(schedule.getRecurringStartTime());
+            }
+            if (schedule.getRecurringEndTime() != null) {
+                scheduleModel.setRecurringEndTime(schedule.getRecurringEndTime());
+            }
+
+            allocationModelForEmployee.setSchedule(scheduleModel);
+            seatAllocationModelsForEmployee.add(allocationModelForEmployee);
         }
+        seatAllocationRequestModel.setResultedSeatAllocations(seatAllocationModelsForEmployee);
 
         return seatAllocationRequestModel;
     }
@@ -661,6 +799,9 @@ public class EntityModelConversionService {
     public ApprovalTicketModel convertExistingApprovalTicketEntityToModel(ApprovalForRequest approvalForRequest) {
         ApprovalTicketModel approvalTicketModel = new ApprovalTicketModel();
         approvalTicketModel.setId(approvalForRequest.getId());
+        if (approvalForRequest.getCode() != null) {
+            approvalTicketModel.setTicketNumber(approvalForRequest.getCode());
+        }
         approvalTicketModel.setApproverComment(approvalForRequest.getCommentByApprover());
         approvalTicketModel.setRequesterComment(approvalForRequest.getCommentByRequester());
         approvalTicketModel.setCreatedDateTime(approvalForRequest.getCreatedDateTime().toString());
@@ -699,4 +840,47 @@ public class EntityModelConversionService {
         return approvalForRequest;
     }
 
+
+
+    // ---------------------------------- Seat Demand Forecast -----------------------------------
+
+    public MonthlySeatForecastModelForTeam createMonthlyForecastModelForTeam(Team team, YearMonth yearMonth, Integer inventoryCount,
+                                                                             Integer occupancyCount, List<Employee> employeesWhoNeedSeats,
+                                                                             List<Employee> employeesWithUnnecessaryAllocations) {
+
+        MonthlySeatForecastModelForTeam monthlySeatForecastModelForTeam = new MonthlySeatForecastModelForTeam();
+
+        GroupModel teamModel = new GroupModel();
+        teamModel.setId(team.getId());
+        teamModel.setName(team.getObjectName());
+        teamModel.setCode(team.getCode());
+        monthlySeatForecastModelForTeam.setTeam(teamModel);
+
+        monthlySeatForecastModelForTeam.setYearMonth(yearMonth.toString());
+
+        List<EmployeeModel> employeeModelsWhoNeedSeats = new ArrayList<>();
+        for (Employee employee :
+                employeesWhoNeedSeats) {
+            EmployeeModel employeeModel = new EmployeeModel();
+            employeeModel.setId(employee.getId());
+            employeeModel.setFullName(employee.getFullName());
+            employeeModelsWhoNeedSeats.add(employeeModel);
+        }
+        monthlySeatForecastModelForTeam.setEmployeesWhoNeedSeats(employeeModelsWhoNeedSeats);
+
+        List<EmployeeModel> employeeModelsWithUnnecessaryAllocations = new ArrayList<>();
+        for (Employee employee :
+                employeesWithUnnecessaryAllocations) {
+            EmployeeModel employeeModel = new EmployeeModel();
+            employeeModel.setId(employee.getId());
+            employeeModel.setFullName(employee.getFullName());
+            employeeModelsWithUnnecessaryAllocations.add(employeeModel);
+        }
+        monthlySeatForecastModelForTeam.setEmployeesWithUnnecessaryAllocations(employeeModelsWithUnnecessaryAllocations);
+
+        monthlySeatForecastModelForTeam.setInventoryCount(inventoryCount);
+        monthlySeatForecastModelForTeam.setNumOfSeatsOccupied(occupancyCount);
+
+        return  monthlySeatForecastModelForTeam;
+    }
 }

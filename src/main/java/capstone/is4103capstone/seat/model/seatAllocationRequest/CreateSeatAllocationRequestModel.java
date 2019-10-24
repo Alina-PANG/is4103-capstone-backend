@@ -4,11 +4,12 @@ import capstone.is4103capstone.seat.model.ScheduleModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateSeatAllocationRequestModel implements Serializable {
 
-    private ScheduleModel schedule;
+    private List<ScheduleModel> schedules;
     private String employeeIdOfAllocation;
     private String allocationType;
     private String requesterId;
@@ -17,21 +18,21 @@ public class CreateSeatAllocationRequestModel implements Serializable {
     public CreateSeatAllocationRequestModel() {
     }
 
-    public CreateSeatAllocationRequestModel(ScheduleModel schedule, String employeeIdOfAllocation, String allocationType,
+    public CreateSeatAllocationRequestModel(List<ScheduleModel> schedules, String employeeIdOfAllocation, String allocationType,
                                             String requesterId, String comment) {
-        this.schedule = schedule;
+        this.schedules = schedules;
         this.employeeIdOfAllocation = employeeIdOfAllocation;
         this.allocationType = allocationType;
         this.requesterId = requesterId;
         this.comment = comment;
     }
 
-    public ScheduleModel getSchedule() {
-        return schedule;
+    public List<ScheduleModel> getSchedules() {
+        return schedules;
     }
 
-    public void setSchedule(ScheduleModel schedule) {
-        this.schedule = schedule;
+    public void setSchedules(List<ScheduleModel> schedules) {
+        this.schedules = schedules;
     }
 
     public String getEmployeeIdOfAllocation() {

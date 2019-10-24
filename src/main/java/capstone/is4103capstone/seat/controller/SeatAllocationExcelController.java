@@ -14,7 +14,7 @@ import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/api/seatAllocation/upload")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class SeatAllocationExcelController {
 
     private static final Logger logger = LoggerFactory.getLogger(SeatAllocationExcelController.class);

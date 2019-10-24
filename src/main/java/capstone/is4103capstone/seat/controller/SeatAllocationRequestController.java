@@ -1,7 +1,6 @@
 package capstone.is4103capstone.seat.controller;
 
 import capstone.is4103capstone.admin.service.EmployeeService;
-import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
@@ -30,7 +29,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/seatAllocation/request")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class SeatAllocationRequestController {
 
     private static final Logger logger = LoggerFactory.getLogger(SeatAllocationRequestController.class);
@@ -84,7 +83,7 @@ public class SeatAllocationRequestController {
             throw new EntityModelConversionException("Seat Allocation Validation failed: invalid seat allocation type!");
         }
 
-        seatAllocation.setSchedule(entityModelConversionService.convertScheduleModelToSchedule(seatAllocationModelForEmployee.getSchedule(),
+        seatAllocation.setSchedule(entityModelConversionService.convertScheduleModelToSeatAllocationSchedule(seatAllocationModelForEmployee.getSchedule(),
                 seatAllocation.getAllocationType().toString()));
         List<SeatMapModelForAllocationWithHighlight> seatMapModels = seatMapService.retrieveAvailableSeatMapsForAllocationByHierarchy(hierarchy, hierarchyId, seatAllocation);
         for (SeatMapModelForAllocationWithHighlight seatMapModel :

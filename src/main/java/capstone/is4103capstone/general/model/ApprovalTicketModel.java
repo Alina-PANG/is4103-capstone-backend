@@ -10,6 +10,7 @@ import java.util.Date;
 
 public class ApprovalTicketModel implements Serializable {
     private String id;
+    private String ticketNumber;
     private String reviewerUsername;
     private String requestedItemId;
     private String approverComment;
@@ -26,6 +27,9 @@ public class ApprovalTicketModel implements Serializable {
 
     public ApprovalTicketModel(ApprovalForRequest a) {
         setId(a.getId());
+        if (a.getCode() != null) {
+            setTicketNumber(a.getCode());
+        }
         setReviewerUsername(a.getApprover().getUserName());
         setRequestedItemId(a.getRequestedItemId());
         setApproverComment(a.getCommentByApprover());
@@ -38,6 +42,7 @@ public class ApprovalTicketModel implements Serializable {
 
     public ApprovalTicketModel(String id, String reviewerUsername, String requestedItemId, String approverComment, String requesterComment, String createdDateTime, String reviewedDateTime, ApprovalStatusEnum ticketResult, ApprovalTypeEnum requestType) {
         this.id = id;
+        this.ticketNumber = ticketNumber;
         this.reviewerUsername = reviewerUsername;
         this.requestedItemId = requestedItemId;
         this.approverComment = approverComment;
@@ -49,6 +54,7 @@ public class ApprovalTicketModel implements Serializable {
     }
 
     public ApprovalTicketModel(String id, String reviewerUsername, String comment, Date createdDateTime, Date reviewedDateTime, ApprovalStatusEnum ticketResult) {
+        this.id = id;
         this.reviewerUsername = reviewerUsername;
         this.approverComment = comment;
         this.createdDateTime = datetimeFormatter.format(createdDateTime);
@@ -62,6 +68,14 @@ public class ApprovalTicketModel implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getTicketNumber() {
+        return ticketNumber;
+    }
+
+    public void setTicketNumber(String ticketNumber) {
+        this.ticketNumber = ticketNumber;
     }
 
     public String getRequesterComment() {

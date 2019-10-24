@@ -75,7 +75,7 @@ public class AdminInitialization {
         newEmployee.setLastModifiedBy("admin");
 
         Employee newEmployee2 = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
-        newEmployee2.setEmployeeType(EmployeeTypeEnum.WORKINGFROMHOME);
+        newEmployee2.setEmployeeType(EmployeeTypeEnum.WORKING_FROM_HOME);
         newEmployee2.setCode("EMPLOYEE-caiyuqian");
         newEmployee2.setCreatedBy("admin");
         newEmployee2.setLastModifiedBy("admin");

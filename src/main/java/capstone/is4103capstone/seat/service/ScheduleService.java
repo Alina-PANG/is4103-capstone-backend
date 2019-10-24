@@ -1,24 +1,103 @@
 package capstone.is4103capstone.seat.service;
 
+import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.Schedule;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.helper.DateHelper;
+import capstone.is4103capstone.entities.seat.EmployeeOfficeWorkingSchedule;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.seat.model.ScheduleModel;
+import capstone.is4103capstone.seat.model.EmployeeOfficeWorkingScheduleModel;
+import capstone.is4103capstone.seat.repository.EmployeeOfficeWorkingScheduleRepository;
+import capstone.is4103capstone.seat.repository.ScheduleRepository;
 import capstone.is4103capstone.util.enums.ScheduleRecurringBasisEnum;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
+import capstone.is4103capstone.util.exception.CreateEmployeeOfficeWorkingScheduleException;
 import capstone.is4103capstone.util.exception.ScheduleClashException;
 import capstone.is4103capstone.util.exception.SeatAllocationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.time.YearMonth;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class ScheduleService {
 
+    @Autowired
+    private EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
-    // Check whether there is any clash of allocation schedule
+    Comparator<EmployeeOfficeWorkingSchedule> workingScheduleComparatorByReverseChronologicalOrder = new Comparator<EmployeeOfficeWorkingSchedule>() {
+        @Override
+        public int compare(EmployeeOfficeWorkingSchedule e1, EmployeeOfficeWorkingSchedule e2) {
+            return e1.getSchedule().compareTo(e2.getSchedule()) * (-1);
+        }
+    };
+
+    // -------------------------------- Employee Office Working Schedule --------------------------------
+
+    public void createNewEmployeeOfficeWorkingSchedule(EmployeeOfficeWorkingSchedule employeeOfficeWorkingSchedule) {
+        // Checking whether the employee belongs to a team that's under the office
+        Employee employee = employeeOfficeWorkingSchedule.getEmployee();
+        Office office = employeeOfficeWorkingSchedule.getOffice();
+        Team team = employee.getTeam();
+        if (!team.getOffice().getId().equals(office.getId())) {
+            throw new CreateEmployeeOfficeWorkingScheduleException("Create employee office working schedule failed:" +
+                    "employee " + employee.getFullName() + "'s team does not work under office " + office.getObjectName() + "!");
+        }
+        scheduleRepository.save(employeeOfficeWorkingSchedule.getSchedule());
+        employeeOfficeWorkingScheduleRepository.save(employeeOfficeWorkingSchedule);
+    }
+
+    public boolean hasWorkingScheduleDuringYearMonthAtOfficeByEmployeeId(String employeeId, String officeId, YearMonth yearMonth) {
+        List<EmployeeOfficeWorkingSchedule> employeeOfficeWorkingSchedules = employeeOfficeWorkingScheduleRepository.findByEmployeeIdAndOfficeId(employeeId, officeId);
+
+        Collections.sort(employeeOfficeWorkingSchedules, workingScheduleComparatorByReverseChronologicalOrder);
+        for (EmployeeOfficeWorkingSchedule workingSchedule :
+                employeeOfficeWorkingSchedules) {
+            if (containYearMonth(workingSchedule.getSchedule(), yearMonth)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // -------------------------------- Logic Checking --------------------------------
+
+    // ---------------- Check whether a schedule contains a particular year month ----------------
+
+    public boolean containYearMonth(Schedule schedule, YearMonth yearMonth) {
+        YearMonth scheduleStartYearMonth = YearMonth.of(DateHelper.getYearFromDate(schedule.getStartDateTime()),
+                DateHelper.getMonthFromDate(schedule.getStartDateTime()));
+        if (yearMonth.isBefore(scheduleStartYearMonth)) {
+            return false;
+        } else if (yearMonth.equals(scheduleStartYearMonth)) {
+            return true;
+        } else { // after scheduleStartYearMonth
+            if (schedule.getEndDateTime() != null) {
+                YearMonth scheduleEndYearMonth = YearMonth.of(DateHelper.getYearFromDate(schedule.getEndDateTime()),
+                        DateHelper.getMonthFromDate(schedule.getEndDateTime()));
+                if (!yearMonth.isAfter(scheduleEndYearMonth)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
+        }
+    }
+
+    // ---------------- Check whether there is any clash of allocation schedule ----------------
+
     // - allocation with no occupancy end date: compare the start date of this one and the end date of the new one
     // - allocation with an occupancy end date: compare the whole time frame
     public void checkClashForHotDeskTypeAllocation(Date requiredStartDateTime, Date requiredEndDateTime, SeatAllocation existingSeatAllocation)
@@ -49,7 +128,6 @@ public class ScheduleService {
 
 
 
-    // Check whether there is any clash of allocation schedule
     // For both fixed & shared seats allocation:
     // - allocation with no occupancy end date: directly reject
     // - allocation with an occupancy end date: compare the end date of this one and the start date of the new one
@@ -77,7 +155,6 @@ public class ScheduleService {
 
 
 
-    // Check whether there is any clash of allocation schedule
     // - allocation with no occupancy end date: compare the start date of this one and the end date of the new one
     // - allocation with an occupancy end date: compare the whole time frame
     public void checkClashForTemporaryFixedTypeAllocation(Date requiredStartDateTime, Date requiredEndDateTime, SeatAllocation existingSeatAllocation)
@@ -109,7 +186,6 @@ public class ScheduleService {
 
 
 
-    // Check whether there is any clash of allocation schedule
     // For fixed seat allocation:
     // - for permanent employees (no occupancy end date): compare the start date of this one and the end date of the new one (if have any)
     // - for temporary employees (with occupancy end date): compare the whole time period
@@ -179,7 +255,6 @@ public class ScheduleService {
 
 
 
-
     public void validateScheduleRecurringBasis(ScheduleRecurringBasisEnum recurringBasisEnum, ScheduleModel scheduleModel) throws ScheduleClashException {
         if (recurringBasisEnum == ScheduleRecurringBasisEnum.EVERYDAY) {
             if (scheduleModel.getRecurringStartTime() == null || scheduleModel.getRecurringEndTime() == null) {
@@ -200,6 +275,9 @@ public class ScheduleService {
         }
     }
 
+
+
+    // -------------------------------- Helper methods --------------------------------
 
     // Pre-condition:
     // - The two schedules were checked before hand to have overlapping time frame (based on date only)

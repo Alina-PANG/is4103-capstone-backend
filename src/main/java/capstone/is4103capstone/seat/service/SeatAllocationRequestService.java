@@ -1,24 +1,20 @@
 package capstone.is4103capstone.seat.service;
 
 import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
+import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.service.BusinessUnitService;
 import capstone.is4103capstone.admin.service.CompanyFunctionService;
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.admin.service.TeamService;
 import capstone.is4103capstone.entities.*;
-import capstone.is4103capstone.entities.seat.Seat;
-import capstone.is4103capstone.entities.seat.SeatAllocation;
-import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.entities.seat.*;
 import capstone.is4103capstone.finance.Repository.ApprovalForRequestRepository;
-import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
+import capstone.is4103capstone.seat.model.ScheduleModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.ApproveSeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.CreateSeatAllocationRequestModel;
-import capstone.is4103capstone.seat.repository.ScheduleRepository;
-import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
-import capstone.is4103capstone.seat.repository.SeatAllocationRequestRepository;
-import capstone.is4103capstone.seat.repository.SeatRepository;
+import capstone.is4103capstone.seat.repository.*;
+import capstone.is4103capstone.util.SeatManagementEntityCodeHPGenerator;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
@@ -31,6 +27,8 @@ import java.util.*;
 
 @Service
 public class SeatAllocationRequestService {
+
+    private static SeatManagementEntityCodeHPGenerator seatManagementEntityCodeHPGenerator = new SeatManagementEntityCodeHPGenerator();
 
     @Autowired
     private EmployeeService employeeService;
@@ -56,9 +54,13 @@ public class SeatAllocationRequestService {
     @Autowired
     private SeatAllocationRepository seatAllocationRepository;
     @Autowired
+    private SeatAllocationInactivationLogRepository seatAllocationInactivationLogRepository;
+    @Autowired
     private ScheduleRepository scheduleRepository;
     @Autowired
     private BusinessUnitRepository businessUnitRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
     // ---------------------------------- Create New ----------------------------------
 
@@ -103,20 +105,34 @@ public class SeatAllocationRequestService {
         } else {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: invalid allocation type!");
         }
-        Schedule schedule = entityModelConversionService.convertScheduleModelToSchedule(createSeatAllocationRequestModel.getSchedule(),
-                seatAllocationRequest.getAllocationType().toString());
-        if (!schedule.getStartDateTime().after(new Date())) {
-            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: start date time cannot be a historical date time!");
+        List<Schedule> schedules = new ArrayList<>();
+        for (ScheduleModel scheduleModel:
+                createSeatAllocationRequestModel.getSchedules()) {
+            Schedule schedule = entityModelConversionService.convertScheduleModelToSeatAllocationSchedule(scheduleModel,
+                    seatAllocationRequest.getAllocationType().toString());
+
+            if (!schedule.getStartDateTime().after(new Date())) {
+                throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: start date time cannot be a historical date time!");
+            }
+            GregorianCalendar oneYearLater = new GregorianCalendar();
+            oneYearLater.roll(Calendar.YEAR,1);
+            Date oneYearLaterDate = oneYearLater.getTime();
+            if (schedule.getStartDateTime().after(oneYearLaterDate)) {
+                throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be later than 1 year " +
+                        "after the current date!");
+            }
+            if (schedule.getEndDateTime() != null && schedule.getEndDateTime().before(schedule.getStartDateTime())) {
+                throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: end date time cannot be before start date time!");
+            }
+
+            schedule = scheduleRepository.save(schedule);
+            schedules.add(schedule);
         }
-        if (schedule.getEndDateTime() != null && schedule.getEndDateTime().before(schedule.getStartDateTime())) {
-            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: end date time cannot be before start date time!");
-        }
-        schedule = scheduleRepository.save(schedule);
 
         // Set the new request attributes
         seatAllocationRequest.setTeam(requester.getTeam());
         seatAllocationRequest.setEmployeeOfAllocation(employeeOfAllocation);
-        seatAllocationRequest.setSeatAllocationSchedule(schedule);
+        seatAllocationRequest.setSeatAllocationSchedules(schedules);
         seatAllocationRequest.setRequester(requester);
 
         // Create the initial approval ticket: escalate to the business unit level
@@ -135,22 +151,36 @@ public class SeatAllocationRequestService {
         ticket.setApprovalStatus(ApprovalStatusEnum.PENDING);
         ticket.setCommentByRequester(requestorComment);
         ticket = approvalForRequestRepository.save(ticket);
-        String code = EntityCodeHPGeneration.getCode(approvalForRequestRepository, ticket);
-        ticket.setCode(code);
-        ticket.setObjectName(code);
+        try {
+            String code = seatManagementEntityCodeHPGenerator.generateCode(approvalForRequestRepository, ticket);
+            ticket.setCode(code);
+            ticket.setObjectName(code);
+        } catch (Exception ex) {
+            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " + ex.getMessage());
+        }
 
         // Update the seat allocation request
         seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.BUSINESS_UNIT);
         seatAllocationRequest.setEscalatedHierarchyId(businessUnit.getId());
         seatAllocationRequest = seatAllocationRequestRepository.save(seatAllocationRequest);
+        try {
+            String code = seatManagementEntityCodeHPGenerator.generateCode(seatAllocationRequestRepository, seatAllocationRequest);
+            seatAllocationRequest.setCode(code);
+            seatAllocationRequest.setObjectName(code);
+        } catch (Exception ex) {
+            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " + ex.getMessage());
+        }
 
         ticket.setRequestedItemId(seatAllocationRequest.getId());
         seatAllocationRequest.setCurrentPendingTicket(ticket);
         seatAllocationRequest.getApprovalTickets().add(ticket);
         requester.getMyRequestTickets().add(ticket.getId());
         approver.getMyApprovals().add(ticket.getId());
+
         approvalForRequestRepository.save(ticket);
         seatAllocationRequestRepository.save(seatAllocationRequest);
+        employeeRepository.save(requester);
+        employeeRepository.save(approver);
     }
 
 
@@ -283,24 +313,42 @@ public class SeatAllocationRequestService {
             }
         }
 
-        // 2. there is no schedule clash with the required schedule
-        Schedule schedule = seatAllocationRequest.getSeatAllocationSchedule();
-        if (seatService.hasScheduleClash(seat, schedule, seatAllocationRequest.getAllocationType())) {
-            throw new SeatAllocationRequestProcessingException("Approval of seat allocation request failed: there is a schedule clash!");
+        // 2. the seat is in the office where the employee's team is located
+        if (!seat.getSeatMap().getOffice().getId().equals(seatAllocationRequest.getEmployeeOfAllocation().getTeam().getOffice().getId())) {
+            throw new SeatAllocationRequestProcessingException("Invalid seat choice for this allocation request: the seat must be at the office where" +
+                    " the employee's team is located.");
         }
 
-        // 3. create a new allocation for the employee; allocation type will be the required type even if the seat is actually assigned to another unit entity
-        // IMPORTANT: in the seat utilization reports, we only concern the fact that:
-        // - how many seats are allocated to team A
-        // - Among these seats, how many are occupied/empty -> we DON'T care who are using the seat
-        SeatAllocation newSeatAllocation = new SeatAllocation();
-        newSeatAllocation.setSchedule(schedule);
-        newSeatAllocation.setEmployee(seatAllocationRequest.getEmployeeOfAllocation());
-        newSeatAllocation.setAllocationType(seatAllocationRequest.getAllocationType());
-        newSeatAllocation.setSeat(seat);
-        newSeatAllocation = seatAllocationRepository.save(newSeatAllocation);
-        seat.getActiveSeatAllocations().add(newSeatAllocation);
-        seatRepository.save(seat);
+        // 3. there is no schedule clash with the required schedule
+        for (Schedule schedule :
+                seatAllocationRequest.getSeatAllocationSchedules()) {
+            if (seatService.hasScheduleClash(seat, schedule, seatAllocationRequest.getAllocationType())) {
+                throw new SeatAllocationRequestProcessingException("Approval of seat allocation request failed: there is a schedule clash!");
+            }
+        }
+
+        for (Schedule schedule :
+                seatAllocationRequest.getSeatAllocationSchedules()) {
+            // 4. create a new allocation for the employee; allocation type will be the required type even if the seat is actually assigned to another unit entity
+            // IMPORTANT: in the seat utilization reports, we only concern the fact that:
+            // - how many seats are allocated to team A
+            // - Among these seats, how many are occupied/empty -> we DON'T care who are using the seat
+            SeatAllocation newSeatAllocation = new SeatAllocation();
+            newSeatAllocation.setSchedule(schedule);
+            newSeatAllocation.setEmployee(seatAllocationRequest.getEmployeeOfAllocation());
+            newSeatAllocation.setAllocationType(seatAllocationRequest.getAllocationType());
+            newSeatAllocation.setSeat(seat);
+            newSeatAllocation = seatAllocationRepository.save(newSeatAllocation);
+            if (schedule.getEndDateTime() != null) {
+                SeatAllocationInactivationLog log = new SeatAllocationInactivationLog();
+                log.setAllocation_id(newSeatAllocation.getId());
+                log.setInactivate_time(schedule.getEndDateTime());
+                seatAllocationInactivationLogRepository.save(log);
+            }
+            seat.getActiveSeatAllocations().add(newSeatAllocation);
+            seatRepository.save(seat);
+            seatAllocationRequest.getResultedSeatAllocations().add(newSeatAllocation);
+        }
 
         approvalForRequest.setApprovalStatus(ApprovalStatusEnum.APPROVED);
         if (approveSeatAllocationRequestModel.getApprovalTicket().getApproverComment() != null) {
@@ -309,7 +357,6 @@ public class SeatAllocationRequestService {
         approvalForRequestRepository.save(approvalForRequest);
         seatAllocationRequest.setCurrentPendingTicket(null);
         seatAllocationRequest.setResolved(true);
-        seatAllocationRequest.setResultedSeatAllocation(newSeatAllocation);
         seatAllocationRequestRepository.save(seatAllocationRequest);
         // TODO: send email to the requester for notification
     }
@@ -415,9 +462,13 @@ public class SeatAllocationRequestService {
         newApprovalForRequest = approvalForRequestRepository.save(newApprovalForRequest);
         seatAllocationRequest.getApprovalTickets().add(newApprovalForRequest);
         seatAllocationRequest.setCurrentPendingTicket(newApprovalForRequest);
+        newReviewer.getMyApprovals().add(newApprovalForRequest.getId());
+        seatAllocationRequest.getRequester().getMyRequestTickets().add(newApprovalForRequest.getId());
 
         approvalForRequestRepository.save(approvalForRequest);
         seatAllocationRequestRepository.save(seatAllocationRequest);
+        employeeRepository.save(newReviewer);
+        employeeRepository.save(seatAllocationRequest.getRequester());
         // TODO: send email to the requester and the new approver for notification
     }
 
@@ -438,9 +489,21 @@ public class SeatAllocationRequestService {
                 seatAllocationRequest.getApprovalTickets()) {
             ticket.setDeleted(true);
             approvalForRequestRepository.save(ticket);
+            ticket.getApprover().getMyApprovals().remove(ticket.getId());
+            employeeRepository.save(ticket.getApprover());
+            seatAllocationRequest.getRequester().getMyRequestTickets().remove(ticket.getId());
         }
         seatAllocationRequest.setDeleted(true);
         seatAllocationRequestRepository.save(seatAllocationRequest);
+        employeeRepository.save(seatAllocationRequest.getRequester());
         // TODO: send email to all the previous approvers for notification
     }
+
+
+    // ---------------------------------- Forecasting Queries ----------------------------------
+    // 1. By Hiring
+    // 2. By Leavers
+    // 3. Net Demand
+
+
 }

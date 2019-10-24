@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Schedule extends DBEntityTemplate {
+public class Schedule extends DBEntityTemplate implements Comparable<Schedule> {
     @NotNull
     private boolean isRecurring = false;
     private ScheduleRecurringBasisEnum recurringBasis;
@@ -120,5 +120,34 @@ public class Schedule extends DBEntityTemplate {
 
     public void setEndDateTime(Date endDateTime) {
         this.endDateTime = endDateTime;
+    }
+
+    @Override
+    public int compareTo(Schedule anotherSchedule) {
+        if (this.startDateTime.before(anotherSchedule.startDateTime)) {
+            return  -1;
+        } else if (this.startDateTime.equals(anotherSchedule.startDateTime)) {
+            if (this.endDateTime != null) {
+                if (anotherSchedule.endDateTime == null) {
+                    return -1;
+                } else {
+                    if (this.endDateTime.before(anotherSchedule.endDateTime)) {
+                        return -1;
+                    } else if (this.endDateTime.equals(anotherSchedule.endDateTime)) {
+                        return 0;
+                    } else {
+                        return 1;
+                    }
+                }
+            } else {
+                if (anotherSchedule.endDateTime == null) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        } else {
+            return 1;
+        }
     }
 }
