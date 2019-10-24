@@ -18,6 +18,16 @@ public class DateHelper {
         return calendar.getTime();
     }
 
+    public static Date getDateByYearMonthDate(int year, int month, int date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
     public static DayOfWeek getDayOfWeekFromDate(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

@@ -246,9 +246,7 @@ public class SeatMapService {
                     for (Schedule schedule :
                             schedules) {
                         if (seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
-                            // its seat map should be included; need to convert the seat as well
                             hasFoundClash = true;
-
                         }
                     }
                     if (hasFoundClash) {
@@ -299,9 +297,7 @@ public class SeatMapService {
                     for (Schedule schedule :
                             schedules) {
                         if (seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
-                            // its seat map should be included; need to convert the seat as well
                             hasFoundClash = true;
-
                         }
                     }
                     if (hasFoundClash) {
@@ -352,9 +348,7 @@ public class SeatMapService {
                     for (Schedule schedule :
                             schedules) {
                         if (seatService.hasScheduleClash(seat, schedule, seatAllocationTypeEnum)) {
-                            // its seat map should be included; need to convert the seat as well
                             hasFoundClash = true;
-
                         }
                     }
                     if (hasFoundClash) {

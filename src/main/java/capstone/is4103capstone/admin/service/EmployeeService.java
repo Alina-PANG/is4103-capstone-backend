@@ -185,7 +185,9 @@ public class EmployeeService {
         employeeDto.setLastName(Optional.of(input.getLastName()));
         employeeDto.setUserName(Optional.of(input.getUserName()));
         employeeDto.setSecurityId(Optional.of(input.getSecurityId()));
-        employeeDto.setEmail(Optional.of(input.getEmail()));
+        if (input.getEmail() != null) {
+            employeeDto.setEmail(Optional.of(input.getEmail()));
+        }
         return employeeDto;
     }
 
