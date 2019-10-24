@@ -1,5 +1,6 @@
 package capstone.is4103capstone.supplychain.Repository;
 
+import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.AssessmentFormSimpleModel;
 import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
@@ -13,6 +14,12 @@ public interface OutsourcingAssessmentRepository extends JpaRepository<Outsourci
 
     @Query(value = "SELECT * FROM outsourcing_assessment p WHERE p.is_deleted=false AND p.outsourcing_assessment_status=0",nativeQuery = true)
     public OutsourcingAssessment findTemplate();
+
+    @Query(value = "SELECT * FROM purchase_order p WHERE p.is_deleted=false AND p.approver=?1",nativeQuery = true)
+    public List<OutsourcingAssessment> findAllByApprover(String approver);
+
+    @Query(value = "SELECT * FROM purchase_order p WHERE p.is_deleted=false AND p.created_by=?1",nativeQuery = true)
+    public List<OutsourcingAssessment> findAllByCreatedBy(String requestor);
 
     @Query(value = "select o.last_modified_date_time as last_modified_dt, o.id as form_id,o.code as form_code,b.code as bjf_code,b.id as bjf_id,o.created_by as requester, e2.user_name as bm_approver, " +
             "o.business_case_description as description,o.outsourcing_assessment_status as form_status,o.outsourcing as outsourcing_id " +

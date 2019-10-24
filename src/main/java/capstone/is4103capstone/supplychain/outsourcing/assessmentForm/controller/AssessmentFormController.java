@@ -9,6 +9,7 @@ import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.res.GetAsseFormListRes;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service.AssessmentFormService;
 
+import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ public class AssessmentFormController {
                     .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
+
     @GetMapping
     public ResponseEntity<GetAsseFormListRes> retrieveAllFormsUserCanAccess(){
         try{
