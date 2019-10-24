@@ -19,7 +19,6 @@ import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingRepository;
-import capstone.is4103capstone.supplychain.Repository.OutsourcingSelfAssessmentRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.model.OutsourcingModel;
@@ -107,7 +106,7 @@ public class OutsourcingService {
                     throw new Exception("This is not a APPROVED outsourcing assessment form. You are not allowed to create new outsourcing based on this assessment form!");
                 }else{
                     outsourcing.setOutsourcingAssessmentId(createOutsourcingReq.getOutsourcingAssessmentId());
-                    outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.CLOSED);
+                    outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.git CLOSED);
                     outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
                     bjfService.afterOutsourcing(outsourcingAssessment);
                 }

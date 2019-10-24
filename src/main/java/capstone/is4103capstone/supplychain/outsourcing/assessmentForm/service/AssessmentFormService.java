@@ -1,7 +1,6 @@
 package capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service;
 
-import capstone.is4103capstone.admin.repository.EmployeeRepository;
-import capstone.is4103capstone.entities.Country;
+import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
@@ -18,12 +17,14 @@ import capstone.is4103capstone.supplychain.Repository.OutsourcingRepository;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.configuration.ThreadPoolTaskSchedulerConfig;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateTemplateReq;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateResponseReq;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.res.GetAsseFormListRes;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.res.GetAssessmentFormRes;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -39,11 +40,14 @@ public class AssessmentFormService {
     @Autowired
     OutsourcingAssessmentRepository outsourcingAssessmentRepository;
     @Autowired
-    EmployeeRepository employeeRepository;
+    EmployeeService employeeService;
     @Autowired
     OutsourcingRepository outsourcingRepository;
     @Autowired
     MailService mailService;
+
+    @Value("${spring.mail.username}")
+    private String senderEmailAddr;
 
     public ResponseEntity<GeneralRes> getForm(String id){
         try{
@@ -64,6 +68,24 @@ public class AssessmentFormService {
                     .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
         }
     }
+
+    /*
+    Retrieve:
+    1) if the current log in user belongs to outsourcing team(now: employee code/hierachy contains'OUTSOURCING':
+        we return the full list,
+    2) If not, we assume he is the directly manager, so we retrieve the assessment forms under his management
+
+     */
+    public GetAsseFormListRes retrieveAssessmentForms(){
+        Employee currentUser = employeeService.getCurrentLoginEmployee();
+        if (currentUser.getCode().toUpperCase().contains("OUTSOURCING")){
+            //it's an outsourcing manager
+            return new GetAsseFormListRes("Succesffully retrieved",false,outsourcingAssessmentRepository.getAllAssessmentsForms(),true);
+        }else{
+            return new GetAsseFormListRes("Succesffully retrieved",false,outsourcingAssessmentRepository.getAssessmentsUnderMyApproval(currentUser.getId()),false);
+        }
+    }
+
 
     public ResponseEntity<GeneralRes> getTemplateForm(){
         try{
@@ -89,7 +111,7 @@ public class AssessmentFormService {
         try {
             logger.info("Action performed by: "+username+" on "+new Date());
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
-            Employee creater = employeeRepository.findEmployeeByUserName(username);
+            Employee creater = employeeService.validateUser(username);
             if(creater == null) {
                 logger.info("Cannot find the user!");
                 return ResponseEntity.notFound().build();
@@ -164,7 +186,7 @@ public class AssessmentFormService {
 
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
 
-            Employee creater = employeeRepository.findEmployeeByUserName(username);
+            Employee creater = employeeService.validateUser(username);
 
             if(creater == null) {
                 logger.info("Cannot find the user!");
@@ -240,15 +262,14 @@ public class AssessmentFormService {
                     .notFound().build();
             if(approved) {
                 if(isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL) {
-                    form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL);
-                    Employee manager = employeeRepository.findEmployeeByUserName(username);
+                    form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_OUTSOURCING_APPROVAL);
+                    Employee manager = employeeService.validateUser(username);
                     createApprovalTicket(form.getCreatedBy(), manager,form,"Please review and approve the outsourcing assessment form.");
                 }
-                else if(!isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_FUNCTION_APPROVAL) {
+                else if(!isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_OUTSOURCING_APPROVAL) {
                     form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
-                    String sender = "is4103.capstone@gmail.com";
-                    String receiver = employeeRepository.findEmployeeByUserName(form.getCreatedBy()).getEmail();
-                    mailService.sendGeneralEmail(sender, receiver, "Your Outsourcing Assessment Form Has Been Approved!", "Outsourcing Assessment Form "+form.getCode()+" has been successfully approved!");
+                    String receiver = employeeService.validateUser(form.getCreatedBy()).getEmail();
+                    mailService.sendGeneralEmail(senderEmailAddr, receiver, "Your Outsourcing Assessment Form Has Been Approved!", "Outsourcing Assessment Form "+form.getCode()+" has been successfully approved!");
                 }
                 else {
                     logger.error("approve type is not consistent with the pending status!");
@@ -268,7 +289,7 @@ public class AssessmentFormService {
     }
 
     private void createApprovalTicket(String requesterUsername, Employee receiver, OutsourcingAssessment outsourcingAssessment, String content){
-        Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
+        Employee requesterEntity = employeeService.validateUser(requesterUsername);
         ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,outsourcingAssessment,content, ApprovalTypeEnum.OUTSOURCING_ASSESSMENT_FORM);
     }
 
@@ -297,7 +318,7 @@ public class AssessmentFormService {
     private Mail buildMail(Outsourcing outsourcing){
         String from = "is4103.capstone@gmail.com";
         String toUsername = outsourcing.getCreatedBy();
-        String to = employeeRepository.findEmployeeByUserName(toUsername).getEmail();
+        String to = employeeService.validateUser(toUsername).getEmail();
         String subject = "Reminder: Please Complete the Annual Outsourcing Assessment Form";
         Map<String, Object> model = new HashMap<>();
 
