@@ -14,7 +14,7 @@ public class SupplychainEntityCodeHPGenerator {
     private static final Logger logger = LoggerFactory.getLogger(SupplychainEntityCodeHPGenerator.class);
     private final String VENDOR_TEMPLATE = "Vendor-%1$s-%2$s";
     private final String CONTRACT_TEMPLATE = "Contract-%1$s";
-    private final String CHILD_CONTRACT_TEMPLATE = "ChildContract-%1$s";
+    private final String CHILD_CONTRACT_TEMPLATE = "Child-Contract-%1$s";
     private final String OUTSOURCING_TEMPLATE = "Outsourcing-%1$s";
     private final String OUTSOURCING_SELF_ASSESSMENT_TEMPLATE = "OutsourcingSelfAssessment-%1$s";
     private final String OUTSOURCING_SELF_ASSESSMENT_QUESTION_TEMPLATE = "OutsourcingSelfAssessmentQuestion-%1$s";

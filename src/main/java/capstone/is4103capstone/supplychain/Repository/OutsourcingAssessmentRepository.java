@@ -8,12 +8,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OutsourcingAssessmentRepository extends JpaRepository<OutsourcingAssessment, String> {
     public List<OutsourcingAssessment> findOutsourcingAssessmentByCode(String Code);
 
     @Query(value = "SELECT * FROM outsourcing_assessment p WHERE p.is_deleted=false AND p.outsourcing_assessment_status=0",nativeQuery = true)
     public OutsourcingAssessment findTemplate();
+
+    @Query(value = "SELECT * FROM outsourcing_assessment p WHERE p.is_deleted=false AND p.id=?1",nativeQuery = true)
+    Optional<OutsourcingAssessment> findUndeletedAssessmentFormById(String id);
 
     @Query(value = "select o.last_modified_date_time as last_modified_dt, o.id as form_id,o.code as form_code,b.code as bjf_code,b.id as bjf_id,o.created_by as requester, e2.user_name as bm_approver, " +
             "o.business_case_description as description,o.outsourcing_assessment_status as form_status,o.outsourcing_id as outsourcing_id " +
