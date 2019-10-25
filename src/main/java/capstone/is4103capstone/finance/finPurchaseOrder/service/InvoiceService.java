@@ -129,8 +129,8 @@ public class InvoiceService {
             Resource resource = new ByteArrayResource(invoice.getData());
             String contentType = "application/octet-stream";
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename="+resource.getFilename());
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.add("Content-Disposition", "attachment; filename="+resource.getFilename());
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
