@@ -62,12 +62,12 @@ public class PurchaseOrderService {
 
             Vendor v = vendorRepository.getOne(createPOReq.getVendorid());
             purchaseOrder.setVendor(v);
-            purchaseOrder.setStatus(ApprovalStatusEnum.PENDING);
+            purchaseOrder.setStatus(ApprovalStatusEnum.APPROVED);
             purchaseOrder.setTotalAmount(createPOReq.getAmount());
             purchaseOrder.setCurrencyCode(createPOReq.getCurrencyCode());
             purchaseOrder.setCreatedBy(employeeService.getCurrentLoginUsername());
-            purchaseOrder.setCreatedDateTime(new Date());
             purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
+            purchaseOrder.setCode(createPOReq.getPoNumber());
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
             purchaseOrder.setApprover(createPOReq.getApproverUsername());
             if(purchaseOrder.getSeqNo() == null){
@@ -75,7 +75,7 @@ public class PurchaseOrderService {
             }
             logger.info("Creating purchase order with related BJF: "+createPOReq.getRelatedBJF());
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
-            purchaseOrder.setCode(POEntityCodeHPGeneration.getCode(purchaseOrderRepository,purchaseOrder));
+//            purchaseOrder.setCode(POEntityCodeHPGeneration.getCode(purchaseOrderRepository,purchaseOrder));
             purchaseOrderRepository.saveAndFlush(purchaseOrder);
             bjfService.afterPOUpdated(purchaseOrder);
 

@@ -9,10 +9,19 @@ public class CreatePOReq implements Serializable {
     private List<String> relatedBJF;
     private Double amount;
     private String vendorid;
+    private String poNumber;
     private String approverUsername;
 
 
     public CreatePOReq() {
+    }
+
+    public String getPoNumber() {
+        return poNumber;
+    }
+
+    public void setPoNumber(String poNumber) {
+        this.poNumber = poNumber;
     }
 
     public String getApproverUsername() {
