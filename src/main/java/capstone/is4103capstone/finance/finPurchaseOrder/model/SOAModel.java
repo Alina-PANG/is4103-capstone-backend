@@ -31,6 +31,14 @@ public class SOAModel implements Serializable {
         this.scheduleDate = scheduleDate;
     }
 
+    public String getInvoice_code() {
+        return invoice_code;
+    }
+
+    public void setInvoice_code(String invoice_code) {
+        this.invoice_code = invoice_code;
+    }
+
     public BigDecimal getPaidAmt() {
         return paidAmt;
     }
