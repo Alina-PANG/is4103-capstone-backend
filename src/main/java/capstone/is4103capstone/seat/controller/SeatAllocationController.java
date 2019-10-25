@@ -24,7 +24,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/seatAllocation")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class SeatAllocationController {
 
     private static final Logger logger = LoggerFactory.getLogger(SeatAllocationController.class);

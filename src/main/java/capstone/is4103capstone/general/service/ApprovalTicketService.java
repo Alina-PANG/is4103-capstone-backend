@@ -167,7 +167,7 @@ public class ApprovalTicketService {
         for (ApprovalForRequest a: list){
             if (a.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
                 continue;
-            models.add(new ApprovalTicketModel(a.getId(),a.getApprover().getUserName(),a.getCommentByApprover(),a.getCreatedDateTime(),a.getLastModifiedDateTime(),a.getApprovalStatus()));
+            models.add(new ApprovalTicketModel(a.getId(), a.getApprover().getUserName(), a.getCommentByApprover(),a.getCreatedDateTime(),a.getLastModifiedDateTime(),a.getApprovalStatus()));
         }
         return models;
     }

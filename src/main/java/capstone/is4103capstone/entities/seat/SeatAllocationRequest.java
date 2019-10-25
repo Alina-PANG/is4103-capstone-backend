@@ -26,10 +26,9 @@ public class SeatAllocationRequest extends DBEntityTemplate {
     @NotNull
     private String escalatedHierarchyId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", referencedColumnName = "id")
-    @NotNull
-    private Schedule seatAllocationSchedule;
+    private List<Schedule> seatAllocationSchedules = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "employee_of_allocation_id", referencedColumnName = "id")
     @NotNull
@@ -60,21 +59,21 @@ public class SeatAllocationRequest extends DBEntityTemplate {
     private ApprovalForRequest currentPendingTicket;
 
     private boolean resolved = false;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "resulted_seat_allocation_id", referencedColumnName = "id")
-    private SeatAllocation resultedSeatAllocation;
+    private List<SeatAllocation> resultedSeatAllocations = new ArrayList<>();
 
     public SeatAllocationRequest() {
     }
 
     public SeatAllocationRequest(@NotNull Team team, String escalatedHierarchyId, @NotNull HierarchyTypeEnum escalatedHierarchyLevel,
-                                 @NotNull Schedule seatAllocationSchedule, @NotNull Employee employeeOfAllocation, SeatAllocationTypeEnum allocationType,
+                                 List<Schedule> seatAllocationSchedules, @NotNull Employee employeeOfAllocation, SeatAllocationTypeEnum allocationType,
                                  @NotNull Employee requester, List<ApprovalForRequest> approvalTickets,
                                  ApprovalForRequest currentPendingTicket, boolean resolved) {
         this.team = team;
         this.escalatedHierarchyLevel = escalatedHierarchyLevel;
         this.escalatedHierarchyId = escalatedHierarchyId;
-        this.seatAllocationSchedule = seatAllocationSchedule;
+        this.seatAllocationSchedules = seatAllocationSchedules;
         this.employeeOfAllocation = employeeOfAllocation;
         this.allocationType = allocationType;
         this.requester = requester;
@@ -107,12 +106,12 @@ public class SeatAllocationRequest extends DBEntityTemplate {
         this.escalatedHierarchyId = escalatedHierarchyId;
     }
 
-    public Schedule getSeatAllocationSchedule() {
-        return seatAllocationSchedule;
+    public List<Schedule> getSeatAllocationSchedules() {
+        return seatAllocationSchedules;
     }
 
-    public void setSeatAllocationSchedule(Schedule seatAllocationSchedule) {
-        this.seatAllocationSchedule = seatAllocationSchedule;
+    public void setSeatAllocationSchedules(List<Schedule> seatAllocationSchedules) {
+        this.seatAllocationSchedules = seatAllocationSchedules;
     }
 
     public Employee getEmployeeOfAllocation() {
@@ -163,11 +162,11 @@ public class SeatAllocationRequest extends DBEntityTemplate {
         this.resolved = resolved;
     }
 
-    public SeatAllocation getResultedSeatAllocation() {
-        return resultedSeatAllocation;
+    public List<SeatAllocation> getResultedSeatAllocations() {
+        return resultedSeatAllocations;
     }
 
-    public void setResultedSeatAllocation(SeatAllocation resultedSeatAllocation) {
-        this.resultedSeatAllocation = resultedSeatAllocation;
+    public void setResultedSeatAllocations(List<SeatAllocation> resultedSeatAllocations) {
+        this.resultedSeatAllocations = resultedSeatAllocations;
     }
 }

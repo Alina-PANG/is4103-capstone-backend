@@ -14,6 +14,9 @@ import capstone.is4103capstone.util.exception.SeatNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.time.YearMonth;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,6 +87,10 @@ public class SeatService {
         }
     }
 
+    public List<Seat> retrieveSeatInventoryByTeamId(String teamId) {
+        return seatRepository.findOnesByTeamId(teamId);
+    }
+
 
     // ---------------------------------- Deletion -----------------------------------
 
@@ -144,6 +151,20 @@ public class SeatService {
             return true;
         }
 
+        return false;
+    }
+
+    public boolean isSeatOccupiedDuringYearMonth(Seat seat, YearMonth yearMonth) {
+        if (seat.getActiveSeatAllocations().size() == 0) {
+            return false;
+        }
+        Collections.sort(seat.getActiveSeatAllocations());
+        for (SeatAllocation activeSeatAllocation :
+                seat.getActiveSeatAllocations()) {
+            if (scheduleService.containYearMonth(activeSeatAllocation.getSchedule(), yearMonth)) {
+                return true;
+            }
+        }
         return false;
     }
 }

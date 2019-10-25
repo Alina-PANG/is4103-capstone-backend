@@ -24,6 +24,7 @@ import capstone.is4103capstone.finance.requestsMgmt.model.res.BjfAnalysisRespons
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.general.service.MailService;
+import capstone.is4103capstone.general.service.WriteAuditTrail;
 import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.model.ContractAndChildAggre;
@@ -146,6 +147,9 @@ public class BJFService {
         if (!isUpdate || changeFromReject)
             ApprovalTicketService.createTicketAndSendEmail(requester,approver,newBjf,"To BJF BM Approver: BJF Submitted / Updated, please have a look", ApprovalTypeEnum.BJF);
 
+        WriteAuditTrail.createExtendedAuditRecord(newBjf,OperationTypeEnum.WRITE);
+
+
         return new BJFModel(newBjf,service,vendor,null,p);
     }
 
@@ -171,6 +175,7 @@ public class BJFService {
             bjf.setBjfStatus(BJFStatusEnum.REJECTED);
         }
         bjfRepository.saveAndFlush(bjf);
+        WriteAuditTrail.createExtendedAuditRecord(bjf,OperationTypeEnum.WRITE);
 
     //TODO: can be approve or reject
         //approve -> go to outsourcing steps
@@ -181,6 +186,8 @@ public class BJFService {
         List<BJFAggregateModel> myRequests = bjfRepository.getSimpleBJFsByApprover(user.getId());
         if (myRequests.isEmpty())
             throw new Exception("No records found.");
+
+        WriteAuditTrail.createExtendedAuditRecord(new BJF(),OperationTypeEnum.READ);
 
         return myRequests;
     }
@@ -232,7 +239,7 @@ public class BJFService {
             }
 
             response.put(thisYear+" Commited Value within cost center",commitedBudget);
-
+            response.put("BJF Estimated Budget",bjf.getEstimatedBudget());
             // current year
             // bjf status
             // this cost center
@@ -289,7 +296,12 @@ public class BJFService {
                 if (activeChildContractInfos.size() > 1){
                     logger.warn("Mulitple child contract connected within vendor and service"+vendor.getId()+" "+service.getId());
                 }
-                contractAnalysis.put("Child Contract Info",new JSONObject(activeChildContractInfos.get(0)));
+                ContractAndChildAggre childAggre = activeChildContractInfos.get(0);
+                contractAnalysis.put("Child Contract Value",childAggre.getChildContractValue());
+                contractAnalysis.put("Child Contract Code",childAggre.getChildContractCode());
+                contractAnalysis.put("Contract Start Date",childAggre.getContractStartDate());
+                contractAnalysis.put("Contract End Date",childAggre.getContractEndDate());
+                contractAnalysis.put("Contract Status",childAggre.getContractStatus());
             }
             response.put("Contract Value Analysis",contractAnalysis);
 
@@ -310,7 +322,7 @@ public class BJFService {
         try{
             BJF bjf = assessment.getRelated_BJF();
             bjf.setBjfStatus(BJFStatusEnum.APPROVED);
-
+            bjfRepository.saveAndFlush(bjf);
             mailService.sendGeneralEmailDefaultEmail(bjf.getRequester().getEmail(),"["+bjf.getCode()+"] got approved.",
                     "Your BJF ["+bjf.getCode()+"] is approved. Purchase request is sent to the purchase order team. ");
 

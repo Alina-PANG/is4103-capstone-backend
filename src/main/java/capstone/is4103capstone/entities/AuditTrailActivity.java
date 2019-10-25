@@ -53,7 +53,7 @@ public class AuditTrailActivity implements Serializable {
     public AuditTrailActivity(String userUuid, String activity, DBEntityTemplate modifiedObject, OperationTypeEnum operationType) {
         this.userUuid = userUuid;
         this.activity = activity;
-        this.modifiedObjectUuid = modifiedObject.getId();
+        this.modifiedObjectUuid = modifiedObject.getId() == null || modifiedObject.getId().isEmpty()? "N/A" : modifiedObject.getId();
         this.modifiedObjectType = modifiedObject.getClass().getSimpleName();
         this.operationType = operationType;
         // set date performed to now

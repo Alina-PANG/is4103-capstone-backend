@@ -339,6 +339,19 @@ public class OutsourcingService {
         GeneralEntityModel vendor = null;
         GeneralEntityModel outsourcingAssessment = null;
 
+        if(outsourcing.getRegionId() != null){
+            Region r = regionRepository.getOne(outsourcing.getRegionId());
+            region = new GeneralEntityModel(r);
+        }
+        if(outsourcing.getDepartmentId() != null){
+            CompanyFunction d = functionRepository.getOne(outsourcing.getDepartmentId());
+            department = new GeneralEntityModel(d);
+        }
+        if(outsourcing.getCountryId() != null){
+            Country c = countryRepository.getOne(outsourcing.getCountryId());
+            country = new GeneralEntityModel(c);
+        }
+
         OutsourcingModel outsourcingModel = new OutsourcingModel(outsourcing.getCode(), outsourcing.getId(), outsourcing.getSeqNo(),
                 outsourcing.getOutsourcingTitle(), region, country, department,
                 outsourcing.getOutsourcingType(), outsourcing.getOutsourcingCategory(), outsourcing.getMateriality(),

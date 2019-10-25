@@ -102,7 +102,6 @@ public class PlansComparisonService {
             System.out.println(m[0].getServiceName()+ " "+m[1].getServiceName());
         }
 
-
         return new PlanCompareRes("Successfully Retrieved", false, insertion,deletion,changed,
                 before.calculateTotalValue(), after.calculateTotalValue());
 
