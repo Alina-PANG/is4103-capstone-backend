@@ -76,7 +76,7 @@ public class AuditTrailActivityService {
     //!!using Spring JPA Projection
     public List<AuditTrailModel> getAllAuditTrailWithUsername() {
         Pageable resultPageOptions =
-                PageRequest.of(0, 100, Sort.by("time_stamp").ascending());
+                PageRequest.of(0, 100, Sort.by("time_stamp").descending());
         List<AuditTrailModel> auditTrailActivities = auditTrailActivityRepo.findAuditTrailActivityWithUsernamePageable(resultPageOptions);
         return auditTrailActivities;
     }

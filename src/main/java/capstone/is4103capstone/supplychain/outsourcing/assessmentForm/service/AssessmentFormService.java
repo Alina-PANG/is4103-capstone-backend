@@ -377,7 +377,10 @@ public class AssessmentFormService {
                     return ResponseEntity.badRequest().build();
                 }
             }
-            else form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
+            else {
+                form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
+                bjfService.afterOutsourcing(form);
+            }
             outsourcingAssessmentRepository.saveAndFlush(form);
             logger.info("Approving/Rejecting the assessment form created by "+ form.getCreatedBy());
             return ResponseEntity.ok().body(new GeneralRes("Successfully approved/rejected the purchase orders!", false));
