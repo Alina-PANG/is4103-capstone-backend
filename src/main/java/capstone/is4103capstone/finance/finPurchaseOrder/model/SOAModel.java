@@ -12,15 +12,23 @@ public class SOAModel implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date scheduleDate;
     private String invoice_id;
+    private String invoice_code;
 
     public SOAModel() {
     }
 
-    public SOAModel(BigDecimal paidAmt, BigDecimal actualPmt, Date scheduleDate, String invoice_id) {
+    public SOAModel(BigDecimal paidAmt, BigDecimal actualPmt, Date scheduleDate, String invoice_id, String invoice_code) {
         this.paidAmt = paidAmt;
         this.actualPmt = actualPmt;
         this.scheduleDate = scheduleDate;
         this.invoice_id = invoice_id;
+        this.invoice_code = invoice_code;
+    }
+
+    public SOAModel(BigDecimal paidAmt, BigDecimal actualPmt, Date scheduleDate) {
+        this.paidAmt = paidAmt;
+        this.actualPmt = actualPmt;
+        this.scheduleDate = scheduleDate;
     }
 
     public BigDecimal getPaidAmt() {

@@ -20,7 +20,7 @@ public class SupplychainEntityCodeHPGenerator {
     private final String OUTSOURCING_SELF_ASSESSMENT_QUESTION_TEMPLATE = "OutsourcingSelfAssessmentQuestion-%1$s";
     private final String OUTSOURCING_ASS_FORM = "OutsourcingAssessment-%1$s";
     private final String OUTSOURCING_ASS_FORM_SECTION = "OutsourcingAssessmentSection-%1$s";
-    private final String OUTSOURCING_ASS_FORM_LINE = "OutsourcingAssessmentLine%1$s";
+    private final String OUTSOURCING_ASS_FORM_LINE = "OutsourcingAssessmentLine-%1$s";
 
     public String generateCode(JpaRepository repo, DBEntityTemplate entity) throws Exception {
         Optional<DBEntityTemplate> entityOptional = repo.findById(entity.getId());

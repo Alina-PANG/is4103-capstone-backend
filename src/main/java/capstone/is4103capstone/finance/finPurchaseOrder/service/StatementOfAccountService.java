@@ -159,9 +159,12 @@ public class StatementOfAccountService {
                     .notFound().build();
             List<SOAModel> result = new ArrayList<>();
             for(StatementOfAcctLineItem l: list){
-                result.add(new SOAModel(l.getPaidAmt(), l.getActualPmt(), l.getScheduleDate(), l.getInvoice().getId()));
+                if(l.getInvoice() != null)
+                    result.add(new SOAModel(l.getPaidAmt(), l.getActualPmt(), l.getScheduleDate(), l.getInvoice().getId(), l.getInvoice().getCode()));
+                else
+                    result.add(new SOAModel(l.getPaidAmt(), l.getActualPmt(), l.getScheduleDate()));
             }
-            return ResponseEntity.ok().body(new GetSoARes("Successfully retrieved the purchase orders!", true, result));
+            return ResponseEntity.ok().body(new GetSoARes("Successfully retrieved the statement of accounts!", true, result));
         }
         catch (Exception ex){
             ex.printStackTrace();

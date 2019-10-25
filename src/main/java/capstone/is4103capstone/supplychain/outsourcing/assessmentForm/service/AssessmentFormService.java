@@ -210,13 +210,13 @@ public class AssessmentFormService {
             outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL);
             outsourcingAssessment.setBusinessCaseDescription(createResponseReq.getBusinessCaseDescription());
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
-            newAssess.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,newAssess));
+            newAssess.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentRepository,newAssess));
 
             int j = 0;
             List<OutsourcingAssessmentSection> newSections = new ArrayList<>();
             for (OutsourcingAssessmentSection s : sections) {
-                s.setNumber(j);
                 OutsourcingAssessmentSection newS = new OutsourcingAssessmentSection();
+                newS.setNumber(j);
                 newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
@@ -230,7 +230,7 @@ public class AssessmentFormService {
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);
                     o = outsourcingAssessmentLineRepository.saveAndFlush(o);
-                    o.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,o));
+                    o.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentLineRepository,o));
                     linesSaved.add(o);
                     outsourcingAssessmentLineRepository.saveAndFlush(o);
                 }
@@ -238,8 +238,8 @@ public class AssessmentFormService {
                 newS.setOutsourcingAssessment(newAssess);
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
+                newS.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentLineRepository,newS));
                 newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
-                newS.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,newS));
                 newSections.add(newS);
                 outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 j ++;
@@ -303,22 +303,23 @@ public class AssessmentFormService {
 
             outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.TEMPLATE);
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
-            newAssess.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,newAssess));
+            newAssess.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentRepository,newAssess));
 
-            Integer i = 1;
+            Integer i = 0;
             for (OutsourcingAssessmentSection s : sections) {
-                s.setNumber(i);
                 OutsourcingAssessmentSection newS = outsourcingAssessmentSectionRepository.saveAndFlush(s);
+                newS.setNumber(i);
+                newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
-                Integer j = 1;
+                Integer j = 0;
                 for (OutsourcingAssessmentLine o : outsourcingAssessmentLine) {
                     o.setNumber(j);
                     o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);
                     outsourcingAssessmentLineRepository.saveAndFlush(o);
-                    o.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,o));
+                    o.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentLineRepository,o));
                     linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
                     j ++;
                 }
@@ -326,8 +327,7 @@ public class AssessmentFormService {
                 newS.setOutsourcingAssessment(newAssess);
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
-                outsourcingAssessmentSectionRepository.saveAndFlush(newS);
-                newS.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,newS));
+                newS.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentLineRepository,newS));
                 outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 i ++;
             }
