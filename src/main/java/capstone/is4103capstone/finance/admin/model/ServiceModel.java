@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class ServiceModel implements Serializable {
     String serviceName;
     String serviceCode;
+    String itemName;
 //    String vendorCode;
 //    String vendorName;
     String measureUnit;

@@ -119,8 +119,10 @@ public class AssessmentFormService {
     public GetAsseFormListRes retrieveAssessmentForms() throws Exception{
         Employee currentUser = employeeService.getCurrentLoginEmployee();
         List<AssessmentFormSimpleModel> allForms = new ArrayList<>();
+        boolean isOutsourcingStaff = false;
         if (currentUser.getCode().toUpperCase().contains("OUTSOURCING")){
             //it's an outsourcing manager
+            isOutsourcingStaff = true;
             allForms = outsourcingAssessmentRepository.getAllAssessmentsForms();
         }else{
             allForms = outsourcingAssessmentRepository.getAssessmentsUnderMyApproval(currentUser.getId());
@@ -128,7 +130,7 @@ public class AssessmentFormService {
         if (allForms.isEmpty())
             throw new Exception("No assessment forms available.");
 
-        return new GetAsseFormListRes("Succesffully retrieved",false,allForms,false);
+        return new GetAsseFormListRes("Succesffully retrieved",false,allForms,isOutsourcingStaff);
 
     }
 

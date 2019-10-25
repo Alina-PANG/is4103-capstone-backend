@@ -40,19 +40,36 @@ public class AdminInitialization {
     @PostConstruct
     public void init() {
 //
-        List<Currency> currencyList = currencyRepository.findAll();
-        if (currencyList == null || currencyList.size() == 0) {
-            createCurrency();
-            createGeo();
-            System.out.println("-----Created Geographies-----");
-            createEmployee();
-        }
+//        List<Currency> currencyList = currencyRepository.findAll();
+//        if (currencyList == null || currencyList.size() == 0) {
+//            createCurrency();
+//            createGeo();
+//            System.out.println("-----Created Geographies-----");
+//            createEmployee();
+//        }
 //        List<CostCenter> costCenterList = costCenterRepository.findAll();
 //        if (costCenterList == null || costCenterList.size() == 0) {
 //            createCostCenter();
 //        }
-    }
+//        String[] firstNameList = {"Hong","Tom","Amy","Daivd","Outsourcing","BM","Function"};
+//        String[] lastNameList = {"Xu","Green","Brown","Cook","Staff","Approver","Approver"};
+//        String[] usernameList = {"xuhong","user01","user02","user03","outsourcing1","bmapprover","funcapprover"};
+//        String[] codeCpntList = {"5","6","7","8","OUTSOURCING","BM01","FUNC01"};
+//        for (int i=0;i<firstNameList.length;i++){
+//            createEmployeeTemplate(firstNameList[i],lastNameList[i],usernameList[i],"password","huangyingshi@gmail.com",codeCpntList[i]);
+//        }
 
+    }
+    private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
+        Employee newEmployee = new Employee(username, fName, lName, "", password);
+        newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        newEmployee.setCode("EMP-"+codeCPnt);
+        newEmployee.setCreatedBy("admin");
+        newEmployee.setEmail(email);
+        newEmployee.setLastModifiedBy("admin");
+        employeeRepository.save(newEmployee);
+
+    }
     public void createCurrency() {
         Currency c = new Currency("Singapore Dollars", "SGD");
         currencyRepository.save(c);
