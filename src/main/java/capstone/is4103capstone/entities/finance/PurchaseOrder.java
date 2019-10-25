@@ -20,7 +20,7 @@ public class PurchaseOrder extends DBEntityTemplate {
     @Convert(converter = StringListConverter.class)
     private List<String> relatedBJF;
 
-    @OneToMany(mappedBy = "purchaseOrder")
+    @OneToMany(mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
     private List<StatementOfAcctLineItem> statementOfAccount = new ArrayList<>();
 
     @Column(name = "status")

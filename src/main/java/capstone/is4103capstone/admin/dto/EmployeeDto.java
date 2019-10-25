@@ -1,14 +1,13 @@
 package capstone.is4103capstone.admin.dto;
 
 import capstone.is4103capstone.entities.helper.WebAppPermissionMap;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.util.Optional;
 
 
-@JsonInclude(JsonInclude.Include.NON_NULL) // don't serialize nulls since there are optional classes
+@JsonInclude(JsonInclude.Include.NON_EMPTY) // don't serialize nulls since there are optional classes
 public class EmployeeDto implements Serializable {
 
     private Optional<String> id = Optional.empty();
@@ -79,7 +78,6 @@ public class EmployeeDto implements Serializable {
         this.securityId = securityId;
     }
 
-    @JsonIgnore // so DTO to JSON does not display password: null
     public Optional<String> getPassword() {
         return password;
     }

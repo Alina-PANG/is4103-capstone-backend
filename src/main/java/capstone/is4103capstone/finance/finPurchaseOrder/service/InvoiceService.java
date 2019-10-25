@@ -10,10 +10,13 @@ import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.InvoiceRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.Repository.StatementOfAccountLineItemRepository;
+import capstone.is4103capstone.finance.finPurchaseOrder.POEntityCodeHPGeneration;
+import capstone.is4103capstone.finance.finPurchaseOrder.model.InvoiceModel;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateInvoiceReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetInvoiceRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.controller.AssessmentFormController;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.res.GetAssessmentFormRes;
 import capstone.is4103capstone.util.exception.FileStorageException;
@@ -51,20 +54,27 @@ public class InvoiceService {
     public ResponseEntity<GeneralRes> update(CreateInvoiceReq createInvoiceReq, String soaId, String username) {
         try {
             StatementOfAcctLineItem soa = statementOfAccountLineItemRepository.getOne(soaId);
-            Vendor vendor = vendorRepository.getOne(createInvoiceReq.getVendorId());
-            if(soa == null || vendor == null) return ResponseEntity.notFound().build();
+
+            if(soa == null)
+                return ResponseEntity.notFound().build();
 
             Invoice invoice = soa.getInvoice();
-            if(invoice == null) invoice = new Invoice();
+            if(invoice == null)
+                invoice = new Invoice();
 
             invoice.setCurrencyCode(createInvoiceReq.getCurrencyCode());
             invoice.setDescription(createInvoiceReq.getDescription());
             invoice.setPaymentAmount(createInvoiceReq.getTotalAmt());
-            invoice.setVendor(vendor);
+
             invoice.setStatementOfAcctLineItem(soa);
+            invoice.setLastModifiedBy(username);
+            invoice.setLastModifiedDateTime(new Date());
 
             invoice = invoiceRepository.saveAndFlush(invoice);
+            invoice.setCode(POEntityCodeHPGeneration.getCode(invoiceRepository,invoice));
+            invoiceRepository.saveAndFlush(invoice);
             soa.setInvoice(invoice);
+            soa.setPaidAmt(invoice.getPaymentAmount());
             statementOfAccountLineItemRepository.saveAndFlush(soa);
             logger.info("Successfully updated the invoice!");
             return ResponseEntity.ok().body(new GeneralRes("Successfully updated the invoice information!", false));
@@ -76,7 +86,7 @@ public class InvoiceService {
         }
     }
 
-    public ResponseEntity<GeneralRes> storeFile(MultipartFile file, String username, String soaId) {
+    public ResponseEntity<GeneralRes> storeFile(MultipartFile file, String soaId, String username) {
         try {
             StatementOfAcctLineItem soa = statementOfAccountLineItemRepository.getOne(soaId);
             if(soa == null) return ResponseEntity.notFound().build();
@@ -93,7 +103,12 @@ public class InvoiceService {
             invoice.setStatementOfAcctLineItem(soa);
 
             invoice = invoiceRepository.saveAndFlush(invoice);
+            invoice.setCode(POEntityCodeHPGeneration.getCode(invoiceRepository,invoice));
+            invoiceRepository.saveAndFlush(invoice);
             soa.setInvoice(invoice);
+            if(invoice.getPaymentAmount() != null) {
+                soa.setPaidAmt(invoice.getPaymentAmount());
+            }
             statementOfAccountLineItemRepository.saveAndFlush(soa);
             logger.info("Successfully saved the invoice!");
             return ResponseEntity.ok().body(new GeneralRes("Successfully uploaded the invoice!", false));
@@ -116,6 +131,27 @@ public class InvoiceService {
                     .contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity
+                    .badRequest().build();
+        }
+    }
+
+    public ResponseEntity<GeneralRes> getDetail(String id) {
+        try{
+            Invoice invoice = invoiceRepository.getOne(id);
+            if(invoice == null) return ResponseEntity
+                    .notFound().build();
+            InvoiceModel model = new InvoiceModel();
+            model.setCurrencyCode(invoice.getCurrencyCode());
+            model.setDescription(invoice.getDescription());
+            model.setFileName(invoice.getFileName());
+            model.setPaymentAmount(invoice.getPaymentAmount());
+            model.setId(invoice.getId());
+            return ResponseEntity.ok()
+                    .body(new GetInvoiceRes("Successfully retrieved the invoice!", false, model));
         }
         catch (Exception ex){
             ex.printStackTrace();

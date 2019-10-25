@@ -18,6 +18,7 @@ public class CreateOutsourcingReq implements Serializable {
     private String outsourcingTitle;
     private List<String> serviceIdList;
     private String vendorId;
+    private String outsourcingAssessmentId;
 
     @Temporal(TemporalType.DATE)
     private Date dueDiligenceDate;
@@ -37,7 +38,7 @@ public class CreateOutsourcingReq implements Serializable {
     public CreateOutsourcingReq() {
     }
 
-    public CreateOutsourcingReq(String regionId, String countryId, String departmentId, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, String outsourcingTitle, List<String> serviceIdList, String vendorId, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
+    public CreateOutsourcingReq(String regionId, String countryId, String departmentId, OutsourcingTypeEnum outsourcingType, OutsourcingCategoryEnum outsourcingCategory, MaterialityEnum materiality, String outsourcingTitle, List<String> serviceIdList, String vendorId, String outsourcingAssessmentId, Date dueDiligenceDate, Date materialityAssessmentDate, Date bcpTestDate, Date annualSelfAssessmentDate, Date independentAuditDate) {
         this.regionId = regionId;
         this.countryId = countryId;
         this.departmentId = departmentId;
@@ -47,6 +48,7 @@ public class CreateOutsourcingReq implements Serializable {
         this.outsourcingTitle = outsourcingTitle;
         this.serviceIdList = serviceIdList;
         this.vendorId = vendorId;
+        this.outsourcingAssessmentId = outsourcingAssessmentId;
         this.dueDiligenceDate = dueDiligenceDate;
         this.materialityAssessmentDate = materialityAssessmentDate;
         this.bcpTestDate = bcpTestDate;
@@ -164,5 +166,13 @@ public class CreateOutsourcingReq implements Serializable {
 
     public void setIndependentAuditDate(Date independentAuditDate) {
         this.independentAuditDate = independentAuditDate;
+    }
+
+    public String getOutsourcingAssessmentId() {
+        return outsourcingAssessmentId;
+    }
+
+    public void setOutsourcingAssessmentId(String outsourcingAssessmentId) {
+        this.outsourcingAssessmentId = outsourcingAssessmentId;
     }
 }

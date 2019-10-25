@@ -9,18 +9,23 @@ import capstone.is4103capstone.admin.service.RegionService;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.finance.Service;
 import capstone.is4103capstone.entities.supplyChain.Outsourcing;
+import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
+import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
+import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
 import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.model.OutsourcingModel;
 import capstone.is4103capstone.supplychain.model.res.GetOutsourcingRes;
 import capstone.is4103capstone.supplychain.model.res.GetOutsourcingsRes;
+import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service.AssessmentFormService;
+import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import org.springframework.security.core.Authentication;
 import capstone.is4103capstone.supplychain.model.req.CreateOutsourcingReq;
 import org.slf4j.Logger;
@@ -57,6 +62,12 @@ public class OutsourcingService {
     CompanyFunctionService companyFunctionService;
     @Autowired
     ServiceServ serviceServ;
+    @Autowired
+    AssessmentFormService assessmentFormService;
+    @Autowired
+    OutsourcingAssessmentRepository outsourcingAssessmentRepository;
+    @Autowired
+    BJFService bjfService;
 
 
     public GeneralRes createOutsourcing(CreateOutsourcingReq createOutsourcingReq){
@@ -88,6 +99,20 @@ public class OutsourcingService {
                 outsourcing.setDepartmentId(createOutsourcingReq.getDepartmentId());
             }else{
                 throw new Exception("This is not a valid department ID.");
+            }
+
+            if(assessmentFormService.validateAssessmentFormId(createOutsourcingReq.getOutsourcingAssessmentId())){
+                OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.getOne(createOutsourcingReq.getOutsourcingAssessmentId());
+                if(outsourcingAssessment.getOutsourcingAssessmentStatus() != OutsourcingAssessmentStatusEnum.APPROVED){
+                    throw new Exception("This is not a APPROVED outsourcing assessment form. You are not allowed to create new outsourcing based on this assessment form!");
+                }else{
+                    outsourcing.setOutsourcingAssessmentId(createOutsourcingReq.getOutsourcingAssessmentId());
+                    outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.OUTSOURCING_RECORD_CREATED);
+                    outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
+                    bjfService.afterOutsourcing(outsourcingAssessment);
+                }
+            }else{
+                throw new Exception("This is not a valid outsourcing assessment ID.");
             }
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -140,7 +165,7 @@ public class OutsourcingService {
                 return new GetOutsourcingRes("This outsourcing is deleted", true, null);
             }
             else{
-                OutsourcingModel outsourcingModel = transformToOutsourcingModel(outsourcing);
+                OutsourcingModel outsourcingModel = transformToOutsourcingModelDetails(outsourcing);
                 return new GetOutsourcingRes("Successfully retrieved the outsourcing with id " + id, false, outsourcingModel);
             }
         }catch(Exception ex){
@@ -160,7 +185,7 @@ public class OutsourcingService {
                     continue;
                 }
 
-                OutsourcingModel outsourcingModel = transformToOutsourcingModel(outsourcing);
+                OutsourcingModel outsourcingModel = transformToOutsourcingModelOverview(outsourcing);
                 returnList.add(outsourcingModel);
             }
 
@@ -261,12 +286,13 @@ public class OutsourcingService {
         }
     }
 
-    public OutsourcingModel transformToOutsourcingModel(Outsourcing outsourcing){
+    public OutsourcingModel transformToOutsourcingModelDetails(Outsourcing outsourcing){
         GeneralEntityModel region = null;
         GeneralEntityModel country = null;
         GeneralEntityModel department = null;
         List<GeneralEntityModel> serviceList = new ArrayList<>();
         GeneralEntityModel vendor = null;
+        GeneralEntityModel outsouricngAssessment = null;
 
         if(outsourcing.getRegionId() != null){
             Region r = regionRepository.getOne(outsourcing.getRegionId());
@@ -290,15 +316,38 @@ public class OutsourcingService {
                 serviceList.add(serviceModel);
             }
         }
+        if(outsourcing.getOutsourcingAssessmentId() != null){
+            OutsourcingAssessment assessment = outsourcingAssessmentRepository.getOne(outsourcing.getOutsourcingAssessmentId());
+            outsouricngAssessment = new GeneralEntityModel(assessment);
+        }
 
         OutsourcingModel outsourcingModel = new OutsourcingModel(outsourcing.getCode(), outsourcing.getId(), outsourcing.getSeqNo(),
                 outsourcing.getOutsourcingTitle(), region, country, department,
                 outsourcing.getOutsourcingType(), outsourcing.getOutsourcingCategory(), outsourcing.getMateriality(),
-                serviceList, vendor, outsourcing.getDueDiligenceDate(),outsourcing.getMaterialityAssessmentDate(),
+                serviceList, vendor, outsouricngAssessment, outsourcing.getDueDiligenceDate(),outsourcing.getMaterialityAssessmentDate(),
                 outsourcing.getBcpTestDate(), outsourcing.getAnnualSelfAssessmentDate(), outsourcing.getIndependentAuditDate());
 
         return outsourcingModel;
     }
+
+    //faster to load overview info
+    public OutsourcingModel transformToOutsourcingModelOverview(Outsourcing outsourcing){
+        GeneralEntityModel region = null;
+        GeneralEntityModel country = null;
+        GeneralEntityModel department = null;
+        List<GeneralEntityModel> serviceList = new ArrayList<>();
+        GeneralEntityModel vendor = null;
+        GeneralEntityModel outsourcingAssessment = null;
+
+        OutsourcingModel outsourcingModel = new OutsourcingModel(outsourcing.getCode(), outsourcing.getId(), outsourcing.getSeqNo(),
+                outsourcing.getOutsourcingTitle(), region, country, department,
+                outsourcing.getOutsourcingType(), outsourcing.getOutsourcingCategory(), outsourcing.getMateriality(),
+                serviceList, vendor, outsourcingAssessment, outsourcing.getDueDiligenceDate(),outsourcing.getMaterialityAssessmentDate(),
+                outsourcing.getBcpTestDate(), outsourcing.getAnnualSelfAssessmentDate(), outsourcing.getIndependentAuditDate());
+
+        return outsourcingModel;
+    }
+
 
     public Boolean validateOutsourcingId(String id){
         Optional<Outsourcing> outsourcing = outsourcingRepository.findUndeletedOutsourcingById(id);

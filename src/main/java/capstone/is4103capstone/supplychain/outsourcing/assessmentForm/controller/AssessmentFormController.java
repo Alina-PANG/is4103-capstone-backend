@@ -52,6 +52,7 @@ public class AssessmentFormController {
             return ResponseEntity.badRequest().body(new GetAsseFormListRes(ex.getMessage(),true));
         }
     }
+
     @GetMapping("/view-approved")
     public ResponseEntity<GetAsseFormListRes> retrieveApprovedAssessmentForms(){
         try{

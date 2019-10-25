@@ -6,16 +6,14 @@ import java.math.BigDecimal;
 
 public class CreateInvoiceReq {
     private BigDecimal totalAmt;
-    private String vendorId;
     private String description;
     private String currencyCode;
 
     public CreateInvoiceReq() {
     }
 
-    public CreateInvoiceReq(BigDecimal totalAmt, String vendorId, String description, String currencyCode) {
+    public CreateInvoiceReq(BigDecimal totalAmt, String description, String currencyCode) {
         this.totalAmt = totalAmt;
-        this.vendorId = vendorId;
         this.description = description;
         this.currencyCode = currencyCode;
     }
@@ -26,14 +24,6 @@ public class CreateInvoiceReq {
 
     public void setTotalAmt(BigDecimal totalAmt) {
         this.totalAmt = totalAmt;
-    }
-
-    public String getVendorId() {
-        return vendorId;
-    }
-
-    public void setVendorId(String vendorId) {
-        this.vendorId = vendorId;
     }
 
     public String getDescription() {

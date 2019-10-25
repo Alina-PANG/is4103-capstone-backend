@@ -1,16 +1,13 @@
 package capstone.is4103capstone.supplychain.outsourcing.assessmentForm.service;
 
-import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.finance.BJF;
-import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.supplyChain.Outsourcing;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentLine;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessmentSection;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
-import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFModel;
 import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -21,6 +18,7 @@ import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentLineR
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentSectionRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingRepository;
+import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.configuration.ThreadPoolTaskSchedulerConfig;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.AssessmentFormSimpleModel;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateTemplateReq;
@@ -36,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -175,12 +174,16 @@ public class AssessmentFormService {
         try {
             logger.info("Action performed by: "+username+" on "+new Date());
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
-            Employee creater = employeeService.validateUser(username);
-            BJF b = bjfRepository.getOne(createResponseReq.getBjfId());
-            if(creater == null || b == null) {
+            Employee creater = null;
+            BJF b = null;
+            try{
+                creater = employeeService.validateUser(username);
+                b = bjfService.validateBJF(createResponseReq.getBjfId());
+            }catch (EntityNotFoundException ex){
                 logger.info("Cannot find the user!");
                 return ResponseEntity.notFound().build();
             }
+
             if(b.getRelated_outsourcing_assessment() != null){
                 OutsourcingAssessment temp = b.getRelated_outsourcing_assessment();
                 if(temp != null){
@@ -204,12 +207,13 @@ public class AssessmentFormService {
             outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL);
             outsourcingAssessment.setBusinessCaseDescription(createResponseReq.getBusinessCaseDescription());
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
+            newAssess.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentRepository,newAssess));
 
             int j = 0;
             List<OutsourcingAssessmentSection> newSections = new ArrayList<>();
             for (OutsourcingAssessmentSection s : sections) {
-                s.setNumber(j);
                 OutsourcingAssessmentSection newS = new OutsourcingAssessmentSection();
+                newS.setNumber(j);
                 newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
@@ -222,26 +226,38 @@ public class AssessmentFormService {
                     o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);
-                    linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
+                    o = outsourcingAssessmentLineRepository.saveAndFlush(o);
+                    o.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentLineRepository,o));
+                    linesSaved.add(o);
+                    outsourcingAssessmentLineRepository.saveAndFlush(o);
                 }
                 newS.setOutsourcingAssessmentLines(linesSaved);
                 newS.setOutsourcingAssessment(newAssess);
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
-                newSections.add(outsourcingAssessmentSectionRepository.saveAndFlush(newS));
+                newS.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentLineRepository,newS));
+                newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
+                newSections.add(newS);
+                outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 j ++;
             }
             newAssess.setSectionList(newSections);
             newAssess.setCreatedBy(username);
             newAssess.setCreatedDateTime(new Date());
-            newAssess.setRelated_BJF(b);
+            newAssess = outsourcingAssessmentRepository.saveAndFlush(newAssess);
 
-            outsourcingAssessmentRepository.saveAndFlush(newAssess);
+            newAssess.setRelated_BJF(b);
             b.setRelated_outsourcing_assessment(newAssess);
+            if(newAssess.getSeqNo() == null){
+                newAssess.setSeqNo(new Long(outsourcingAssessmentRepository.findAll().size()));
+            }
+
+            newAssess = outsourcingAssessmentRepository.saveAndFlush(newAssess);
             bjfRepository.saveAndFlush(b);
+
             Employee approverA = creater.getManager();
             createApprovalTicket(creater.getUserName(), approverA, newAssess,"Please review and approve the outsourcing assessment form.");
-            mailService.sendOscAssForm("noreply@gmail.com", "hangzhipang@u.nus.edu", "test the outsourcing form", "www.google.com", "xxxTitleA",  newAssess);
+            mailService.sendOscAssForm("", creater.getEmail(), "You have just created an outsourcing assessment form", "", "",  newAssess);
             return ResponseEntity
                     .ok()
                     .body(new GeneralRes("Successfully created the outsourcing assessment form!", false));
@@ -287,19 +303,23 @@ public class AssessmentFormService {
 
             outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.TEMPLATE);
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
+            newAssess.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentRepository,newAssess));
 
-            Integer i = 1;
+            Integer i = 0;
             for (OutsourcingAssessmentSection s : sections) {
-                s.setNumber(i);
                 OutsourcingAssessmentSection newS = outsourcingAssessmentSectionRepository.saveAndFlush(s);
+                newS.setNumber(i);
+                newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 List<OutsourcingAssessmentLine> outsourcingAssessmentLine = s.getOutsourcingAssessmentLines();
                 List<OutsourcingAssessmentLine> linesSaved = new ArrayList<>();
-                Integer j = 1;
+                Integer j = 0;
                 for (OutsourcingAssessmentLine o : outsourcingAssessmentLine) {
                     o.setNumber(j);
                     o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);
+                    outsourcingAssessmentLineRepository.saveAndFlush(o);
+                    o.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentLineRepository,o));
                     linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
                     j ++;
                 }
@@ -307,6 +327,7 @@ public class AssessmentFormService {
                 newS.setOutsourcingAssessment(newAssess);
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
+                newS.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingAssessmentLineRepository,newS));
                 outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 i ++;
             }
@@ -403,5 +424,14 @@ public class AssessmentFormService {
         String link = "http://localhost:3000/api/assessmentForm/getDetails/"+outsourcing.getId();
         model.put("link", link);
         return new Mail(from, to, subject, model);
+    }
+
+    public Boolean validateAssessmentFormId(String id){
+        Optional<OutsourcingAssessment> optionalOutsourcingAssessment = outsourcingAssessmentRepository.findUndeletedAssessmentFormById(id);
+        if (!optionalOutsourcingAssessment.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
     }
 }

@@ -10,6 +10,8 @@ import capstone.is4103capstone.entities.finance.StatementOfAcctLineItem;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
+import capstone.is4103capstone.finance.finPurchaseOrder.POEntityCodeHPGeneration;
+import capstone.is4103capstone.finance.finPurchaseOrder.model.POModel;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreatePOReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderRes;
@@ -68,8 +70,13 @@ public class PurchaseOrderService {
             purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
             purchaseOrder.setApprover(createPOReq.getApproverUsername());
+            if(purchaseOrder.getSeqNo() == null){
+                purchaseOrder.setSeqNo(new Long(purchaseOrderRepository.findAll().size()));
+            }
             logger.info("Creating purchase order with related BJF: "+createPOReq.getRelatedBJF());
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
+            purchaseOrder.setCode(POEntityCodeHPGeneration.getCode(purchaseOrderRepository,purchaseOrder));
+            purchaseOrderRepository.saveAndFlush(purchaseOrder);
             bjfService.afterPOUpdated(purchaseOrder);
 
             return ResponseEntity
@@ -86,6 +93,7 @@ public class PurchaseOrderService {
     public ResponseEntity<GeneralRes> getPO(String id){
         try{
             PurchaseOrder po = purchaseOrderRepository.getOne(id);
+            Vendor v = po.getVendor();
             List<String> bjfList = po.getRelatedBJF();
             List<String> bjfCode = new ArrayList<>();
             for(String bjfId: bjfList){
@@ -96,7 +104,15 @@ public class PurchaseOrderService {
             }
             if(po == null) return ResponseEntity
                     .notFound().build();
-            else return ResponseEntity.ok().body(new GetPurchaseOrderRes("Successfully retrieved the purchase order!", true, po, bjfCode));
+
+            POModel model = new POModel();
+            model.setCurrencyCode(po.getCurrencyCode());
+            model.setTotalAmount(po.getTotalAmount());
+            model.setVendorId(v.getId());
+            model.setVendorName(v.getObjectName());
+            model.setCode(po.getCode());
+            model.setId(po.getId());
+            return ResponseEntity.ok().body(new GetPurchaseOrderRes("Successfully retrieved the purchase order!", true, model, bjfCode));
         }
         catch (Exception ex){
             ex.printStackTrace();

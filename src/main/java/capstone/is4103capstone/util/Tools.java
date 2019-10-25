@@ -1,6 +1,8 @@
 package capstone.is4103capstone.util;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -12,10 +14,16 @@ public class Tools {
         Calendar c = Calendar.getInstance();
         c.setTime(today);
         c.add(Calendar.DATE,-1);
-
-
-
         return c.getTime();
+    }
+    public static int getCalendarYear(){
+        Calendar now = Calendar.getInstance();
+        return now.get(Calendar.YEAR);
+    }
+    public static boolean isSameYear(Date one, int calendarYear){
+        LocalDate localDate = one.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        int year  = localDate.getYear();
+        return year == calendarYear;
     }
 
     public static Date getTomorrow(Date today){
