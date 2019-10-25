@@ -10,11 +10,13 @@ import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.InvoiceRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.Repository.StatementOfAccountLineItemRepository;
+import capstone.is4103capstone.finance.finPurchaseOrder.POEntityCodeHPGeneration;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.InvoiceModel;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateInvoiceReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetInvoiceRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.controller.AssessmentFormController;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.res.GetAssessmentFormRes;
 import capstone.is4103capstone.util.exception.FileStorageException;
@@ -69,6 +71,8 @@ public class InvoiceService {
             invoice.setLastModifiedDateTime(new Date());
 
             invoice = invoiceRepository.saveAndFlush(invoice);
+            invoice.setCode(POEntityCodeHPGeneration.getCode(invoiceRepository,invoice));
+            invoiceRepository.saveAndFlush(invoice);
             soa.setInvoice(invoice);
             soa.setPaidAmt(invoice.getPaymentAmount());
             statementOfAccountLineItemRepository.saveAndFlush(soa);
@@ -99,6 +103,8 @@ public class InvoiceService {
             invoice.setStatementOfAcctLineItem(soa);
 
             invoice = invoiceRepository.saveAndFlush(invoice);
+            invoice.setCode(POEntityCodeHPGeneration.getCode(invoiceRepository,invoice));
+            invoiceRepository.saveAndFlush(invoice);
             soa.setInvoice(invoice);
             if(invoice.getPaymentAmount() != null) {
                 soa.setPaidAmt(invoice.getPaymentAmount());

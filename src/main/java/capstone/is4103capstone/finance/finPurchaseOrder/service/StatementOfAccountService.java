@@ -4,6 +4,8 @@ import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.finance.StatementOfAcctLineItem;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.Repository.StatementOfAccountLineItemRepository;
+import capstone.is4103capstone.finance.finPurchaseOrder.POEntityCodeHPGeneration;
+import capstone.is4103capstone.finance.finPurchaseOrder.model.SOAModel;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoAByInvoiceReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoAByScheduleReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
@@ -38,7 +40,7 @@ public class StatementOfAccountService {
 
     public ResponseEntity<GeneralRes> createBySchedule(CreateSoAByScheduleReq createSoAByScheduleReq, String username){
         try{
-
+            Date endDate = dateFormatter.parse(createSoAByScheduleReq.getEndDate());
             Date current = dateFormatter.parse(createSoAByScheduleReq.getStartDate());
             List<StatementOfAcctLineItem> items = new ArrayList<>();
             Calendar calendar = Calendar.getInstance();
@@ -50,28 +52,12 @@ public class StatementOfAccountService {
             DateTime dateTime2 = new DateTime(createSoAByScheduleReq.getEndDate());
 
             // 0: weekly, 1: monthly, 2: yearly
-            if(createSoAByScheduleReq.getFrequency() == 0){
-                toAdd = Calendar.WEEK_OF_YEAR;
-                numberOfLoops = Weeks.weeksBetween(dateTime1, dateTime2).getWeeks();
-            }
-            else if(createSoAByScheduleReq.getFrequency() == 1) {
-                toAdd = Calendar.MONTH;
-                numberOfLoops = Months.monthsBetween(dateTime1, dateTime2).getMonths();
-            }
-            else {
-                toAdd = Calendar.YEAR;
-                numberOfLoops = Years.yearsBetween(dateTime1, dateTime2).getYears();
-            }
-
-            numberOfLoops /= createSoAByScheduleReq.getNumFrequency() + 1;
-            logger.info("There will be "+numberOfLoops+" loops.");
-            BigDecimal actualPmt = createSoAByScheduleReq.getTotalAmount().divide(BigDecimal.valueOf(numberOfLoops));
-
-            Date endDate = dateFormatter.parse(createSoAByScheduleReq.getEndDate());
+            if(createSoAByScheduleReq.getFrequency() == 0) toAdd = Calendar.WEEK_OF_YEAR;
+            else if(createSoAByScheduleReq.getFrequency() == 1) toAdd = Calendar.MONTH;
+            else toAdd = Calendar.YEAR;
 
             while (current.before(endDate)) {
                 StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem();
-                statementOfAcctLineItem.setActualPmt(actualPmt);
                 statementOfAcctLineItem.setPurchaseOrder(po);
                 statementOfAcctLineItem.setScheduleDate(current);
                 statementOfAcctLineItem.setCreatedBy(username);
@@ -80,11 +66,21 @@ public class StatementOfAccountService {
                 calendar.setTime(current);
                 calendar.add(toAdd, createSoAByScheduleReq.getNumFrequency());
                 current = calendar.getTime();
+                numberOfLoops ++;
+            }
+
+            logger.info("There will be "+numberOfLoops+" loops.");
+            BigDecimal actualPmt = createSoAByScheduleReq.getTotalAmount().divide(BigDecimal.valueOf(numberOfLoops));
+
+            for(StatementOfAcctLineItem s: items){
+                s.setActualPmt(actualPmt);
+                s.setCode(POEntityCodeHPGeneration.getCode(statementOfAccountLineItemRepository,s));
+                statementOfAccountLineItemRepository.saveAndFlush(s);
             }
 
             po.setStatementOfAccount(items);
             purchaseOrderRepository.saveAndFlush(po);
-            return ResponseEntity.ok().body(new GetSoARes("Successfully saved the statement of accounts!", false, items));
+            return ResponseEntity.ok().body(new GeneralRes("Successfully saved the statement of accounts!", false));
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -108,6 +104,8 @@ public class StatementOfAccountService {
             statementOfAcctLineItem.setCreatedDateTime(new Date());
 
             statementOfAcctLineItem = statementOfAccountLineItemRepository.saveAndFlush(statementOfAcctLineItem);
+            statementOfAcctLineItem.setCode(POEntityCodeHPGeneration.getCode(statementOfAccountLineItemRepository,statementOfAcctLineItem));
+            statementOfAccountLineItemRepository.saveAndFlush(statementOfAcctLineItem);
 
             if(po.getStatementOfAccount() == null) po.setStatementOfAccount(new ArrayList<StatementOfAcctLineItem>());
             po.getStatementOfAccount().add(statementOfAcctLineItem);
@@ -156,9 +154,14 @@ public class StatementOfAccountService {
             if(po == null) return ResponseEntity
                     .notFound().build();
             List<StatementOfAcctLineItem> list = po.getStatementOfAccount();
+
             if(list == null) return ResponseEntity
                     .notFound().build();
-            else return ResponseEntity.ok().body(new GetSoARes("Successfully retrieved the purchase orders!", true, list));
+            List<SOAModel> result = new ArrayList<>();
+            for(StatementOfAcctLineItem l: list){
+                result.add(new SOAModel(l.getPaidAmt(), l.getActualPmt(), l.getScheduleDate(), l.getInvoice().getId()));
+            }
+            return ResponseEntity.ok().body(new GetSoARes("Successfully retrieved the purchase orders!", true, result));
         }
         catch (Exception ex){
             ex.printStackTrace();

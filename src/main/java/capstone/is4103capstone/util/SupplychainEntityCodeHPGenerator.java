@@ -18,6 +18,9 @@ public class SupplychainEntityCodeHPGenerator {
     private final String OUTSOURCING_TEMPLATE = "Outsourcing-%1$s";
     private final String OUTSOURCING_SELF_ASSESSMENT_TEMPLATE = "OutsourcingSelfAssessment-%1$s";
     private final String OUTSOURCING_SELF_ASSESSMENT_QUESTION_TEMPLATE = "OutsourcingSelfAssessmentQuestion-%1$s";
+    private final String OUTSOURCING_ASS_FORM = "OutsourcingAssessment-%1$s";
+    private final String OUTSOURCING_ASS_FORM_SECTION = "OutsourcingAssessmentSection-%1$s";
+    private final String OUTSOURCING_ASS_FORM_LINE = "OutsourcingAssessmentLine%1$s";
 
     public String generateCode(JpaRepository repo, DBEntityTemplate entity) throws Exception {
         Optional<DBEntityTemplate> entityOptional = repo.findById(entity.getId());
@@ -47,12 +50,25 @@ public class SupplychainEntityCodeHPGenerator {
                         break;
                     case "ChildContract":
                         code = String.format(CHILD_CONTRACT_TEMPLATE, seqNoStr);
+                        break;
                     case "Outsourcing":
                         code = String.format(OUTSOURCING_TEMPLATE, seqNoStr);
+                        break;
                     case "OutsourcingSelfAssessment":
                         code = String.format(OUTSOURCING_SELF_ASSESSMENT_TEMPLATE, seqNoStr);
+                        break;
                     case "OutsourcingSelfAssessmentQuestion":
                         code = String.format(OUTSOURCING_SELF_ASSESSMENT_QUESTION_TEMPLATE, seqNoStr);
+                        break;
+                    case "OutsourcingAssessment":
+                        code = String.format(OUTSOURCING_ASS_FORM, seqNoStr);
+                        break;
+                    case "OutsourcingAssessmentSection":
+                        code = String.format(OUTSOURCING_ASS_FORM_SECTION, seqNoStr);
+                        break;
+                    case "OutsourcingAssessmentLine":
+                        code = String.format(OUTSOURCING_ASS_FORM_LINE, seqNoStr);
+                        break;
                     default:
                         System.out.println("Not found");
                 }

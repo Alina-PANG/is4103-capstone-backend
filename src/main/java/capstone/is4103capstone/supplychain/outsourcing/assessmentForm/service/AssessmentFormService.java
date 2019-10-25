@@ -21,6 +21,7 @@ import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentLineR
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentSectionRepository;
 import capstone.is4103capstone.supplychain.Repository.OutsourcingRepository;
+import capstone.is4103capstone.supplychain.SCMEntityCodeHPGeneration;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.configuration.ThreadPoolTaskSchedulerConfig;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.AssessmentFormSimpleModel;
 import capstone.is4103capstone.supplychain.outsourcing.assessmentForm.model.req.CreateTemplateReq;
@@ -204,6 +205,7 @@ public class AssessmentFormService {
             outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL);
             outsourcingAssessment.setBusinessCaseDescription(createResponseReq.getBusinessCaseDescription());
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
+            newAssess.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,newAssess));
 
             int j = 0;
             List<OutsourcingAssessmentSection> newSections = new ArrayList<>();
@@ -222,13 +224,19 @@ public class AssessmentFormService {
                     o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);
-                    linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
+                    o = outsourcingAssessmentLineRepository.saveAndFlush(o);
+                    o.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,o));
+                    linesSaved.add(o);
+                    outsourcingAssessmentLineRepository.saveAndFlush(o);
                 }
                 newS.setOutsourcingAssessmentLines(linesSaved);
                 newS.setOutsourcingAssessment(newAssess);
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
-                newSections.add(outsourcingAssessmentSectionRepository.saveAndFlush(newS));
+                newS = outsourcingAssessmentSectionRepository.saveAndFlush(newS);
+                newS.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,newS));
+                newSections.add(newS);
+                outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 j ++;
             }
             newAssess.setSectionList(newSections);
@@ -287,6 +295,7 @@ public class AssessmentFormService {
 
             outsourcingAssessment.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.TEMPLATE);
             OutsourcingAssessment newAssess = outsourcingAssessmentRepository.saveAndFlush(outsourcingAssessment);
+            newAssess.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,newAssess));
 
             Integer i = 1;
             for (OutsourcingAssessmentSection s : sections) {
@@ -300,6 +309,8 @@ public class AssessmentFormService {
                     o.setCreatedBy(username);
                     o.setCreatedDateTime(new Date());
                     o.setOutsourcingAssessmentSection(newS);
+                    outsourcingAssessmentLineRepository.saveAndFlush(o);
+                    o.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,o));
                     linesSaved.add(outsourcingAssessmentLineRepository.saveAndFlush(o));
                     j ++;
                 }
@@ -307,6 +318,8 @@ public class AssessmentFormService {
                 newS.setOutsourcingAssessment(newAssess);
                 newS.setCreatedBy(username);
                 newS.setCreatedDateTime(new Date());
+                outsourcingAssessmentSectionRepository.saveAndFlush(newS);
+                newS.setCode(SCMEntityCodeHPGeneration.getCode(outsourcingRepository,newS));
                 outsourcingAssessmentSectionRepository.saveAndFlush(newS);
                 i ++;
             }
