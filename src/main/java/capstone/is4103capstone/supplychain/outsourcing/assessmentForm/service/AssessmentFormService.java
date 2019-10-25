@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -175,12 +176,16 @@ public class AssessmentFormService {
         try {
             logger.info("Action performed by: "+username+" on "+new Date());
             OutsourcingAssessment outsourcingAssessment = new OutsourcingAssessment();
-            Employee creater = employeeService.validateUser(username);
-            BJF b = bjfRepository.getOne(createResponseReq.getBjfId());
-            if(creater == null || b == null) {
+            Employee creater = null;
+            BJF b = null;
+            try{
+                creater = employeeService.validateUser(username);
+                b = bjfService.validateBJF(createResponseReq.getBjfId());
+            }catch (EntityNotFoundException ex){
                 logger.info("Cannot find the user!");
                 return ResponseEntity.notFound().build();
             }
+
             if(b.getRelated_outsourcing_assessment() != null){
                 OutsourcingAssessment temp = b.getRelated_outsourcing_assessment();
                 if(temp != null){
@@ -234,11 +239,14 @@ public class AssessmentFormService {
             newAssess.setSectionList(newSections);
             newAssess.setCreatedBy(username);
             newAssess.setCreatedDateTime(new Date());
-            newAssess.setRelated_BJF(b);
+            newAssess = outsourcingAssessmentRepository.saveAndFlush(newAssess);
 
-            outsourcingAssessmentRepository.saveAndFlush(newAssess);
+            newAssess.setRelated_BJF(b);
             b.setRelated_outsourcing_assessment(newAssess);
+
+            newAssess = outsourcingAssessmentRepository.saveAndFlush(newAssess);
             bjfRepository.saveAndFlush(b);
+
             Employee approverA = creater.getManager();
             createApprovalTicket(creater.getUserName(), approverA, newAssess,"Please review and approve the outsourcing assessment form.");
             mailService.sendOscAssForm("noreply@gmail.com", "hangzhipang@u.nus.edu", "test the outsourcing form", "www.google.com", "xxxTitleA",  newAssess);
