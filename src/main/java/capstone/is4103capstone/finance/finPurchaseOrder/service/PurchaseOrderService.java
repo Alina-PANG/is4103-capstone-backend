@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -119,6 +120,8 @@ public class PurchaseOrderService {
             model.setVendorName(v.getObjectName());
             model.setCode(po.getCode());
             model.setId(po.getId());
+            po.getStatementOfAccount().size();
+            model.setTotalPaidAmount(calculatePOPaidAmt(po));
             return ResponseEntity.ok().body(new GetPurchaseOrderRes("Successfully retrieved the purchase order!", true, model, bjfCode));
         }
         catch (Exception ex){
@@ -187,5 +190,14 @@ public class PurchaseOrderService {
                     .badRequest()
                     .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
         }
+    }
+
+    private BigDecimal calculatePOPaidAmt(PurchaseOrder po){
+        List<StatementOfAcctLineItem> soa = po.getStatementOfAccount();
+        BigDecimal total = BigDecimal.ZERO;
+        for (StatementOfAcctLineItem l:soa){
+            total = total.add(l.getPaidAmt());
+        }
+        return total;
     }
 }
