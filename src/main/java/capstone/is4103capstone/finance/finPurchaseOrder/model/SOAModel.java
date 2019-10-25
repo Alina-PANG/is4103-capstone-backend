@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class SOAModel implements Serializable {
+    private String id;
     private BigDecimal paidAmt;
     private BigDecimal actualPmt;
     @Temporal(TemporalType.DATE)
@@ -15,6 +16,22 @@ public class SOAModel implements Serializable {
     private String invoice_code;
 
     public SOAModel() {
+    }
+
+    public SOAModel(String id, BigDecimal paidAmt, BigDecimal actualPmt, Date scheduleDate) {
+        this.id = id;
+        this.paidAmt = paidAmt;
+        this.actualPmt = actualPmt;
+        this.scheduleDate = scheduleDate;
+    }
+
+    public SOAModel(String id, BigDecimal paidAmt, BigDecimal actualPmt, Date scheduleDate, String invoice_id, String invoice_code) {
+        this.id = id;
+        this.paidAmt = paidAmt;
+        this.actualPmt = actualPmt;
+        this.scheduleDate = scheduleDate;
+        this.invoice_id = invoice_id;
+        this.invoice_code = invoice_code;
     }
 
     public SOAModel(BigDecimal paidAmt, BigDecimal actualPmt, Date scheduleDate, String invoice_id, String invoice_code) {
@@ -37,6 +54,14 @@ public class SOAModel implements Serializable {
 
     public void setInvoice_code(String invoice_code) {
         this.invoice_code = invoice_code;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public BigDecimal getPaidAmt() {
