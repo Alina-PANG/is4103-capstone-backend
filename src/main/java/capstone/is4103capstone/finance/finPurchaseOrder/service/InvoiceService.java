@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -127,10 +128,19 @@ public class InvoiceService {
                     .notFound().build();
             Resource resource = new ByteArrayResource(invoice.getData());
             String contentType = "application/octet-stream";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename="+resource.getFilename());
+
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
+
+//            return ResponseEntity
+//                    .ok()
+//                    .headers(headers)
+//                    .body(new InputStreamResource(resource.getInputStream()));
         }
         catch (Exception ex){
             ex.printStackTrace();

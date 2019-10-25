@@ -77,7 +77,7 @@ public class PurchaseOrderController {
     }
 
     @PostMapping("/approvePO/{id}")
-    public ResponseEntity<GeneralRes> getListPO(@PathVariable("id") String id, @RequestParam(name="approved", required=true) int approved){
+    public ResponseEntity<GeneralRes> approve(@PathVariable("id") String id, @RequestParam(name="approved", required=true) int approved){
         System.out.println("reached!");
         if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
             return purchaseOrderService.approvePO(id, approved == 1);
