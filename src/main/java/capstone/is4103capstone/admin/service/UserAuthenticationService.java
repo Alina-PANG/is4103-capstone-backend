@@ -146,7 +146,8 @@ public class UserAuthenticationService {
     public WebAppPermissionMapDto updateWebAppPermissions(String userUuid, WebAppPermissionMapDto webAppPermissionMapDto) throws Exception {
         String userUuidForCurrentOperation = userUuid;
         // check if the dto contains useruuid property. if yes, then use that instead.
-        if (webAppPermissionMapDto.getUserUuid().isPresent()) userUuidForCurrentOperation = webAppPermissionMapDto.getUserUuid().get();
+        if (webAppPermissionMapDto.getUserUuid().isPresent())
+            userUuidForCurrentOperation = webAppPermissionMapDto.getUserUuid().get();
         Optional<Employee> employee = er.findById(userUuidForCurrentOperation);
 
         if (employee.isPresent()) {
