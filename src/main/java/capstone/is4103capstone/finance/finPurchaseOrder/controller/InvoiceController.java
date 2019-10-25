@@ -63,7 +63,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/download/{invoiceId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("invoiceId") String id) {
+    public ResponseEntity<byte[]> downloadFile(@PathVariable("invoiceId") String id) {
         if (AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
             return invoiceService.getFile(id);
         else

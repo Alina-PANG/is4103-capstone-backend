@@ -27,6 +27,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -121,7 +122,7 @@ public class InvoiceService {
         }
     }
 
-    public ResponseEntity<Resource> getFile(String fileId) {
+    public ResponseEntity<byte[]> getFile(String fileId) {
         try{
             Invoice invoice = invoiceRepository.getOne(fileId);
             if(invoice == null) return ResponseEntity
@@ -129,13 +130,16 @@ public class InvoiceService {
             Resource resource = new ByteArrayResource(invoice.getData());
             String contentType = "application/octet-stream";
 
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.add("Content-Disposition", "attachment; filename="+resource.getFilename());
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.valueOf(invoice.getFileType()));
+            header.setContentLength(invoice.getData().length);
+            header.set("Content-Disposition", "attachment; filename=" + invoice.getFileName());
 
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
+            return new ResponseEntity<>(invoice.getData(), header, HttpStatus.OK);
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.parseMediaType(contentType))
+//                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+//                    .body(resource);
 
 //            return ResponseEntity
 //                    .ok()
