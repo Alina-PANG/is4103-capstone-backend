@@ -39,7 +39,9 @@ public class BJF extends RequestFormTemplate {
 
     private BJFStatusEnum bjfStatus = BJFStatusEnum.PENDING_APPROVAL;
 
-    @OneToOne(mappedBy = "related_BJF")
+
+    @OneToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "oa_id",nullable = true)
     @JsonIgnore
     private OutsourcingAssessment related_outsourcing_assessment;
 

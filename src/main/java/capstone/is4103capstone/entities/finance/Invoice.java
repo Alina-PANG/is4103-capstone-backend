@@ -23,16 +23,14 @@ public class Invoice extends DBEntityTemplate {
     private String fileName;
 
     @OneToOne(fetch = FetchType.LAZY)
-    StatementOfAcctLineItem statementOfAcctLineItem;
+    @JoinColumn(name = "soa_id")
+    @JsonIgnore
+    private StatementOfAcctLineItem statementOfAcctLineItem;
 
 
     @Lob
     private byte[] data;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vendor_id")
-    @JsonIgnore
-    private Vendor vendor;
 
     public Invoice() {
     }
@@ -104,13 +102,5 @@ public class Invoice extends DBEntityTemplate {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public Vendor getVendor() {
-        return vendor;
-    }
-
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
     }
 }

@@ -70,4 +70,13 @@ public class InvoiceController {
             return ResponseEntity
                     .badRequest().build();
     }
+
+    @GetMapping("/getDetail/{invoiceId}")
+    public ResponseEntity<GeneralRes> getDetail(@PathVariable("invoiceId") String id) {
+        if (AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
+            return invoiceService.getDetail(id);
+        else
+            return ResponseEntity
+                    .badRequest().build();
+    }
 }
