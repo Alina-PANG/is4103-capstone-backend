@@ -347,8 +347,9 @@ public class OutsourcingService {
             CompanyFunction d = functionRepository.getOne(outsourcing.getDepartmentId());
             department = new GeneralEntityModel(d);
         }
-        if(outsourcing.getOutsourcedVendor() != null){
-            vendor = new GeneralEntityModel(outsourcing.getOutsourcedVendor());
+        if(outsourcing.getCountryId() != null){
+            Country c = countryRepository.getOne(outsourcing.getCountryId());
+            country = new GeneralEntityModel(c);
         }
 
         OutsourcingModel outsourcingModel = new OutsourcingModel(outsourcing.getCode(), outsourcing.getId(), outsourcing.getSeqNo(),
