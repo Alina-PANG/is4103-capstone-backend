@@ -1,6 +1,7 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.model.res;
 
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
+import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.model.GeneralRes;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 public class GetPurchaseOrderRes extends GeneralRes {
     PurchaseOrder purchaseOrder;
     List<String> bjfCode;
+    Vendor v;
 
     public GetPurchaseOrderRes(PurchaseOrder purchaseOrder) {
         this.purchaseOrder = purchaseOrder;
@@ -18,6 +20,18 @@ public class GetPurchaseOrderRes extends GeneralRes {
         this.purchaseOrder = purchaseOrder;
     }
 
+    public GetPurchaseOrderRes(PurchaseOrder purchaseOrder, List<String> bjfCode, Vendor v) {
+        this.purchaseOrder = purchaseOrder;
+        this.bjfCode = bjfCode;
+        this.v = v;
+    }
+
+    public GetPurchaseOrderRes(String message, Boolean hasError, PurchaseOrder purchaseOrder, List<String> bjfCode, Vendor v) {
+        super(message, hasError);
+        this.purchaseOrder = purchaseOrder;
+        this.bjfCode = bjfCode;
+        this.v = v;
+    }
 
     public GetPurchaseOrderRes(String message, Boolean hasError, PurchaseOrder purchaseOrder, List<String> bjfCode) {
         super(message, hasError);
