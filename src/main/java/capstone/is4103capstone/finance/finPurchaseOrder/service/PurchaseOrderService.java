@@ -19,6 +19,7 @@ import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
+import capstone.is4103capstone.supplychain.service.VendorService;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class PurchaseOrderService {
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
-    VendorRepository vendorRepository;
+    VendorService vendorService;
     @Autowired
     BjfRepository bjfRepository;
     @Autowired
@@ -59,8 +60,10 @@ public class PurchaseOrderService {
                     purchaseOrderRepository.saveAndFlush(temp);
                 }
             }
+            if (createPOReq.getPoNumber() == null || createPOReq.getPoNumber().isEmpty())
+                throw new Exception("PO Number cannot be null or empty.");
 
-            Vendor v = vendorRepository.getOne(createPOReq.getVendorid());
+            Vendor v = vendorService.validateVendor(createPOReq.getVendorid());
             purchaseOrder.setVendor(v);
             purchaseOrder.setStatus(ApprovalStatusEnum.APPROVED);
             purchaseOrder.setTotalAmount(createPOReq.getAmount());
@@ -68,6 +71,10 @@ public class PurchaseOrderService {
             purchaseOrder.setCreatedBy(employeeService.getCurrentLoginUsername());
             purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
             purchaseOrder.setCode(createPOReq.getPoNumber());
+            purchaseOrder.setObjectName(createPOReq.getPoNumber());
+
+
+
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
             purchaseOrder.setApprover(createPOReq.getApproverUsername());
             if(purchaseOrder.getSeqNo() == null){
