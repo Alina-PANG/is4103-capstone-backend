@@ -2,41 +2,36 @@ package capstone.is4103capstone.finance.finPurchaseOrder.model.res;
 
 import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.finance.finPurchaseOrder.model.POModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 
 import java.util.List;
 
 public class GetPurchaseOrderRes extends GeneralRes {
-    PurchaseOrder purchaseOrder;
+    POModel purchaseOrder;
     List<String> bjfCode;
-    Vendor v;
 
-    public GetPurchaseOrderRes(PurchaseOrder purchaseOrder) {
-        this.purchaseOrder = purchaseOrder;
+    public GetPurchaseOrderRes() {
     }
 
-    public GetPurchaseOrderRes(String message, Boolean hasError, PurchaseOrder purchaseOrder) {
-        super(message, hasError);
-        this.purchaseOrder = purchaseOrder;
-    }
-
-    public GetPurchaseOrderRes(PurchaseOrder purchaseOrder, List<String> bjfCode, Vendor v) {
-        this.purchaseOrder = purchaseOrder;
-        this.bjfCode = bjfCode;
-        this.v = v;
-    }
-
-    public GetPurchaseOrderRes(String message, Boolean hasError, PurchaseOrder purchaseOrder, List<String> bjfCode, Vendor v) {
+    public GetPurchaseOrderRes(String message, Boolean hasError, POModel purchaseOrder, List<String> bjfCode) {
         super(message, hasError);
         this.purchaseOrder = purchaseOrder;
         this.bjfCode = bjfCode;
-        this.v = v;
     }
 
-    public GetPurchaseOrderRes(String message, Boolean hasError, PurchaseOrder purchaseOrder, List<String> bjfCode) {
-        super(message, hasError);
+    public GetPurchaseOrderRes(POModel purchaseOrder, List<String> bjfCode) {
         this.purchaseOrder = purchaseOrder;
         this.bjfCode = bjfCode;
+
+    }
+
+    public POModel getPurchaseOrder() {
+        return purchaseOrder;
+    }
+
+    public void setPurchaseOrder(POModel purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
     }
 
     public List<String> getBjfCode() {
@@ -47,13 +42,5 @@ public class GetPurchaseOrderRes extends GeneralRes {
         this.bjfCode = bjfCode;
     }
 
-
-
-    public PurchaseOrder getPurchaseOrder() {
-        return purchaseOrder;
-    }
-
-    public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
-        this.purchaseOrder = purchaseOrder;
-    }
 }
+

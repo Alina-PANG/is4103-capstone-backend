@@ -248,13 +248,16 @@ public class AssessmentFormService {
 
             newAssess.setRelated_BJF(b);
             b.setRelated_outsourcing_assessment(newAssess);
+            if(newAssess.getSeqNo() == null){
+                newAssess.setSeqNo(new Long(outsourcingAssessmentRepository.findAll().size()));
+            }
 
             newAssess = outsourcingAssessmentRepository.saveAndFlush(newAssess);
             bjfRepository.saveAndFlush(b);
 
             Employee approverA = creater.getManager();
             createApprovalTicket(creater.getUserName(), approverA, newAssess,"Please review and approve the outsourcing assessment form.");
-            mailService.sendOscAssForm("noreply@gmail.com", "hangzhipang@u.nus.edu", "test the outsourcing form", "www.google.com", "xxxTitleA",  newAssess);
+            mailService.sendOscAssForm("", creater.getEmail(), "You have just created an outsourcing assessment form", "", "",  newAssess);
             return ResponseEntity
                     .ok()
                     .body(new GeneralRes("Successfully created the outsourcing assessment form!", false));

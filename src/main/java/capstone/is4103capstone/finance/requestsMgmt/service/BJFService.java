@@ -396,8 +396,10 @@ public class BJFService {
     public BJF validateBJF(String idOrCode) throws EntityNotFoundException{
         Optional<BJF> bjfOps = bjfRepository.findById(idOrCode);
         if (bjfOps.isPresent()){
-            if (bjfOps.get().getDeleted())
+            if (bjfOps.get().getDeleted()){
                 throw new EntityNotFoundException("BJF already removed");
+            }
+
             return bjfOps.get();
         }
 
