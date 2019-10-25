@@ -94,19 +94,26 @@ public class AdminInitialization {
     }
 
     public void createEmployee() {
-        Employee newEmployee = new Employee("yingshi2502", "Yingshi", "Huang", "", "password");
-        newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        newEmployee.setCode("EMPLOYEE-yingshi2502");
-        newEmployee.setCreatedBy("admin");
-        newEmployee.setEmail("yuqiancai987@gmail.com");
-        newEmployee.setLastModifiedBy("admin");
+        Employee yingshi = new Employee("yingshi2502", "Yingshi", "Huang", "", "password");
+        yingshi.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        yingshi.setCode("EMPLOYEE-yingshi2502");
+        yingshi.setCreatedBy("admin");
+        yingshi.setEmail("yuqiancai987@gmail.com");
+        yingshi.setLastModifiedBy("admin");
 
-        Employee newEmployee2 = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
-        newEmployee2.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
-        newEmployee2.setCode("EMPLOYEE-caiyuqian");
-        newEmployee2.setCreatedBy("admin");
-        newEmployee2.setEmail("yuqiancai987@gmail.com");
-        newEmployee2.setLastModifiedBy("admin");
+        Employee yuqian = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
+        yuqian.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
+        yuqian.setCode("EMPLOYEE-caiyuqian");
+        yuqian.setCreatedBy("admin");
+        yuqian.setEmail("yuqiancai987@gmail.com");
+        yuqian.setLastModifiedBy("admin");
+
+        Employee joshua = new Employee("joshuachew", "Joshua", "Chew", "", "password");
+        joshua.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        joshua.setCode("EMPLOYEE-joshuachew");
+        joshua.setCreatedBy("admin");
+        joshua.setEmail("chewzhj@gmail.com");
+        joshua.setLastModifiedBy("admin");
 
         Employee admin = new Employee("admin", "adminFirstName", "adminLastName", "adminMiddleName", "password");
         admin.setEmployeeType(EmployeeTypeEnum.PERMANENT);
@@ -124,8 +131,9 @@ public class AdminInitialization {
         restApiTestUser.setLastModifiedBy("admin");
         */
 
-        newEmployee = employeeRepository.save(newEmployee);
-        newEmployee2 = employeeRepository.save(newEmployee2);
+        yingshi = employeeRepository.save(yingshi);
+        yuqian = employeeRepository.save(yuqian);
+        joshua = employeeRepository.save(joshua);
         admin = employeeRepository.save(admin);
 
         // Create Employee Office Working Schedule
@@ -144,7 +152,7 @@ public class AdminInitialization {
             yuqianSchedule2.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 3, 30, 18, 0));
             yuqianSchedule2 = scheduleRepository.save(yuqianSchedule2);
             yuqianWorkingSchedule.getSchedules().add(yuqianSchedule2);
-            yuqianWorkingSchedule.setEmployee(newEmployee2);
+            yuqianWorkingSchedule.setEmployee(yuqian);
             yuqianWorkingSchedule.setOffice(office);
 
             EmployeeOfficeWorkingSchedule yingshiWorkingSchedule = new EmployeeOfficeWorkingSchedule();
@@ -152,7 +160,7 @@ public class AdminInitialization {
             yingshiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
             yingshiSchedule = scheduleRepository.save(yingshiSchedule);
             yingshiWorkingSchedule.getSchedules().add(yingshiSchedule);
-            yingshiWorkingSchedule.setEmployee(newEmployee);
+            yingshiWorkingSchedule.setEmployee(yingshi);
             yingshiWorkingSchedule.setOffice(office);
 
             employeeOfficeWorkingScheduleRepository.save(yuqianWorkingSchedule);
@@ -162,59 +170,75 @@ public class AdminInitialization {
 
         Team team1 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
 
-        newEmployee.setTeam(team1);
-        newEmployee2.setTeam(team1);
-        team1.getMembers().add(newEmployee);
-        team1.getMembers().add(newEmployee2);
-        newEmployee.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-yingshi2502");
-        newEmployee2.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-caiyuqian");
+        yingshi.setTeam(team1);
+        yuqian.setTeam(team1);
+        team1.getMembers().add(yingshi);
+        team1.getMembers().add(yuqian);
+        yingshi.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-yingshi2502");
+        yuqian.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-caiyuqian");
 
-        newEmployee2.setManager(newEmployee);
-        newEmployee.getSubordinates().add(newEmployee2);
+        yuqian.setManager(yingshi);
+        yingshi.getSubordinates().add(yuqian);
+
+        yingshi.setManager(joshua);
+        joshua.getSubordinates().add(yingshi);
 
         Team team2 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
         Team team3 = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
         Team team4 = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
 
         // Seat admin setup for different hierarchies
+        // SG-Tech-FixIncTech-Dev
         SeatRequestAdminMatch seatRequestAdminMatch1 = new SeatRequestAdminMatch();
         seatRequestAdminMatch1.setHierarchyId(team1.getId());
         seatRequestAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch1.setSeatAdmin(newEmployee);
+        seatRequestAdminMatch1.setSeatAdmin(yingshi);
 
+        // SG-Tech-FixIncTech
         SeatRequestAdminMatch seatRequestAdminMatch2 = new SeatRequestAdminMatch();
         seatRequestAdminMatch2.setHierarchyId(team1.getBusinessUnit().getId());
         seatRequestAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatRequestAdminMatch2.setSeatAdmin(admin);
+        seatRequestAdminMatch2.setSeatAdmin(joshua);
 
+        // SG-Tech-FixIncTech
         SeatRequestAdminMatch seatRequestAdminMatch3 = new SeatRequestAdminMatch();
         seatRequestAdminMatch3.setHierarchyId(team1.getBusinessUnit().getFunction().getId());
         seatRequestAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
         seatRequestAdminMatch3.setSeatAdmin(admin);
 
+        // SG-Tech-FixIncTech-ProdSupp
         SeatRequestAdminMatch seatRequestAdminMatch4 = new SeatRequestAdminMatch();
         seatRequestAdminMatch4.setHierarchyId(team2.getId());
         seatRequestAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
         seatRequestAdminMatch4.setSeatAdmin(admin);
 
+        // SG-Tech-InfraTech-DBAdmin
         SeatRequestAdminMatch seatRequestAdminMatch5 = new SeatRequestAdminMatch();
         seatRequestAdminMatch5.setHierarchyId(team3.getId());
         seatRequestAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
         seatRequestAdminMatch5.setSeatAdmin(admin);
 
+        // SG-Tech-InfraTech-Networks
         SeatRequestAdminMatch seatRequestAdminMatch6 = new SeatRequestAdminMatch();
         seatRequestAdminMatch6.setHierarchyId(team4.getId());
         seatRequestAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
         seatRequestAdminMatch6.setSeatAdmin(admin);
 
+        // SG-Tech-InfraTech
         SeatRequestAdminMatch seatRequestAdminMatch7 = new SeatRequestAdminMatch();
         seatRequestAdminMatch7.setHierarchyId(team4.getBusinessUnit().getId());
         seatRequestAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
         seatRequestAdminMatch7.setSeatAdmin(admin);
 
+        SeatRequestAdminMatch seatRequestAdminMatch8 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch8.setHierarchyId(team1.getOffice().getId());
+        seatRequestAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
+        seatRequestAdminMatch8.setSeatAdmin(admin);
+
         teamRepository.saveAndFlush(team1);
-        employeeRepository.saveAndFlush(newEmployee);
-        employeeRepository.saveAndFlush(newEmployee2);
+        employeeRepository.saveAndFlush(yingshi);
+        employeeRepository.saveAndFlush(yuqian);
+        employeeRepository.saveAndFlush(joshua);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch1);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch2);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch3);
@@ -222,6 +246,7 @@ public class AdminInitialization {
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch5);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch6);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch7);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch8);
     }
 
     public void createGeo() {
