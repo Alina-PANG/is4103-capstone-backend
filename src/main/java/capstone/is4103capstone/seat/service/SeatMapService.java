@@ -7,10 +7,7 @@ import capstone.is4103capstone.admin.service.CompanyFunctionService;
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.admin.service.TeamService;
 import capstone.is4103capstone.entities.*;
-import capstone.is4103capstone.entities.seat.Seat;
-import capstone.is4103capstone.entities.seat.SeatAllocation;
-import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
-import capstone.is4103capstone.entities.seat.SeatMap;
+import capstone.is4103capstone.entities.seat.*;
 import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocationWithHighlight;
@@ -21,6 +18,8 @@ import capstone.is4103capstone.seat.repository.SeatRepository;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
 import capstone.is4103capstone.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -43,6 +42,8 @@ public class SeatMapService {
 
     @Autowired
     private SeatService seatService;
+    @Autowired
+    private SeatRequestAdminMatchService seatRequestAdminMatchService;
     @Autowired
     private EmployeeService employeeService;
     @Autowired
@@ -88,6 +89,13 @@ public class SeatMapService {
             throw new SeatMapCreationException("Creation of seat map failed: invalid office information.");
         }
         Office office = optionalOffice.get();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currentEmployee = (Employee) auth.getPrincipal();
+        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(office.getId());
+        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+            throw new UnauthorizedActionException("Creating office failed: you do not have the right to do this action!");
+        }
 
         // Check whether there is an existing seat map that has the same floor and the same office as the new one
         if (seatMapRepository.findByOfficeIdAndFloor(office.getId(), createSeatMapReq.getFloor()).isPresent()) {
@@ -195,6 +203,14 @@ public class SeatMapService {
             throw new SeatMapNotFoundException("Fail to retrieve seat maps: hierarchy detail is required!");
         }
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currentEmployee = (Employee) auth.getPrincipal();
+        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(hierarchyId);
+        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+            throw new UnauthorizedActionException("Retrieving available seat maps failed: employee " + currentEmployee.getFullName() +
+                    " does not have the right to do this action!");
+        }
+
         Office office = seatAllocationRequest.getEmployeeOfAllocation().getTeam().getOffice();
 
         // Retrieve the corresponding hierarchy level
@@ -267,7 +283,6 @@ public class SeatMapService {
     }
 
 
-    // TODO: must ensure that the user does the checking has access to the office where the teams are located
     private List<SeatMapModelForAllocationWithHighlight> retrieveAvailableSeatMapsForAllocationByBusinessUnit(BusinessUnit businessUnit,
                                                                                                               List<Schedule> schedules,
                                                                                                               SeatAllocationTypeEnum seatAllocationTypeEnum,
@@ -390,12 +405,21 @@ public class SeatMapService {
         if (seatMapModelForSetup.getId() == null || seatMapModelForSetup.getId().trim().length() == 0) {
             throw new SeatMapUpdateException("Seat map update failed: insufficient seat map info given.");
         }
+
         Collections.sort(seatMapModelForSetup.getSeats());
         if (hasDuplicateSeatModelIdOrSerialNumber(seatMapModelForSetup)) {
             throw new SeatMapUpdateException("Seat map update failed: there are seats with duplicate serial number or id.");
         }
 
         SeatMap seatMap = getSeatMapById(seatMapModelForSetup.getId().trim());
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currentEmployee = (Employee) auth.getPrincipal();
+        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seatMap.getOffice().getId());
+        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+            throw new UnauthorizedActionException("Creating office failed: you do not have the right to do this action!");
+        }
+
         List<String> originalSeatsIds = new ArrayList<>();
         for (Seat originalSeat:
              seatMap.getSeats()) {
@@ -505,6 +529,13 @@ public class SeatMapService {
     public void deleteSeatMapById(String id) throws SeatMapNotFoundException {
 
         SeatMap seatMap = getSeatMapById(id);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currentEmployee = (Employee) auth.getPrincipal();
+        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seatMap.getOffice().getId());
+        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+            throw new UnauthorizedActionException("Creating office failed: you do not have the right to do this action!");
+        }
 
         seatService.deleteSeats(seatMap.getSeats());
 
