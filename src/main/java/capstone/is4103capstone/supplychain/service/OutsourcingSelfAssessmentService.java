@@ -291,6 +291,10 @@ public class OutsourcingSelfAssessmentService {
                 || outsourcingSelfAssessment.getOutsourcingSelfAssessmentStatus().equals(OutsourcingSelfAssessmentStatusEnum.REJECTED)) {
             canUpdateAndRequest = true;
         }
+        if (outsourcingSelfAssessment.getFunctionHeadId() != null) {
+            Employee f = employeeRepository.getOne(outsourcingSelfAssessment.getFunctionHeadId());
+            functionHead = new EmployeeModel(f);
+        }
 
         OutsourcingSelfAssessmentModel result = new OutsourcingSelfAssessmentModel(
                 outsourcingSelfAssessment.getCode(), outsourcingSelfAssessment.getId(), outsourcingSelfAssessment.getSeqNo(),
