@@ -6,7 +6,6 @@ import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.repository.SessionKeyRepo;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.SessionKey;
-import capstone.is4103capstone.entities.helper.WebAppPermissionMap;
 import capstone.is4103capstone.general.StandardStatusMessages;
 import capstone.is4103capstone.util.exception.DbObjectNotFoundException;
 import capstone.is4103capstone.util.exception.SessionKeyNotValidException;
@@ -145,10 +144,13 @@ public class UserAuthenticationService {
 
     @Transactional
     public WebAppPermissionMapDto updateWebAppPermissions(String userUuid, WebAppPermissionMapDto webAppPermissionMapDto) throws Exception {
-        Optional<Employee> employee = er.findById(userUuid);
+        String userUuidForCurrentOperation = userUuid;
+        // check if the dto contains useruuid property. if yes, then use that instead.
+        if (webAppPermissionMapDto.getUserUuid().isPresent()) userUuidForCurrentOperation = webAppPermissionMapDto.getUserUuid().get();
+        Optional<Employee> employee = er.findById(userUuidForCurrentOperation);
+
         if (employee.isPresent()) {
             employee.get().setWebAppPermissionMap(webAppPermissionMapDto.thisToEntity());
-
             return WebAppPermissionMapDto.fromEntity(employee.get().getWebAppPermissionMap());
         } else {
             throw new Exception(StandardStatusMessages.NO_SEARCH_RESULTS_FOUND);
