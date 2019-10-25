@@ -195,7 +195,7 @@ public class ContractService {
                 return new GetContractRes("This contract is deleted", true, null);
             }
             else{
-                ContractModel contractModel = transformToContractModel(contract);
+                ContractModel contractModel = transformToContractModelDetails(contract);
                 return new GetContractRes("Successfully retrieved the contract with id " + id, false, contractModel);
             }
         }catch(Exception ex){
@@ -215,7 +215,7 @@ public class ContractService {
                     continue;
                 }
 
-                ContractModel contractModel = transformToContractModel(contract);
+                ContractModel contractModel = transformToContractModelOverview(contract);
                 returnList.add(contractModel);
             }
 
@@ -319,7 +319,7 @@ public class ContractService {
         }
     }
 
-    public ContractModel transformToContractModel(Contract contract){
+    public ContractModel transformToContractModelDetails(Contract contract){
         GeneralEntityModel vendor = null;
         EmployeeModel employeeInChargeContract = null;
         GeneralEntityModel team = null;
@@ -357,6 +357,38 @@ public class ContractService {
     }
 
 
+    //faster to load overview information
+    public ContractModel transformToContractModelOverview(Contract contract){
+        GeneralEntityModel vendor = null;
+        EmployeeModel employeeInChargeContract = null;
+        GeneralEntityModel team = null;
+        EmployeeModel approver = null;
+
+        if(contract.getVendor() != null){
+            vendor = new GeneralEntityModel(contract.getVendor());
+        }
+        if(contract.getApprover() != null){
+            Employee employee = contract.getApprover();
+            approver = new EmployeeModel(employee.getId(), employee.getFullName(), employee.getUserName());
+        }
+
+        Boolean canUpdateAndRequest = false;
+        ContractStatusEnum contractStatus = contract.getContractStatus();
+        if(contractStatus.equals(ContractStatusEnum.REJECTED)||contractStatus.equals(ContractStatusEnum.DRAFT)){
+            canUpdateAndRequest = true;
+        }
+
+        ContractModel contractModel = new ContractModel(
+                contract.getContractDescription(), contract.getObjectName(), contract.getCode(), contract.getId(), contract.getSeqNo(),
+                contract.getPurchaseType(), contract.getSpendType(), contract.getContractTerm(),
+                contract.getContractType(), contract.getContractStatus(), contract.getNoticeDaysToExit(),
+                vendor, employeeInChargeContract, approver, team, contract.getTotalContractValue(), contract.getCurrencyCode(), canUpdateAndRequest,
+                contract.getStartDate(), contract.getEndDate(), contract.getRenewalStartDate(), contract.getCpgReviewAlertDate());
+
+        return contractModel;
+    }
+
+
     public GetContractsRes getContractsByTeamId(String teamId){
         try {
             List<ContractModel> returnList = new ArrayList<>();
@@ -367,7 +399,7 @@ public class ContractService {
                     continue;
                 }
 
-                ContractModel contractModel = transformToContractModel(contract);
+                ContractModel contractModel = transformToContractModelOverview(contract);
                 returnList.add(contractModel);
             }
 
@@ -393,7 +425,7 @@ public class ContractService {
                     continue;
                 }
 
-                ContractModel contractModel = transformToContractModel(contract);
+                ContractModel contractModel = transformToContractModelOverview(contract);
                 returnList.add(contractModel);
             }
 
