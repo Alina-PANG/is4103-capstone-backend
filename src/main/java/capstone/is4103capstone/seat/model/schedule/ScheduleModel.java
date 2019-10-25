@@ -1,4 +1,4 @@
-package capstone.is4103capstone.seat.model;
+package capstone.is4103capstone.seat.model.schedule;
 
 import java.io.Serializable;
 import java.time.LocalTime;

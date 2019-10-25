@@ -3,7 +3,11 @@ package capstone.is4103capstone.admin;
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.Address;
+import capstone.is4103capstone.entities.helper.DateHelper;
+import capstone.is4103capstone.entities.seat.EmployeeOfficeWorkingSchedule;
 import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.seat.repository.EmployeeOfficeWorkingScheduleRepository;
+import capstone.is4103capstone.seat.repository.ScheduleRepository;
 import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminInitialization {
@@ -36,6 +41,10 @@ public class AdminInitialization {
     CostCenterRepository costCenterRepository;
     @Autowired
     SeatRequestAdminMatchRepository seatRequestAdminMatchRepository;
+    @Autowired
+    EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
+    @Autowired
+    ScheduleRepository scheduleRepository;
 
     @PostConstruct
     public void init() {
@@ -72,12 +81,14 @@ public class AdminInitialization {
         newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
         newEmployee.setCode("EMPLOYEE-yingshi2502");
         newEmployee.setCreatedBy("admin");
+        newEmployee.setEmail("yuqiancai987@gmail.com");
         newEmployee.setLastModifiedBy("admin");
 
         Employee newEmployee2 = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
-        newEmployee2.setEmployeeType(EmployeeTypeEnum.WORKINGFROMHOME);
+        newEmployee2.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
         newEmployee2.setCode("EMPLOYEE-caiyuqian");
         newEmployee2.setCreatedBy("admin");
+        newEmployee2.setEmail("yuqiancai987@gmail.com");
         newEmployee2.setLastModifiedBy("admin");
 
         Employee admin = new Employee("admin", "adminFirstName", "adminLastName", "adminMiddleName", "password");
@@ -85,6 +96,7 @@ public class AdminInitialization {
         admin.setCreatedBy("admin");
         admin.setCode("EMPLOYEE-admin");
         admin.setLastModifiedBy("admin");
+
 
         // REST API Testing
         /*
@@ -98,6 +110,38 @@ public class AdminInitialization {
         newEmployee = employeeRepository.save(newEmployee);
         newEmployee2 = employeeRepository.save(newEmployee2);
         admin = employeeRepository.save(admin);
+
+        // Create Employee Office Working Schedule
+        Optional<Office> optionalOffice = officeRepository.findByName("One Raffles Quay");
+        if (optionalOffice.isPresent()) {
+            Office office = optionalOffice.get();
+
+            EmployeeOfficeWorkingSchedule yuqianWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule yuqianSchedule1 = new Schedule();
+            yuqianSchedule1.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 10, 1, 9, 0));
+            yuqianSchedule1.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 1, 1, 18, 0));
+            yuqianSchedule1 = scheduleRepository.save(yuqianSchedule1);
+            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule1);
+            Schedule yuqianSchedule2 = new Schedule();
+            yuqianSchedule2.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 3, 1, 9, 0));
+            yuqianSchedule2.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 3, 30, 18, 0));
+            yuqianSchedule2 = scheduleRepository.save(yuqianSchedule2);
+            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule2);
+            yuqianWorkingSchedule.setEmployee(newEmployee2);
+            yuqianWorkingSchedule.setOffice(office);
+
+            EmployeeOfficeWorkingSchedule yingshiWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule yingshiSchedule = new Schedule();
+            yingshiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
+            yingshiSchedule = scheduleRepository.save(yingshiSchedule);
+            yingshiWorkingSchedule.getSchedules().add(yingshiSchedule);
+            yingshiWorkingSchedule.setEmployee(newEmployee);
+            yingshiWorkingSchedule.setOffice(office);
+
+            employeeOfficeWorkingScheduleRepository.save(yuqianWorkingSchedule);
+            employeeOfficeWorkingScheduleRepository.save(yingshiWorkingSchedule);
+        }
+
 
         Team team1 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
 

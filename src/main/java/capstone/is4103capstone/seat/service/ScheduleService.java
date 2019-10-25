@@ -1,24 +1,218 @@
 package capstone.is4103capstone.seat.service;
 
+import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.Schedule;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.helper.DateHelper;
+import capstone.is4103capstone.entities.seat.EmployeeOfficeWorkingSchedule;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
-import capstone.is4103capstone.seat.model.ScheduleModel;
+import capstone.is4103capstone.seat.model.schedule.ScheduleModel;
+import capstone.is4103capstone.seat.repository.EmployeeOfficeWorkingScheduleRepository;
+import capstone.is4103capstone.seat.repository.ScheduleRepository;
 import capstone.is4103capstone.util.enums.ScheduleRecurringBasisEnum;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
+import capstone.is4103capstone.util.exception.CreateEmployeeOfficeWorkingScheduleException;
 import capstone.is4103capstone.util.exception.ScheduleClashException;
 import capstone.is4103capstone.util.exception.SeatAllocationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.Date;
+import java.time.YearMonth;
+import java.util.*;
 
 @Service
 public class ScheduleService {
 
+    @Autowired
+    private EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
-    // Check whether there is any clash of allocation schedule
+    Comparator<EmployeeOfficeWorkingSchedule> workingScheduleComparatorByReverseChronologicalOrder = new Comparator<EmployeeOfficeWorkingSchedule>() {
+        @Override
+        public int compare(EmployeeOfficeWorkingSchedule e1, EmployeeOfficeWorkingSchedule e2) {
+            Collections.sort(e1.getSchedules());
+            Collections.sort(e2.getSchedules());
+            return e1.getSchedules().get(0).compareTo(e2.getSchedules().get(0)) * (-1);
+        }
+    };
+
+    // -------------------------------- Employee Office Working Schedule --------------------------------
+
+    public void createNewEmployeeOfficeWorkingSchedule(EmployeeOfficeWorkingSchedule employeeOfficeWorkingSchedule) {
+        // Checking whether the employee belongs to a team that's under the office
+        Employee employee = employeeOfficeWorkingSchedule.getEmployee();
+        Office office = employeeOfficeWorkingSchedule.getOffice();
+        Team team = employee.getTeam();
+        if (!team.getOffice().getId().equals(office.getId())) {
+            throw new CreateEmployeeOfficeWorkingScheduleException("Create employee office working schedule failed:" +
+                    "employee " + employee.getFullName() + "'s team does not work under office " + office.getObjectName() + "!");
+        }
+
+        // Check whether there is an existing working schedule of the employee at the office
+        Optional<EmployeeOfficeWorkingSchedule> optionalEmployeeOfficeWorkingSchedule = employeeOfficeWorkingScheduleRepository.
+                findByEmployeeIdAndOfficeId(employee.getId(), office.getId());
+        if (optionalEmployeeOfficeWorkingSchedule.isPresent()) {
+            // Try to see if can merge or not
+            // Check schedule clash
+            EmployeeOfficeWorkingSchedule existingEmployeeOfficeWorkingSchedule = optionalEmployeeOfficeWorkingSchedule.get();
+            for (Schedule existingSchedule :
+                    existingEmployeeOfficeWorkingSchedule.getSchedules()) {
+                for (Schedule newSchedule:
+                        employeeOfficeWorkingSchedule.getSchedules()) {
+                    try {
+                        checkClashBetweenTwoGeneralSchedules(existingSchedule, newSchedule);
+                    } catch (ScheduleClashException ex) {
+                        throw new CreateEmployeeOfficeWorkingScheduleException("Create employee office working schedule failed: " +
+                                "the employee has an existing working schedule at the office, and there is schedule clash found " +
+                                "between existing schedule and the new schedule.");
+                    }
+                }
+            }
+
+            // Merge
+            for (Schedule newSchedule:
+                    employeeOfficeWorkingSchedule.getSchedules()) {
+                newSchedule = scheduleRepository.save(newSchedule);
+                existingEmployeeOfficeWorkingSchedule.getSchedules().add(newSchedule);
+            }
+            employeeOfficeWorkingScheduleRepository.save(existingEmployeeOfficeWorkingSchedule);
+
+        } else {
+            for (Schedule schedule :
+                    employeeOfficeWorkingSchedule.getSchedules()) {
+                scheduleRepository.save(schedule);
+            }
+            employeeOfficeWorkingScheduleRepository.save(employeeOfficeWorkingSchedule);
+        }
+    }
+
+    public Optional<EmployeeOfficeWorkingSchedule> retrieveEmployeeOfficeWorkingSchedulesByEmployeeAndOffice(String employeeId, String officeId) {
+        Optional<EmployeeOfficeWorkingSchedule> optionalEmployeeOfficeWorkingSchedule = employeeOfficeWorkingScheduleRepository.findByEmployeeIdAndOfficeId(employeeId, officeId);
+        return optionalEmployeeOfficeWorkingSchedule;
+    }
+
+    public boolean hasWorkingScheduleDuringYearMonthAtOfficeByEmployeeId(String employeeId, String officeId, YearMonth yearMonth) {
+        Optional<EmployeeOfficeWorkingSchedule> optionalEmployeeOfficeWorkingSchedule = employeeOfficeWorkingScheduleRepository.findByEmployeeIdAndOfficeId(employeeId, officeId);
+        if (!optionalEmployeeOfficeWorkingSchedule.isPresent()) {
+            return false;
+        } else {
+            EmployeeOfficeWorkingSchedule employeeOfficeWorkingSchedule = optionalEmployeeOfficeWorkingSchedule.get();
+            Collections.sort(employeeOfficeWorkingSchedule.getSchedules());
+            for (Schedule schedule :
+                    employeeOfficeWorkingSchedule.getSchedules()) {
+                if (containYearMonth(schedule, yearMonth)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    // -------------------------------- Logic Checking --------------------------------
+
+    // ---------------- Check whether a schedule contains a particular year month ----------------
+
+    public boolean containYearMonth(Schedule schedule, YearMonth yearMonth) {
+        YearMonth scheduleStartYearMonth = YearMonth.of(DateHelper.getYearFromDate(schedule.getStartDateTime()),
+                DateHelper.getMonthFromDate(schedule.getStartDateTime()));
+        System.out.println("********* year month to compare with " + yearMonth.toString() + " *********");
+        System.out.println("********* schedule start time " + schedule.getStartDateTime().toString() + " *********");
+        System.out.println("********* schedule start time year month " + scheduleStartYearMonth.toString() + " *********");
+        if (yearMonth.isBefore(scheduleStartYearMonth)) {
+            System.out.println("********* year month is before schedule start year month *********");
+            return false;
+        } else if (yearMonth.equals(scheduleStartYearMonth)) {
+            System.out.println("********* year month equals schedule start year month *********");
+            return true;
+        } else { // after scheduleStartYearMonth
+            System.out.println("********* year month is after schedule start year month *********");
+            if (schedule.getEndDateTime() != null) {
+                YearMonth scheduleEndYearMonth = YearMonth.of(DateHelper.getYearFromDate(schedule.getEndDateTime()),
+                        DateHelper.getMonthFromDate(schedule.getEndDateTime()));
+                if (!yearMonth.isAfter(scheduleEndYearMonth)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return true;
+            }
+        }
+    }
+
+    // ---------------- Check whether there is any clash of two schedules ----------------
+
+    public void checkClashBetweenTwoGeneralSchedules(Schedule schedule1, Schedule schedule2) throws ScheduleClashException {
+        // Check the type (recurring or not)
+        if (!schedule1.isRecurring()) {
+            checkClashBetweenPermanentOrTemporarySchedules(schedule1, schedule2);
+        } else { // schedule 1 recurring
+            if (!schedule2.isRecurring()) {
+                checkClashBetweenPermanentOrTemporarySchedules(schedule1, schedule2);
+            } else {
+                // both are recurring
+                checkRecurringSchedulesClash(schedule1, schedule2);
+
+                // The checking can be bypassed if the time frames don't overlap
+                if (schedule1.getEndDateTime() != null) {
+                    if (schedule2.getEndDateTime() == null) {
+                        if (!schedule1.getEndDateTime().before(schedule2.getStartDateTime())) {
+                            checkRecurringSchedulesClash(schedule1, schedule2);
+                        }
+                    } else { // both have an end date
+                        if (schedule1.getStartDateTime().after(schedule2.getStartDateTime()) && schedule1.getStartDateTime().before(schedule2.getEndDateTime())
+                                || schedule1.getEndDateTime().after(schedule2.getStartDateTime()) && schedule1.getEndDateTime().before(schedule2.getEndDateTime())) {
+                            checkRecurringSchedulesClash(schedule1, schedule2);
+                        }
+                    }
+                } else {
+                    if (schedule2.getEndDateTime() == null) {
+                        checkRecurringSchedulesClash(schedule1, schedule2);
+                    } else {
+                        if (schedule2.getEndDateTime().after(schedule1.getStartDateTime())) {
+                            checkRecurringSchedulesClash(schedule1, schedule2);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void checkClashBetweenPermanentOrTemporarySchedules(Schedule schedule1, Schedule schedule2) throws ScheduleClashException {
+        if (schedule1.getEndDateTime() == null) {
+            if (schedule2.getEndDateTime() == null) {
+                throw new ScheduleClashException("Schedule clash: two schedules both have no end date!");
+            } else { // schedule 2 temporary
+                if (!schedule2.getEndDateTime().before(schedule1.getStartDateTime())) {
+                    throw new ScheduleClashException("Schedule clash found!");
+                }
+            }
+        } else {
+            if (schedule2.getEndDateTime() == null) {
+                throw new ScheduleClashException("Schedule clash found!");
+            } else { // both temporary
+                if (schedule1.getStartDateTime().before(schedule2.getStartDateTime())) {
+                    if (!schedule1.getEndDateTime().before(schedule2.getStartDateTime())) {
+                        throw new ScheduleClashException("Schedule clash found!");
+                    }
+                } else if (schedule1.getStartDateTime().equals(schedule2.getStartDateTime())){
+                    throw new ScheduleClashException("Schedule clash found!");
+                } else { // schedule1.getStartDateTime().after(schedule2.getStartDateTime())
+                    if (schedule1.getStartDateTime().before(schedule2.getEndDateTime())) {
+                        throw new ScheduleClashException("Schedule clash found!");
+                    }
+                }
+            }
+        }
+    }
+
+
+    // ---------------- Check whether there is any clash of allocation schedule ----------------
+
     // - allocation with no occupancy end date: compare the start date of this one and the end date of the new one
     // - allocation with an occupancy end date: compare the whole time frame
     public void checkClashForHotDeskTypeAllocation(Date requiredStartDateTime, Date requiredEndDateTime, SeatAllocation existingSeatAllocation)
@@ -49,7 +243,6 @@ public class ScheduleService {
 
 
 
-    // Check whether there is any clash of allocation schedule
     // For both fixed & shared seats allocation:
     // - allocation with no occupancy end date: directly reject
     // - allocation with an occupancy end date: compare the end date of this one and the start date of the new one
@@ -77,7 +270,6 @@ public class ScheduleService {
 
 
 
-    // Check whether there is any clash of allocation schedule
     // - allocation with no occupancy end date: compare the start date of this one and the end date of the new one
     // - allocation with an occupancy end date: compare the whole time frame
     public void checkClashForTemporaryFixedTypeAllocation(Date requiredStartDateTime, Date requiredEndDateTime, SeatAllocation existingSeatAllocation)
@@ -100,7 +292,7 @@ public class ScheduleService {
                 throw new ScheduleClashException("Allocation schedule clash with another seat allocation of " +
                         existingSeatAllocation.getAllocationType().toString() + " type!");
             }
-            if (requiredStartDateTime.after(allocationSchedule.getStartDateTime()) && requiredEndDateTime.before(allocationSchedule.getEndDateTime())) {
+            if (requiredStartDateTime.after(allocationSchedule.getStartDateTime()) && requiredStartDateTime.before(allocationSchedule.getEndDateTime())) {
                 throw new ScheduleClashException("Allocation schedule clash with another seat allocation of " +
                         existingSeatAllocation.getAllocationType().toString() + " type!");
             }
@@ -109,7 +301,6 @@ public class ScheduleService {
 
 
 
-    // Check whether there is any clash of allocation schedule
     // For fixed seat allocation:
     // - for permanent employees (no occupancy end date): compare the start date of this one and the end date of the new one (if have any)
     // - for temporary employees (with occupancy end date): compare the whole time period
@@ -157,26 +348,25 @@ public class ScheduleService {
             if (allocationSchedule.getEndDateTime() != null) { // the existing allocation has an end date
                 if (requiredEndDateTime == null) { // the new allocation does not have an end date, sliding on the time scale
                     if (requiredStartDateTime.before(allocationSchedule.getEndDateTime())) {
-                        checkSharedSeatsScheduleClash(allocationSchedule, newAllocationSchedule);
+                        checkRecurringSchedulesClash(allocationSchedule, newAllocationSchedule);
                     }
                 } else { // both have an end date
                     if (requiredStartDateTime.after(allocationSchedule.getStartDateTime()) && requiredStartDateTime.before(allocationSchedule.getEndDateTime())
                             || requiredEndDateTime.after(allocationSchedule.getStartDateTime()) && requiredEndDateTime.before(allocationSchedule.getEndDateTime())) {
-                        checkSharedSeatsScheduleClash(allocationSchedule, newAllocationSchedule);
+                        checkRecurringSchedulesClash(allocationSchedule, newAllocationSchedule);
                     }
                 }
             } else { // the existing allocation does not have an end date
                 if (requiredEndDateTime == null) {
-                    checkSharedSeatsScheduleClash(allocationSchedule, newAllocationSchedule);
+                    checkRecurringSchedulesClash(allocationSchedule, newAllocationSchedule);
                 } else {
                     if (requiredEndDateTime.after(allocationSchedule.getStartDateTime())) {
-                        checkSharedSeatsScheduleClash(allocationSchedule, newAllocationSchedule);
+                        checkRecurringSchedulesClash(allocationSchedule, newAllocationSchedule);
                     }
                 }
             }
         }
     }
-
 
 
 
@@ -201,9 +391,12 @@ public class ScheduleService {
     }
 
 
+
+    // -------------------------------- Helper methods --------------------------------
+
     // Pre-condition:
     // - The two schedules were checked before hand to have overlapping time frame (based on date only)
-    private void checkSharedSeatsScheduleClash(Schedule schedule1, Schedule schedule2) throws ScheduleClashException {
+    private void checkRecurringSchedulesClash(Schedule schedule1, Schedule schedule2) throws ScheduleClashException {
 
         // shared seats -> compare by recurring basis, one by one
         // "EveryDay" (recurringStartTime, recurringEndTime),

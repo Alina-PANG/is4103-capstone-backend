@@ -22,7 +22,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/seatmap")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class SeatMapController {
 
     private static final Logger logger = LoggerFactory.getLogger(BudgetController.class);
