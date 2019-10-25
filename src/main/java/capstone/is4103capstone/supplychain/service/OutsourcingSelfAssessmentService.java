@@ -131,7 +131,7 @@ public class OutsourcingSelfAssessmentService {
                 return new GetOutsourcingSelfAssessmentRes("This outsourcing self assessment is deleted", true, null);
             }
             else{
-                OutsourcingSelfAssessmentModel outsourcingSelfAssessmentModel = transformToOutsourcingSelfAssessmentModel(outsourcingSelfAssessment);
+                OutsourcingSelfAssessmentModel outsourcingSelfAssessmentModel = transformToOutsourcingSelfAssessmentModelDetails(outsourcingSelfAssessment);
                 return new GetOutsourcingSelfAssessmentRes("Successfully retrieved the outsourcing self assessment with id " + id, false, outsourcingSelfAssessmentModel);
             }
         }catch(Exception ex){
@@ -151,12 +151,12 @@ public class OutsourcingSelfAssessmentService {
                     continue;
                 }
 
-                OutsourcingSelfAssessmentModel outsourcingSelfAssessmentModel = transformToOutsourcingSelfAssessmentModel(outsourcingSelfAssessment);
+                OutsourcingSelfAssessmentModel outsourcingSelfAssessmentModel = transformToOutsourcingSelfAssessmentModelOverview(outsourcingSelfAssessment);
                 returnList.add(outsourcingSelfAssessmentModel);
             }
 
             if(returnList.size() == 0){
-                throw new Exception("No outsourcing  self assessment available.");
+                throw new Exception("No outsourcing self assessment available.");
             }
 
             return new GetOutsourcingSelfAssessmentsRes("Successfully retrieved all outsourcing  self assessments", false, returnList);
@@ -241,7 +241,7 @@ public class OutsourcingSelfAssessmentService {
         }
     }
 
-    public OutsourcingSelfAssessmentModel transformToOutsourcingSelfAssessmentModel(OutsourcingSelfAssessment outsourcingSelfAssessment) {
+    public OutsourcingSelfAssessmentModel transformToOutsourcingSelfAssessmentModelDetails(OutsourcingSelfAssessment outsourcingSelfAssessment) {
         EmployeeModel outsourcingManager = null;
         EmployeeModel designation = null;
         EmployeeModel functionHead = null;
@@ -269,6 +269,27 @@ public class OutsourcingSelfAssessmentService {
         for(String questionId : outsourcingSelfAssessment.getOutsourcingSelfAssessmentQuestionIdList()){
             OutsourcingSelfAssessmentQuestion question = outsourcingSelfAssessmentQuestionRepository.getOne(questionId);
             outsourcingSelfAssessmentQuestionList.add(question);
+        }
+
+        OutsourcingSelfAssessmentModel result = new OutsourcingSelfAssessmentModel(
+                outsourcingSelfAssessment.getCode(), outsourcingSelfAssessment.getId(), outsourcingSelfAssessment.getSeqNo(),
+                outsourcingManager, designation, functionHead, outsourcingSelfAssessment.getOutsourcingSelfAssessmentStatus(),
+                outsourcingSelfAssessment.getAnnualAssessmentDate(), outsourcingSelfAssessmentQuestionList, canUpdateAndRequest);
+
+        return result;
+    }
+
+    //faster to load overview information
+    public OutsourcingSelfAssessmentModel transformToOutsourcingSelfAssessmentModelOverview(OutsourcingSelfAssessment outsourcingSelfAssessment) {
+        EmployeeModel outsourcingManager = null;
+        EmployeeModel designation = null;
+        EmployeeModel functionHead = null;
+        Boolean canUpdateAndRequest = false;
+        List<OutsourcingSelfAssessmentQuestion> outsourcingSelfAssessmentQuestionList = new ArrayList<>();
+
+        if (outsourcingSelfAssessment.getOutsourcingSelfAssessmentStatus().equals(OutsourcingSelfAssessmentStatusEnum.DRAFT)
+                || outsourcingSelfAssessment.getOutsourcingSelfAssessmentStatus().equals(OutsourcingSelfAssessmentStatusEnum.REJECTED)) {
+            canUpdateAndRequest = true;
         }
 
         OutsourcingSelfAssessmentModel result = new OutsourcingSelfAssessmentModel(

@@ -82,7 +82,7 @@ public class VendorService {
                 return new GetVendorRes("This vendor is deleted.", true, null);
             }
             else {
-                VendorModel vendorModel = transformToGeneralEntityModel(vendor);
+                VendorModel vendorModel = transformToGeneralEntityModelDetails(vendor);
                 return new GetVendorRes("Successfully retrieved the vendor with id " + id, false, vendorModel);
             }
         }catch(Exception ex){
@@ -102,7 +102,7 @@ public class VendorService {
                     continue;
                 }
 
-                VendorModel vendorModel = transformToGeneralEntityModel(vendor);
+                VendorModel vendorModel = transformToGeneralEntityModelOverview(vendor);
                 returnList.add(vendorModel);
             }
 
@@ -159,7 +159,7 @@ public class VendorService {
         }
     }
 
-    private VendorModel transformToGeneralEntityModel(Vendor vendor){
+    private VendorModel transformToGeneralEntityModelDetails(Vendor vendor){
         List<GeneralEntityModel> businessUnits = new ArrayList<>();
 
         if(vendor.getBusinessUnits() != null) {
@@ -179,6 +179,18 @@ public class VendorService {
         return vendorModel;
     }
 
+    //faster to load overview information
+    private VendorModel transformToGeneralEntityModelOverview(Vendor vendor){
+        List<GeneralEntityModel> businessUnits = new ArrayList<>();
+
+        VendorModel vendorModel = new VendorModel(
+                vendor.getId(), vendor.getCode(), vendor.getObjectName(), vendor.getSeqNo(), businessUnits,
+                vendor.getServiceDescription(), vendor.getRelationshipManagerName(), vendor.getRelationshipManagerEmail(),
+                vendor.getBillingContactName(), vendor.getBillingContactEmail(),
+                vendor.getEscalationContactName(), vendor.getEscalationContactEmail());
+
+        return vendorModel;
+    }
 
     public Vendor validateVendor(String idOrUsername) throws EntityNotFoundException {
         Optional<Vendor> vendorOps = vendorRepository.findById(idOrUsername);

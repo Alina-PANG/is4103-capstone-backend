@@ -165,7 +165,7 @@ public class OutsourcingService {
                 return new GetOutsourcingRes("This outsourcing is deleted", true, null);
             }
             else{
-                OutsourcingModel outsourcingModel = transformToOutsourcingModel(outsourcing);
+                OutsourcingModel outsourcingModel = transformToOutsourcingModelDetails(outsourcing);
                 return new GetOutsourcingRes("Successfully retrieved the outsourcing with id " + id, false, outsourcingModel);
             }
         }catch(Exception ex){
@@ -185,7 +185,7 @@ public class OutsourcingService {
                     continue;
                 }
 
-                OutsourcingModel outsourcingModel = transformToOutsourcingModel(outsourcing);
+                OutsourcingModel outsourcingModel = transformToOutsourcingModelOverview(outsourcing);
                 returnList.add(outsourcingModel);
             }
 
@@ -286,7 +286,7 @@ public class OutsourcingService {
         }
     }
 
-    public OutsourcingModel transformToOutsourcingModel(Outsourcing outsourcing){
+    public OutsourcingModel transformToOutsourcingModelDetails(Outsourcing outsourcing){
         GeneralEntityModel region = null;
         GeneralEntityModel country = null;
         GeneralEntityModel department = null;
@@ -329,6 +329,25 @@ public class OutsourcingService {
 
         return outsourcingModel;
     }
+
+    //faster to load overview info
+    public OutsourcingModel transformToOutsourcingModelOverview(Outsourcing outsourcing){
+        GeneralEntityModel region = null;
+        GeneralEntityModel country = null;
+        GeneralEntityModel department = null;
+        List<GeneralEntityModel> serviceList = new ArrayList<>();
+        GeneralEntityModel vendor = null;
+        GeneralEntityModel outsourcingAssessment = null;
+
+        OutsourcingModel outsourcingModel = new OutsourcingModel(outsourcing.getCode(), outsourcing.getId(), outsourcing.getSeqNo(),
+                outsourcing.getOutsourcingTitle(), region, country, department,
+                outsourcing.getOutsourcingType(), outsourcing.getOutsourcingCategory(), outsourcing.getMateriality(),
+                serviceList, vendor, outsourcingAssessment, outsourcing.getDueDiligenceDate(),outsourcing.getMaterialityAssessmentDate(),
+                outsourcing.getBcpTestDate(), outsourcing.getAnnualSelfAssessmentDate(), outsourcing.getIndependentAuditDate());
+
+        return outsourcingModel;
+    }
+
 
     public Boolean validateOutsourcingId(String id){
         Optional<Outsourcing> outsourcing = outsourcingRepository.findUndeletedOutsourcingById(id);
