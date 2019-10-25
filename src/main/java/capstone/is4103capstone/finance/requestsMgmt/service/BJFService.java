@@ -139,7 +139,7 @@ public class BJFService {
 
         //create approval request
         if (!isUpdate || changeFromReject)
-            ApprovalTicketService.createTicketAndSendEmail(requester,approver,newBjf,"BJF Submitted / Updated, please have a look", ApprovalTypeEnum.BJF);
+            ApprovalTicketService.createTicketAndSendEmail(requester,approver,newBjf,"To BJF BM Approver: BJF Submitted / Updated, please have a look", ApprovalTypeEnum.BJF);
 
         return new BJFModel(newBjf,service,vendor,null,p);
     }
