@@ -31,8 +31,7 @@ public class OutsourcingAssessment extends DBEntityTemplate {
     @JsonIgnore
     private Employee employeeAssess;
 
-    @OneToOne(fetch = FetchType.LAZY,optional = true)
-    @JoinColumn(name = "related_bjf_id")
+    @OneToOne(mappedBy = "related_outsourcing_assessment")
     @JsonIgnore
     private BJF related_BJF;
 

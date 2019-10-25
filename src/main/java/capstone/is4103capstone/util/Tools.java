@@ -12,10 +12,11 @@ public class Tools {
         Calendar c = Calendar.getInstance();
         c.setTime(today);
         c.add(Calendar.DATE,-1);
-
-
-
         return c.getTime();
+    }
+
+    public static boolean isSameYear(Date one, Date another){
+        return one.getYear() == another.getYear();
     }
 
     public static Date getTomorrow(Date today){
