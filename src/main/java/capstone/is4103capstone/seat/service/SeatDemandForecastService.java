@@ -6,11 +6,16 @@ import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.helper.DateHelper;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
+import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
 import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.seat.model.GroupModel;
 import capstone.is4103capstone.seat.model.seatDemandForecast.MonthlySeatForecastModelForTeam;
 import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
+import capstone.is4103capstone.util.exception.InvalidInputException;
+import capstone.is4103capstone.util.exception.UnauthorizedActionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
@@ -21,6 +26,8 @@ public class SeatDemandForecastService {
 
     @Autowired
     private SeatService seatService;
+    @Autowired
+    private SeatRequestAdminMatchService seatRequestAdminMatchService;
     @Autowired
     private TeamService teamService;
     @Autowired
@@ -33,6 +40,19 @@ public class SeatDemandForecastService {
 
 
     public List<MonthlySeatForecastModelForTeam> forecastSeatDemandForNext6MonthsByTeam(String teamId) {
+
+        if(teamId == null || teamId.trim().length() ==0) {
+            throw new InvalidInputException("Retrieving forecast failed because of invalid input: team ID is missing!");
+        }
+        Team team = teamService.retrieveTeamById(teamId);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currentEmployee = (Employee) auth.getPrincipal();
+        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(teamId);
+        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+            throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to do this action!");
+        }
+
         YearMonth thisYearMonth = DateHelper.getYearMonthFromDate(new Date());
         List<MonthlySeatForecastModelForTeam> monthlySeatForecastModelsForTeam = new ArrayList<>();
         for(int i = 1; i <= 6; i++) {
@@ -45,6 +65,19 @@ public class SeatDemandForecastService {
     }
 
     public List<MonthlySeatForecastModelForTeam> forecastSeatDemandForNext12MonthsByTeam(String teamId) {
+
+        if(teamId == null || teamId.trim().length() ==0) {
+            throw new InvalidInputException("Retrieving forecast failed because of invalid input: team ID is missing!");
+        }
+        Team team = teamService.retrieveTeamById(teamId);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currentEmployee = (Employee) auth.getPrincipal();
+        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(team.getId());
+        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+            throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to do this action!");
+        }
+
         YearMonth thisYearMonth = DateHelper.getYearMonthFromDate(new Date());
         List<MonthlySeatForecastModelForTeam> monthlySeatForecastModelsForTeam = new ArrayList<>();
         for(int i = 1; i <= 12; i++) {

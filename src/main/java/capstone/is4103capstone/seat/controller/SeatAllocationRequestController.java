@@ -70,12 +70,12 @@ public class SeatAllocationRequestController {
         return ResponseEntity.ok(seatMapModels);
     }
 
-    @GetMapping
-    public ResponseEntity retrieveSeatAllocationRequestById(@RequestParam(name="requestId", required=true) String requestId) {
-        SeatAllocationRequest seatAllocationRequest = seatAllocationRequestService.retrieveSeatAllocationRequestById(requestId);
-        SeatAllocationRequestModel seatAllocationRequestModel = entityModelConversionService.convertSeatAllocationRequestEntityToModel(seatAllocationRequest);
-        return ResponseEntity.ok(seatAllocationRequestModel);
-    }
+//    @GetMapping
+//    public ResponseEntity retrieveSeatAllocationRequestById(@RequestParam(name="requestId", required=true) String requestId) {
+//        SeatAllocationRequest seatAllocationRequest = seatAllocationRequestService.retrieveSeatAllocationRequestById(requestId);
+//        SeatAllocationRequestModel seatAllocationRequestModel = entityModelConversionService.convertSeatAllocationRequestEntityToModel(seatAllocationRequest);
+//        return ResponseEntity.ok(seatAllocationRequestModel);
+//    }
 
     // Return all the approval tickets assigned to a particular employee, including ones that have already been processed and the pending ones
     // The return type will be seat allocation request including the required approval tickets

@@ -165,4 +165,22 @@ public class SeatManagementExceptionController {
         error.setStatus(HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = UnauthorizedActionException.class)
+    public ResponseEntity handleUnthorizedActionException(UnauthorizedActionException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = InvalidInputException.class)
+    public ResponseEntity handleInvalidInputException(InvalidInputException ex) {
+        CustomErrorRes error = new CustomErrorRes();
+        error.setTimestamp(LocalDateTime.now());
+        error.setError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }
