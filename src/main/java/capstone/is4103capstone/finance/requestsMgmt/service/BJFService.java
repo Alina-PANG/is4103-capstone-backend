@@ -232,7 +232,7 @@ public class BJFService {
             }
 
             response.put(thisYear+" Commited Value within cost center",commitedBudget);
-
+            response.put("BJF Estimated Budget",bjf.getEstimatedBudget());
             // current year
             // bjf status
             // this cost center
@@ -289,7 +289,12 @@ public class BJFService {
                 if (activeChildContractInfos.size() > 1){
                     logger.warn("Mulitple child contract connected within vendor and service"+vendor.getId()+" "+service.getId());
                 }
-                contractAnalysis.put("Child Contract Info",new JSONObject(activeChildContractInfos.get(0)));
+                ContractAndChildAggre childAggre = activeChildContractInfos.get(0);
+                contractAnalysis.put("Child Contract Value",childAggre.getChildContractValue());
+                contractAnalysis.put("Child Contract Code",childAggre.getChildContractCode());
+                contractAnalysis.put("Contract Start Date",childAggre.getContractStartDate());
+                contractAnalysis.put("Contract End Date",childAggre.getContractEndDate());
+                contractAnalysis.put("Contract Status",childAggre.getContractStatus());
             }
             response.put("Contract Value Analysis",contractAnalysis);
 
