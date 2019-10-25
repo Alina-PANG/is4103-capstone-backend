@@ -1,6 +1,6 @@
-package capstone.is4103capstone.seat.model;
+package capstone.is4103capstone.seat.model.schedule;
 
-import capstone.is4103capstone.entities.Schedule;
+import capstone.is4103capstone.seat.model.schedule.ScheduleModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;

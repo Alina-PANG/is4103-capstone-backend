@@ -28,7 +28,7 @@ public class Schedule extends DBEntityTemplate implements Comparable<Schedule> {
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date endDateTime;
+    private Date endDateTime; // meaning before the end date time the schedule is still active (e.g., end time is 6 pm, till 6 pm it's active)
 
     public Schedule() {
 

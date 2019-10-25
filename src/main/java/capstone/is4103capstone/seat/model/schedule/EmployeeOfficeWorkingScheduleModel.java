@@ -1,27 +1,27 @@
-package capstone.is4103capstone.seat.model;
+package capstone.is4103capstone.seat.model.schedule;
 
 import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.seat.model.GroupModel;
-import capstone.is4103capstone.seat.model.ScheduleModel;
+import capstone.is4103capstone.seat.model.schedule.ScheduleModel;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EmployeeOfficeWorkingScheduleModel implements Serializable {
     private String id;
     private EmployeeModel employee;
     private GroupModel office;
-    private ScheduleModel schedule;
-    private String employeeType; // PERMANENT, TEMPORARY, WORKING_FROM_HOME
+    private List<ScheduleModel> schedules = new ArrayList<>();
 
     public EmployeeOfficeWorkingScheduleModel() {
     }
 
-    public EmployeeOfficeWorkingScheduleModel(String id, EmployeeModel employee, GroupModel office, ScheduleModel schedule, String employeeType) {
+    public EmployeeOfficeWorkingScheduleModel(String id, EmployeeModel employee, GroupModel office, List<ScheduleModel> schedules) {
         this.id = id;
         this.employee = employee;
         this.office = office;
-        this.schedule = schedule;
-        this.employeeType = employeeType;
+        this.schedules = schedules;
     }
 
     public String getId() {
@@ -48,19 +48,11 @@ public class EmployeeOfficeWorkingScheduleModel implements Serializable {
         this.office = office;
     }
 
-    public ScheduleModel getSchedule() {
-        return schedule;
+    public List<ScheduleModel> getSchedules() {
+        return schedules;
     }
 
-    public void setSchedule(ScheduleModel schedule) {
-        this.schedule = schedule;
-    }
-
-    public String getEmployeeType() {
-        return employeeType;
-    }
-
-    public void setEmployeeType(String employeeType) {
-        this.employeeType = employeeType;
+    public void setSchedules(List<ScheduleModel> schedules) {
+        this.schedules = schedules;
     }
 }

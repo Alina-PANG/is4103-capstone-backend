@@ -9,9 +9,9 @@ import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.seat.*;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.seat.model.EmployeeModel;
-import capstone.is4103capstone.seat.model.EmployeeOfficeWorkingScheduleModel;
+import capstone.is4103capstone.seat.model.schedule.EmployeeOfficeWorkingScheduleModel;
 import capstone.is4103capstone.seat.model.GroupModel;
-import capstone.is4103capstone.seat.model.ScheduleModel;
+import capstone.is4103capstone.seat.model.schedule.ScheduleModel;
 import capstone.is4103capstone.seat.model.seat.SeatModelForAllocation;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
@@ -561,7 +561,7 @@ public class EntityModelConversionService {
             throws EntityModelConversionException{
         EmployeeOfficeWorkingSchedule employeeOfficeWorkingSchedule = new EmployeeOfficeWorkingSchedule();
 
-        if (employeeOfficeWorkingSchedule.getEmployee() == null) {
+        if (employeeOfficeWorkingScheduleModel.getEmployee() == null) {
             throw new EntityModelConversionException("Incomplete input: employee info is missing!");
         }
         EmployeeModel employeeModel = employeeOfficeWorkingScheduleModel.getEmployee();
@@ -571,7 +571,7 @@ public class EntityModelConversionService {
         Employee employee = employeeService.retrieveEmployeeById(employeeModel.getId());
         employeeOfficeWorkingSchedule.setEmployee(employee);
 
-        if (employeeOfficeWorkingSchedule.getOffice() == null) {
+        if (employeeOfficeWorkingScheduleModel.getOffice() == null) {
             throw new EntityModelConversionException("Incomplete input: office info is missing!");
         }
         GroupModel officeModel = employeeOfficeWorkingScheduleModel.getOffice();
@@ -582,18 +582,23 @@ public class EntityModelConversionService {
             Office office = officeService.getOfficeEntityByUuid(officeModel.getId());
             employeeOfficeWorkingSchedule.setOffice(office);
 
-            if (employeeOfficeWorkingSchedule.getSchedule() == null) {
+            if (employeeOfficeWorkingScheduleModel.getSchedules() == null || employeeOfficeWorkingScheduleModel.getSchedules().size() == 0) {
                 throw new EntityModelConversionException("Incomplete input: schedule info is missing!");
             }
-            ScheduleModel scheduleModel = employeeOfficeWorkingScheduleModel.getSchedule();
-            if (employeeOfficeWorkingScheduleModel.getEmployeeType() == null || employeeOfficeWorkingScheduleModel.getEmployeeType().trim().length() == 0) {
-                throw new EntityModelConversionException("Incomplete input: employee type is missing!");
+
+            List<Schedule> schedules = new ArrayList<>();
+            for (ScheduleModel scheduleModel :
+                    employeeOfficeWorkingScheduleModel.getSchedules()) {
+                schedules.add(convertNewScheduleModelToEmployeeOfficeWorkingSchedule(scheduleModel, employee.getEmployeeType().toString()));
             }
-            Schedule schedule = convertNewScheduleModelToEmployeeOfficeWorkingSchedule(scheduleModel, employeeOfficeWorkingScheduleModel.getEmployeeType());
-            employeeOfficeWorkingSchedule.setSchedule(schedule);
+            employeeOfficeWorkingSchedule.setSchedules(schedules);
 
             return employeeOfficeWorkingSchedule;
+        } catch (EntityModelConversionException ex) {
+            ex.printStackTrace();
+            throw ex;
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new EntityModelConversionException(ex.getMessage());
         }
 
@@ -618,7 +623,7 @@ public class EntityModelConversionService {
         if (scheduleModel.getStartDateTime() == null) {
             throw new EntityModelConversionException("Incomplete input: schedule's start date time is missing!");
         }
-        Date startDateTime = schedule.getStartDateTime();
+        Date startDateTime = scheduleModel.getStartDateTime();
         schedule.setStartDateTime(startDateTime);
         if (employeeType.equals("PERMANENT")) {
 
@@ -629,7 +634,7 @@ public class EntityModelConversionService {
             if (scheduleModel.getEndDateTime() == null) {
                 throw new EntityModelConversionException("Incomplete input: schedule's end date time is missing!");
             }
-            Date endDateTime = schedule.getEndDateTime();
+            Date endDateTime = scheduleModel.getEndDateTime();
             if (!endDateTime.after(startDateTime)) {
                 throw new EntityModelConversionException("Invalid input: schedule's end date time must be after the start date time!");
             }
@@ -691,6 +696,30 @@ public class EntityModelConversionService {
         return  schedule;
     }
 
+    public EmployeeOfficeWorkingScheduleModel convertEmployeeOfficeWorkingScheduleEntityToModel(EmployeeOfficeWorkingSchedule employeeOfficeWorkingSchedule) {
+        EmployeeOfficeWorkingScheduleModel employeeOfficeWorkingScheduleModel = new EmployeeOfficeWorkingScheduleModel();
+        employeeOfficeWorkingScheduleModel.setId(employeeOfficeWorkingSchedule.getId());
+
+        EmployeeModel employeeModel = new EmployeeModel();
+        employeeModel.setId(employeeOfficeWorkingSchedule.getEmployee().getId());
+        employeeModel.setFullName(employeeOfficeWorkingSchedule.getEmployee().getFullName());
+        employeeOfficeWorkingScheduleModel.setEmployee(employeeModel);
+
+        GroupModel officeModel = new GroupModel();
+        officeModel.setId(employeeOfficeWorkingSchedule.getOffice().getId());
+        officeModel.setName(employeeOfficeWorkingSchedule.getOffice().getObjectName());
+        officeModel.setCode(employeeOfficeWorkingSchedule.getOffice().getCode());
+        employeeOfficeWorkingScheduleModel.setOffice(officeModel);
+
+        List<ScheduleModel> scheduleModels = new ArrayList<>();
+        for (Schedule schedule :
+                employeeOfficeWorkingSchedule.getSchedules()) {
+            scheduleModels.add(convertScheduleEntityToModel(schedule));
+        }
+        employeeOfficeWorkingScheduleModel.setSchedules(scheduleModels);
+
+        return employeeOfficeWorkingScheduleModel;
+    }
 
 
     // ---------------------------------- Seat Allocation Request -----------------------------------

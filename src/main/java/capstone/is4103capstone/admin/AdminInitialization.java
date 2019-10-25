@@ -117,24 +117,27 @@ public class AdminInitialization {
             Office office = optionalOffice.get();
 
             EmployeeOfficeWorkingSchedule yuqianWorkingSchedule = new EmployeeOfficeWorkingSchedule();
-            Schedule yuqianSchedule = new Schedule();
-            yuqianSchedule.setStartDateTime(DateHelper.getDateByYearMonthDate(2019, 11, 1));
-            yuqianSchedule.setEndDateTime(DateHelper.getDateByYearMonthDate(2020, 2, 1));
-            yuqianWorkingSchedule.setSchedule(yuqianSchedule);
+            Schedule yuqianSchedule1 = new Schedule();
+            yuqianSchedule1.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 10, 1, 9, 0));
+            yuqianSchedule1.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 1, 1, 18, 0));
+            yuqianSchedule1 = scheduleRepository.save(yuqianSchedule1);
+            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule1);
+            Schedule yuqianSchedule2 = new Schedule();
+            yuqianSchedule2.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 3, 1, 9, 0));
+            yuqianSchedule2.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 3, 30, 18, 0));
+            yuqianSchedule2 = scheduleRepository.save(yuqianSchedule2);
+            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule2);
             yuqianWorkingSchedule.setEmployee(newEmployee2);
             yuqianWorkingSchedule.setOffice(office);
-            yuqianWorkingSchedule.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
 
             EmployeeOfficeWorkingSchedule yingshiWorkingSchedule = new EmployeeOfficeWorkingSchedule();
             Schedule yingshiSchedule = new Schedule();
-            yingshiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDate(2018, 1, 1));
-            yingshiWorkingSchedule.setSchedule(yingshiSchedule);
+            yingshiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
+            yingshiSchedule = scheduleRepository.save(yingshiSchedule);
+            yingshiWorkingSchedule.getSchedules().add(yingshiSchedule);
             yingshiWorkingSchedule.setEmployee(newEmployee);
             yingshiWorkingSchedule.setOffice(office);
-            yingshiWorkingSchedule.setEmployeeType(EmployeeTypeEnum.PERMANENT);
 
-            scheduleRepository.save(yuqianSchedule);
-            scheduleRepository.save(yingshiSchedule);
             employeeOfficeWorkingScheduleRepository.save(yuqianWorkingSchedule);
             employeeOfficeWorkingScheduleRepository.save(yingshiWorkingSchedule);
         }

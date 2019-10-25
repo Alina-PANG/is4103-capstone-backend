@@ -1,14 +1,8 @@
 package capstone.is4103capstone.seat.controller;
 
 import capstone.is4103capstone.admin.service.EmployeeService;
-import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.Schedule;
-import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
-import capstone.is4103capstone.seat.model.BulkScheduleModel;
-import capstone.is4103capstone.seat.model.ScheduleModel;
-import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.CreateSeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.ApproveSeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestGroupModel;
@@ -18,8 +12,6 @@ import capstone.is4103capstone.seat.service.EntityModelConversionService;
 import capstone.is4103capstone.seat.service.SeatAllocationRequestService;
 import capstone.is4103capstone.seat.service.SeatAllocationService;
 import capstone.is4103capstone.seat.service.SeatMapService;
-import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
-import capstone.is4103capstone.util.exception.EntityModelConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

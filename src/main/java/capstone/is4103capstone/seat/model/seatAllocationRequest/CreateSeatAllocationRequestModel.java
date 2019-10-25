@@ -1,6 +1,6 @@
 package capstone.is4103capstone.seat.model.seatAllocationRequest;
 
-import capstone.is4103capstone.seat.model.ScheduleModel;
+import capstone.is4103capstone.seat.model.schedule.ScheduleModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;

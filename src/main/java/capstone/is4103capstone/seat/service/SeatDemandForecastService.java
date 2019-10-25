@@ -90,6 +90,7 @@ public class SeatDemandForecastService {
 
     // Calculate the number of employees under the team who doesn't have a seat allocation during the year month (positive demand count)
     private List<Employee> findEmployeesWhoNeedSeatDuringYearMonthByTeam(YearMonth yearMonth, Team team) {
+
         List<Employee> employees = team.getMembers();
         List<Employee> employeesWhoNeedSeats = new ArrayList<>();
 

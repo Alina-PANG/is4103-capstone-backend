@@ -10,7 +10,7 @@ import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.seat.*;
 import capstone.is4103capstone.finance.Repository.ApprovalForRequestRepository;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
-import capstone.is4103capstone.seat.model.ScheduleModel;
+import capstone.is4103capstone.seat.model.schedule.ScheduleModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.ApproveSeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.CreateSeatAllocationRequestModel;
 import capstone.is4103capstone.seat.repository.*;

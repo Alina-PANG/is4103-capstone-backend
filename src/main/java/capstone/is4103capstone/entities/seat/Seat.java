@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.CompanyFunction;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Entity
 @Table
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     // Seat code example: SG-ORQ-26-01
@@ -37,15 +39,15 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     private Integer adjacentSeatSeqNum; // the sequence number of the adjacent seat in the same office; can be null (only one seat in an office)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "function_id")
+    @JoinColumn(name = "function_id", referencedColumnName = "id")
     @JsonIgnore
     private CompanyFunction functionAssigned;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "business_unit_id")
+    @JoinColumn(name = "business_unit_id", referencedColumnName = "id")
     @JsonIgnore
     private BusinessUnit businessUnitAssigned;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id")
+    @JoinColumn(name = "team_id", referencedColumnName = "id")
     @JsonIgnore
     private Team teamAssigned;
 

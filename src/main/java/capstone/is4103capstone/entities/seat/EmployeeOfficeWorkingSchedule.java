@@ -8,38 +8,46 @@ import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table
-public class EmployeeOfficeWorkingSchedule extends DBEntityTemplate implements Comparable<EmployeeOfficeWorkingSchedule> {
-    @OneToOne
+public class EmployeeOfficeWorkingSchedule extends DBEntityTemplate {
+
+    // At any point of time an employee should only have one working schedule object at a particular office
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "office_id", nullable = false)
     @JsonIgnore
     private Office office;
 
-    @OneToOne
-    private Schedule schedule;
-    private EmployeeTypeEnum employeeType;
+    // The end date of the schedule means the last day of work for the employee -> should still occupies a seat
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "employee_working_schedule_object",
+            joinColumns = @JoinColumn(name = "working_schedule_id"),
+            inverseJoinColumns = @JoinColumn(name = "schedule_object_id")
+    )
+    private List<Schedule> schedules = new ArrayList<>();
+
 
     public EmployeeOfficeWorkingSchedule() {
     }
 
-    public EmployeeOfficeWorkingSchedule(Employee employee, Office office, Schedule schedule, EmployeeTypeEnum employeeType) {
+    public EmployeeOfficeWorkingSchedule(Employee employee, Office office, List<Schedule> schedules) {
         this.employee = employee;
         this.office = office;
-        this.schedule = schedule;
-        this.employeeType = employeeType;
+        this.schedules = schedules;
     }
 
     public EmployeeOfficeWorkingSchedule(String objectName, String code, String hierachyPath, Employee employee, Office office,
-                                         Schedule schedule, EmployeeTypeEnum employeeType) {
+                                         List<Schedule> schedules) {
         super(objectName, code, hierachyPath);
         this.employee = employee;
         this.office = office;
-        this.schedule = schedule;
-        this.employeeType = employeeType;
+        this.schedules = schedules;
     }
 
     public Employee getEmployee() {
@@ -58,24 +66,12 @@ public class EmployeeOfficeWorkingSchedule extends DBEntityTemplate implements C
         this.office = office;
     }
 
-    public Schedule getSchedule() {
-        return schedule;
+    public List<Schedule> getSchedules() {
+        return schedules;
     }
 
-    public void setSchedule(Schedule schedule) {
-        this.schedule = schedule;
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 
-    public EmployeeTypeEnum getEmployeeType() {
-        return employeeType;
-    }
-
-    public void setEmployeeType(EmployeeTypeEnum employeeType) {
-        this.employeeType = employeeType;
-    }
-
-    @Override
-    public int compareTo(EmployeeOfficeWorkingSchedule anotherSchedule) {
-        return this.getSchedule().compareTo(anotherSchedule.schedule);
-    }
 }
