@@ -2,6 +2,7 @@ package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.model.res.TeamRes;
 import capstone.is4103capstone.admin.service.TeamService;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
@@ -9,6 +10,8 @@ import capstone.is4103capstone.seat.model.GroupModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -49,11 +52,13 @@ public class TeamController {
         }
     }
 
-    @GetMapping("/byTeamLeadUuid/{teamLeadUuid}")
-    public ResponseEntity getTeamByTeamLeadId(@PathVariable(name = "countryUuid") String teamLeadUuid) {
+    @GetMapping("/byTeamLead")
+    public ResponseEntity getTeamByTeamLeadId() {
         try {
             WriteAuditTrail.createBasicAuditRecord();
-            Team team = teamService.getTeamEntityByTeamLeadUuid(teamLeadUuid);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Employee currentEmployee = (Employee) auth.getPrincipal();
+            Team team = teamService.getTeamEntityByTeamLeadUuid(currentEmployee.getId());
             GroupModel teamModel = new GroupModel();
             teamModel.setId(team.getId());
             teamModel.setName(team.getObjectName());
