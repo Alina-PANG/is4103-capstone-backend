@@ -141,7 +141,9 @@ public class ApprovalTicketService {
             ticket.setCode(code);
             ticket.setObjectName(code);
             approvalForRequestRepo.save(ticket);
+            requester.setMyRequestTickets(new ArrayList<>(requester.getMyRequestTickets()));
             requester.getMyRequestTickets().add(ticket.getId());
+            receiver.setMyApprovals(new ArrayList<>(receiver.getMyApprovals()));
             receiver.getMyApprovals().add(ticket.getId());
             sendEmail(ticket);
         }catch (Exception e){
