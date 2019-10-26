@@ -98,7 +98,8 @@ public class StatementOfAccountService {
             StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem();
             statementOfAcctLineItem.setScheduleDate(dateFormatter.parse(createSoAByInvoiceReq.getReceiveDate()));
             statementOfAcctLineItem.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
-            statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
+            statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getPaidAmt());
+//            statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
             statementOfAcctLineItem.setPurchaseOrder(po);
             statementOfAcctLineItem.setCreatedBy(username);
             statementOfAcctLineItem.setCreatedDateTime(new Date());
