@@ -171,6 +171,7 @@ public class AdminInitialization {
         Team team1 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
 
         yingshi.setTeam(team1);
+        team1.setTeamLeader(yingshi);
         yuqian.setTeam(team1);
         team1.getMembers().add(yingshi);
         team1.getMembers().add(yuqian);

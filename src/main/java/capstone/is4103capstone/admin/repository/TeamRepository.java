@@ -20,6 +20,6 @@ public interface TeamRepository extends JpaRepository<Team, String> {
             "WHERE t3.country_id = ?1", nativeQuery = true)
     List<Team> findTeamsByCountryId(String countryUuid);
 
-    @Query(value = "SELECT * FROM team t WHERE t.team_lead_id = ?1 AND t.is_deleted=false", nativeQuery = true)
+    @Query(value = "SELECT * FROM team t WHERE t.team_leader_id = ?1 AND t.is_deleted=false", nativeQuery = true)
     Optional<Team> findByTeamLeadUuid(String teamLeadUuid);
 }
