@@ -61,7 +61,6 @@ public class StatementOfAccountService {
                 statementOfAcctLineItem.setPurchaseOrder(po);
                 statementOfAcctLineItem.setScheduleDate(current);
                 statementOfAcctLineItem.setCreatedBy(username);
-                statementOfAcctLineItem.setCreatedDateTime(new Date());
                 items.add(statementOfAccountLineItemRepository.saveAndFlush(statementOfAcctLineItem));
                 calendar.setTime(current);
                 calendar.add(toAdd, createSoAByScheduleReq.getNumFrequency());
@@ -74,6 +73,7 @@ public class StatementOfAccountService {
 
             for(StatementOfAcctLineItem s: items){
                 s.setActualPmt(actualPmt);
+                s.setPaidAmt(BigDecimal.ZERO);
                 s.setCode(POEntityCodeHPGeneration.getCode(statementOfAccountLineItemRepository,s));
                 statementOfAccountLineItemRepository.saveAndFlush(s);
             }
@@ -127,7 +127,8 @@ public class StatementOfAccountService {
             StatementOfAcctLineItem statementOfAcctLineItem = statementOfAccountLineItemRepository.getOne(id);
             if(statementOfAcctLineItem == null) return ResponseEntity.notFound().build();
 
-            if(createSoAByInvoiceReq.getActualPmt() != null) statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
+            if(createSoAByInvoiceReq.getActualPmt() != null)
+                statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
             if(createSoAByInvoiceReq.getPaidAmt() != null) {
                 statementOfAcctLineItem.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
                 if(statementOfAcctLineItem.getInvoice() != null){

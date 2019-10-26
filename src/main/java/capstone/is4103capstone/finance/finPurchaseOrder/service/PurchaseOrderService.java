@@ -193,11 +193,15 @@ public class PurchaseOrderService {
     }
 
     private BigDecimal calculatePOPaidAmt(PurchaseOrder po){
-        List<StatementOfAcctLineItem> soa = po.getStatementOfAccount();
-        BigDecimal total = BigDecimal.ZERO;
-        for (StatementOfAcctLineItem l:soa){
-            total = total.add(l.getPaidAmt());
+        try {
+            List<StatementOfAcctLineItem> soa = po.getStatementOfAccount();
+            BigDecimal total = BigDecimal.ZERO;
+            for (StatementOfAcctLineItem l : soa) {
+                total = total.add(l.getPaidAmt());
+            }
+            return total;
+        }catch (Exception ex){
+            return null;
         }
-        return total;
     }
 }
