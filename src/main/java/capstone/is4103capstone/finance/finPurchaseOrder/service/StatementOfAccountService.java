@@ -23,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,7 +72,11 @@ public class StatementOfAccountService {
             }
 
             logger.info("There will be "+numberOfLoops+" loops.");
-            BigDecimal actualPmt = createSoAByScheduleReq.getTotalAmount().divide(BigDecimal.valueOf(numberOfLoops));
+            if(numberOfLoops <= 0) {
+                logger.error("Error: Start date is later than end date. ");
+                return ResponseEntity.badRequest().build();
+            }
+            BigDecimal actualPmt = createSoAByScheduleReq.getTotalAmount().divide(BigDecimal.valueOf(numberOfLoops), 2, RoundingMode.HALF_UP);
 
             for(StatementOfAcctLineItem s: items){
                 s.setActualPmt(actualPmt);
