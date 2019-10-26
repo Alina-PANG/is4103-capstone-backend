@@ -49,11 +49,11 @@ public class TeamController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity getTeamByTeamLeadId(String employeeId) {
+    @GetMapping("/byTeamLeadUuid/{teamLeadUuid}")
+    public ResponseEntity getTeamByTeamLeadId(@PathVariable(name = "countryUuid") String teamLeadUuid) {
         try {
             WriteAuditTrail.createBasicAuditRecord();
-            Team team = teamService.getTeamEntityByTeamLeadUuid(employeeId);
+            Team team = teamService.getTeamEntityByTeamLeadUuid(teamLeadUuid);
             GroupModel teamModel = new GroupModel();
             teamModel.setId(team.getId());
             teamModel.setName(team.getObjectName());
