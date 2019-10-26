@@ -494,7 +494,7 @@ public class EntityModelConversionService {
                                 throw new EntityModelConversionException("Conversion from Schedule Model to Schedule failed: invalid recurring start time and end time!");
                             }
                             schedule.setRecurringStartTime(scheduleModel.getRecurringStartTime());
-                            scheduleModel.setRecurringEndTime(scheduleModel.getRecurringEndTime());
+                            schedule.setRecurringEndTime(scheduleModel.getRecurringEndTime());
                         }
                     } else if (schedule.getRecurringBasis().equals(ScheduleRecurringBasisEnum.EVERYDAY)) {
                         if (scheduleModel.getRecurringStartTime() != null && scheduleModel.getRecurringEndTime() != null) {

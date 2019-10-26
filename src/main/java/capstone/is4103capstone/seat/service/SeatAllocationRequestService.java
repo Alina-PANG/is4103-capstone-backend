@@ -478,7 +478,7 @@ public class SeatAllocationRequestService {
 
 
     // ---------------------------------- Delete a Pending Request (by the original requester) ----------------------------------
-    // TODO: Check whether the requester has the right to process this seat allocation request + send email to all the previous reviewers for notification
+    // TODO: Send email to all the previous reviewers for notification
     public void deletePendingSeatAllocationRequest(String requestId) {
         SeatAllocationRequest seatAllocationRequest = retrieveSeatAllocationRequestById(requestId);
         // Check whether the request has already been resolved
@@ -489,7 +489,7 @@ public class SeatAllocationRequestService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
         Employee requester = seatAllocationRequest.getRequester();
-        if (currentEmployee.getId().equals(requester.getId())) {
+        if (!currentEmployee.getId().equals(requester.getId())) {
             throw new UnauthorizedActionException("Processing seat allocation request failed: you do not have the right to delete the request!");
         }
 
@@ -498,8 +498,12 @@ public class SeatAllocationRequestService {
                 seatAllocationRequest.getApprovalTickets()) {
             ticket.setDeleted(true);
             approvalForRequestRepository.save(ticket);
+            System.out.println("********************** check my approvals **********************");
+            System.out.println("********************** num of approvals: " + ticket.getApprover().getMyApprovals().size() + " **********************");
+            ticket.getApprover().setMyApprovals(new ArrayList<>(ticket.getApprover().getMyApprovals()));
             ticket.getApprover().getMyApprovals().remove(ticket.getId());
             employeeRepository.save(ticket.getApprover());
+            seatAllocationRequest.getRequester().setMyRequestTickets(new ArrayList<>(seatAllocationRequest.getRequester().getMyRequestTickets()));
             seatAllocationRequest.getRequester().getMyRequestTickets().remove(ticket.getId());
         }
         seatAllocationRequest.setDeleted(true);
