@@ -238,27 +238,6 @@ public class SeatAllocationRequestService {
         List<SeatAllocationRequest> seatAllocationRequests = new ArrayList<>();
         seatAllocationRequests = seatAllocationRequestRepository.findOnesByReviewerId(reviewerId);
 
-        // Remove approval tickets that are created after the one assigned to the reviewer (escalated by the reviewer)
-        for (SeatAllocationRequest request :
-                seatAllocationRequests) {
-            String ticketIdAssignedToReviewer = "";
-            Date ticketCreatedDateTime = new Date();
-            for (ApprovalForRequest ticket :
-                    request.getApprovalTickets()) {
-                if (ticket.getApprover().getId().equals(reviewerId)) {
-                    ticketIdAssignedToReviewer = ticket.getId();
-                    ticketCreatedDateTime = ticket.getCreatedDateTime();
-                }
-            }
-
-            ListIterator<ApprovalForRequest> listIterator = request.getApprovalTickets().listIterator();
-            while(listIterator.hasNext()) {
-                ApprovalForRequest thisTicket = listIterator.next();
-                if (!thisTicket.getApprover().getId().equals(reviewerId) && thisTicket.getCreatedDateTime().after(ticketCreatedDateTime)) {
-                    listIterator.remove();
-                }
-            }
-        }
         return seatAllocationRequests;
     }
 
@@ -466,6 +445,13 @@ public class SeatAllocationRequestService {
         newApprovalForRequest.setRequestedItemId(seatAllocationRequest.getId());
         newApprovalForRequest.setCommentByRequester(approvalForRequest.getCommentByRequester());
         newApprovalForRequest = approvalForRequestRepository.save(newApprovalForRequest);
+        try {
+            String code = seatManagementEntityCodeHPGenerator.generateCode(approvalForRequestRepository, newApprovalForRequest);
+            newApprovalForRequest.setCode(code);
+            newApprovalForRequest.setObjectName(code);
+        } catch (Exception ex) {
+            throw new SeatAllocationRequestProcessingException("Escalating seat allocation request failed: " + ex.getMessage());
+        }
         seatAllocationRequest.getApprovalTickets().add(newApprovalForRequest);
         seatAllocationRequest.setCurrentPendingTicket(newApprovalForRequest);
         newReviewer.setMyApprovals(new ArrayList<>(newReviewer.getMyApprovals()));
