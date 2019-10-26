@@ -2,8 +2,10 @@ package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.model.res.TeamRes;
 import capstone.is4103capstone.admin.service.TeamService;
+import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
+import capstone.is4103capstone.seat.model.GroupModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +44,21 @@ public class TeamController {
         try {
             WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity.ok().body(new TeamRes(null, false, Optional.of(teamService.getTeamsByCountry(countryUuid))));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new TeamRes(ex.getMessage(), true, Optional.empty()));
+        }
+    }
+
+    @GetMapping("/byTeamLeadUuid/{teamLeadUuid}")
+    public ResponseEntity getTeamByTeamLeadId(@PathVariable(name = "countryUuid") String teamLeadUuid) {
+        try {
+            WriteAuditTrail.createBasicAuditRecord();
+            Team team = teamService.getTeamEntityByTeamLeadUuid(teamLeadUuid);
+            GroupModel teamModel = new GroupModel();
+            teamModel.setId(team.getId());
+            teamModel.setName(team.getObjectName());
+            teamModel.setCode(team.getCode());
+            return ResponseEntity.ok().body(teamModel);
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(new TeamRes(ex.getMessage(), true, Optional.empty()));
         }

@@ -180,7 +180,9 @@ public class SeatAllocationRequestService {
         ticket.setRequestedItemId(seatAllocationRequest.getId());
         seatAllocationRequest.setCurrentPendingTicket(ticket);
         seatAllocationRequest.getApprovalTickets().add(ticket);
+        requester.setMyRequestTickets(new ArrayList<>(requester.getMyRequestTickets()));
         requester.getMyRequestTickets().add(ticket.getId());
+        approver.setMyApprovals(new ArrayList<>(approver.getMyApprovals()));
         approver.getMyApprovals().add(ticket.getId());
 
         approvalForRequestRepository.save(ticket);
@@ -466,7 +468,9 @@ public class SeatAllocationRequestService {
         newApprovalForRequest = approvalForRequestRepository.save(newApprovalForRequest);
         seatAllocationRequest.getApprovalTickets().add(newApprovalForRequest);
         seatAllocationRequest.setCurrentPendingTicket(newApprovalForRequest);
+        newReviewer.setMyApprovals(new ArrayList<>(newReviewer.getMyApprovals()));
         newReviewer.getMyApprovals().add(newApprovalForRequest.getId());
+        seatAllocationRequest.getRequester().setMyRequestTickets(new ArrayList<>(seatAllocationRequest.getRequester().getMyRequestTickets()));
         seatAllocationRequest.getRequester().getMyRequestTickets().add(newApprovalForRequest.getId());
 
         approvalForRequestRepository.save(approvalForRequest);

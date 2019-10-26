@@ -86,6 +86,15 @@ public class TeamService {
         }
     }
 
+    public Team getTeamEntityByTeamLeadUuid(String teamLeadUuid) throws Exception {
+        Optional<Team> team = teamRepository.findByTeamLeadUuid(teamLeadUuid);
+        if (team.isPresent()) {
+            return team.get();
+        } else {
+            throw new Exception("No team found under the management by employee " + teamLeadUuid);
+        }
+    }
+
     // DTO to Entity Conversion Methods
     public TeamDto entityToDto(Team input) {
         TeamDto teamDto = new TeamDto();
