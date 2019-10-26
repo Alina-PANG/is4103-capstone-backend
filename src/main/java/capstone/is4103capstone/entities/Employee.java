@@ -65,8 +65,20 @@ public class Employee extends DBEntityTemplate {
     private List<BJF> bjfs = new ArrayList<>();
 
     @Convert(converter = StringListConverter.class)
+    @JoinTable(name = "my_request_tickets",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            foreignKey = @ForeignKey(name = "id"),
+            inverseJoinColumns = @JoinColumn(name = "ticket_id"),
+            inverseForeignKey = @ForeignKey(name = "id")
+    )
     private List<String> myRequestTickets = new ArrayList<>();
     @Convert(converter = StringListConverter.class)
+    @JoinTable(name = "my_approvals",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            foreignKey = @ForeignKey(name = "id"),
+            inverseJoinColumns = @JoinColumn(name = "ticket_id"),
+            inverseForeignKey = @ForeignKey(name = "id")
+    )
     private List<String> myApprovals = new ArrayList<>();
 
     //    @LazyCollection(LazyCollectionOption.FALSE)
