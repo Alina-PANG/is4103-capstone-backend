@@ -50,7 +50,7 @@ public class CountryService {
 
     public Country getCountryEntityByUuid(String uuid) throws Exception {
         try {
-            Country result = countryRepository.findById(uuid).get();
+            Country result = countryRepository.findCountryById(uuid);
             result.getFunctions().size();
             List<CompanyFunction> fs = result.getFunctions();
             return result;
@@ -130,12 +130,15 @@ public class CountryService {
         return countries;
     }
 
+    @Transactional
     public CountryDto entityToDto(Country input) {
         CountryDto countryDto = new CountryDto();
-        countryDto.setId(Optional.of(input.getId()));
-        countryDto.setCode(Optional.of(input.getCode()));
-        countryDto.setObjectName(Optional.of(input.getObjectName()));
-        if (!Objects.isNull(input.getRegion())) countryDto.setRegionId(Optional.of(input.getRegion().getId()));
+        countryDto.setId(Optional.ofNullable(input.getId()));
+        countryDto.setCode(Optional.ofNullable(input.getCode()));
+        countryDto.setObjectName(Optional.ofNullable(input.getObjectName()));
+        if (!Objects.isNull(input.getRegion()))
+            countryDto.setRegionId(Optional.ofNullable(input.getRegion().getId()));
+        input.getFunctions().size();
         if (!Objects.isNull(input.getFunctions()) && !input.getFunctions().isEmpty()) {
 //            List<String> functionIds = new ArrayList<>();
             List<GeneralEntityModel> functions = new ArrayList<>();
@@ -143,7 +146,7 @@ public class CountryService {
                 functions.add(new GeneralEntityModel(function));
 //                functionIds.add(function.getId());
             }
-            countryDto.setFunctions(Optional.of(functions));
+            countryDto.setFunctions(Optional.ofNullable(functions));
         }
         return countryDto;
     }
@@ -158,5 +161,14 @@ public class CountryService {
             }
         }
         return countryDtos;
+    }
+
+    public Boolean validateCountryId(String id){
+        Optional<Country> optionalCountry = countryRepository.findUndeletedCountryById(id);
+        if (!optionalCountry.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
     }
 }

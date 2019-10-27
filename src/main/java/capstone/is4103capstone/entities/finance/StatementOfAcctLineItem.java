@@ -12,25 +12,38 @@ import java.util.Date;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class StatementOfAcctLineItem extends DBEntityTemplate {
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchaseOrder_id")
+    @ManyToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "purchase_order_id")
     @JsonIgnore
     private PurchaseOrder purchaseOrder;
+
     @Temporal(TemporalType.DATE)
     private Date scheduleDate;
 
+    @OneToOne(fetch = FetchType.LAZY,mappedBy = "statementOfAcctLineItem")
+    @JsonIgnore
+    private Invoice invoice;
+
     private BigDecimal paidAmt;
     private BigDecimal actualPmt;
-    private BigDecimal accruals;
 
     public StatementOfAcctLineItem() {
     }
 
-    public StatementOfAcctLineItem(Date scheduleDate, BigDecimal paidAmt, BigDecimal actualPmt, BigDecimal accruals) {
+    public StatementOfAcctLineItem(PurchaseOrder purchaseOrder, Date scheduleDate, Invoice invoice, BigDecimal paidAmt, BigDecimal actualPmt) {
+        this.purchaseOrder = purchaseOrder;
         this.scheduleDate = scheduleDate;
+        this.invoice = invoice;
         this.paidAmt = paidAmt;
         this.actualPmt = actualPmt;
-        this.accruals = accruals;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 
     public Date getScheduleDate() {
@@ -55,14 +68,6 @@ public class StatementOfAcctLineItem extends DBEntityTemplate {
 
     public void setActualPmt(BigDecimal actualPmt) {
         this.actualPmt = actualPmt;
-    }
-
-    public BigDecimal getAccruals() {
-        return accruals;
-    }
-
-    public void setAccruals(BigDecimal accruals) {
-        this.accruals = accruals;
     }
 
 

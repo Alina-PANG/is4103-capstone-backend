@@ -1,16 +1,17 @@
 package capstone.is4103capstone.entities.supplyChain;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.finance.Invoice;
-import capstone.is4103capstone.entities.finance.Merchandise;
+import capstone.is4103capstone.entities.finance.PurchaseOrder;
+import capstone.is4103capstone.entities.helper.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table
@@ -24,22 +25,19 @@ public class Vendor extends DBEntityTemplate {
     private String escalationContactName;
     private String escalationContactEmail;
 
-    @ManyToMany(mappedBy = "vendors", fetch = FetchType.EAGER)
-    private List<Team> businessUnits = new ArrayList<>();
-
-    @OneToMany(mappedBy = "vendor")
-    private List<Merchandise> merchandises = new ArrayList<>();
-
-    @OneToMany(mappedBy = "vendor")
-    private List<Invoice> invoices = new ArrayList<>();
+    @Convert(converter = StringListConverter.class)
+    private List<String> businessUnits = new ArrayList<>();
 
     @OneToMany(mappedBy = "vendor")
     private List<Contract> contracts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "vendor")
+    private List<PurchaseOrder> purchaseOrders= new ArrayList<>();
+
     @OneToMany(mappedBy = "outsourcedVendor")
     private List<Outsourcing> outsourcingList = new ArrayList<>();
 
-    public Vendor(String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
+    public Vendor(String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail, List<String> businessUnits, List<Contract> contracts, List<PurchaseOrder> purchaseOrders, List<Outsourcing> outsourcingList) {
         this.serviceDescription = serviceDescription;
         this.relationshipManagerName = relationshipManagerName;
         this.relationshipManagerEmail = relationshipManagerEmail;
@@ -47,26 +45,83 @@ public class Vendor extends DBEntityTemplate {
         this.billingContactEmail = billingContactEmail;
         this.escalationContactName = escalationContactName;
         this.escalationContactEmail = escalationContactEmail;
+        this.businessUnits = businessUnits;
+        this.contracts = contracts;
+        this.purchaseOrders = purchaseOrders;
+        this.outsourcingList = outsourcingList;
+    }
+
+    public Vendor(String objectName, String code, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail, List<String> businessUnits, List<Contract> contracts, List<PurchaseOrder> purchaseOrders, List<Outsourcing> outsourcingList) {
+        super(objectName, code);
+        this.serviceDescription = serviceDescription;
+        this.relationshipManagerName = relationshipManagerName;
+        this.relationshipManagerEmail = relationshipManagerEmail;
+        this.billingContactName = billingContactName;
+        this.billingContactEmail = billingContactEmail;
+        this.escalationContactName = escalationContactName;
+        this.escalationContactEmail = escalationContactEmail;
+        this.businessUnits = businessUnits;
+        this.contracts = contracts;
+        this.purchaseOrders = purchaseOrders;
+        this.outsourcingList = outsourcingList;
+    }
+
+    public Vendor(String objectName, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail, List<String> businessUnits, List<Contract> contracts, List<PurchaseOrder> purchaseOrders, List<Outsourcing> outsourcingList) {
+        super(objectName);
+        this.serviceDescription = serviceDescription;
+        this.relationshipManagerName = relationshipManagerName;
+        this.relationshipManagerEmail = relationshipManagerEmail;
+        this.billingContactName = billingContactName;
+        this.billingContactEmail = billingContactEmail;
+        this.escalationContactName = escalationContactName;
+        this.escalationContactEmail = escalationContactEmail;
+        this.businessUnits = businessUnits;
+        this.contracts = contracts;
+        this.purchaseOrders = purchaseOrders;
+        this.outsourcingList = outsourcingList;
+    }
+
+    public Vendor(String objectName, String code, String hierachyPath, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail, List<String> businessUnits, List<Contract> contracts, List<PurchaseOrder> purchaseOrders, List<Outsourcing> outsourcingList) {
+        super(objectName, code, hierachyPath);
+        this.serviceDescription = serviceDescription;
+        this.relationshipManagerName = relationshipManagerName;
+        this.relationshipManagerEmail = relationshipManagerEmail;
+        this.billingContactName = billingContactName;
+        this.billingContactEmail = billingContactEmail;
+        this.escalationContactName = escalationContactName;
+        this.escalationContactEmail = escalationContactEmail;
+        this.businessUnits = businessUnits;
+        this.contracts = contracts;
+        this.purchaseOrders = purchaseOrders;
+        this.outsourcingList = outsourcingList;
+    }
+
+    public Vendor(String objectName, String code, String hierachyPath, String createdBy, String lastModifiedBy, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail, List<String> businessUnits, List<Contract> contracts, List<PurchaseOrder> purchaseOrders, List<Outsourcing> outsourcingList) {
+        super(objectName, code, hierachyPath, createdBy, lastModifiedBy);
+        this.serviceDescription = serviceDescription;
+        this.relationshipManagerName = relationshipManagerName;
+        this.relationshipManagerEmail = relationshipManagerEmail;
+        this.billingContactName = billingContactName;
+        this.billingContactEmail = billingContactEmail;
+        this.escalationContactName = escalationContactName;
+        this.escalationContactEmail = escalationContactEmail;
+        this.businessUnits = businessUnits;
+        this.contracts = contracts;
+        this.purchaseOrders = purchaseOrders;
+        this.outsourcingList = outsourcingList;
     }
 
     public Vendor() {
     }
 
-    public List<Merchandise> getMerchandises() {
-        return merchandises;
+    public List<PurchaseOrder> getPurchaseOrders() {
+        return purchaseOrders;
     }
 
-    public void setMerchandises(List<Merchandise> merchandises) {
-        this.merchandises = merchandises;
+    public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
+        this.purchaseOrders = purchaseOrders;
     }
 
-    public List<Invoice> getInvoices() {
-        return invoices;
-    }
-
-    public void setInvoices(List<Invoice> invoices) {
-        this.invoices = invoices;
-    }
 
     public List<Outsourcing> getOutsourcingList() {
         return outsourcingList;
@@ -76,11 +131,11 @@ public class Vendor extends DBEntityTemplate {
         this.outsourcingList = outsourcingList;
     }
 
-    public List<Team> getBusinessUnits() {
+    public List<String> getBusinessUnits() {
         return businessUnits;
     }
 
-    public void setBusinessUnits(List<Team> businessUnits) {
+    public void setBusinessUnits(List<String> businessUnits) {
         this.businessUnits = businessUnits;
     }
 

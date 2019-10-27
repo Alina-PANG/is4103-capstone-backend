@@ -14,6 +14,12 @@ public interface TeamRepository extends JpaRepository<Team, String> {
     @Query(value = "SELECT * FROM team t WHERE t.id = ?1 AND t.is_deleted=false", nativeQuery = true)
     Optional<Team> findById(String id);
 
-    @Query(value = "SELECT * FROM team t WHERE t.country_id = ?1", nativeQuery = true)
+    @Query(value = "SELECT * FROM team t1 " +
+            "JOIN business_unit t2 ON t1.business_unit_id = t2.id " +
+            "JOIN company_function t3 ON t2.function_id = t3.id " +
+            "WHERE t3.country_id = ?1", nativeQuery = true)
     List<Team> findTeamsByCountryId(String countryUuid);
+
+    @Query(value = "SELECT * FROM team t WHERE t.team_leader_id = ?1 AND t.is_deleted=false", nativeQuery = true)
+    Optional<Team> findByTeamLeadUuid(String teamLeadUuid);
 }

@@ -1,5 +1,6 @@
 package capstone.is4103capstone.supplychain.model;
 
+import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 
 import java.io.Serializable;
@@ -18,6 +19,7 @@ public class VendorModel implements Serializable {
     private String billingContactEmail;
     private String escalationContactName;
     private String escalationContactEmail;
+
 
     public VendorModel(String id, String code, String vendorName, Long seqNo, List<GeneralEntityModel> businessUnits, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
         this.id = id;

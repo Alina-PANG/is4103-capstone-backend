@@ -12,4 +12,7 @@ public interface ContractRepository extends JpaRepository<Contract, String> {
 
     @Query(value = "SELECT * FROM contract cont WHERE cont.is_deleted=false AND cont.vendor_id=?1",nativeQuery = true)
     List<Contract> findContractsByVendorId(String vendorId);
+
+    @Query(value = "SELECT * FROM contract cont WHERE cont.is_deleted=false AND cont.team_id=?1",nativeQuery = true)
+    List<Contract> findContractsByTeamId(String teamId);
 }

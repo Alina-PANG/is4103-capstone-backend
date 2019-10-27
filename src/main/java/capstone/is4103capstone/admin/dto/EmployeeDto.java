@@ -1,14 +1,13 @@
 package capstone.is4103capstone.admin.dto;
 
+import capstone.is4103capstone.entities.helper.WebAppPermissionMap;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Optional;
 
 
-@JsonInclude(JsonInclude.Include.NON_NULL) // don't serialize nulls since there are optional classes
+@JsonInclude(JsonInclude.Include.NON_EMPTY) // don't serialize nulls since there are optional classes
 public class EmployeeDto implements Serializable {
 
     private Optional<String> id = Optional.empty();
@@ -20,6 +19,7 @@ public class EmployeeDto implements Serializable {
     private Optional<String> securityId = Optional.empty();
     private Optional<String> password = Optional.empty();
     private Optional<String> email = Optional.empty();
+    private Optional<WebAppPermissionMap> permissions = Optional.empty();
 
 
     public Optional<String> getId() {
@@ -92,5 +92,13 @@ public class EmployeeDto implements Serializable {
 
     public void setEmail(Optional<String> email) {
         this.email = email;
+    }
+
+    public Optional<WebAppPermissionMap> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Optional<WebAppPermissionMap> permissions) {
+        this.permissions = permissions;
     }
 }

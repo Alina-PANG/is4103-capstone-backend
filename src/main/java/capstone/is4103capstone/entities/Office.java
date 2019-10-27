@@ -28,9 +28,14 @@ public class Office extends DBEntityTemplate {
     @JsonIgnore
     private Country country;
 
+    @OneToMany(mappedBy = "office")
+    private List<Team> teams = new ArrayList<>();
 
-    @Convert(converter = StringListConverter.class)
+    @ElementCollection(targetClass= String.class)
     private List<String> functionsCodeInOffice = new ArrayList<>();
+
+    @ElementCollection(targetClass= String.class)
+    private List<String> businessUnitsCodeInOffice = new ArrayList<>();
 
     public Office() {
     }
@@ -69,12 +74,24 @@ public class Office extends DBEntityTemplate {
         this.country = country;
     }
 
+    public List<Team> getTeams() { return teams; }
+
+    public void setTeams(List<Team> teams) { this.teams = teams; }
+
     public List<String> getFunctionsCodeInOffice() {
         return functionsCodeInOffice;
     }
 
     public void setFunctionsCodeInOffice(List<String> functionsCodeInOffice) {
         this.functionsCodeInOffice = functionsCodeInOffice;
+    }
+
+    public List<String> getBusinessUnitsCodeInOffice() {
+        return businessUnitsCodeInOffice;
+    }
+
+    public void setBusinessUnitsCodeInOffice(List<String> businessUnitsCodeInOffice) {
+        this.businessUnitsCodeInOffice = businessUnitsCodeInOffice;
     }
 
     public List<String> getFloors() {

@@ -1,15 +1,18 @@
 package capstone.is4103capstone.supplychain.model;
 
 import capstone.is4103capstone.general.model.GeneralEntityModel;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class ContractModel implements Serializable {
+    private String contractDescription;
     private String name;
     private String code;
     private String id;
@@ -21,9 +24,12 @@ public class ContractModel implements Serializable {
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
     private GeneralEntityModel vendor;
-    private GeneralEntityModel employeeInChargeContract;
+    private EmployeeModel employeeInChargeContract;
+    private EmployeeModel approver;
     private GeneralEntityModel team;
-    private Integer totalContractValue;
+    private BigDecimal totalContractValue;
+    private String currencyCode;
+    private Boolean canUpdateAndRequest;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -37,7 +43,8 @@ public class ContractModel implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date cpgReviewAlertDate;
 
-    public ContractModel(String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, GeneralEntityModel employeeInChargeContract, GeneralEntityModel team, Integer totalContractValue, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
+    public ContractModel(String contractDescription, String name, String code, String id, Long seqNo, PurchaseTypeEnum purchaseType, String spendType, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, GeneralEntityModel vendor, EmployeeModel employeeInChargeContract, EmployeeModel approver, GeneralEntityModel team, BigDecimal totalContractValue, String currencyCode, Boolean canUpdateAndRequest, Date startDate, Date endDate, Date renewalStartDate, Date cpgReviewAlertDate) {
+        this.contractDescription = contractDescription;
         this.name = name;
         this.code = code;
         this.id = id;
@@ -50,8 +57,11 @@ public class ContractModel implements Serializable {
         this.noticeDaysToExit = noticeDaysToExit;
         this.vendor = vendor;
         this.employeeInChargeContract = employeeInChargeContract;
+        this.approver = approver;
         this.team = team;
         this.totalContractValue = totalContractValue;
+        this.currencyCode = currencyCode;
+        this.canUpdateAndRequest = canUpdateAndRequest;
         this.startDate = startDate;
         this.endDate = endDate;
         this.renewalStartDate = renewalStartDate;
@@ -61,12 +71,40 @@ public class ContractModel implements Serializable {
     public ContractModel() {
     }
 
-    public Integer getTotalContractValue() {
+    public void setEmployeeInChargeContract(EmployeeModel employeeInChargeContract) {
+        this.employeeInChargeContract = employeeInChargeContract;
+    }
+
+    public EmployeeModel getApprover() {
+        return approver;
+    }
+
+    public void setApprover(EmployeeModel approver) {
+        this.approver = approver;
+    }
+
+    public String getContractDescription() {
+        return contractDescription;
+    }
+
+    public void setContractDescription(String contractDescription) {
+        this.contractDescription = contractDescription;
+    }
+
+    public BigDecimal getTotalContractValue() {
         return totalContractValue;
     }
 
-    public void setTotalContractValue(Integer totalContractValue) {
+    public void setTotalContractValue(BigDecimal totalContractValue) {
         this.totalContractValue = totalContractValue;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
     }
 
     public Long getSeqNo() {
@@ -99,6 +137,14 @@ public class ContractModel implements Serializable {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Boolean getCanUpdateAndRequest() {
+        return canUpdateAndRequest;
+    }
+
+    public void setCanUpdateAndRequest(Boolean canUpdateAndRequest) {
+        this.canUpdateAndRequest = canUpdateAndRequest;
     }
 
     public String getId() {
@@ -165,12 +211,8 @@ public class ContractModel implements Serializable {
         this.vendor = vendor;
     }
 
-    public GeneralEntityModel getEmployeeInChargeContract() {
+    public EmployeeModel getEmployeeInChargeContract() {
         return employeeInChargeContract;
-    }
-
-    public void setEmployeeInChargeContract(GeneralEntityModel employeeInChargeContract) {
-        this.employeeInChargeContract = employeeInChargeContract;
     }
 
     public Date getStartDate() {

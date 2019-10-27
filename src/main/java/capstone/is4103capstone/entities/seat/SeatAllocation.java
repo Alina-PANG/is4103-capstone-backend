@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.Schedule;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
 import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.istack.Nullable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -24,9 +25,10 @@ public class SeatAllocation extends DBEntityTemplate implements Comparable<SeatA
     private boolean isActive = true;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "seat_id",nullable = false)
+    @JoinColumn(name = "seat_id", nullable = false)
     @JsonIgnore
     private Seat seat;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     @JsonIgnore
@@ -105,6 +107,6 @@ public class SeatAllocation extends DBEntityTemplate implements Comparable<SeatA
 
     @Override
     public int compareTo(SeatAllocation anotherSeatAllocation) {
-        return this.schedule.getStartDateTime().compareTo(anotherSeatAllocation.schedule.getStartDateTime());
+        return this.schedule.compareTo(anotherSeatAllocation.schedule);
     }
 }

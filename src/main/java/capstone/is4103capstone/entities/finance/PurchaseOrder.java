@@ -1,12 +1,15 @@
 package capstone.is4103capstone.entities.finance;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.helper.StringListConverter;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
+import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,47 +20,34 @@ public class PurchaseOrder extends DBEntityTemplate {
     @Convert(converter = StringListConverter.class)
     private List<String> relatedBJF;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vendor_id")
-    private Vendor vendor;
-
-    @OneToMany(mappedBy = "purchaseOrder",fetch = FetchType.EAGER)
-    private List<PurchaseOrderLineItem> purchaseOrderLineItems = new ArrayList<>();
-
-    @OneToMany(mappedBy = "purchaseOrder")
-    private List<Invoice> invoices = new ArrayList<>();
-
-    @OneToMany(mappedBy = "purchaseOrder")
+    @OneToMany(mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
     private List<StatementOfAcctLineItem> statementOfAccount = new ArrayList<>();
+
+    @Column(name = "status")
+    private ApprovalStatusEnum status;
 
     private String currencyCode;
 
-    public String getCurrencyCode() {
-        return currencyCode;
-    }
+    private Double totalAmount;
 
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
-    }
+    private String approver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchaseOrder_vendor")
+    @JsonIgnore
+    private Vendor vendor;
 
     public PurchaseOrder() {
+
     }
 
-    public PurchaseOrder(String poCode, String hierachyPath) {
-        super(poCode, hierachyPath);
+
+    public String getApprover() {
+        return approver;
     }
 
-    public PurchaseOrder(Employee employee, List<PurchaseOrderLineItem> purchaseOrderLineItems, List<Invoice> invoices, List<StatementOfAcctLineItem> statementOfAccounts, List<Merchandise> merchandises) {
-        this.purchaseOrderLineItems = purchaseOrderLineItems;
-        this.invoices = invoices;
-    }
-
-    public Vendor getVendor() {
-        return vendor;
-    }
-
-    public void setVendor(Vendor vendor) {
-        this.vendor = vendor;
+    public void setApprover(String approver) {
+        this.approver = approver;
     }
 
     public List<String> getRelatedBJF() {
@@ -68,22 +58,6 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.relatedBJF = relatedBJF;
     }
 
-    public List<PurchaseOrderLineItem> getPurchaseOrderLineItems() {
-        return purchaseOrderLineItems;
-    }
-
-    public void setPurchaseOrderLineItems(List<PurchaseOrderLineItem> purchaseOrderLineItems) {
-        this.purchaseOrderLineItems = purchaseOrderLineItems;
-    }
-
-    public List<Invoice> getInvoices() {
-        return invoices;
-    }
-
-    public void setInvoices(List<Invoice> invoices) {
-        this.invoices = invoices;
-    }
-
     public List<StatementOfAcctLineItem> getStatementOfAccount() {
         return statementOfAccount;
     }
@@ -92,14 +66,35 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.statementOfAccount = statementOfAccount;
     }
 
-    public Double calculateTotalPrice(){
-        if (this.purchaseOrderLineItems.size() == 0){
-            return Double.valueOf(0.0);
-        }
-        Double total = 0d;
-        for (PurchaseOrderLineItem lineItem: purchaseOrderLineItems){
-            total += lineItem.getPrice().doubleValue() * lineItem.getQuantity();
-        }
-        return total;
+    public Vendor getVendor() {
+        return vendor;
+    }
+
+    public void setVendor(Vendor vendor) {
+        this.vendor = vendor;
+    }
+
+    public ApprovalStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(ApprovalStatusEnum status) {
+        this.status = status;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

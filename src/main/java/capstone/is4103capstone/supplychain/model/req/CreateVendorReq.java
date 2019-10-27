@@ -1,13 +1,16 @@
 package capstone.is4103capstone.supplychain.model.req;
 
+import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.entities.helper.StringListConverter;
 
+import javax.persistence.Convert;
 import java.io.Serializable;
 import java.util.List;
 
 public class CreateVendorReq implements Serializable {
     private String vendorName;
-    private List<Team> businessUnits;
+    private List<String> businessUnitIds;
     private String serviceDescription;
     private String relationshipManagerName;
     private String relationshipManagerEmail;
@@ -36,12 +39,12 @@ public class CreateVendorReq implements Serializable {
         this.vendorName = vendorName;
     }
 
-    public List<Team> getBusinessUnits() {
-        return businessUnits;
+    public List<String> getBusinessUnitIds() {
+        return businessUnitIds;
     }
 
-    public void setBusinessUnits(List<Team> businessUnits) {
-        this.businessUnits = businessUnits;
+    public void setBusinessUnitIds(List<String> businessUnitIds) {
+        this.businessUnitIds = businessUnitIds;
     }
 
     public String getServiceDescription() {

@@ -11,6 +11,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public class EntityCodeHPGeneration {
     static  FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
 
+    public static String getCode(JpaRepository repo, DBEntityTemplate entity, String additionalInfo){
+        try {
+            String code = g.generateCode(repo,entity,additionalInfo);
+            entity.setCode(code);
+            return code;
+        }catch (RepositoryEntityMismatchException e){
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
     public static String getCode(JpaRepository repo, DBEntityTemplate entity){
         try {
             String code = g.generateCode(repo,entity);
@@ -36,7 +47,12 @@ public class EntityCodeHPGeneration {
         return hp;
     }
     public static String setPlanItemHP(PlanLineItem pl){
-        String hp = pl.getPlanBelongsTo().getHierachyPath() + "-"+pl.getMerchandiseCode();
+        String hp = pl.getPlanBelongsTo().getHierachyPath() + "-"+pl.getserviceCode();
+        pl.setHierachyPath(hp);
+        return hp;
+    }
+    public static String setPlanItemHP(PlanLineItem pl,String planHierachyPath){
+        String hp = planHierachyPath + "-"+pl.getserviceCode();
         pl.setHierachyPath(hp);
         return hp;
     }

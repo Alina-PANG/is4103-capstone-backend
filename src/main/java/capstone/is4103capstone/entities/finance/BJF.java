@@ -1,7 +1,8 @@
 package capstone.is4103capstone.entities.finance;
 
-import capstone.is4103capstone.configuration.DBEntityTemplate;
-import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.RequestFormTemplate;
+import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
+import capstone.is4103capstone.util.enums.BJFStatusEnum;
 import capstone.is4103capstone.util.enums.BjfTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,64 +13,119 @@ import java.math.BigDecimal;
 @Entity
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class BJF extends DBEntityTemplate {
+public class BJF extends RequestFormTemplate {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "merchandise_id")
-    @JsonIgnore
-    private Merchandise merchandise;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id")
-    @JsonIgnore
-    private Employee requester;
+    //justification == form description
+    private String serviceId;
+    private String vendorId;
 
     private BjfTypeEnum BjfType;
 
-    private String justification;
-
-    private String currencyCode;
-
-    private BigDecimal ongoingCost;
-
-    private BigDecimal totalAmt;
-
-    private String costCenterCode;
-
-    private BigDecimal projectCost = null; // if type == project
-
-    private String projectCode = null; // if type == project
-
-    private String purchaseOrdersNumber;
+    private BigDecimal capex;
+    private String capexCurrency;
+    private String revexCurrency;
+    private Boolean competitiveQuotesAvailable;
+    private BigDecimal revex; // if type == project
+    private String sponsor;
+    private String projectCode = null; // string/id both should work: if type == project
+    private String coverage;
+    private String purchaseOrderNumber;
 
     // link to the unique code from the approval
     private String businessApprovalTicketCode;
     // link to the unique code from the approval
     private String budgetApprovalTicketCode;
+    private BigDecimal totalSpending;
 
+    private BJFStatusEnum bjfStatus = BJFStatusEnum.PENDING_APPROVAL;
+
+
+    @OneToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "oa_id",nullable = true)
+    @JsonIgnore
+    private OutsourcingAssessment related_outsourcing_assessment;
 
     public BJF() {
     }
 
-
-
-    public BJF(BjfTypeEnum bjfType, String justification, String currencyCode, BigDecimal ongoingCost, BigDecimal totalAmt, String costCenterCode, BigDecimal projectCost, String projectCode) {
-        this.BjfType = bjfType;
-        this.justification = justification;
-        this.currencyCode = currencyCode;
-        this.ongoingCost = ongoingCost;
-        this.totalAmt = totalAmt;
-        this.costCenterCode = costCenterCode;
-        this.projectCost = projectCost;
-        this.projectCode = projectCode;
+    public OutsourcingAssessment getRelated_outsourcing_assessment() {
+        return related_outsourcing_assessment;
     }
 
-    public Merchandise getMerchandise() {
-        return merchandise;
+    public void setRelated_outsourcing_assessment(OutsourcingAssessment related_outsourcing_assessment) {
+        this.related_outsourcing_assessment = related_outsourcing_assessment;
     }
 
-    public void setMerchandise(Merchandise merchandise) {
-        this.merchandise = merchandise;
+    public BigDecimal getTotalSpending() {
+        return totalSpending;
+    }
+
+    public void setTotalSpending(BigDecimal totalSpending) {
+        this.totalSpending = totalSpending;
+    }
+
+    public String getCapexCurrency() {
+        return capexCurrency;
+    }
+
+    public void setCapexCurrency(String capexCurrency) {
+        this.capexCurrency = capexCurrency;
+    }
+
+    public String getRevexCurrency() {
+        return revexCurrency;
+    }
+
+    public void setRevexCurrency(String revexCurrency) {
+        this.revexCurrency = revexCurrency;
+    }
+
+    public Boolean getCompetitiveQuotesAvailable() {
+        return competitiveQuotesAvailable;
+    }
+
+    public void setCompetitiveQuotesAvailable(Boolean competitiveQuotesAvailable) {
+        this.competitiveQuotesAvailable = competitiveQuotesAvailable;
+    }
+
+    public String getSponsor() {
+        return sponsor;
+    }
+
+    public void setSponsor(String sponsor) {
+        this.sponsor = sponsor;
+    }
+
+    public String getCoverage() {
+        return coverage;
+    }
+
+    public void setCoverage(String coverage) {
+        this.coverage = coverage;
+    }
+
+    public BJFStatusEnum getBjfStatus() {
+        return bjfStatus;
+    }
+
+    public void setBjfStatus(BJFStatusEnum bjfStatus) {
+        this.bjfStatus = bjfStatus;
+    }
+
+    public String getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(String vendorId) {
+        this.vendorId = vendorId;
+    }
+
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
     }
 
     public BjfTypeEnum getBjfType() {
@@ -80,44 +136,21 @@ public class BJF extends DBEntityTemplate {
         BjfType = bjfType;
     }
 
-    public String getCurrencyCode() {
-        return currencyCode;
+    public BigDecimal getCapex() {
+        return capex;
     }
 
-    public void setCurrencyCode(String currencyCode) {
-        this.currencyCode = currencyCode;
+    public void setCapex(BigDecimal capex) {
+        this.capex = capex;
     }
 
-    public BigDecimal getOngoingCost() {
-        return ongoingCost;
+
+    public BigDecimal getRevex() {
+        return revex;
     }
 
-    public void setOngoingCost(BigDecimal ongoingCost) {
-        this.ongoingCost = ongoingCost;
-    }
-
-    public BigDecimal getTotalAmt() {
-        return totalAmt;
-    }
-
-    public void setTotalAmt(BigDecimal totalAmt) {
-        this.totalAmt = totalAmt;
-    }
-
-    public String getCostCenterCode() {
-        return costCenterCode;
-    }
-
-    public void setCostCenterCode(String costCenterCode) {
-        this.costCenterCode = costCenterCode;
-    }
-
-    public BigDecimal getProjectCost() {
-        return projectCost;
-    }
-
-    public void setProjectCost(BigDecimal projectCost) {
-        this.projectCost = projectCost;
+    public void setRevex(BigDecimal revex) {
+        this.revex = revex;
     }
 
     public String getProjectCode() {
@@ -128,12 +161,12 @@ public class BJF extends DBEntityTemplate {
         this.projectCode = projectCode;
     }
 
-    public String getPurchaseOrdersNumber() {
-        return purchaseOrdersNumber;
+    public String getPurchaseOrderNumber() {
+        return purchaseOrderNumber;
     }
 
-    public void setPurchaseOrdersNumber(String purchaseOrdersNumber) {
-        this.purchaseOrdersNumber = purchaseOrdersNumber;
+    public void setPurchaseOrderNumber(String purchaseOrderNumber) {
+        this.purchaseOrderNumber = purchaseOrderNumber;
     }
 
     public String getBusinessApprovalTicketCode() {
@@ -152,19 +185,4 @@ public class BJF extends DBEntityTemplate {
         this.budgetApprovalTicketCode = budgetApprovalTicketCode;
     }
 
-    public Employee getRequester() {
-        return requester;
-    }
-
-    public void setRequester(Employee requester) {
-        this.requester = requester;
-    }
-
-    public String getJustification() {
-        return justification;
-    }
-
-    public void setJustification(String justification) {
-        this.justification = justification;
-    }
 }

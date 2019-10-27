@@ -1,18 +1,18 @@
 package capstone.is4103capstone.supplychain.model.req;
 
-import capstone.is4103capstone.entities.Team;
-import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.ContractLine;
+import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import capstone.is4103capstone.util.enums.ContractTypeEnum;
 import capstone.is4103capstone.util.enums.PurchaseTypeEnum;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 public class CreateContractReq implements Serializable {
+    private String contractDescription;
     private PurchaseTypeEnum purchaseType;
     private ContractStatusEnum contractStatus;
     private Integer noticeDaysToExit;
@@ -33,22 +33,47 @@ public class CreateContractReq implements Serializable {
     private Date cpgReviewAlertDate;
 
     private String vendorId;
-    private List<ContractLine> contractLineList;
     private String modifierUsername;
     private String employeeInChargeId;
     private String contractName;
-    private Integer totalContractValue;
+    private BigDecimal totalContractValue;
+    private String currencyCode;
     private String teamId;
+    private String approverId;
 
     public CreateContractReq() {
     }
 
-    public Integer getTotalContractValue() {
+    public BigDecimal getTotalContractValue() {
         return totalContractValue;
     }
 
-    public void setTotalContractValue(Integer totalContractValue) {
+    public void setTotalContractValue(BigDecimal totalContractValue) {
         this.totalContractValue = totalContractValue;
+    }
+
+    public String getContractDescription() {
+        return contractDescription;
+    }
+
+    public void setContractDescription(String contractDescription) {
+        this.contractDescription = contractDescription;
+    }
+
+    public String getCurrencyCode() {
+        return currencyCode;
+    }
+
+    public void setCurrencyCode(String currencyCode) {
+        this.currencyCode = currencyCode;
+    }
+
+    public String getApproverId() {
+        return approverId;
+    }
+
+    public void setApproverId(String approverId) {
+        this.approverId = approverId;
     }
 
     public String getTeamId() {
@@ -153,14 +178,6 @@ public class CreateContractReq implements Serializable {
 
     public void setVendorId(String vendorId) {
         this.vendorId = vendorId;
-    }
-
-    public List<ContractLine> getContractLineList() {
-        return contractLineList;
-    }
-
-    public void setContractLineList(List<ContractLine> contractLineList) {
-        this.contractLineList = contractLineList;
     }
 
     public String getModifierUsername() {

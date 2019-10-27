@@ -13,7 +13,8 @@ public class SessionKey implements Serializable {
     private int id;
     private String sessionKey;
     private Date lastAuthenticated;
-    @OneToOne
+
+    @OneToOne(fetch = FetchType.LAZY)
     private Employee linkedUser;
 
     public SessionKey() {

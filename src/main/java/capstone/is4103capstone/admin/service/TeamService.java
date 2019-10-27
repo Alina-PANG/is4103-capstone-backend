@@ -27,7 +27,7 @@ public class TeamService {
         teamId = teamId.trim();
         Optional<Team> optionalTeam = teamRepository.findById(teamId);
         if (!optionalTeam.isPresent()) {
-            throw new TeamNotFoundException("Employee with ID " + teamId + " does not exist!");
+            throw new TeamNotFoundException("Team with ID " + teamId + " does not exist!");
         }
 
         return optionalTeam.get();
@@ -86,14 +86,24 @@ public class TeamService {
         }
     }
 
+    public Team getTeamEntityByTeamLeadUuid(String teamLeadUuid) throws Exception {
+        Optional<Team> team = teamRepository.findByTeamLeadUuid(teamLeadUuid);
+        if (team.isPresent()) {
+            return team.get();
+        } else {
+            throw new Exception("No team found under the management by employee " + teamLeadUuid);
+        }
+    }
+
     // DTO to Entity Conversion Methods
     public TeamDto entityToDto(Team input) {
         TeamDto teamDto = new TeamDto();
         teamDto.setId(Optional.of(input.getId()));
         teamDto.setCode(Optional.of(input.getCode()));
         teamDto.setObjectName(Optional.of(input.getObjectName()));
-        teamDto.setCompanyFunction(Optional.of(input.getFunction().getId()));
-        teamDto.setCountry(Optional.of(input.getCountry().getId()));
+        teamDto.setCompanyFunction(Optional.of(input.getBusinessUnit().getFunction().getId()));
+        teamDto.setCountry(Optional.of(input.getBusinessUnit().getFunction().getCountry().getId()));
+        teamDto.setBusinessUnitUuid(Optional.of(input.getBusinessUnit().getId()));
         return teamDto;
     }
 

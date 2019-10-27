@@ -3,12 +3,16 @@ package capstone.is4103capstone.admin.service;
 import capstone.is4103capstone.admin.dto.EmployeeDto;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,13 +41,26 @@ public class EmployeeService {
         return optionalEmployee.get();
     }
 
+
+    public String getCurrentLoginUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currEmployee = (Employee) auth.getPrincipal();
+        return currEmployee.getUserName();
+    }
+
+    public Employee getCurrentLoginEmployee() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Employee currEmployee = (Employee) auth.getPrincipal();
+        return currEmployee;
+    }
+
     // ===== CRUD METHODS =====
     // === CREATE ===
     @Transactional
     public Employee createNewEmployeeEntity(Employee input) {
         Employee newE = employeeRepository.save(input);
         newE = employeeRepository.findEmployeeById(newE.getId());
-        newE.setCode("EMP-"+newE.getSeqNo());
+        newE.setCode("EMP-" + newE.getSeqNo());
         employeeRepository.save(newE);
         return newE;
     }
@@ -72,6 +89,33 @@ public class EmployeeService {
         } else {
             throw new Exception("Employee with UUID " + input + " not found!");
         }
+    }
+
+    public List<EmployeeDto> getTeamMembersByTeamLeadUuid(String teamLeadUuid) throws Exception {
+        Optional<Employee> optionalEmployee = employeeRepository.findUndeletedEmployeeById(teamLeadUuid);
+        if (optionalEmployee.isPresent()) {
+            Employee teamLead = optionalEmployee.get();
+            Team team = teamLead.getTeam();
+            if (!team.getTeamLeader().getId().equals(teamLeadUuid)) {
+                throw new Exception("Employee with UUID " + teamLeadUuid + " is not a team lead!");
+            } else {
+                List<EmployeeDto> employeeDtos = entityToDto(team.getMembers(), true);
+                return  employeeDtos;
+            }
+        } else {
+            throw new Exception("Employee with UUID " + teamLeadUuid + " not found!");
+        }
+    }
+
+    public Employee getEmployeeByUsername(String username) throws EmployeeNotFoundException {
+        if (username == null || username.trim().length() == 0) {
+            throw new EmployeeNotFoundException("Invalid username given!");
+        }
+        Optional<Employee> optionalEmployee = employeeRepository.findUndeletedEmployeeByUsername(username);
+        if (!optionalEmployee.isPresent()) {
+            throw new EmployeeNotFoundException("Employee with username " + username + " does not exist!");
+        }
+        return optionalEmployee.get();
     }
 
     public EmployeeDto getEmployeeByUuid(String input) throws Exception {
@@ -137,14 +181,15 @@ public class EmployeeService {
     // ===== ENTITY TO DTO CONVERTER METHODS =====
     public EmployeeDto entityToDto(Employee input) {
         EmployeeDto employeeDto = new EmployeeDto();
-        employeeDto.setId(Optional.of(input.getId()));
-        employeeDto.setCode(Optional.of(input.getCode()));
-        employeeDto.setFirstName(Optional.of(input.getFirstName()));
-        employeeDto.setMiddleName(Optional.of(input.getMiddleName()));
-        employeeDto.setLastName(Optional.of(input.getLastName()));
-        employeeDto.setUserName(Optional.of(input.getUserName()));
-        employeeDto.setSecurityId(Optional.of(input.getSecurityId()));
-        employeeDto.setEmail(Optional.of(input.getEmail()));
+        employeeDto.setId(Optional.ofNullable(input.getId()));
+        employeeDto.setCode(Optional.ofNullable(input.getCode()));
+        employeeDto.setFirstName(Optional.ofNullable(input.getFirstName()));
+        employeeDto.setMiddleName(Optional.ofNullable(input.getMiddleName()));
+        employeeDto.setLastName(Optional.ofNullable(input.getLastName()));
+        employeeDto.setUserName(Optional.ofNullable(input.getUserName()));
+        employeeDto.setSecurityId(Optional.ofNullable(input.getSecurityId()));
+        employeeDto.setEmail(Optional.ofNullable(input.getEmail()));
+        employeeDto.setPermissions(Optional.ofNullable(input.getWebAppPermissionMap()));
         return employeeDto;
     }
 
@@ -181,9 +226,29 @@ public class EmployeeService {
         return employees;
     }
 
-    public String getUsernameByUuid(String uuid){
+    public String getUsernameByUuid(String uuid) {
         Employee e = employeeRepository.findEmployeeById(uuid);
-        return e == null? null :e.getUserName();
+        return e == null ? null : e.getUserName();
+    }
+
+    public Employee validateUser(String idOrUsername) throws EntityNotFoundException {
+        Optional<Employee> employee = employeeRepository.findUndeletedEmployeeById(idOrUsername);
+        if (employee.isPresent())
+            return employee.get();
+        Employee e = employeeRepository.findEmployeeByUserName(idOrUsername);
+        if (e != null)
+            return e;
+
+        throw new EntityNotFoundException("username or id not valid");
+    }
+
+    public Boolean validateEmployeeId(String id){
+        Optional<Employee> employee = employeeRepository.findUndeletedEmployeeById(id);
+        if (!employee.isPresent()) {
+            return false;
+        }else{
+            return true;
+        }
     }
 
 }

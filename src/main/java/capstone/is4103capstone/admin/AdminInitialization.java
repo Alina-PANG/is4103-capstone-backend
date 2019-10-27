@@ -3,12 +3,20 @@ package capstone.is4103capstone.admin;
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.Address;
+import capstone.is4103capstone.entities.helper.DateHelper;
+import capstone.is4103capstone.entities.seat.EmployeeOfficeWorkingSchedule;
+import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.seat.repository.EmployeeOfficeWorkingScheduleRepository;
+import capstone.is4103capstone.seat.repository.ScheduleRepository;
+import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
+import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminInitialization {
@@ -22,6 +30,8 @@ public class AdminInitialization {
     @Autowired
     FunctionRepository functionRepository;
     @Autowired
+    BusinessUnitRepository businessUnitRepository;
+    @Autowired
     TeamRepository teamRepository;
     @Autowired
     OfficeRepository officeRepository;
@@ -29,10 +39,16 @@ public class AdminInitialization {
     CurrencyRepository currencyRepository;
     @Autowired
     CostCenterRepository costCenterRepository;
+    @Autowired
+    SeatRequestAdminMatchRepository seatRequestAdminMatchRepository;
+    @Autowired
+    EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
+    @Autowired
+    ScheduleRepository scheduleRepository;
 
     @PostConstruct
     public void init() {
-
+//
         List<Currency> currencyList = currencyRepository.findAll();
         if (currencyList == null || currencyList.size() == 0) {
             createCurrency();
@@ -40,12 +56,29 @@ public class AdminInitialization {
             System.out.println("-----Created Geographies-----");
             createEmployee();
         }
-        List<CostCenter> costCenterList = costCenterRepository.findAll();
-        if (costCenterList == null || costCenterList.size() == 0) {
-            createCostCenter();
-        }
-    }
+//        List<CostCenter> costCenterList = costCenterRepository.findAll();
+//        if (costCenterList == null || costCenterList.size() == 0) {
+//            createCostCenter();
+//        }
+//        String[] firstNameList = {"Hong","Tom","Amy","Daivd","Outsourcing","BM","Function"};
+//        String[] lastNameList = {"Xu","Green","Brown","Cook","Staff","Approver","Approver"};
+//        String[] usernameList = {"xuhong","user01","user02","user03","outsourcing1","bmapprover","funcapprover"};
+//        String[] codeCpntList = {"5","6","7","8","OUTSOURCING","BM01","FUNC01"};
+//        for (int i=0;i<firstNameList.length;i++){
+//            createEmployeeTemplate(firstNameList[i],lastNameList[i],usernameList[i],"password","huangyingshi@gmail.com",codeCpntList[i]);
+//        }
 
+    }
+    private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
+        Employee newEmployee = new Employee(username, fName, lName, "", password);
+        newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        newEmployee.setCode("EMP-"+codeCPnt);
+        newEmployee.setCreatedBy("admin");
+        newEmployee.setEmail(email);
+        newEmployee.setLastModifiedBy("admin");
+        employeeRepository.save(newEmployee);
+
+    }
     public void createCurrency() {
         Currency c = new Currency("Singapore Dollars", "SGD");
         currencyRepository.save(c);
@@ -61,23 +94,33 @@ public class AdminInitialization {
     }
 
     public void createEmployee() {
-        Employee newEmployee = new Employee("yingshi2502", "Yingshi", "Huang", "", "password");
-        newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        newEmployee.setCode("EMPLOYEE-yingshi2502");
-        newEmployee.setCreatedBy("admin");
-        newEmployee.setLastModifiedBy("admin");
+        Employee yingshi = new Employee("yingshi2502", "Yingshi", "Huang", "", "password");
+        yingshi.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        yingshi.setCode("EMPLOYEE-yingshi2502");
+        yingshi.setCreatedBy("admin");
+        yingshi.setEmail("yuqiancai987@gmail.com");
+        yingshi.setLastModifiedBy("admin");
 
-        Employee newEmployee2 = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
-        newEmployee2.setEmployeeType(EmployeeTypeEnum.WORKINGFROMHOME);
-        newEmployee2.setCode("EMPLOYEE-caiyuqian");
-        newEmployee2.setCreatedBy("admin");
-        newEmployee2.setLastModifiedBy("admin");
+        Employee yuqian = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
+        yuqian.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
+        yuqian.setCode("EMPLOYEE-caiyuqian");
+        yuqian.setCreatedBy("admin");
+        yuqian.setEmail("yuqiancai987@gmail.com");
+        yuqian.setLastModifiedBy("admin");
+
+        Employee joshua = new Employee("joshuachew", "Joshua", "Chew", "", "password");
+        joshua.setEmployeeType(EmployeeTypeEnum.PERMANENT);
+        joshua.setCode("EMPLOYEE-joshuachew");
+        joshua.setCreatedBy("admin");
+        joshua.setEmail("chewzhj@gmail.com");
+        joshua.setLastModifiedBy("admin");
 
         Employee admin = new Employee("admin", "adminFirstName", "adminLastName", "adminMiddleName", "password");
         admin.setEmployeeType(EmployeeTypeEnum.PERMANENT);
         admin.setCreatedBy("admin");
         admin.setCode("EMPLOYEE-admin");
         admin.setLastModifiedBy("admin");
+
 
         // REST API Testing
         /*
@@ -88,33 +131,145 @@ public class AdminInitialization {
         restApiTestUser.setLastModifiedBy("admin");
         */
 
-        employeeRepository.save(newEmployee);
-        employeeRepository.save(newEmployee2);
-        employeeRepository.save(admin);
+        yingshi = employeeRepository.save(yingshi);
+        yuqian = employeeRepository.save(yuqian);
+        joshua = employeeRepository.save(joshua);
+        admin = employeeRepository.save(admin);
 
-        Team team = teamRepository.findTeamByCode("APP");
+        // Create Employee Office Working Schedule
+        Optional<Office> optionalOffice = officeRepository.findByName("One Raffles Quay");
+        if (optionalOffice.isPresent()) {
+            Office office = optionalOffice.get();
 
-        newEmployee.getMemberOfTeams().add(team);
-        newEmployee2.getMemberOfTeams().add(team);
-        team.getMembers().add(newEmployee);
-        team.getMembers().add(newEmployee2);
-        newEmployee.setHierachyPath("APAC-SG-TECH-APP-yingshi2502");
-        newEmployee2.setHierachyPath("APAC-SG-TECH-APP-caiyuqian");
+            EmployeeOfficeWorkingSchedule yuqianWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule yuqianSchedule1 = new Schedule();
+            yuqianSchedule1.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 10, 1, 9, 0));
+            yuqianSchedule1.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 1, 1, 18, 0));
+            yuqianSchedule1 = scheduleRepository.save(yuqianSchedule1);
+            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule1);
+            Schedule yuqianSchedule2 = new Schedule();
+            yuqianSchedule2.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 3, 1, 9, 0));
+            yuqianSchedule2.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 3, 30, 18, 0));
+            yuqianSchedule2 = scheduleRepository.save(yuqianSchedule2);
+            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule2);
+            yuqianWorkingSchedule.setEmployee(yuqian);
+            yuqianWorkingSchedule.setOffice(office);
 
-        newEmployee2.setManager(newEmployee);
-        newEmployee.getSubordinates().add(newEmployee2);
+            EmployeeOfficeWorkingSchedule yingshiWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule yingshiSchedule = new Schedule();
+            yingshiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
+            yingshiSchedule = scheduleRepository.save(yingshiSchedule);
+            yingshiWorkingSchedule.getSchedules().add(yingshiSchedule);
+            yingshiWorkingSchedule.setEmployee(yingshi);
+            yingshiWorkingSchedule.setOffice(office);
 
-        teamRepository.saveAndFlush(team);
-        employeeRepository.saveAndFlush(newEmployee);
-        employeeRepository.saveAndFlush(newEmployee2);
+            employeeOfficeWorkingScheduleRepository.save(yuqianWorkingSchedule);
+            employeeOfficeWorkingScheduleRepository.save(yingshiWorkingSchedule);
+        }
 
+
+        Team team1 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
+
+        yingshi.setTeam(team1);
+        team1.setTeamLeader(yingshi);
+        yuqian.setTeam(team1);
+        team1.getMembers().add(yingshi);
+        team1.getMembers().add(yuqian);
+        yingshi.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-yingshi2502");
+        yuqian.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-caiyuqian");
+
+        yuqian.setManager(yingshi);
+        yingshi.getSubordinates().add(yuqian);
+
+        yingshi.setManager(joshua);
+        joshua.getSubordinates().add(yingshi);
+
+        Team team2 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
+        Team team3 = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
+        Team team4 = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
+
+        // Seat admin setup for different hierarchies
+        // SG-Tech-FixIncTech-Dev
+        SeatRequestAdminMatch seatRequestAdminMatch1 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch1.setHierarchyId(team1.getId());
+        seatRequestAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch1.setSeatAdmin(yingshi);
+
+        // SG-Tech-FixIncTech
+        SeatRequestAdminMatch seatRequestAdminMatch2 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch2.setHierarchyId(team1.getBusinessUnit().getId());
+        seatRequestAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatRequestAdminMatch2.setSeatAdmin(joshua);
+
+        // SG-Tech-FixIncTech
+        SeatRequestAdminMatch seatRequestAdminMatch3 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch3.setHierarchyId(team1.getBusinessUnit().getFunction().getId());
+        seatRequestAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+        seatRequestAdminMatch3.setSeatAdmin(admin);
+
+        // SG-Tech-FixIncTech-ProdSupp
+        SeatRequestAdminMatch seatRequestAdminMatch4 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch4.setHierarchyId(team2.getId());
+        seatRequestAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch4.setSeatAdmin(admin);
+
+        // SG-Tech-InfraTech-DBAdmin
+        SeatRequestAdminMatch seatRequestAdminMatch5 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch5.setHierarchyId(team3.getId());
+        seatRequestAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch5.setSeatAdmin(admin);
+
+        // SG-Tech-InfraTech-Networks
+        SeatRequestAdminMatch seatRequestAdminMatch6 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch6.setHierarchyId(team4.getId());
+        seatRequestAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch6.setSeatAdmin(admin);
+
+        // SG-Tech-InfraTech
+        SeatRequestAdminMatch seatRequestAdminMatch7 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch7.setHierarchyId(team4.getBusinessUnit().getId());
+        seatRequestAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatRequestAdminMatch7.setSeatAdmin(admin);
+
+        SeatRequestAdminMatch seatRequestAdminMatch8 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch8.setHierarchyId(team1.getOffice().getId());
+        seatRequestAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
+        seatRequestAdminMatch8.setSeatAdmin(admin);
+
+        teamRepository.saveAndFlush(team1);
+        employeeRepository.saveAndFlush(yingshi);
+        employeeRepository.saveAndFlush(yuqian);
+        employeeRepository.saveAndFlush(joshua);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch1);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch2);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch3);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch4);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch5);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch6);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch7);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch8);
     }
 
     public void createGeo() {
+
+        // ---------------------------------- Region ----------------------------------
+
         Region region = new Region("Asia-Pacific", "APAC", "APAC");
         region.setCreatedBy("admin");
         region.setLastModifiedBy("admin");
         region = regionRepository.save(region);
+
+        Region region2 = new Region("The United Kingdom", "UK", "UK");
+        region2.setCreatedBy("admin");
+        region2.setLastModifiedBy("admin");
+        region2 = regionRepository.save(region2);
+
+        Region region3 = new Region("Europe", "EUR", "EUR");
+        region3.setCreatedBy("admin");
+        region3.setLastModifiedBy("admin");
+        region3 = regionRepository.save(region3);
+
+        // ---------------------------------- Country ----------------------------------
 
         Country countrySG = new Country("Singapore", "SG", "APAC-SG");
         countrySG.setCreatedBy("admin");
@@ -128,17 +283,41 @@ public class AdminInitialization {
         countryHK = countryRepository.save(countryHK);
         countryHK.setRegion(region);
 
+        Country countryIND = new Country("India", "IND", "APAC-IND");
+        countryIND.setCreatedBy("admin");
+        countryIND.setLastModifiedBy("admin");
+        countryIND = countryRepository.save(countryIND);
+        countryIND.setRegion(region);
+
         region.getCountries().add(countrySG);
         region.getCountries().add(countryHK);
+        region.getCountries().add(countryIND);
 
-        CompanyFunction function = new CompanyFunction("Technology", "Tech", "Tech");
-        function.setCreatedBy("admin");
-        function.setLastModifiedBy("admin");
-        function = functionRepository.save(function);
-        function.getCountries().add(countryHK);
-        function.getCountries().add(countrySG);
-        countryHK.getFunctions().add(function);
-        countrySG.getFunctions().add(function);
+        // ---------------------------------- Function ----------------------------------
+
+        CompanyFunction techFunctionSG = new CompanyFunction("Technology", "SG-Tech", "SG-Tech");
+        techFunctionSG.setCreatedBy("admin");
+        techFunctionSG.setLastModifiedBy("admin");
+        techFunctionSG = functionRepository.save(techFunctionSG);
+        techFunctionSG.setCountry(countrySG);
+        countrySG.getFunctions().add(techFunctionSG);
+
+        CompanyFunction hrFunctionSG = new CompanyFunction("Human Resource", "SG-HR", "SG-HR");
+        hrFunctionSG.setCreatedBy("admin");
+        hrFunctionSG.setLastModifiedBy("admin");
+        hrFunctionSG = functionRepository.save(hrFunctionSG);
+        hrFunctionSG.setCountry(countrySG);
+        countrySG.getFunctions().add(hrFunctionSG);
+
+        CompanyFunction salesFunctionSG = new CompanyFunction("Sales", "SG-Sales", "SG-Sales");
+        salesFunctionSG.setCreatedBy("admin");
+        salesFunctionSG.setLastModifiedBy("admin");
+        salesFunctionSG = functionRepository.save(hrFunctionSG);
+        salesFunctionSG.setCountry(countrySG);
+        countrySG.getFunctions().add(salesFunctionSG);
+
+
+        // ---------------------------------- Office ----------------------------------
 
         Office office = new Office("One Raffles Quay", "ORQ", "APAC-SG-ORQ");
         Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG");
@@ -151,33 +330,102 @@ public class AdminInitialization {
         office.setCountry(countrySG);
         countrySG.getOffices().add(office);
 
-        function.getOfficesCodeOfFunction().add("ORQ");
-        office.getFunctionsCodeInOffice().add("Tech");
+        // ---------------------------------- Business Unit ----------------------------------
 
-        Team team = new Team("Data Security", "DTS", "Tech-DTS");
-        team.setCreatedBy("admin");
-        team.setLastModifiedBy("admin");
-        team = teamRepository.save(team);
-        team.setFunction(function);
+        BusinessUnit businessUnitInfraTech = new BusinessUnit("Infrastructure Tech", "SG-Tech-InfraTech", "SG-Tech-InfraTech");
+        businessUnitInfraTech.setCreatedBy("admin");
+        businessUnitInfraTech.setLastModifiedBy("admin");
+        businessUnitInfraTech = businessUnitRepository.save(businessUnitInfraTech);
+        businessUnitInfraTech.setFunction(techFunctionSG);
 
-        Team team2 = new Team("App Development", "APP", "Tech-APP");
-        team2.setCreatedBy("admin");
-        team2.setLastModifiedBy("admin");
-        team2 = teamRepository.save(team2);
-        team2.setFunction(function);
+        BusinessUnit businessUnitCurrencyTech = new BusinessUnit("Currency Tech", "SG-Tech-CurrTech", "SG-Tech-CurrTech");
+        businessUnitCurrencyTech.setCreatedBy("admin");
+        businessUnitCurrencyTech.setLastModifiedBy("admin");
+        businessUnitCurrencyTech = businessUnitRepository.save(businessUnitCurrencyTech);
+        businessUnitCurrencyTech.setFunction(techFunctionSG);
+
+        BusinessUnit businessUnitFixIncomeTech = new BusinessUnit("Fix Income Tech", "SG-Tech-FixIncTech", "SG-Tech-FixIncTech");
+        businessUnitFixIncomeTech.setCreatedBy("admin");
+        businessUnitFixIncomeTech.setLastModifiedBy("admin");
+        businessUnitFixIncomeTech = businessUnitRepository.save(businessUnitFixIncomeTech);
+        businessUnitFixIncomeTech.setFunction(techFunctionSG);
+
+        // ---------------------------------- Team ----------------------------------
+
+        Team endUserComputingTeam = new Team("End User Computing", "SG-Tech-InfraTech-EndUserCom", "SG-Tech-InfraTech-EndUserCom");
+        endUserComputingTeam.setCreatedBy("admin");
+        endUserComputingTeam.setLastModifiedBy("admin");
+        endUserComputingTeam.setOffice(office);
+        endUserComputingTeam = teamRepository.save(endUserComputingTeam);
+        endUserComputingTeam.setBusinessUnit(businessUnitInfraTech);
+
+        Team dataCenterOpeTeam = new Team("Data Center Operation", "SG-Tech-InfraTech-DataCenOpr", "SG-Tech-InfraTech-DataCenOpr");
+        dataCenterOpeTeam.setCreatedBy("admin");
+        dataCenterOpeTeam.setLastModifiedBy("admin");
+        dataCenterOpeTeam.setOffice(office);
+        dataCenterOpeTeam = teamRepository.save(dataCenterOpeTeam);
+        dataCenterOpeTeam.setBusinessUnit(businessUnitInfraTech);
+
+        Team databaseAdminTeam = new Team("Database Admin", "SG-Tech-InfraTech-DBAdmin", "SG-Tech-InfraTech-DBAdmin");
+        databaseAdminTeam.setCreatedBy("admin");
+        databaseAdminTeam.setLastModifiedBy("admin");
+        databaseAdminTeam.setOffice(office);
+        databaseAdminTeam = teamRepository.save(databaseAdminTeam);
+        databaseAdminTeam.setBusinessUnit(businessUnitInfraTech);
+
+        Team networkTeam = new Team("Networks", "SG-Tech-InfraTech-Networks", "SG-Tech-InfraTech-Networks");
+        networkTeam.setCreatedBy("admin");
+        networkTeam.setLastModifiedBy("admin");
+        networkTeam.setOffice(office);
+        networkTeam = teamRepository.save(networkTeam);
+        networkTeam.setBusinessUnit(businessUnitInfraTech);
+
+        Team productionSupportTeam = new Team("Production Support", "SG-Tech-FixIncTech-ProdSupp", "SG-Tech-FixIncTech-ProdSupp");
+        productionSupportTeam.setCreatedBy("admin");
+        productionSupportTeam.setLastModifiedBy("admin");
+        productionSupportTeam.setOffice(office);
+        productionSupportTeam = teamRepository.save(productionSupportTeam);
+        productionSupportTeam.setBusinessUnit(businessUnitFixIncomeTech);
+
+        Team developmentTeam = new Team("Development", "SG-Tech-FixIncTech-Dev", "SG-Tech-FixIncTech-Dev");
+        developmentTeam.setCreatedBy("admin");
+        developmentTeam.setLastModifiedBy("admin");
+        developmentTeam.setOffice(office);
+        developmentTeam = teamRepository.save(developmentTeam);
+        developmentTeam.setBusinessUnit(businessUnitFixIncomeTech);
 
         //last update
         regionRepository.saveAndFlush(region);
+        regionRepository.saveAndFlush(region2);
+        regionRepository.saveAndFlush(region3);
         countryRepository.saveAndFlush(countryHK);
         countryRepository.saveAndFlush(countrySG);
-        functionRepository.saveAndFlush(function);
+        countryRepository.saveAndFlush(countryIND);
+        functionRepository.saveAndFlush(techFunctionSG);
+        functionRepository.saveAndFlush(hrFunctionSG);
         officeRepository.saveAndFlush(office);
-        teamRepository.saveAndFlush(team);
-        teamRepository.saveAndFlush(team2);
+        businessUnitRepository.saveAndFlush(businessUnitInfraTech);
+        businessUnitRepository.saveAndFlush(businessUnitCurrencyTech);
+        businessUnitRepository.saveAndFlush(businessUnitFixIncomeTech);
+        teamRepository.saveAndFlush(endUserComputingTeam);
+        teamRepository.saveAndFlush(dataCenterOpeTeam);
+        teamRepository.saveAndFlush(databaseAdminTeam);
+        teamRepository.saveAndFlush(networkTeam);
+        teamRepository.saveAndFlush(productionSupportTeam);
+        teamRepository.saveAndFlush(developmentTeam);
 
-        office.getFunctionsCodeInOffice().add("Tech");
-        function.getOfficesCodeOfFunction().add("ORQ");
+        office.getFunctionsCodeInOffice().add("SG-Tech");
+        office.getFunctionsCodeInOffice().add("SG-HR");
+        office.getFunctionsCodeInOffice().add("SG-Sales");
+        office.getBusinessUnitsCodeInOffice().add("SG-Tech-InfraTech");
+        office.getBusinessUnitsCodeInOffice().add("SG-Tech-CurrTech");
+        office.getBusinessUnitsCodeInOffice().add("SG-Tech-FixIncTech");
+        techFunctionSG.getOfficesCodeOfFunction().add("ORQ");
+        hrFunctionSG.getOfficesCodeOfFunction().add("ORQ");
+        salesFunctionSG.getOfficesCodeOfFunction().add("ORQ");
         officeRepository.save(office);
-        functionRepository.save(function);
+        functionRepository.save(techFunctionSG);
+        functionRepository.save(hrFunctionSG);
+        functionRepository.save(salesFunctionSG);
     }
 }

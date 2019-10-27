@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -17,7 +18,17 @@ public class OutsourcingAssessmentSection extends DBEntityTemplate {
     @JsonIgnore
     private OutsourcingAssessment outsourcingAssessment;
 
-    @OneToMany(mappedBy = "outsourcingAssessmentSection",fetch = FetchType.EAGER)
+    private int number;
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
+    @OneToMany(mappedBy = "outsourcingAssessmentSection",fetch = FetchType.LAZY)
     private List<OutsourcingAssessmentLine> outsourcingAssessmentLines = new ArrayList<>();
 
     public OutsourcingAssessmentSection() {
@@ -36,7 +47,8 @@ public class OutsourcingAssessmentSection extends DBEntityTemplate {
     }
 
     public List<OutsourcingAssessmentLine> getOutsourcingAssessmentLines() {
-        return outsourcingAssessmentLines;
+        Collections.sort(this.outsourcingAssessmentLines, (a, b) -> a.getNumber() - b.getNumber());
+        return this.outsourcingAssessmentLines;
     }
 
     public void setOutsourcingAssessmentLines(List<OutsourcingAssessmentLine> outsourcingAssessmentLines) {

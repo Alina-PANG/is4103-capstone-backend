@@ -2,7 +2,7 @@ package capstone.is4103capstone.admin.controller;
 
 import capstone.is4103capstone.admin.model.res.GetCostCenterListRes;
 import capstone.is4103capstone.admin.service.CostCenterService;
-import capstone.is4103capstone.general.Authentication;
+import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
@@ -19,28 +19,29 @@ public class CostCenterController {
     CostCenterService ccService;
 
     @GetMapping("/view-my-cc")
-    public @ResponseBody ResponseEntity<Object> retrieveSimpleCostCentersByUser(@RequestHeader("Authorization") String authToken){
-        String username = Authentication.getUsernameFromToken(authToken);
-        WriteAuditTrail.autoAudit(username);
-        if(Authentication.authenticateUser(username))
-            return new ResponseEntity<Object>(ccService.getCostCentersByUserSimple(username).toString(), HttpStatus.OK);
-        else
-            return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
-
-
+    public @ResponseBody ResponseEntity<Object> retrieveSimpleCostCentersByUser(){
+        try{
+            return new ResponseEntity<Object>(ccService.getCostCentersByUser("").toString(), HttpStatus.OK);
+        }catch (Exception ex){
+            return new ResponseEntity<Object>(new GeneralRes(ex.getMessage(),true), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/view-my")
-    public ResponseEntity<GetCostCenterListRes> retrieveCostCenterByUser(@RequestHeader("Authorization") String authToken){
-        String username = Authentication.getUsernameFromToken(authToken);
-        WriteAuditTrail.autoAudit(username);
-        if(Authentication.authenticateUser(username))
-            return ResponseEntity
-                    .ok()
-                    .body(ccService.getCostCentersByUser(username));
-        else
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GetCostCenterListRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+    public ResponseEntity<GetCostCenterListRes> retrieveCostCenterByUser(){
+        try{
+            return new ResponseEntity<>(ccService.getCostCentersByUser(""), HttpStatus.OK);
+        }catch (Exception ex){
+            return new ResponseEntity<>(new GetCostCenterListRes(ex.getMessage(),true), HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping
+    public ResponseEntity<GetCostCenterListRes> findAll(){
+        try{
+            return new ResponseEntity<>(ccService.getCostCentersByUser(""), HttpStatus.OK);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(new GetCostCenterListRes(ex.getMessage(),true), HttpStatus.BAD_REQUEST);
+        }
     }
 }

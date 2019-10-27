@@ -18,7 +18,7 @@ public class BudgetSub2 extends DBEntityTemplate {
     private BudgetSub1 budgetSub1;
 
     @OneToMany(mappedBy = "budgetSub2")
-    private List<Merchandise> merchandises = new ArrayList<>();
+    private List<Service> services = new ArrayList<>();
 
     public BudgetSub2() {
     }
@@ -37,12 +37,12 @@ public class BudgetSub2 extends DBEntityTemplate {
         this.budgetSub1 = budgetSub1;
     }
 
-    public List<Merchandise> getMerchandises() {
-        return merchandises;
+    public List<Service> getservices() {
+        return services;
     }
 
-    public void setMerchandises(List<Merchandise> merchandises) {
-        this.merchandises = merchandises;
+    public void setservices(List<Service> services) {
+        this.services = services;
     }
 
 

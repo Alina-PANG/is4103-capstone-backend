@@ -1,7 +1,9 @@
 package capstone.is4103capstone.admin.model;
 
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.CostCenter;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
+import capstone.is4103capstone.seat.model.EmployeeModel;
 
 import java.io.Serializable;
 
@@ -11,10 +13,12 @@ public class CostCenterModel implements Serializable {
     private String code;
     private String id;
     private GeneralEntityModel team;
-    private GeneralEntityModel costCenterManager;
-    private GeneralEntityModel bmApprover;
-    private GeneralEntityModel functionApprover;
+    private EmployeeModel costCenterManager;
+    private EmployeeModel bmApprover;
+    private EmployeeModel functionApprover;
     private GeneralEntityModel country;
+    private GeneralEntityModel businessUnit;
+    private GeneralEntityModel function;
 
     public GeneralEntityModel getCountry() {
         return country;
@@ -27,13 +31,7 @@ public class CostCenterModel implements Serializable {
     public CostCenterModel() {
     }
 
-    public CostCenterModel(String name, String code, String id) {
-        this.name = name;
-        this.code = code;
-        this.id = id;
-    }
-
-    public CostCenterModel(String name, String code, String id, GeneralEntityModel team, GeneralEntityModel costCenterManager, GeneralEntityModel bmApprover, GeneralEntityModel functionApprover, GeneralEntityModel country) {
+    public CostCenterModel(String name, String code, String id, GeneralEntityModel team, EmployeeModel costCenterManager, EmployeeModel bmApprover, EmployeeModel functionApprover, GeneralEntityModel country, GeneralEntityModel businessUnit, GeneralEntityModel function) {
         this.name = name;
         this.code = code;
         this.id = id;
@@ -42,7 +40,44 @@ public class CostCenterModel implements Serializable {
         this.bmApprover = bmApprover;
         this.functionApprover = functionApprover;
         this.country = country;
+        this.businessUnit = businessUnit;
+        this.function = function;
     }
+
+    public CostCenterModel(CostCenter c) {
+        setName(c.getObjectName());
+        setCode(c.getCode());
+        setCostCenterManager(c.getCostCenterManager() == null? null: new EmployeeModel(c.getCostCenterManager()));
+        setBmApprover(c.getBmApprover() == null? null : new EmployeeModel(c.getBmApprover()));
+        setFunctionApprover(c.getFunctionApprover() == null? null: new EmployeeModel(c.getFunctionApprover()));
+        setTeam(c.getTeam() == null? null : new GeneralEntityModel(c.getTeam()));
+        setCountry(c.getTeam() == null? null : new GeneralEntityModel(c.getTeam().getOffice().getCountry()));
+        setBusinessUnit(c.getTeam() == null? null : new GeneralEntityModel(c.getTeam().getBusinessUnit()));
+    }
+
+    public GeneralEntityModel getBusinessUnit() {
+        return businessUnit;
+    }
+
+    public void setBusinessUnit(GeneralEntityModel businessUnit) {
+        this.businessUnit = businessUnit;
+    }
+
+    public GeneralEntityModel getFunction() {
+        return function;
+    }
+
+    public void setFunction(GeneralEntityModel function) {
+        this.function = function;
+    }
+
+    public CostCenterModel(String name, String code, String id) {
+        this.name = name;
+        this.code = code;
+        this.id = id;
+    }
+
+
 
     public String getName() {
         return name;
@@ -76,27 +111,27 @@ public class CostCenterModel implements Serializable {
         this.team = team;
     }
 
-    public GeneralEntityModel getCostCenterManager() {
+    public EmployeeModel getCostCenterManager() {
         return costCenterManager;
     }
 
-    public void setCostCenterManager(GeneralEntityModel costCenterManager) {
+    public void setCostCenterManager(EmployeeModel costCenterManager) {
         this.costCenterManager = costCenterManager;
     }
 
-    public GeneralEntityModel getBmApprover() {
+    public EmployeeModel getBmApprover() {
         return bmApprover;
     }
 
-    public void setBmApprover(GeneralEntityModel bmApprover) {
+    public void setBmApprover(EmployeeModel bmApprover) {
         this.bmApprover = bmApprover;
     }
 
-    public GeneralEntityModel getFunctionApprover() {
+    public EmployeeModel getFunctionApprover() {
         return functionApprover;
     }
 
-    public void setFunctionApprover(GeneralEntityModel functionApprover) {
+    public void setFunctionApprover(EmployeeModel functionApprover) {
         this.functionApprover = functionApprover;
     }
 }

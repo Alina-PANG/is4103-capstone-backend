@@ -6,19 +6,14 @@ import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.finance.budget.controller.BudgetController;
-import capstone.is4103capstone.seat.model.SeatMapModel;
-import capstone.is4103capstone.seat.model.CustomErrorRes;
-import capstone.is4103capstone.seat.model.SeatModelForSeatMap;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForSetup;
+import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
 import capstone.is4103capstone.seat.service.SeatMapService;
-import capstone.is4103capstone.util.exception.SeatMapCreationException;
-import capstone.is4103capstone.util.exception.SeatMapNotFoundException;
-import capstone.is4103capstone.util.exception.SeatMapUpdateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +22,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/seatmap")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin
 public class SeatMapController {
 
     private static final Logger logger = LoggerFactory.getLogger(BudgetController.class);
@@ -48,7 +43,7 @@ public class SeatMapController {
     // ---------------------------------- POST: Create ----------------------------------
 
     @PostMapping
-    public ResponseEntity createSeatMap(@RequestBody SeatMapModel createSeatMapReq) {
+    public ResponseEntity createSeatMap(@RequestBody SeatMapModelForSetup createSeatMapReq) {
         String newSeatMapId = seatMapService.createNewSeatMap(createSeatMapReq);
         return ResponseEntity.ok("Created new seat map successfully: seatmap ID: " + newSeatMapId);
     }
@@ -61,12 +56,12 @@ public class SeatMapController {
         Office office = seatMap.getOffice();
         Country country = office.getCountry();
         String region = office.getCountry().getRegion().getObjectName();
-        SeatMapModel response = new SeatMapModel(seatMap.getId(), region, country.getObjectName(), country.getId(), office.getObjectName(), seatMap.getFloor(), new ArrayList<>());
+        SeatMapModelForSetup response = new SeatMapModelForSetup(seatMap.getId(), region, country.getObjectName(), country.getId(), office.getObjectName(), office.getId(), seatMap.getFloor(), new ArrayList<>());
 
         for (Seat seat:
                 seatMap.getSeats()) {
             SeatModelForSeatMap seatModel = new SeatModelForSeatMap(seat.getSerialNumber(), seat.getId(),
-                    seat.getActiveSeatAllocations().size() != 0, seat.getxCoordinate(), seat.getyCoordinate());
+                    seat.getActiveSeatAllocations().size() != 0, seat.getxCoordinate(), seat.getyCoordinate(), seat.isUnderOffice(), seat.getAdjacentSeatSeqNum());
             response.getSeats().add(seatModel);
         }
 
@@ -77,24 +72,24 @@ public class SeatMapController {
     @GetMapping("/all")
     public ResponseEntity getAllSeatMaps() {
         List<SeatMap> seatmaps = seatMapService.getAllSeatMaps();
-        List<SeatMapModel> response = new ArrayList<>();
+        List<SeatMapModelForSetup> response = new ArrayList<>();
 
         for (SeatMap seatMap :
                 seatmaps) {
             Office office = seatMap.getOffice();
             Country country = office.getCountry();
             String region = office.getCountry().getRegion().getObjectName();
-            SeatMapModel seatMapModel = new SeatMapModel(seatMap.getId(), region, country.getObjectName(), country.getId(), office.getObjectName(), seatMap.getFloor(), new ArrayList<>());
+            SeatMapModelForSetup seatMapModelForSetup = new SeatMapModelForSetup(seatMap.getId(), region, country.getObjectName(), country.getId(), office.getObjectName(), office.getId(), seatMap.getFloor(), new ArrayList<>());
 
             for (Seat seat:
                     seatMap.getSeats()) {
                 SeatModelForSeatMap seatModel = new SeatModelForSeatMap(seat.getSerialNumber(), seat.getId(),
-                        seat.getActiveSeatAllocations().size() != 0, seat.getxCoordinate(), seat.getyCoordinate());
-                seatMapModel.getSeats().add(seatModel);
+                        seat.getActiveSeatAllocations().size() != 0, seat.getxCoordinate(), seat.getyCoordinate(), seat.isUnderOffice(), seat.getAdjacentSeatSeqNum());
+                seatMapModelForSetup.getSeats().add(seatModel);
             }
 
-            Collections.sort(seatMapModel.getSeats());
-            response.add(seatMapModel);
+            Collections.sort(seatMapModelForSetup.getSeats());
+            response.add(seatMapModelForSetup);
         }
         return ResponseEntity.ok().body(response);
     }
@@ -102,7 +97,7 @@ public class SeatMapController {
     // ---------------------------------- PUT: Update ----------------------------------
 
     @PutMapping
-    public ResponseEntity editSeatMap(@RequestBody SeatMapModel editSeatMapReq) {
+    public ResponseEntity editSeatMap(@RequestBody SeatMapModelForSetup editSeatMapReq) {
         seatMapService.updateSeatMap(editSeatMapReq);
         return ResponseEntity.ok("Edited seatmap successfully.");
     }

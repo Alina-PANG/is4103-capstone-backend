@@ -3,6 +3,7 @@ package capstone.is4103capstone.entities;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.entities.helper.StringListConverter;
+import capstone.is4103capstone.entities.helper.WebAppPermissionMap;
 import capstone.is4103capstone.entities.supplyChain.*;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,6 +28,9 @@ public class Employee extends DBEntityTemplate {
     private String middleName;
     private String email;
 
+    @Embedded
+    private WebAppPermissionMap webAppPermissionMap = new WebAppPermissionMap();
+
     @JsonIgnore
     private String password;
 
@@ -45,8 +49,9 @@ public class Employee extends DBEntityTemplate {
     @JoinColumn(name = "costcenter_id")
     private CostCenter defaultCostCenter;
 
-    @ManyToMany(mappedBy = "members", fetch = FetchType.EAGER)
-    private List<Team> memberOfTeams = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
@@ -60,8 +65,20 @@ public class Employee extends DBEntityTemplate {
     private List<BJF> bjfs = new ArrayList<>();
 
     @Convert(converter = StringListConverter.class)
+    @JoinTable(name = "my_request_tickets",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            foreignKey = @ForeignKey(name = "id"),
+            inverseJoinColumns = @JoinColumn(name = "ticket_id"),
+            inverseForeignKey = @ForeignKey(name = "id")
+    )
     private List<String> myRequestTickets = new ArrayList<>();
     @Convert(converter = StringListConverter.class)
+    @JoinTable(name = "my_approvals",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            foreignKey = @ForeignKey(name = "id"),
+            inverseJoinColumns = @JoinColumn(name = "ticket_id"),
+            inverseForeignKey = @ForeignKey(name = "id")
+    )
     private List<String> myApprovals = new ArrayList<>();
 
     //    @LazyCollection(LazyCollectionOption.FALSE)
@@ -77,11 +94,11 @@ public class Employee extends DBEntityTemplate {
     @OneToMany(mappedBy = "creator")
     private List<Dispute> disputesCreated = new ArrayList<>();
 
-    @OneToMany(mappedBy = "employeeInChargeOutsourcing")
-    private List<Outsourcing> outsourcingInCharged = new ArrayList<>();
-
     @OneToMany(mappedBy = "employeeInChargeContract")
     private List<Contract> contractInCharged = new ArrayList<>();
+
+    @OneToMany(mappedBy = "approver")
+    private List<Contract> contractsApproved = new ArrayList<>();
 
     @OneToMany(mappedBy = "employeeAssess")
     private List<OutsourcingAssessment> outsourcingAssessmentList = new ArrayList<>();
@@ -100,6 +117,13 @@ public class Employee extends DBEntityTemplate {
         this.securityId = "S-" + UUID.randomUUID();
     }
 
+//    public List<ChildContract> getChildContractsApproved() {
+//        return childContractsApproved;
+//    }
+//
+//    public void setChildContractsApproved(List<ChildContract> childContractsApproved) {
+//        this.childContractsApproved = childContractsApproved;
+//    }
 
     public CostCenter getDefaultCostCenter() {
         return defaultCostCenter;
@@ -115,6 +139,22 @@ public class Employee extends DBEntityTemplate {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public List<Contract> getContractsApproved() {
+        return contractsApproved;
+    }
+
+    public void setContractsApproved(List<Contract> contractsApproved) {
+        this.contractsApproved = contractsApproved;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
     public String getFirstName() {
@@ -165,15 +205,6 @@ public class Employee extends DBEntityTemplate {
 
     public void setEmployeeType(EmployeeTypeEnum employeeType) {
         this.employeeType = employeeType;
-    }
-
-
-    public List<Team> getMemberOfTeams() {
-        return memberOfTeams;
-    }
-
-    public void setMemberOfTeams(List<Team> memberOfTeams) {
-        this.memberOfTeams = memberOfTeams;
     }
 
     public Employee getManager() {
@@ -248,14 +279,6 @@ public class Employee extends DBEntityTemplate {
         this.disputesCreated = disputesCreated;
     }
 
-    public List<Outsourcing> getOutsourcingInCharged() {
-        return outsourcingInCharged;
-    }
-
-    public void setOutsourcingInCharged(List<Outsourcing> outsourcingInCharged) {
-        this.outsourcingInCharged = outsourcingInCharged;
-    }
-
     public List<Contract> getContractInCharged() {
         return contractInCharged;
     }
@@ -280,6 +303,9 @@ public class Employee extends DBEntityTemplate {
         return securityId;
     }
 
+    public void setSecurityId(String securityId) {
+        this.securityId = securityId;
+    }
 
     public List<SecurityGroup> getMemberOfSecurityGroups() {
         return memberOfSecurityGroups;
@@ -297,7 +323,11 @@ public class Employee extends DBEntityTemplate {
         this.email = email;
     }
 
-    public void setSecurityId(String securityId) {
-        this.securityId = securityId;
+    public WebAppPermissionMap getWebAppPermissionMap() {
+        return webAppPermissionMap;
+    }
+
+    public void setWebAppPermissionMap(WebAppPermissionMap webAppPermissionMap) {
+        this.webAppPermissionMap = webAppPermissionMap;
     }
 }

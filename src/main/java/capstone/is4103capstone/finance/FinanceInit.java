@@ -9,14 +9,12 @@ import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
-@Service
+@org.springframework.stereotype.Service
 public class FinanceInit {
     @Autowired
     BudgetCategoryRepository budgetCategoryRepository;
@@ -25,7 +23,7 @@ public class FinanceInit {
     @Autowired
     BudgetSub2Repository budgetSub2Repository;
     @Autowired
-    MerchandiseRepository merchandiseRepository;
+    ServiceRepository serviceRepository;
     @Autowired
     PlanRepository planRepository;
     @Autowired
@@ -48,7 +46,7 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
-        String thisUser = "yingshi2502";
+//        String thisUser = "yingshi2502";
 //        Country country = countryRepository.findCountryByCode("SG");
 //
 //        List<FXRecord> fxRecords = fxRecordRepository.findAll();
@@ -56,9 +54,12 @@ public class FinanceInit {
 //            createFXRecord(thisUser);
 //            String catCode = createCategories(thisUser);
 //            String sub2Code = createSubCategories(thisUser,catCode);
-//            createMerchandise(thisUser,sub2Code);
+//            createservice(thisUser,sub2Code);
 //        }
     }
+
+
+
 
     public void createFXRecord(String userOps){
         FXRecord fx = new FXRecord("SGD","CNY", BigDecimal.valueOf(5.16),new Date());
@@ -140,17 +141,17 @@ public class FinanceInit {
         return sub2Code;
     }
 
-    public void createMerchandise(String thisUser,String sub2Code){
-        Merchandise m = new Merchandise("Data Link","MER-DL-12","SG-TELECOM-DATA-DATA_LINK-SINGTEL","bps",thisUser);
-        merchandiseRepository.save(m);
+    public void createservice(String thisUser,String sub2Code){
+        Service m = new Service("Data Link","MER-DL-12","SG-TELECOM-DATA-DATA_LINK-SINGTEL","bps",thisUser);
+        serviceRepository.save(m);
 
         BudgetSub2 sub2 = budgetSub2Repository.findBudgetSub2ByCode(sub2Code);
 //        System.out.println(sub2.getId());
-        sub2.getMerchandises().size();
-        sub2.getMerchandises().add(m);
+        sub2.getservices().size();
+        sub2.getservices().add(m);
         m.setBudgetSub2(sub2);
 
         budgetSub2Repository.saveAndFlush(sub2);
-        merchandiseRepository.saveAndFlush(m);
+        serviceRepository.saveAndFlush(m);
     }
 }

@@ -1,6 +1,6 @@
 package capstone.is4103capstone.admin.controller;
 
-import capstone.is4103capstone.admin.controller.model.res.CountryRes;
+import capstone.is4103capstone.admin.model.res.CountryRes;
 import capstone.is4103capstone.admin.dto.CountryDto;
 import capstone.is4103capstone.admin.service.AuditTrailActivityService;
 import capstone.is4103capstone.admin.service.CountryService;
@@ -24,9 +24,9 @@ public class CountryController {
     CountryService cs;
 
     @PostMapping
-    public ResponseEntity<CountryRes> createCountry(@RequestBody CountryDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CountryRes> createCountry(@RequestBody CountryDto input) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.createCountry(input)))));
@@ -38,10 +38,10 @@ public class CountryController {
     }
 
     @GetMapping
-    public ResponseEntity<CountryRes> getAllCountries(@RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CountryRes> getAllCountries() {
         WriteAuditTrail.autoAudit("admin");
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(cs.getAllCountries())));
@@ -53,9 +53,9 @@ public class CountryController {
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CountryRes> getCountryByUuid(@PathVariable(name = "uuid") String uuid, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CountryRes> getCountryByUuid(@PathVariable(name = "uuid") String uuid) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.getCountryByUuid(uuid)))));
@@ -67,9 +67,9 @@ public class CountryController {
     }
 
     @GetMapping("/byRegion/{region}")
-    public ResponseEntity<CountryRes> getCountryDtoByRegion(@PathVariable(name = "region") String region, @RequestHeader(name = "Authorization", required = false) String headerUsername) throws Exception {
+    public ResponseEntity<CountryRes> getCountryDtoByRegion(@PathVariable(name = "region") String region) throws Exception {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(cs.getCountryEntityByRegion(region))));
@@ -81,9 +81,9 @@ public class CountryController {
     }
 
     @PutMapping
-    public ResponseEntity<CountryRes> updateCountry(@RequestBody CountryDto input, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity<CountryRes> updateCountry(@RequestBody CountryDto input) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             return ResponseEntity
                     .ok()
                     .body(new CountryRes(null, false, Optional.of(Arrays.asList(cs.updateCountry(input)))));
@@ -95,9 +95,9 @@ public class CountryController {
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity deleteCountry(@PathVariable(name = "uuid") String uuid, @RequestHeader(name = "Authorization", required = false) String headerUsername) {
+    public ResponseEntity deleteCountry(@PathVariable(name = "uuid") String uuid) {
         try {
-            WriteAuditTrail.autoAudit(headerUsername);
+            WriteAuditTrail.createBasicAuditRecord();
             cs.deleteCountry(uuid);
             return ResponseEntity
                     .ok()
