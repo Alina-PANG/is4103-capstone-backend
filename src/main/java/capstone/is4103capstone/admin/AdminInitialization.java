@@ -67,6 +67,8 @@ public class AdminInitialization {
 //        for (int i=0;i<firstNameList.length;i++){
 //            createEmployeeTemplate(firstNameList[i],lastNameList[i],usernameList[i],"password","huangyingshi@gmail.com",codeCpntList[i]);
 //        }
+//         createEmployeeTemplate("PO","Last name","poteam","password","huangyingshi@gmail.com","PO_TEAM-1");
+
 
     }
     private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
