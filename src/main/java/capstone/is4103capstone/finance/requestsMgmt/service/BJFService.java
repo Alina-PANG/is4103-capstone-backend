@@ -402,6 +402,11 @@ public class BJFService {
     }
 
     public void purchaseOrderClosed(PurchaseOrder po){
+        for (String bjfId:po.getRelatedBJF()){
+            BJF bjf = validateBJF(bjfId);
+            bjf.setBjfStatus(BJFStatusEnum.DELIVERED);
+            bjfRepository.saveAndFlush(bjf);
+        }
         //update the 'actuals' spending;
     }
 

@@ -201,7 +201,8 @@ public class ApprovalTicketService {
 
     public static ApprovalTicketModel getLatestTicketByRequestedItem(String requestedItemId) throws Exception{
         List<ApprovalForRequest> list = approvalForRequestRepo.findTicketsByRequestedItemId(requestedItemId);
-
+        if (list.size() == 0)
+            return null;
         ApprovalForRequest latest = list.get(0);
         for (ApprovalForRequest f:list){
             if (latest.getLastModifiedDateTime().after(latest.getLastModifiedDateTime())){
