@@ -77,7 +77,6 @@ public class ProjectService {
         String code = EntityCodeHPGeneration.getCode(projectRepository,p);
         p.setCode(code);
 
-        //TODO: create request ticket
         ApprovalTicketService.createTicketAndSendEmail(projectRequester,projectSupervisory,p,p.getRequestDescription(), ApprovalTypeEnum.PROJECT);
 
         return new ProjectModel(p);

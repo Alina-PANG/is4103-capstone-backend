@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 public class CreateTravelRequest implements Serializable {
 
-    String requester;
+//    String requester;
     String costCenter;
     String description;
     String additionalInfo;
@@ -20,20 +20,6 @@ public class CreateTravelRequest implements Serializable {
     public CreateTravelRequest() {
     }
 
-    public CreateTravelRequest(String requester, String costCenter, String description, String additionalInfo, BigDecimal estimatedBudget, String currencyCode, Boolean isAdhoc, String destCity, String destCountry, String startDate, String endDate) {
-        this.requester = requester;
-        this.costCenter = costCenter;
-        this.description = description;
-        this.additionalInfo = additionalInfo;
-        this.estimatedBudget = estimatedBudget;
-        this.currencyCode = currencyCode;
-        this.isAdhoc = isAdhoc;
-        this.destCity = destCity;
-        this.destCountry = destCountry;
-        this.startDate = startDate;
-        this.endDate = endDate;
-    }
-
     public Boolean getIsAdhoc() {
         return isAdhoc;
     }
@@ -42,13 +28,13 @@ public class CreateTravelRequest implements Serializable {
         this.isAdhoc = isAdhoc;
     }
 
-    public String getRequester() {
-        return requester;
-    }
-
-    public void setRequester(String requester) {
-        this.requester = requester;
-    }
+//    public String getRequester() {
+//        return requester;
+//    }
+//
+//    public void setRequester(String requester) {
+//        this.requester = requester;
+//    }
 
     public String getCostCenter() {
         return costCenter;
