@@ -5,14 +5,16 @@ import java.math.BigDecimal;
 
 public class CreateTrainingRequest implements Serializable {
 
-    String requester;
     String costCenter;
     String description;
     String additionalInfo;
     BigDecimal estimatedBudget;
     String currencyCode;
     Boolean isAdhoc;
+
+
     Boolean isInternal;
+
 
     String trainingLocation;
     String trainingTitle;
@@ -26,14 +28,6 @@ public class CreateTrainingRequest implements Serializable {
     String endDate;
 
     public CreateTrainingRequest() {
-    }
-
-    public String getRequester() {
-        return requester;
-    }
-
-    public void setRequester(String requester) {
-        this.requester = requester;
     }
 
     public String getCostCenter() {
