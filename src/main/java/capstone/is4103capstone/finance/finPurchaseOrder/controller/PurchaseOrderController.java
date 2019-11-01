@@ -26,7 +26,7 @@ public class PurchaseOrderController {
     @PostMapping("/createPO")
     public ResponseEntity<GeneralRes> createPO(@RequestBody CreatePOReq createPOReq) {
         if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername())) {
-                return purchaseOrderService.createPO(createPOReq, null);
+                return purchaseOrderService.createPO(createPOReq);
         }
         else
             return ResponseEntity
@@ -36,12 +36,12 @@ public class PurchaseOrderController {
 
     @PostMapping("/updatePO/{id}")
     public ResponseEntity<GeneralRes> updatePO(@RequestBody CreatePOReq createPOReq, @PathVariable("id") String id) {
-        if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
-            return purchaseOrderService.createPO(createPOReq, id);
-        else
-            return ResponseEntity
-                    .badRequest()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+        try{
+            return purchaseOrderService.updatePO(createPOReq,id);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
+        }
     }
 
     @GetMapping("/getPO/{id}")
@@ -65,11 +65,13 @@ public class PurchaseOrderController {
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
     }
 
+    //TODO: Update status for PO
+    //TODO: Urgent change for sr2
     @GetMapping("/getPOAsRequestor")
     public ResponseEntity<GeneralRes> getPOAsRequestor(){
         ApprovalStatusEnum inputStatus;
         if(AuthenticationTools.authenticateUser(employeeService.getCurrentLoginUsername()))
-            return purchaseOrderService.getPOAsRequestor(employeeService.getCurrentLoginUsername());
+            return purchaseOrderService.getAllPO();
         else
             return ResponseEntity
                     .badRequest()

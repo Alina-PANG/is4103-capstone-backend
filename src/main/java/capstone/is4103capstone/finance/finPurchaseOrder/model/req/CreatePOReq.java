@@ -1,7 +1,10 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.model.req;
 
 
+import capstone.is4103capstone.entities.finance.SpendingRecord;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CreatePOReq implements Serializable {
@@ -11,9 +14,26 @@ public class CreatePOReq implements Serializable {
     private String vendorid;
     private String poNumber;
     private String approverUsername;
-
+    private List<SpendingRecord> spendingRecordList = new ArrayList<>();
+    private boolean closePOInstruc;
 
     public CreatePOReq() {
+    }
+
+    public List<SpendingRecord> getSpendingRecordList() {
+        return spendingRecordList;
+    }
+
+    public boolean isClosePOInstruc() {
+        return closePOInstruc;
+    }
+
+    public void setClosePOInstruc(boolean closePOInstruc) {
+        this.closePOInstruc = closePOInstruc;
+    }
+
+    public void setSpendingRecordList(List<SpendingRecord> spendingRecordList) {
+        this.spendingRecordList = spendingRecordList;
     }
 
     public String getPoNumber() {

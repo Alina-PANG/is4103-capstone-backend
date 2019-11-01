@@ -1,5 +1,8 @@
 package capstone.is4103capstone.finance.finPurchaseOrder.model;
 
+import capstone.is4103capstone.entities.finance.SpendingRecord;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -11,6 +14,8 @@ public class POModel {
     Double totalAmount;
     String currencyCode;
     BigDecimal totalPaidAmount;
+    String poStatus;
+    List<SpendingModel> servicesSpending;
 
 
     public POModel() {
@@ -25,6 +30,14 @@ public class POModel {
         this.currencyCode = currencyCode;
     }
 
+    public String getPoStatus() {
+        return poStatus;
+    }
+
+    public void setPoStatus(String poStatus) {
+        this.poStatus = poStatus;
+    }
+
     public POModel(String id, String code, String vendorName, String vendorId, Double totalAmount, String currencyCode, BigDecimal totalPaidAmount) {
         this.id = id;
         this.code = code;
@@ -33,6 +46,14 @@ public class POModel {
         this.totalAmount = totalAmount;
         this.currencyCode = currencyCode;
         this.totalPaidAmount = totalPaidAmount;
+    }
+
+    public List<SpendingModel> getServicesSpending() {
+        return servicesSpending;
+    }
+
+    public void setServicesSpending(List<SpendingModel> servicesSpending) {
+        this.servicesSpending = servicesSpending;
     }
 
     public BigDecimal getTotalPaidAmount() {
