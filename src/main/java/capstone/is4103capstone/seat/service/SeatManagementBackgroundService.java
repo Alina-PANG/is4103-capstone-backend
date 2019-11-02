@@ -150,7 +150,6 @@ public class SeatManagementBackgroundService {
     private void inactivateAllocations() {
 
         System.out.println("******************** Seat Management Background Service: inactivate allocations at " + new Date().toString() + " ********************");
-        // List<SeatAllocationInactivationLog> allocationsToInactivate = seatAllocationInactivationLogRepository.getLogsByCurrentTime(new Date());
         List<SeatAllocationInactivationLog> allocationsToInactivate = seatAllocationInactivationLogRepository.getUndoneLogs();
         for (SeatAllocationInactivationLog allocationToInactivate :
                 allocationsToInactivate) {
@@ -175,7 +174,9 @@ public class SeatManagementBackgroundService {
                             seatAllocationInactivationLogRepository.save(allocationToInactivate);
                         }
                     }
-                    seat.setType(SeatTypeEnum.HOTDESK);
+                    if (!seat.getType().equals(SeatTypeEnum.HOTDESK)) {
+                        seat.setType(SeatTypeEnum.FIXED);
+                    }
                     seatRepository.save(seat);
                 }
             }
