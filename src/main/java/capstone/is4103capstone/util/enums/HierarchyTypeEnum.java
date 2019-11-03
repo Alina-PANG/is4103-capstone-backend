@@ -4,5 +4,6 @@ public enum HierarchyTypeEnum {
     COMPANY_FUNCTION,
     BUSINESS_UNIT,
     TEAM,
-    OFFICE
+    OFFICE,
+    OFFICE_FLOOR
 }

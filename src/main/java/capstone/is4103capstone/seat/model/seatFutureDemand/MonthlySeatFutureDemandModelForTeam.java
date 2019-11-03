@@ -1,4 +1,4 @@
-package capstone.is4103capstone.seat.model.seatDemandForecast;
+package capstone.is4103capstone.seat.model.seatFutureDemand;
 
 import capstone.is4103capstone.seat.model.EmployeeModel;
 import capstone.is4103capstone.seat.model.GroupModel;
@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MonthlySeatForecastModelForTeam implements Serializable {
+public class MonthlySeatFutureDemandModelForTeam implements Serializable {
     private Integer seqNum;
     private String yearMonth;
     private GroupModel team;
@@ -16,12 +16,12 @@ public class MonthlySeatForecastModelForTeam implements Serializable {
     private List<EmployeeModel> employeesWhoNeedSeats = new ArrayList<>();
     private List<EmployeeModel> employeesWithUnnecessaryAllocations = new ArrayList<>();
 
-    public MonthlySeatForecastModelForTeam() {
+    public MonthlySeatFutureDemandModelForTeam() {
     }
 
-    public MonthlySeatForecastModelForTeam(Integer seqNum, String yearMonth, GroupModel team, Integer inventoryCount,
-                                           Integer numOfSeatsOccupied, List<EmployeeModel> employeesWhoNeedSeats,
-                                           List<EmployeeModel> employeesWithUnnecessaryAllocations) {
+    public MonthlySeatFutureDemandModelForTeam(Integer seqNum, String yearMonth, GroupModel team, Integer inventoryCount,
+                                               Integer numOfSeatsOccupied, List<EmployeeModel> employeesWhoNeedSeats,
+                                               List<EmployeeModel> employeesWithUnnecessaryAllocations) {
         this.seqNum = seqNum;
         this.yearMonth = yearMonth;
         this.team = team;
