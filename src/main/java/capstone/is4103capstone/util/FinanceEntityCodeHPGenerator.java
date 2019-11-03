@@ -132,10 +132,13 @@ public class FinanceEntityCodeHPGenerator {
                         break;
                     case "TravelForm":
                         code = String.format(TRAVEL_PLAN_TEMPLATE,additionalInfo,seqNoStr);
+                        break;
                     case "TrainingForm":
                         code = String.format(TRAIN_PLAN_TEMPLATE,additionalInfo,seqNoStr);
+                        break;
                     case "CostCenter":
                         code = additionalInfo.isEmpty()? String.format(COST_CENTER_TEMPLATE,"CC",seqNoStr):String.format(COST_CENTER_TEMPLATE,"PJCC",seqNoStr);
+                        break;
                     default:
                         System.out.println("Not found");
                 }

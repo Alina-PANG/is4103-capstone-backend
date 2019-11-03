@@ -23,6 +23,9 @@ public class PurchaseOrder extends DBEntityTemplate {
     @OneToMany(mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
     private List<StatementOfAcctLineItem> statementOfAccount = new ArrayList<>();
 
+    @OneToMany(mappedBy = "relatedPO",fetch = FetchType.LAZY)
+    private List<SpendingRecord> detailedSpending = new ArrayList<>();
+
     @Column(name = "status")
     private ApprovalStatusEnum status;
 
@@ -41,6 +44,13 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     }
 
+    public List<SpendingRecord> getDetailedSpending() {
+        return detailedSpending;
+    }
+
+    public void setDetailedSpending(List<SpendingRecord> detailedSpending) {
+        this.detailedSpending = detailedSpending;
+    }
 
     public String getApprover() {
         return approver;

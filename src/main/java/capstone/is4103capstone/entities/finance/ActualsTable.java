@@ -20,8 +20,8 @@ public class ActualsTable extends DBEntityTemplate {
 
     private Integer forYear;
 
-    @OneToMany(mappedBy = "actuals")
-    private List<SpendingRecord> spendings = new ArrayList<>();
+//    @OneToMany(mappedBy = "actuals")
+//    private List<SpendingRecord> spendings = new ArrayList<>();
 
 
     public ActualsTable() {
@@ -48,13 +48,13 @@ public class ActualsTable extends DBEntityTemplate {
         this.forYear = forYear;
     }
 
-    public List<SpendingRecord> getSpendings() {
-        return spendings;
-    }
-
-    public void setSpendings(List<SpendingRecord> spendings) {
-        this.spendings = spendings;
-    }
+//    public List<SpendingRecord> getSpendings() {
+//        return spendings;
+//    }
+//
+//    public void setSpendings(List<SpendingRecord> spendings) {
+//        this.spendings = spendings;
+//    }
 
 
 }

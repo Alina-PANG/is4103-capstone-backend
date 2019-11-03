@@ -12,25 +12,59 @@ import java.util.Date;
 @Entity
 public class SpendingRecord extends DBEntityTemplate {
 
-    private String relatedItem;
+//    private String poId;
+    private String serviceId;
     private BigDecimal spendingAmt;
     private String currencyCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "actual_table_id")
+    @ManyToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "po_id",nullable = true)
     @JsonIgnore
-    private ActualsTable actuals;
+    private PurchaseOrder relatedPO;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "actual_table_id")
+//    @JsonIgnore
+//    private ActualsTable actuals;
 
     public SpendingRecord() {
     }
 
-    public String getRelatedItem() {
-        return relatedItem;
+    public SpendingRecord(String serviceId, BigDecimal spendingAmt, String currencyCode, PurchaseOrder relatedPO) {
+        this.serviceId = serviceId;
+        if (spendingAmt == null)
+            this.spendingAmt = BigDecimal.ZERO;
+        else
+            this.spendingAmt = spendingAmt;
+        this.currencyCode = currencyCode;
+        this.relatedPO = relatedPO;
     }
 
-    public void setRelatedItem(String relatedItem) {
-        this.relatedItem = relatedItem;
+
+
+    public PurchaseOrder getRelatedPO() {
+        return relatedPO;
     }
+
+    public void setRelatedPO(PurchaseOrder relatedPO) {
+        this.relatedPO = relatedPO;
+    }
+
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
+//    public String getPoId() {
+//        return poId;
+//    }
+//
+//    public void setPoId(String poId) {
+//        this.poId = poId;
+//    }
 
     public BigDecimal getSpendingAmt() {
         return spendingAmt;
@@ -48,11 +82,11 @@ public class SpendingRecord extends DBEntityTemplate {
         this.currencyCode = currencyCode;
     }
 
-    public ActualsTable getActuals() {
-        return actuals;
-    }
-
-    public void setActuals(ActualsTable actuals) {
-        this.actuals = actuals;
-    }
+//    public ActualsTable getActuals() {
+//        return actuals;
+//    }
+//
+//    public void setActuals(ActualsTable actuals) {
+//        this.actuals = actuals;
+//    }
 }

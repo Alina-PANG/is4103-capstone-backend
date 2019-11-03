@@ -1,28 +1,26 @@
 package capstone.is4103capstone.finance.requestsMgmt.controller;
 
+import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateTrainingRequest;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateTravelRequest;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
 import capstone.is4103capstone.finance.requestsMgmt.service.TrainingService;
-import capstone.is4103capstone.finance.requestsMgmt.service.TravelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
-
-@RequestMapping("/api")
+@RequestMapping("/api/train")
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-public class TravelTrainController {
+public class TrainingController {
 
-    @Autowired
-    TravelService travelService;
     @Autowired
     TrainingService trainingService;
+    @Autowired
+    EmployeeService employeeService;
 
-    @PostMapping("/train")
+    @PostMapping
     public ResponseEntity<TTFormResponse> createTrainingRequest(@RequestBody CreateTrainingRequest req){
         try{
             return ResponseEntity.ok().body(trainingService.createTrainingPlan(req));
@@ -31,37 +29,30 @@ public class TravelTrainController {
         }
     }
 
-    @PostMapping("/travel")
-    public ResponseEntity<TTFormResponse> createTravelRequest(@RequestBody CreateTravelRequest req){
+    @GetMapping("/view-my-request")
+    public ResponseEntity<TTListResponse> getTrainingPlansByUser(){
         try{
-            return ResponseEntity.ok().body(travelService.createTravelPlan(req));
-        }catch (Exception ex){
-            return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
-        }
+            String usernameOrId = employeeService.getCurrentLoginUsername();
 
-    }
-
-    @GetMapping("/train/view-my/{id}")
-    public ResponseEntity<TTListResponse> getTrainingPlansByUser(@PathVariable(name = "id") String usernameOrId){
-        String username="";//get from
-        try{
             return ResponseEntity.ok().body(trainingService.retrieveTrainingPlansByUser(usernameOrId));
         }catch (Exception ex){
             return ResponseEntity.badRequest().body(new TTListResponse(ex.getMessage(),true));
         }
     }
 
-    @GetMapping("/travel/view-my/{id}")
-    public ResponseEntity<TTListResponse> getTravelPlansByUser(@PathVariable(name = "id") String usernameOrId){
-        String username = "";
+    @GetMapping("/view-my-approval")
+    public ResponseEntity<TTListResponse> getTravelPlansByApprover(@PathVariable(name = "id",required = false) String usernameOrId){
         try{
-            return ResponseEntity.ok().body(travelService.retrieveTravelPlansByUser(usernameOrId));
+            if (usernameOrId == null || usernameOrId.isEmpty()){
+                usernameOrId = employeeService.getCurrentLoginUsername();
+            }
+            return ResponseEntity.ok().body(trainingService.retrieveTrainingPlanByApprover(usernameOrId));
         }catch (Exception ex){
             return ResponseEntity.badRequest().body(new TTListResponse(ex.getMessage(),true));
         }
     }
 
-    @GetMapping("/train/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<TTFormResponse> getTrainingPlanDetails(@PathVariable(name = "id") String planId){
         try{
             return ResponseEntity.ok().body(trainingService.getTrainingPlanDetails(planId));
@@ -70,12 +61,5 @@ public class TravelTrainController {
         }
 
     }
-    @GetMapping("/travel/{id}")
-    public ResponseEntity<TTFormResponse> getTravelPlanDetails(@PathVariable(name = "id") String planId){
-        try{
-            return ResponseEntity.ok().body(travelService.getTravelPlanDetails(planId));
-        }catch (Exception ex){
-            return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
-        }
-    }
+
 }
