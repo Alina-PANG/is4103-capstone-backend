@@ -7,6 +7,7 @@ import capstone.is4103capstone.util.enums.OutsourcingAssessmentStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +33,8 @@ public interface OutsourcingAssessmentRepository extends JpaRepository<Outsourci
             "and a.approver_id=?1",nativeQuery = true)
     public List<AssessmentFormSimpleModel> getAssessmentsUnderMyApproval(String approverId); //for direct managers;
 
+    @Query(value = "SELECT COUNT(*) FROM outsourcing_assessment a WHERE a.is_deleted=false AND a.outsourcing_assessment_status=?1",nativeQuery = true)
+    BigDecimal findNumberOfAssessmentByStatus(String status);
 
 
 }
