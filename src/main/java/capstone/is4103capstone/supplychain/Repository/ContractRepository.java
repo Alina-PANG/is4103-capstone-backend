@@ -19,4 +19,7 @@ public interface ContractRepository extends JpaRepository<Contract, String> {
 
     @Query(value = "SELECT COUNT(*) FROM contract cont WHERE cont.is_deleted=false AND cont.contract_status=?1",nativeQuery = true)
     BigDecimal findNumberOfContractByStatus(String status);
+
+    @Query(value = "SELECT * FROM contract cont WHERE cont.is_deleted=false AND cont.contract_status=?1",nativeQuery = true)
+    List<Contract> findContractsByStatus(String status);
 }

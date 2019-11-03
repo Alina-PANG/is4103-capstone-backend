@@ -13,4 +13,7 @@ public interface OutsourcingSelfAssessmentRepository extends JpaRepository<Outso
 
     @Query(value = "SELECT COUNT(*) FROM outsourcing_self_assessment a WHERE a.is_deleted=false AND a.outsourcing_self_assessment_status=?1",nativeQuery = true)
     BigDecimal findNumberOfSelfAssessmentByStatus(String status);
+
+    @Query(value = "SELECT * FROM outsourcing_self_assessment a WHERE a.is_deleted=false AND a.outsourcing_self_assessment_status=?1",nativeQuery = true)
+    List<OutsourcingSelfAssessment> findSelfAssessmentsByStatus(String status);
 }

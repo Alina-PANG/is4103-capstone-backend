@@ -36,5 +36,8 @@ public interface OutsourcingAssessmentRepository extends JpaRepository<Outsourci
     @Query(value = "SELECT COUNT(*) FROM outsourcing_assessment a WHERE a.is_deleted=false AND a.outsourcing_assessment_status=?1",nativeQuery = true)
     BigDecimal findNumberOfAssessmentByStatus(String status);
 
+    @Query(value = "SELECT * FROM outsourcing_assessment a WHERE a.is_deleted=false AND a.outsourcing_assessment_status=?1",nativeQuery = true)
+    List<OutsourcingAssessment> findAssessmentsByStatus(String status);
+
 
 }

@@ -43,5 +43,36 @@ public class SupplyChainDashboardController {
             return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(), true));
         }
     }
+
+    @GetMapping("/get-contracts-by-status/{status}")
+    public ResponseEntity<GeneralRes> getContractsByStatus(@PathVariable("status") String status) {
+        try {
+            return ResponseEntity.ok().body(supplyChainDashboardService.getContractsByStatus(status));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(), true));
+        }
+    }
+
+    @GetMapping("/get-assessments-by-status/{status}")
+    public ResponseEntity<GeneralRes> getAssessmentsByStatus(@PathVariable("status") String status) {
+        try {
+            return ResponseEntity.ok().body(supplyChainDashboardService.getAssessmentByStatus(status));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(), true));
+        }
+    }
+
+    @GetMapping("/get-self-assessments-by-status/{status}")
+    public ResponseEntity<GeneralRes> getSelfAssessmentsByStatus(@PathVariable("status") String status) {
+        try {
+            return ResponseEntity.ok().body(supplyChainDashboardService.getSelfAssessmentsByStatus(status));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(), true));
+        }
+    }
+
 }
 
