@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Service
 public class SupplyChainDashboardService {
@@ -40,18 +41,18 @@ public class SupplyChainDashboardService {
             BigDecimal numOfMerged = contractRepository.findNumberOfContractByStatus("4");
             BigDecimal numOfTerminated = contractRepository.findNumberOfContractByStatus("5");
 
-            BigDecimal totalContract = numOfDraft.add(
+            BigDecimal total = numOfDraft.add(
                     numOfPending.add(
                             numOfRejected.add(
                                     numOfActive.add(
                                             numOfMerged.add(numOfTerminated)))));
 
-            BigDecimal draftPercentage = numOfDraft.divide(totalContract);
-            BigDecimal pendingPercentage = numOfPending.divide(totalContract);
-            BigDecimal rejectedPercentage = numOfRejected.divide(totalContract);
-            BigDecimal activePercentage = numOfActive.divide(totalContract);
-            BigDecimal mergedPercentage = numOfMerged.divide(totalContract);
-            BigDecimal terminatedPercentage = numOfTerminated.divide(totalContract);
+            BigDecimal draftPercentage = numOfDraft.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal pendingPercentage = numOfPending.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal rejectedPercentage = numOfRejected.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal activePercentage = numOfActive.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal mergedPercentage = numOfMerged.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal terminatedPercentage = numOfTerminated.divide(total, 3, RoundingMode.HALF_UP);
 
             ContractDistributionModel model = new ContractDistributionModel(draftPercentage,pendingPercentage,activePercentage,
                     terminatedPercentage,mergedPercentage,rejectedPercentage);
@@ -77,18 +78,18 @@ public class SupplyChainDashboardService {
             BigDecimal numOfOutsourcingCreated = outsourcingAssessmentRepository.findNumberOfAssessmentByStatus("4");
             BigDecimal numOfRejected = outsourcingAssessmentRepository.findNumberOfAssessmentByStatus("5");
 
-            BigDecimal totalContract = numOfTemplate.add(
+            BigDecimal total = numOfTemplate.add(
                     numOfPendingBM.add(
                             numOfPendingOutsourcing.add(
                                     numOfApproved.add(
                                             numOfOutsourcingCreated.add(numOfRejected)))));
 
-            BigDecimal templatePercentage = numOfTemplate.divide(totalContract);
-            BigDecimal pendingPMPercentage = numOfPendingBM.divide(totalContract);
-            BigDecimal pendingOutsourcingPercentage = numOfPendingOutsourcing.divide(totalContract);
-            BigDecimal approvedPercentage = numOfApproved.divide(totalContract);
-            BigDecimal outsourcingCreatedPercentage = numOfOutsourcingCreated.divide(totalContract);
-            BigDecimal rejectedPercentage = numOfRejected.divide(totalContract);
+            BigDecimal templatePercentage = numOfTemplate.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal pendingPMPercentage = numOfPendingBM.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal pendingOutsourcingPercentage = numOfPendingOutsourcing.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal approvedPercentage = numOfApproved.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal outsourcingCreatedPercentage = numOfOutsourcingCreated.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal rejectedPercentage = numOfRejected.divide(total, 3, RoundingMode.HALF_UP);
 
             OutsourcingAssessmentDistributionModel model = new OutsourcingAssessmentDistributionModel(
                     templatePercentage,pendingPMPercentage,
@@ -115,14 +116,14 @@ public class SupplyChainDashboardService {
             BigDecimal numOfApproved = outsourcingSelfAssessmentRepository.findNumberOfSelfAssessmentByStatus("3");
 
 
-            BigDecimal totalContract = numOfDraft.add(
+            BigDecimal total = numOfDraft.add(
                     numOfPending.add(
                             numOfRejected.add(numOfApproved)));
 
-            BigDecimal draftPercentage = numOfDraft.divide(totalContract);
-            BigDecimal pendingPercentage = numOfPending.divide(totalContract);
-            BigDecimal rejectedPercentage = numOfRejected.divide(totalContract);
-            BigDecimal approvedPercentage = numOfApproved.divide(totalContract);
+            BigDecimal draftPercentage = numOfDraft.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal pendingPercentage = numOfPending.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal rejectedPercentage = numOfRejected.divide(total, 3, RoundingMode.HALF_UP);
+            BigDecimal approvedPercentage = numOfApproved.divide(total, 3, RoundingMode.HALF_UP);
 
             OutsourcingSelfAssessmentDistributionModel model = new OutsourcingSelfAssessmentDistributionModel(
                     draftPercentage,pendingPercentage,
@@ -135,4 +136,16 @@ public class SupplyChainDashboardService {
             return new GetSelfAssessmentDistributionRes("An unexpected error happens: "+ex.getMessage(), true, null);
         }
     }
+
+//    public GetSefAssessmentDistributionRes getSelfAssessmentDistribution(){
+//        try{
+//            logger.info("Getting Annual Self Assessment Distribution");
+//
+//            return new GetSelfAssessmentDistributionRes("", false, model);
+//
+//        }catch(Exception ex){
+//            ex.printStackTrace();
+//            return new GetSelfAssessmentDistributionRes("An unexpected error happens: "+ex.getMessage(), true, null);
+//        }
+//    }
 }
