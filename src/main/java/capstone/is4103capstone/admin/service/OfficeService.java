@@ -46,7 +46,7 @@ public class OfficeService {
     }
 
     public Office getOfficeEntityByUuid(String input) throws Exception {
-        Optional<Office> office = officeRepository.findAllUndeleted(input);
+        Optional<Office> office = officeRepository.findUndeletedOfficeById(input);
         if (office.isPresent()) {
             return office.get();
         } else {

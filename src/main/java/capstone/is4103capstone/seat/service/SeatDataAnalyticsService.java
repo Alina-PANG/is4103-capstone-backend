@@ -175,12 +175,12 @@ public class SeatDataAnalyticsService {
 
         if (constructNew) {
             SeatBlockedForUseDateModel newModel = new SeatBlockedForUseDateModel();
-            newModel.setParent(teamModel);
+            newModel.setEntity(teamModel);
             newModel.setSeatBlockedCountWithDate(jsonObject);
             seatBlockedForUseDateModel.getChildren().add(newModel);
             return seatBlockedForUseDateModel;
         } else {
-            seatBlockedForUseDateModel.setParent(teamModel);
+            seatBlockedForUseDateModel.setEntity(teamModel);
             seatBlockedForUseDateModel.setSeatBlockedCountWithDate(jsonObject);
             return seatBlockedForUseDateModel;
         }
@@ -207,7 +207,7 @@ public class SeatDataAnalyticsService {
 
         if (constructNew) {
             SeatBlockedForUseDateModel newModel = new SeatBlockedForUseDateModel();
-            newModel.setParent(unitModel);
+            newModel.setEntity(unitModel);
             newModel.setSeatBlockedCountWithDate(jsonObject);
             seatBlockedForUseDateModel.getChildren().add(newModel);
             // Construct children: teams under the business unit
@@ -218,7 +218,7 @@ public class SeatDataAnalyticsService {
             }
             return seatBlockedForUseDateModel;
         } else {
-            seatBlockedForUseDateModel.setParent(unitModel);
+            seatBlockedForUseDateModel.setEntity(unitModel);
             seatBlockedForUseDateModel.setSeatBlockedCountWithDate(jsonObject);
             // Construct children: teams under the business unit
             List<Team> teams = teamRepository.findOnesUnderBusinessUnit(levelEntityId);
@@ -241,7 +241,7 @@ public class SeatDataAnalyticsService {
         functionModel.setId(companyFunction.getId());
         functionModel.setName(companyFunction.getObjectName());
         functionModel.setCode(companyFunction.getCode());
-        seatBlockedForUseDateModel.setParent(functionModel);
+        seatBlockedForUseDateModel.setEntity(functionModel);
 
         JSONObject jsonObject = new JSONObject();
         for (SeatUtilisationLog log :
@@ -282,11 +282,11 @@ public class SeatDataAnalyticsService {
 
         if (constructNew) {
             SeatBlockedForUseDateModel newModel = new SeatBlockedForUseDateModel();
-            newModel.setParent(seatMapModel);
+            newModel.setEntity(seatMapModel);
             newModel.setSeatBlockedCountWithDate(jsonObject);
             seatBlockedForUseDateModel.getChildren().add(newModel);
         } else {
-            seatBlockedForUseDateModel.setParent(seatMapModel);
+            seatBlockedForUseDateModel.setEntity(seatMapModel);
             seatBlockedForUseDateModel.setSeatBlockedCountWithDate(jsonObject);
         }
 
@@ -305,7 +305,7 @@ public class SeatDataAnalyticsService {
             officeModel.setId(office.getId());
             officeModel.setName(office.getObjectName());
             officeModel.setCode(office.getCode());
-            seatBlockedForUseDateModel.setParent(officeModel);
+            seatBlockedForUseDateModel.setEntity(officeModel);
 
             JSONObject jsonObject = new JSONObject();
             for (SeatUtilisationLog log :

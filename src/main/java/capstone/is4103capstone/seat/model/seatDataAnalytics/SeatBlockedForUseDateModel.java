@@ -8,25 +8,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeatBlockedForUseDateModel implements Serializable {
-    private GroupModel parent;
+    private GroupModel entity;
     private List<SeatBlockedForUseDateModel> children = new ArrayList<>();
     private JSONObject seatBlockedCountWithDate;
 
     public SeatBlockedForUseDateModel() {
     }
 
-    public SeatBlockedForUseDateModel(GroupModel parent, List<SeatBlockedForUseDateModel> children, JSONObject seatBlockedCountWithDate) {
-        this.parent = parent;
+    public SeatBlockedForUseDateModel(GroupModel entity, List<SeatBlockedForUseDateModel> children, JSONObject seatBlockedCountWithDate) {
+        this.entity = entity;
         this.children = children;
         this.seatBlockedCountWithDate = seatBlockedCountWithDate;
     }
 
-    public GroupModel getParent() {
-        return parent;
+    public GroupModel getEntity() {
+        return entity;
     }
 
-    public void setParent(GroupModel parent) {
-        this.parent = parent;
+    public void setEntity(GroupModel entity) {
+        this.entity = entity;
     }
 
     public List<SeatBlockedForUseDateModel> getChildren() {

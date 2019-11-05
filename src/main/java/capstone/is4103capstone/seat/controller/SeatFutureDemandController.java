@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/seatAllocation/future")
+@RequestMapping("/api/seatAllocation/future/demand")
 @CrossOrigin
-public class SeatDemandForecastController {
+public class SeatFutureDemandController {
 
     @Autowired
     private SeatFutureDemandService seatFutureDemandService;
@@ -20,7 +20,7 @@ public class SeatDemandForecastController {
     // ---------------------------------- GET: Retrieve ----------------------------------
 
     @GetMapping("/team/6-month")
-    public ResponseEntity getSeatDemandForecastForNext6MonthsByTeam(@RequestParam(name="teamId", required=true) String teamId) {
+    public ResponseEntity getSeatFutureDemandForNext6MonthsByTeam(@RequestParam(name="teamId", required=true) String teamId) {
         SeatFutureDemandGroupModelForTeam seatFutureDemandGroupModelForTeam = new SeatFutureDemandGroupModelForTeam();
         List<MonthlySeatFutureDemandModelForTeam> monthlySeatForecastModelsForTeam = seatFutureDemandService.forecastSeatDemandForNext6MonthsByTeam(teamId);
         seatFutureDemandGroupModelForTeam.setMonthlySeatForecastModelsForTeam(monthlySeatForecastModelsForTeam);
@@ -28,7 +28,7 @@ public class SeatDemandForecastController {
     }
 
     @GetMapping("/team/12-month")
-    public ResponseEntity getSeatDemandForecastForNext12MonthsByTeam(@RequestParam(name="teamId", required=true) String teamId) {
+    public ResponseEntity getSeatFutureDemandForNext12MonthsByTeam(@RequestParam(name="teamId", required=true) String teamId) {
         SeatFutureDemandGroupModelForTeam seatFutureDemandGroupModelForTeam = new SeatFutureDemandGroupModelForTeam();
         List<MonthlySeatFutureDemandModelForTeam> monthlySeatForecastModelsForTeam = seatFutureDemandService.forecastSeatDemandForNext12MonthsByTeam(teamId);
         seatFutureDemandGroupModelForTeam.setMonthlySeatForecastModelsForTeam(monthlySeatForecastModelsForTeam);
