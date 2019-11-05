@@ -94,7 +94,7 @@ public class PurchaseOrderService {
 
             for (SpendingRecord spending:createPOReq.getSpendingRecordList()){
                 Service service = serviceServ.validateService(spending.getServiceId());
-                SpendingRecord s = new SpendingRecord(service.getId(),spending.getSpendingAmt(),purchaseOrder.getCurrencyCode(),purchaseOrder);
+                SpendingRecord s = new SpendingRecord(service.getId(),spending.getSpendingAmt(),purchaseOrder.getCurrencyCode(),purchaseOrder,service.getObjectName());
                 s.setCode("SP-"+purchaseOrder.getCode()+"-"+service.getCode()+"-"+codeCnt);
                 s = spendingRecordRepository.save(s);
                 spendings.add(s);
@@ -105,9 +105,7 @@ public class PurchaseOrderService {
 
             purchaseOrderRepository.saveAndFlush(purchaseOrder);
 
-
             bjfService.afterPOUpdated(purchaseOrder);
-
 
             return ResponseEntity
                     .ok()
@@ -151,7 +149,7 @@ public class PurchaseOrderService {
         int codeCnt = 0;
         for (SpendingRecord spending:createPOReq.getSpendingRecordList()){
             Service requestServ = serviceServ.validateService(spending.getServiceId());
-            SpendingRecord s = new SpendingRecord(requestServ.getId(),spending.getSpendingAmt(),purchaseOrder.getCurrencyCode(),purchaseOrder);
+            SpendingRecord s = new SpendingRecord(requestServ.getId(),spending.getSpendingAmt(),purchaseOrder.getCurrencyCode(),purchaseOrder,requestServ.getObjectName());
             s.setCode("SP-"+purchaseOrder.getCode()+"-"+requestServ.getCode()+"-"+codeCnt);
             s = spendingRecordRepository.saveAndFlush(s);
             spendings.add(s);
@@ -166,7 +164,6 @@ public class PurchaseOrderService {
         }
         purchaseOrderRepository.saveAndFlush(purchaseOrder);
 
-/////
         return ResponseEntity
                 .ok()
                 .body(new GeneralRes("Successfully updated The PO! ID["+purchaseOrder.getId()+"]", false));
