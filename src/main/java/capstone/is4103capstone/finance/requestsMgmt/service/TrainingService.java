@@ -21,7 +21,6 @@ import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.TravelTrainingTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.text.ParseException;
@@ -58,7 +57,7 @@ public class TrainingService {
 
         form.setRequestDescription(req.getDescription());
         form.setAdditionalInfo(req.getAdditionalInfo()==null?"":req.getAdditionalInfo());
-        form.setTrainingType(req.getIsAdhoc()? TravelTrainingTypeEnum.ADHOC:TravelTrainingTypeEnum.BUDGETD);
+        form.setTrainingType(req.getIsAdhoc()? TravelTrainingTypeEnum.ADHOC:TravelTrainingTypeEnum.BUDGETED);
         System.out.println(req.getIsAdhoc());
 
         form.setRequester(requester);
