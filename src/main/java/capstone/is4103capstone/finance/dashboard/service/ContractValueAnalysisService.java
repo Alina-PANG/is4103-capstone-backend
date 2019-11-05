@@ -1,8 +1,8 @@
 package capstone.is4103capstone.finance.dashboard.service;
 
-import capstone.is4103capstone.finance.dashboard.model.VendorAndContractDBModel;
+import capstone.is4103capstone.finance.dashboard.model.dbModel.VendorAndContractDBModel;
 import capstone.is4103capstone.finance.dashboard.model.VendorContractAggreLineModel;
-import capstone.is4103capstone.finance.dashboard.model.VendorPurchaseAmountDBModel;
+import capstone.is4103capstone.finance.dashboard.model.dbModel.VendorPurchaseAmountDBModel;
 import capstone.is4103capstone.finance.dashboard.model.res.VendorContractAggregationRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
@@ -16,6 +16,8 @@ import java.util.List;
 
 @Service
 public class ContractValueAnalysisService {
+
+    //TODO: handle currency exchange!
 
     @Autowired
     VendorRepository vendorRepository;

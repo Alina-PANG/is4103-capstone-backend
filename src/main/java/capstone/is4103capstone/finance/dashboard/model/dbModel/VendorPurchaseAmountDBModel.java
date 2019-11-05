@@ -1,4 +1,4 @@
-package capstone.is4103capstone.finance.dashboard.model;
+package capstone.is4103capstone.finance.dashboard.model.dbModel;
 
 
 import org.springframework.beans.factory.annotation.Value;

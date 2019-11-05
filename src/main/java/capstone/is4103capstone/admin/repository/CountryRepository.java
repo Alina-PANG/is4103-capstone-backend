@@ -22,4 +22,11 @@ public interface CountryRepository extends JpaRepository<Country, String> {
 
     @Query(value = "SELECT * From country c WHERE c.is_deleted=false AND c.id=?1", nativeQuery = true)
     Optional<Country> findUndeletedCountryById(String id);
+
+
+    @Query(value = "select c.* from country c join employee e join team t \n" +
+            "on e.team_id = t.id and t.hierachy_path LIKE CONCAT('%',c.hierachy_path,'%')\n" +
+            "where e.user_name=?1 or e.id=?1",nativeQuery = true)
+    Optional<Country> getCountryByEmployeeBelongTo(String userIdOrName);
+
 }

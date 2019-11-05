@@ -1,8 +1,8 @@
 package capstone.is4103capstone.supplychain.Repository;
 
 import capstone.is4103capstone.entities.supplyChain.Vendor;
-import capstone.is4103capstone.finance.dashboard.model.VendorAndContractDBModel;
-import capstone.is4103capstone.finance.dashboard.model.VendorPurchaseAmountDBModel;
+import capstone.is4103capstone.finance.dashboard.model.dbModel.VendorAndContractDBModel;
+import capstone.is4103capstone.finance.dashboard.model.dbModel.VendorPurchaseAmountDBModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

@@ -1,6 +1,7 @@
 package capstone.is4103capstone.finance;
 
 import capstone.is4103capstone.admin.repository.CountryRepository;
+import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.finance.*;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @org.springframework.stereotype.Service
 public class FinanceInit {
@@ -32,6 +34,10 @@ public class FinanceInit {
     FXRecordRepository fxRecordRepository;
     @Autowired
     CountryRepository countryRepository;
+    @Autowired
+    PurchaseOrderRepository purchaseOrderRepository;
+    @Autowired
+    EmployeeService employeeService;
 
     FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
     private String generateCode(JpaRepository repo, DBEntityTemplate entity){
@@ -46,6 +52,13 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
+
+//        List<PurchaseOrder> po = purchaseOrderRepository.findAll();
+//        for (PurchaseOrder p :po){
+//            p.setCountryId(employeeService.getCountryEmployeeBelongTo(p.getCreatedBy()).getId());
+//            purchaseOrderRepository.saveAndFlush(p);
+//        }
+
 //        String thisUser = "yingshi2502";
 //        Country country = countryRepository.findCountryByCode("SG");
 //

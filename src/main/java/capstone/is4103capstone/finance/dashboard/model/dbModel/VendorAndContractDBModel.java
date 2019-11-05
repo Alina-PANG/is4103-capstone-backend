@@ -1,4 +1,4 @@
-package capstone.is4103capstone.finance.dashboard.model;
+package capstone.is4103capstone.finance.dashboard.model.dbModel;
 
 import capstone.is4103capstone.util.enums.ContractStatusEnum;
 import org.springframework.beans.factory.annotation.Value;

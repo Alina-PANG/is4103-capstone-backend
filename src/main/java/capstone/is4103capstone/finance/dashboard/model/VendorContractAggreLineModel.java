@@ -1,6 +1,7 @@
 package capstone.is4103capstone.finance.dashboard.model;
 
-import capstone.is4103capstone.util.enums.ContractStatusEnum;
+import capstone.is4103capstone.finance.dashboard.model.dbModel.VendorAndContractDBModel;
+import capstone.is4103capstone.finance.dashboard.model.dbModel.VendorPurchaseAmountDBModel;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
