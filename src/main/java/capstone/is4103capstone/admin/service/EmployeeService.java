@@ -1,7 +1,9 @@
 package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.dto.EmployeeDto;
+import capstone.is4103capstone.admin.repository.CountryRepository;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.entities.Team;
@@ -27,6 +29,9 @@ public class EmployeeService {
     @Autowired
     private TeamService teamService;
 
+    @Autowired
+    private CountryRepository countryRepository;
+
     // TODO: refactor - same as getEmployeeEntityByUuid
     public Employee retrieveEmployeeById(String employeeId) throws EmployeeNotFoundException {
         if (employeeId == null || employeeId.trim().length() == 0) {
@@ -41,6 +46,12 @@ public class EmployeeService {
         return optionalEmployee.get();
     }
 
+    public Country getCountryEmployeeBelongTo(String userIdOrUsername) throws EntityNotFoundException{
+        Optional<Country> countryOp = countryRepository.getCountryByEmployeeBelongTo(userIdOrUsername);
+        if (countryOp.isPresent())
+            return countryOp.get();
+        throw new EntityNotFoundException("Internal Error Cannot find the country employee belongs to.");
+    }
 
     public String getCurrentLoginUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

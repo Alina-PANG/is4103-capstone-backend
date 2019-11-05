@@ -45,17 +45,7 @@ public class RequestFormModel implements Serializable {
         setApprover(new EmployeeModel(e.getApprover()));
     }
 
-    public RequestFormModel(EmployeeModel requester, String costCenterCode, String description, String additionalInfo, BigDecimal estimatedBudget, String currencyCode, String approvalStatus, String id, String createdDateTime) {
-        this.requester = requester;
-        this.costCenterCode = costCenterCode;
-        this.description = description;
-        this.additionalInfo = additionalInfo;
-        this.estimatedBudget = estimatedBudget;
-        this.currencyCode = currencyCode;
-        this.approvalStatus = approvalStatus;
-        this.id = id;
-        this.createdDateTime = createdDateTime;
-    }
+
 
     public String getCreatedDateTime() {
         return createdDateTime;

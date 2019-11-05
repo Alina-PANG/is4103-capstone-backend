@@ -29,6 +29,8 @@ public class PurchaseOrder extends DBEntityTemplate {
     @Column(name = "status")
     private ApprovalStatusEnum status;
 
+    private String countryId;
+
     private String currencyCode;
 
     private Double totalAmount;
@@ -42,6 +44,14 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public PurchaseOrder() {
 
+    }
+
+    public String getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(String countryId) {
+        this.countryId = countryId;
     }
 
     public List<SpendingRecord> getDetailedSpending() {
