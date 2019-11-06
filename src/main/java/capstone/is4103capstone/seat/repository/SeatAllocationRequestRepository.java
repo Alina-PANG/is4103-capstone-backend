@@ -12,11 +12,22 @@ public interface SeatAllocationRequestRepository extends JpaRepository<SeatAlloc
     Optional<SeatAllocationRequest> findUndeletedById(String allocationId);
 
     @Query(value = "SELECT * From seat_allocation_request s WHERE s.is_deleted=false AND s.requester_id=?1", nativeQuery = true)
-    List<SeatAllocationRequest> findOnesByRequesterId(String requesterId);
+    List<SeatAllocationRequest> findUndeletedOnesByRequesterId(String requesterId);
+
+    @Query(value = "SELECT * From seat_allocation_request s WHERE s.is_deleted=false AND s.requester_id=?1 AND s.resolved=false", nativeQuery = true)
+    List<SeatAllocationRequest> findUndeletedPendingOnesByRequesterId(String requesterId);
 
     @Query(value = "SELECT * From seat_allocation_request s WHERE s.is_deleted=false AND EXISTS " +
             "(SELECT * FROM approval_for_request a WHERE a.requested_item_id=s.id AND a.approver_id=?1 AND a.is_deleted=false)", nativeQuery = true)
-    List<SeatAllocationRequest> findOnesByReviewerId(String reviewerId);
+    List<SeatAllocationRequest> findUndeletedOnesByReviewerId(String reviewerId);
+
+    @Query(value = "SELECT * From seat_allocation_request s WHERE s.is_deleted=false AND s.resolved=false AND EXISTS " +
+            "(SELECT * FROM approval_for_request a WHERE a.requested_item_id=s.id AND a.approver_id=?1 AND a.is_deleted=false)", nativeQuery = true)
+    List<SeatAllocationRequest> findUndeletedPendingOnesByReviewerId(String reviewerId);
+
+    @Query(value = "SELECT * From seat_allocation_request s WHERE s.is_deleted=false AND " +
+            "s.resolved=false AND s.employee_of_allocation_id=?1", nativeQuery = true)
+    List<SeatAllocationRequest> findUndeletedPendingOnesByEmployeeOfAllocationId(String employeeId);
 
     @Query(value = "SELECT * From seat_allocation_request s WHERE EXISTS " +
             "(SELECT * FROM seat_allocation_request a, approval_for_request b WHERE " +

@@ -225,6 +225,7 @@ public class SeatAllocationService {
     // Pre-conditions:
     // 1. A seat can only be marked as a hot desk if it does not have any active employee allocation.
     // 2. A hot desk is assigned at the floor level, which means a seat does not have to be pre-assigned to a function/team to become a hot desk.
+    //      It means that the associations between the seat and the team/business unit/function will be removed when it becomes a hot desk.
     // 3. An office level level right is required to do this action.
     public void markSeatsAsHotDesk(BulkSeatIdsModel bulkSeatIdsModel) {
 
@@ -235,8 +236,7 @@ public class SeatAllocationService {
 
         SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getSeatMap().getOffice().getId());
         if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-            throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
-                    " does not have the right to do this action!");
+            throw new UnauthorizedActionException("Marking seats as hot desks failed: you do not have the right to do this action!");
         }
 
         // Check whether any seat has active seat allocation
@@ -268,6 +268,7 @@ public class SeatAllocationService {
     // 1. A hot desk is like a fixed seat to a temporary employee, and it's directly allocated to an individual employee.
     // 2. The allocation schedule must have an end date.
     // 3. Seats under office cannot be allocated as hot desks.
+    // 4. Only team leads and office managers have the right to do this action.
     public void assignHotDeskToAnEmployee(SeatAllocationModelForEmployee seatAllocationModelForEmployee) throws SeatAllocationException {
         try {
             Seat seat = seatService.retrieveSeatById(seatAllocationModelForEmployee.getSeatId());
@@ -299,15 +300,13 @@ public class SeatAllocationService {
                 if (!seatRequestAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                     SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
                     if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-                        throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
-                                " does not have the right to do this action!");
+                        throw new UnauthorizedActionException("Assigning hot desk failed: you not have the right to do this action!");
                     }
                 }
             } else {
                 SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
                 if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-                    throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
-                            " does not have the right to do this action!");
+                    throw new UnauthorizedActionException("Assigning hot desk failed: you not have the right to do this action!");
                 }
             }
 
@@ -849,7 +848,7 @@ public class SeatAllocationService {
 
 
     // Soft-delete all active allocations belonging to the employee
-    public void deleteAllocationsByEmployeeId(String employeeId) throws EmployeeNotFoundException {
+    public void deleteActiveAllocationsByEmployeeId(String employeeId) throws EmployeeNotFoundException {
         Employee employeeOfAllocation = employeeService.retrieveEmployeeById(employeeId);
         List<SeatAllocation> seatAllocations = seatAllocationRepository.findActiveOnesByEmployeeId(employeeOfAllocation.getId());
 
@@ -867,6 +866,31 @@ public class SeatAllocationService {
 
             if (seatAllocation.isActive()) {
                 ListIterator<SeatAllocation> iterator = seat.getActiveSeatAllocations().listIterator();
+                while (iterator.hasNext()) {
+                    SeatAllocation thisOne = iterator.next();
+                    if (thisOne.getId().equals(seatAllocation.getId())) {
+                        iterator.remove();
+                    }
+                }
+            }
+            seatRepository.save(seat);
+            seatAllocationRepository.save(seatAllocation);
+        }
+    }
+
+    // Soft-delete all active allocations belonging to the employee
+    public void deleteInactiveAllocationsByEmployeeId(String employeeId) throws EmployeeNotFoundException {
+        Employee employeeOfAllocation = employeeService.retrieveEmployeeById(employeeId);
+        List<SeatAllocation> seatAllocations = seatAllocationRepository.findInactiveOnesByEmployeeId(employeeOfAllocation.getId());
+
+        for (SeatAllocation seatAllocation :
+                seatAllocations) {
+            Seat seat = seatAllocation.getSeat();
+            seatAllocation.setDeleted(true);
+            seatAllocation.getSchedule().setDeleted(true);
+
+            if (!seatAllocation.isActive()) {
+                ListIterator<SeatAllocation> iterator = seat.getInactiveSeatAllocations().listIterator();
                 while (iterator.hasNext()) {
                     SeatAllocation thisOne = iterator.next();
                     if (thisOne.getId().equals(seatAllocation.getId())) {

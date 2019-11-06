@@ -198,7 +198,7 @@ public class SeatAllocationController {
 
     @DeleteMapping("/deallocation/employee")
     public ResponseEntity deallocateSeatAllocationByEmployeeId(@RequestParam(name="employeeId", required=true) String employeeId) {
-        seatAllocationService.deleteAllocationsByEmployeeId(employeeId);
+        seatAllocationService.deleteActiveAllocationsByEmployeeId(employeeId);
         return ResponseEntity.ok("Deallocated seat successfully");
     }
 

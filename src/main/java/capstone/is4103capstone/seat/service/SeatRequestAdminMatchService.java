@@ -18,7 +18,7 @@ public class SeatRequestAdminMatchService {
         if (hierarchyId == null || hierarchyId.trim().length() == 0) {
             throw new SeatRequestAdminMatchNotFoundException("Invalid hierarchy ID given!");
         }
-        Optional<SeatRequestAdminMatch> optionalSeatRequestAdminMatch = seatRequestAdminMatchRepository.findByHierarchyId(hierarchyId);
+        Optional<SeatRequestAdminMatch> optionalSeatRequestAdminMatch = seatRequestAdminMatchRepository.findUndeletedByHierarchyId(hierarchyId);
         if (!optionalSeatRequestAdminMatch.isPresent()) {
             throw new SeatRequestAdminMatchNotFoundException("Seat Request Admin Match under hierarchy ID " + hierarchyId + " does not exist!");
         }

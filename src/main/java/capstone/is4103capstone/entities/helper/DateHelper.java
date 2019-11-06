@@ -18,6 +18,20 @@ public class DateHelper {
         return calendar.getTime();
     }
 
+    public static Date getDaysAfter(Date originalDate, int daysAfter) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(originalDate);
+        calendar.add(Calendar.DAY_OF_MONTH, daysAfter);
+        return calendar.getTime();
+    }
+
+    public static Date getDaysBefore(Date originalDate, int daysBefore) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(originalDate);
+        calendar.add(Calendar.DAY_OF_MONTH, daysBefore * -1);
+        return calendar.getTime();
+    }
+
     // Note: month in Java's calendar is zero-based
     public static Date getDateByYearMonthDateHourMinute(int year, int month, int date, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
@@ -46,6 +60,12 @@ public class DateHelper {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return (calendar.get(Calendar.MONTH) + 1);
+    }
+
+    public static int getDayOfMonthFromDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.DAY_OF_MONTH);
     }
 
     public static YearMonth getYearMonthFromDate(Date date) {

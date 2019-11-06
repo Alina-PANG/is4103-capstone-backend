@@ -7,6 +7,7 @@ import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Region;
 import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.seat.service.SeatManagementGeneralService;
 import capstone.is4103capstone.util.exception.EmployeeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,8 @@ public class EmployeeService {
 
     @Autowired
     private TeamService teamService;
+    @Autowired
+    private SeatManagementGeneralService seatManagementGeneralService;
 
     @Autowired
     private CountryRepository countryRepository;
@@ -186,6 +189,8 @@ public class EmployeeService {
         if (employee.getDeleted())
             throw new Exception("Employee with UUID " + employee.getId() + " has already been deleted and cannot be modified!");
         employee.setDeleted(true);
+        // Delete all the objects associated with this employee under seat management
+        seatManagementGeneralService.deleteSeatManagementDataOfEmployee(employee);
         return true;
     }
 

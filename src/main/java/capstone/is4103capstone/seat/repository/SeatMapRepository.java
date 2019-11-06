@@ -49,4 +49,7 @@ public interface SeatMapRepository extends JpaRepository<SeatMap, String> {
             "b.id=?1 AND b.is_deleted=false)", nativeQuery = true)
     List<SeatMap> findOnesWithSeatsAllocatedToFunction(String functionId);
 
+    @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.office_id=?1", nativeQuery = true)
+    List<SeatMap> findOnesAtOffice(String officeId);
+
 }
