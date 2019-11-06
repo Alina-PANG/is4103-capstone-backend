@@ -1,5 +1,6 @@
 package capstone.is4103capstone.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -16,6 +17,14 @@ public class Tools {
         c.add(Calendar.DATE,-1);
         return c.getTime();
     }
+
+    public static Date getFirstDayOfYear(int year) throws ParseException {
+        return dateFormatter.parse(year+"-01-01");
+    }
+    public static String getFirstStrDayOfYear(int year){
+        return year+"-01-01";
+    }
+
     public static int getCalendarYear(){
         Calendar now = Calendar.getInstance();
         return now.get(Calendar.YEAR);
@@ -26,16 +35,29 @@ public class Tools {
         return year == calendarYear;
     }
 
+    public static Date getTomorrow(){
+        return getTomorrow(new Date());
+    }
+    public static String getTomorrowStr(){
+        return getTomorrowStr(new Date());
+    }
+    public static String getTomorrowStr(Date today){
+        return dateFormatter.format(getTomorrow(today));
+    }
     public static Date getTomorrow(Date today){
         Calendar c = Calendar.getInstance();
         c.setTime(today);
         c.add(Calendar.DATE,1);
         return c.getTime();
     }
-    public static String getTomorrowStr(Date today){
-        Calendar c = Calendar.getInstance();
-        c.setTime(today);
-        c.add(Calendar.DATE,1);
-        return dateFormatter.format(c.getTime());
-    }
+
+
+//    public static void main(String []args){
+//        try{
+//            System.out.println(dateFormatter.format(getFirstDayOfYear(2019)));
+//        }catch (Exception ex){
+//
+//        }
+//    }
+
 }

@@ -70,14 +70,17 @@ public class PurchaseOrderService {
             if (createPOReq.getSpendingRecordList().isEmpty())
                 throw new Exception("Please select at least 1 service");
 
+            String currentUsername = employeeService.getCurrentLoginUsername();
             purchaseOrder.setVendor(v);
             purchaseOrder.setStatus(ApprovalStatusEnum.APPROVED);
             purchaseOrder.setTotalAmount(createPOReq.getAmount());
             purchaseOrder.setCurrencyCode(createPOReq.getCurrencyCode());
-            purchaseOrder.setCreatedBy(employeeService.getCurrentLoginUsername());
+            purchaseOrder.setCreatedBy(currentUsername);
             purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
             purchaseOrder.setCode(createPOReq.getPoNumber());
             purchaseOrder.setObjectName(createPOReq.getPoNumber());
+
+            purchaseOrder.setCountryId(employeeService.getCountryEmployeeBelongTo(currentUsername).getId());
 
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
             purchaseOrder.setApprover(createPOReq.getApproverUsername());

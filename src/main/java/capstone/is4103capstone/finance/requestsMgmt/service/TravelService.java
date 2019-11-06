@@ -1,6 +1,5 @@
 package capstone.is4103capstone.finance.requestsMgmt.service;
 
-import capstone.is4103capstone.admin.repository.EmployeeRepository;
 import capstone.is4103capstone.admin.service.CostCenterService;
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.ApprovalForRequest;
@@ -19,7 +18,6 @@ import capstone.is4103capstone.util.Tools;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.TravelTrainingTypeEnum;
-import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +48,7 @@ public class TravelService {
         form.setDestCountry(req.getDestCountry());
         form.setRequestDescription(req.getDescription());
         form.setAdditionalInfo(req.getAdditionalInfo()==null?"":req.getAdditionalInfo());
-        form.setTravelType(req.getIsAdhoc()? TravelTrainingTypeEnum.ADHOC:TravelTrainingTypeEnum.BUDGETD);
+        form.setTravelType(req.getIsAdhoc()? TravelTrainingTypeEnum.ADHOC:TravelTrainingTypeEnum.BUDGETED);
         System.out.println(req.getIsAdhoc());
 
         form.setRequester(requester);
