@@ -21,6 +21,8 @@ public class SeatUtilisationLog implements Comparable<SeatUtilisationLog> {
     @Column(unique = true, updatable = false, nullable = false,length = 36)
     @Length(min=36, max=36)
     private String id;
+    @NotNull
+    private String hierarchyPath;
 
     @NotNull
     private String levelEntityId;
@@ -78,6 +80,14 @@ public class SeatUtilisationLog implements Comparable<SeatUtilisationLog> {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getHierarchyPath() {
+        return hierarchyPath;
+    }
+
+    public void setHierarchyPath(String hierarchyPath) {
+        this.hierarchyPath = hierarchyPath;
     }
 
     public String getLevelEntityId() {

@@ -190,6 +190,8 @@ public class AdminInitialization {
         Team team2 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
         Team team3 = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
         Team team4 = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
+        Team team5 = teamRepository.findTeamByCode("SG-HR-RCR-INT");
+
 
         // Seat admin setup for different hierarchies
         // SG-Tech-FixIncTech-Dev
@@ -234,10 +236,29 @@ public class AdminInitialization {
         seatRequestAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
         seatRequestAdminMatch7.setSeatAdmin(admin);
 
+        // ORQ Office
         SeatRequestAdminMatch seatRequestAdminMatch8 = new SeatRequestAdminMatch();
         seatRequestAdminMatch8.setHierarchyId(team1.getOffice().getId());
         seatRequestAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
         seatRequestAdminMatch8.setSeatAdmin(admin);
+
+        // SG-HR-RCR-INT
+        SeatRequestAdminMatch seatRequestAdminMatch9 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch9.setHierarchyId(team5.getId());
+        seatRequestAdminMatch9.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatRequestAdminMatch9.setSeatAdmin(admin);
+
+        // SG-HR-RCR
+        SeatRequestAdminMatch seatRequestAdminMatch10 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch10.setHierarchyId(team5.getBusinessUnit().getId());
+        seatRequestAdminMatch10.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatRequestAdminMatch10.setSeatAdmin(admin);
+
+        // SG-HR
+        SeatRequestAdminMatch seatRequestAdminMatch11 = new SeatRequestAdminMatch();
+        seatRequestAdminMatch11.setHierarchyId(team5.getBusinessUnit().getFunction().getId());
+        seatRequestAdminMatch11.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+        seatRequestAdminMatch11.setSeatAdmin(admin);
 
         teamRepository.saveAndFlush(team1);
         employeeRepository.saveAndFlush(yingshi);
@@ -251,6 +272,9 @@ public class AdminInitialization {
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch6);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch7);
         seatRequestAdminMatchRepository.save(seatRequestAdminMatch8);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch9);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch10);
+        seatRequestAdminMatchRepository.save(seatRequestAdminMatch11);
     }
 
     public void createGeo() {
@@ -260,16 +284,19 @@ public class AdminInitialization {
         Region region = new Region("Asia-Pacific", "APAC", "APAC");
         region.setCreatedBy("admin");
         region.setLastModifiedBy("admin");
+        region.setHierachyPath("APAC");
         region = regionRepository.save(region);
 
         Region region2 = new Region("The United Kingdom", "UK", "UK");
         region2.setCreatedBy("admin");
         region2.setLastModifiedBy("admin");
+        region2.setHierachyPath("UK");
         region2 = regionRepository.save(region2);
 
         Region region3 = new Region("Europe", "EUR", "EUR");
         region3.setCreatedBy("admin");
         region3.setLastModifiedBy("admin");
+        region3.setHierachyPath("EUR");
         region3 = regionRepository.save(region3);
 
         // ---------------------------------- Country ----------------------------------
@@ -277,18 +304,21 @@ public class AdminInitialization {
         Country countrySG = new Country("Singapore", "SG", "APAC-SG");
         countrySG.setCreatedBy("admin");
         countrySG.setLastModifiedBy("admin");
+        countrySG.setHierachyPath("APAC:SG");
         countrySG = countryRepository.save(countrySG);
         countrySG.setRegion(region);
 
         Country countryHK = new Country("Hong Kong", "HK", "APAC-HK");
         countryHK.setCreatedBy("admin");
         countryHK.setLastModifiedBy("admin");
+        countryHK.setHierachyPath("APAC:HK");
         countryHK = countryRepository.save(countryHK);
         countryHK.setRegion(region);
 
         Country countryIND = new Country("India", "IND", "APAC-IND");
         countryIND.setCreatedBy("admin");
         countryIND.setLastModifiedBy("admin");
+        countryIND.setHierachyPath("APAC:IND");
         countryIND = countryRepository.save(countryIND);
         countryIND.setRegion(region);
 
@@ -301,6 +331,7 @@ public class AdminInitialization {
         CompanyFunction techFunctionSG = new CompanyFunction("Technology", "SG-Tech", "SG-Tech");
         techFunctionSG.setCreatedBy("admin");
         techFunctionSG.setLastModifiedBy("admin");
+        techFunctionSG.setHierachyPath("APAC:SG:F-SG-Tech");
         techFunctionSG = functionRepository.save(techFunctionSG);
         techFunctionSG.setCountry(countrySG);
         countrySG.getFunctions().add(techFunctionSG);
@@ -308,6 +339,7 @@ public class AdminInitialization {
         CompanyFunction hrFunctionSG = new CompanyFunction("Human Resource", "SG-HR", "SG-HR");
         hrFunctionSG.setCreatedBy("admin");
         hrFunctionSG.setLastModifiedBy("admin");
+        hrFunctionSG.setHierachyPath("APAC:SG:F-SG-HR");
         hrFunctionSG = functionRepository.save(hrFunctionSG);
         hrFunctionSG.setCountry(countrySG);
         countrySG.getFunctions().add(hrFunctionSG);
@@ -315,6 +347,7 @@ public class AdminInitialization {
         CompanyFunction salesFunctionSG = new CompanyFunction("Sales", "SG-Sales", "SG-Sales");
         salesFunctionSG.setCreatedBy("admin");
         salesFunctionSG.setLastModifiedBy("admin");
+        salesFunctionSG.setHierachyPath("APAC:SG:F-SG-Sales");
         salesFunctionSG = functionRepository.save(hrFunctionSG);
         salesFunctionSG.setCountry(countrySG);
         countrySG.getFunctions().add(salesFunctionSG);
@@ -329,73 +362,88 @@ public class AdminInitialization {
 
         office.setCreatedBy("admin");
         office.setLastModifiedBy("admin");
+        office.setHierachyPath("APAC:SG:ORQ");
         office = officeRepository.save(office);
         office.setCountry(countrySG);
         countrySG.getOffices().add(office);
 
         // ---------------------------------- Business Unit ----------------------------------
 
-        BusinessUnit businessUnitInfraTech = new BusinessUnit("Infrastructure Tech", "SG-Tech-InfraTech", "SG-Tech-InfraTech");
+        BusinessUnit businessUnitInfraTech = new BusinessUnit("Infrastructure Tech", "SG-Tech-InfraTech", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech");
         businessUnitInfraTech.setCreatedBy("admin");
         businessUnitInfraTech.setLastModifiedBy("admin");
         businessUnitInfraTech = businessUnitRepository.save(businessUnitInfraTech);
         businessUnitInfraTech.setFunction(techFunctionSG);
 
-        BusinessUnit businessUnitCurrencyTech = new BusinessUnit("Currency Tech", "SG-Tech-CurrTech", "SG-Tech-CurrTech");
+        BusinessUnit businessUnitCurrencyTech = new BusinessUnit("Currency Tech", "SG-Tech-CurrTech", "APAC:SG:F-SG-Tech:BU-SG-Tech-CurrTech");
         businessUnitCurrencyTech.setCreatedBy("admin");
         businessUnitCurrencyTech.setLastModifiedBy("admin");
         businessUnitCurrencyTech = businessUnitRepository.save(businessUnitCurrencyTech);
         businessUnitCurrencyTech.setFunction(techFunctionSG);
 
-        BusinessUnit businessUnitFixIncomeTech = new BusinessUnit("Fix Income Tech", "SG-Tech-FixIncTech", "SG-Tech-FixIncTech");
+        BusinessUnit businessUnitFixIncomeTech = new BusinessUnit("Fix Income Tech", "SG-Tech-FixIncTech", "APAC:SG:F-SG-Tech:BU-SG-Tech-FixIncTech");
         businessUnitFixIncomeTech.setCreatedBy("admin");
         businessUnitFixIncomeTech.setLastModifiedBy("admin");
         businessUnitFixIncomeTech = businessUnitRepository.save(businessUnitFixIncomeTech);
         businessUnitFixIncomeTech.setFunction(techFunctionSG);
 
+        BusinessUnit recruitingUnit = new BusinessUnit("Recruiting", "SG-HR-RCR", "APAC:SG:F-SG-HR:BU-SG-HR-RCR");
+        recruitingUnit.setCreatedBy("admin");
+        recruitingUnit.setLastModifiedBy("admin");
+        recruitingUnit = businessUnitRepository.save(recruitingUnit);
+        recruitingUnit.setFunction(hrFunctionSG);
+
+
         // ---------------------------------- Team ----------------------------------
 
-        Team endUserComputingTeam = new Team("End User Computing", "SG-Tech-InfraTech-EndUserCom", "SG-Tech-InfraTech-EndUserCom");
+        Team endUserComputingTeam = new Team("End User Computing", "SG-Tech-InfraTech-EndUserCom", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-EndUserCom");
         endUserComputingTeam.setCreatedBy("admin");
         endUserComputingTeam.setLastModifiedBy("admin");
         endUserComputingTeam.setOffice(office);
         endUserComputingTeam = teamRepository.save(endUserComputingTeam);
         endUserComputingTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team dataCenterOpeTeam = new Team("Data Center Operation", "SG-Tech-InfraTech-DataCenOpr", "SG-Tech-InfraTech-DataCenOpr");
+        Team dataCenterOpeTeam = new Team("Data Center Operation", "SG-Tech-InfraTech-DataCenOpr", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-DataCenOpr");
         dataCenterOpeTeam.setCreatedBy("admin");
         dataCenterOpeTeam.setLastModifiedBy("admin");
         dataCenterOpeTeam.setOffice(office);
         dataCenterOpeTeam = teamRepository.save(dataCenterOpeTeam);
         dataCenterOpeTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team databaseAdminTeam = new Team("Database Admin", "SG-Tech-InfraTech-DBAdmin", "SG-Tech-InfraTech-DBAdmin");
+        Team databaseAdminTeam = new Team("Database Admin", "SG-Tech-InfraTech-DBAdmin", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-DBAdmin");
         databaseAdminTeam.setCreatedBy("admin");
         databaseAdminTeam.setLastModifiedBy("admin");
         databaseAdminTeam.setOffice(office);
         databaseAdminTeam = teamRepository.save(databaseAdminTeam);
         databaseAdminTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team networkTeam = new Team("Networks", "SG-Tech-InfraTech-Networks", "SG-Tech-InfraTech-Networks");
+        Team networkTeam = new Team("Networks", "SG-Tech-InfraTech-Networks", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-Networks");
         networkTeam.setCreatedBy("admin");
         networkTeam.setLastModifiedBy("admin");
         networkTeam.setOffice(office);
         networkTeam = teamRepository.save(networkTeam);
         networkTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team productionSupportTeam = new Team("Production Support", "SG-Tech-FixIncTech-ProdSupp", "SG-Tech-FixIncTech-ProdSupp");
+        Team productionSupportTeam = new Team("Production Support", "SG-Tech-FixIncTech-ProdSupp", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-FixIncTech-ProdSupp");
         productionSupportTeam.setCreatedBy("admin");
         productionSupportTeam.setLastModifiedBy("admin");
         productionSupportTeam.setOffice(office);
         productionSupportTeam = teamRepository.save(productionSupportTeam);
         productionSupportTeam.setBusinessUnit(businessUnitFixIncomeTech);
 
-        Team developmentTeam = new Team("Development", "SG-Tech-FixIncTech-Dev", "SG-Tech-FixIncTech-Dev");
+        Team developmentTeam = new Team("Development", "SG-Tech-FixIncTech-Dev", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-FixIncTech-Dev");
         developmentTeam.setCreatedBy("admin");
         developmentTeam.setLastModifiedBy("admin");
         developmentTeam.setOffice(office);
         developmentTeam = teamRepository.save(developmentTeam);
         developmentTeam.setBusinessUnit(businessUnitFixIncomeTech);
+
+        Team interviewTeam = new Team("Interview", "SG-HR-RCR-INT", "APAC:SG:F-SG-HR:BU-SG-HR-RCR:T-SG-HR-RCR-INT");
+        interviewTeam.setCreatedBy("admin");
+        interviewTeam.setLastModifiedBy("admin");
+        interviewTeam.setOffice(office);
+        interviewTeam = teamRepository.save(interviewTeam);
+        interviewTeam.setBusinessUnit(recruitingUnit);
 
         //last update
         regionRepository.saveAndFlush(region);
@@ -410,12 +458,14 @@ public class AdminInitialization {
         businessUnitRepository.saveAndFlush(businessUnitInfraTech);
         businessUnitRepository.saveAndFlush(businessUnitCurrencyTech);
         businessUnitRepository.saveAndFlush(businessUnitFixIncomeTech);
+        businessUnitRepository.saveAndFlush(recruitingUnit);
         teamRepository.saveAndFlush(endUserComputingTeam);
         teamRepository.saveAndFlush(dataCenterOpeTeam);
         teamRepository.saveAndFlush(databaseAdminTeam);
         teamRepository.saveAndFlush(networkTeam);
         teamRepository.saveAndFlush(productionSupportTeam);
         teamRepository.saveAndFlush(developmentTeam);
+        teamRepository.saveAndFlush(interviewTeam);
 
         office.getFunctionsCodeInOffice().add("SG-Tech");
         office.getFunctionsCodeInOffice().add("SG-HR");
@@ -423,6 +473,7 @@ public class AdminInitialization {
         office.getBusinessUnitsCodeInOffice().add("SG-Tech-InfraTech");
         office.getBusinessUnitsCodeInOffice().add("SG-Tech-CurrTech");
         office.getBusinessUnitsCodeInOffice().add("SG-Tech-FixIncTech");
+        office.getBusinessUnitsCodeInOffice().add("SG-HR-RCR");
         techFunctionSG.getOfficesCodeOfFunction().add("ORQ");
         hrFunctionSG.getOfficesCodeOfFunction().add("ORQ");
         salesFunctionSG.getOfficesCodeOfFunction().add("ORQ");

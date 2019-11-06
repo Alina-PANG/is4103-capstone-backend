@@ -17,7 +17,6 @@ import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatFutureDemand.MonthlySeatFutureDemandModelForTeam;
-import capstone.is4103capstone.seat.model.seatDataAnalytics.SeatUtilisationModel;
 import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.ScheduleRecurringBasisEnum;
@@ -914,13 +913,4 @@ public class EntityModelConversionService {
         return monthlySeatFutureDemandModelForTeam;
     }
 
-    public SeatUtilisationModel convertSeatUtilisationLogIntoModel(SeatUtilisationLog seatUtilisationLog) {
-        SeatUtilisationModel seatUtilisationModel = new SeatUtilisationModel();
-        seatUtilisationModel.setDate(seatUtilisationLog.getCreatedTime());
-        seatUtilisationModel.setEntityId(seatUtilisationLog.getLevelEntityId());
-        seatUtilisationModel.setInventoryCount(seatUtilisationLog.getInventoryCount());
-        seatUtilisationModel.setOccupancyCount(seatUtilisationLog.getOccupancyCount());
-        seatUtilisationModel.setUnoccupiedCount(seatUtilisationModel.getInventoryCount() - seatUtilisationModel.getOccupancyCount());
-        return seatUtilisationModel;
-    }
 }

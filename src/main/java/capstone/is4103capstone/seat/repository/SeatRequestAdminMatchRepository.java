@@ -14,5 +14,11 @@ public interface SeatRequestAdminMatchRepository extends JpaRepository<SeatReque
     Optional<SeatRequestAdminMatch> findUndeletedByHierarchyId(String hierarchyId);
 
     @Query(value = "SELECT * FROM seat_request_admin_match s WHERE s.is_deleted=false AND s.seat_admin_id=?1", nativeQuery = true)
-    List<SeatRequestAdminMatch> findUndeletedOnesByAdminId(String hierarchyId);
+    List<SeatRequestAdminMatch> findUndeletedOnesByAdminId(String adminId);
+
+    @Query(value = "SELECT * FROM seat_request_admin_match s WHERE s.is_deleted=false AND s.hierarchy_id=?1 AND s.seat_admin_id=?2", nativeQuery = true)
+    Optional<SeatRequestAdminMatch> findUndeletedOnesByEntityAndAdminId(String hierarchyId, String adminID);
+
+    @Query(value = "SELECT * FROM seat_request_admin_match s WHERE s.is_deleted=false AND s.hierarchy_id=?1 AND s.seat_admin_id=?2 AND s.hierarchy_type=?3", nativeQuery = true)
+    Optional<SeatRequestAdminMatch> findUndeletedOnesByEntityAndAdminAndHierarchyType(String hierarchyId, String adminID, int hierarchyType);
 }

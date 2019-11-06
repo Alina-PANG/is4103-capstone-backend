@@ -143,7 +143,7 @@ public class SeatMapService {
         String officeCode = office.getCode();
         newSeatMap.setCode(countryCode + "-" + officeCode + "-" + newSeatMap.getFloor());
         newSeatMap.setObjectName(newSeatMap.getCode());
-        newSeatMap.setHierachyPath(newSeatMap.getCode());
+        newSeatMap.setHierachyPath(newSeatMap.getOffice().getHierachyPath() + "SM-" + newSeatMap.getCode());
         newSeatMap = seatMapRepository.save(newSeatMap);
 
         refreshSeatCode(newSeatMap);
@@ -691,7 +691,7 @@ public class SeatMapService {
 
             String finalString = seatMap.getCode() + "-" + zeroString + seat.getSerialNumber();
             seat.setCode(finalString);
-            seat.setHierachyPath(finalString);
+            seat.setHierachyPath(seatMap.getHierachyPath() + "ST-" + finalString);
             seat.setObjectName(finalString);
         }
     }
