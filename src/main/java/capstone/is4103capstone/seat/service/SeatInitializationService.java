@@ -246,6 +246,8 @@ public class SeatInitializationService {
                     seat.setOriginalSeatMapId(newSeatMapLvl26.getId());
                     seatRepository.save(seat);
                 }
+                office.get().getFloors().add("26");
+                officeRepository.save(office.get());
             } catch (Exception ex) {
                 System.out.println("Seat Management Initialisation failed: " + ex.getMessage());
             }
@@ -389,6 +391,8 @@ public class SeatInitializationService {
                     seat.setOriginalSeatMapId(newSeatMapLvl27.getId());
                     seatRepository.save(seat);
                 }
+                office.get().getFloors().add("27");
+                officeRepository.save(office.get());
             } catch (Exception ex) {
                 System.out.println("Seat Management Initialisation failed: " + ex.getMessage());
             }
