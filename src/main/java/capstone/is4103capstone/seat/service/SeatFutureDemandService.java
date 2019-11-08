@@ -6,7 +6,7 @@ import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.helper.DateHelper;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.seat.model.seatFutureDemand.MonthlySeatFutureDemandModelForTeam;
 import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
 import capstone.is4103capstone.util.exception.InvalidInputException;
@@ -25,7 +25,7 @@ public class SeatFutureDemandService {
     @Autowired
     private SeatService seatService;
     @Autowired
-    private SeatRequestAdminMatchService seatRequestAdminMatchService;
+    private SeatAdminMatchService seatAdminMatchService;
     @Autowired
     private TeamService teamService;
     @Autowired
@@ -46,8 +46,8 @@ public class SeatFutureDemandService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(team.getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(team.getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to do this action!");
         }
 
@@ -71,8 +71,8 @@ public class SeatFutureDemandService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(team.getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(team.getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to do this action!");
         }
 

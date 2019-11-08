@@ -1,18 +1,28 @@
 package capstone.is4103capstone.seat.service;
 
+import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
+import capstone.is4103capstone.admin.repository.TeamRepository;
 import capstone.is4103capstone.entities.ApprovalForRequest;
+import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.entities.helper.DateHelper;
 import capstone.is4103capstone.entities.seat.EmployeeOfficeWorkingSchedule;
 import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.entities.seat.SeatAdminMatch;
+import capstone.is4103capstone.entities.seat.SeatUtilisationLog;
 import capstone.is4103capstone.finance.Repository.ApprovalForRequestRepository;
 import capstone.is4103capstone.seat.repository.EmployeeOfficeWorkingScheduleRepository;
 import capstone.is4103capstone.seat.repository.SeatAllocationRequestRepository;
-import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
+import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
+import capstone.is4103capstone.seat.repository.SeatUtilisationLogRepository;
+import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SeatManagementGeneralService {
@@ -27,7 +37,13 @@ public class SeatManagementGeneralService {
     @Autowired
     private ApprovalForRequestRepository approvalForRequestRepository;
     @Autowired
-    private SeatRequestAdminMatchRepository seatRequestAdminMatchRepository;
+    private SeatAdminMatchRepository seatAdminMatchRepository;
+    @Autowired
+    private SeatUtilisationLogRepository seatUtilisationLogRepository;
+    @Autowired
+    private TeamRepository teamRepository;
+    @Autowired
+    private BusinessUnitRepository businessUnitRepository;
 
     public void deleteSeatManagementDataOfEmployee(Employee employee) {
         // Seat allocations (together with their schedules)
@@ -47,12 +63,12 @@ public class SeatManagementGeneralService {
         deleteAssociatedSeatAllocationRequests(employee.getId());
 
         // Seat admin matches
-        List<SeatRequestAdminMatch> seatRequestAdminMatches = seatRequestAdminMatchRepository.findUndeletedOnesByAdminId(employee.getId());
-        for (SeatRequestAdminMatch match :
-                seatRequestAdminMatches) {
+        List<SeatAdminMatch> seatAdminMatches = seatAdminMatchRepository.findUndeletedOnesByAdminId(employee.getId());
+        for (SeatAdminMatch match :
+                seatAdminMatches) {
             match.setDeleted(true);
             match.setLastModifiedBy("SYSTEM");
-            seatRequestAdminMatchRepository.save(match);
+            seatAdminMatchRepository.save(match);
         }
     }
 

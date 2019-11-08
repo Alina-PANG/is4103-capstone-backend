@@ -39,7 +39,7 @@ public class SeatAllocationRequestService {
     @Autowired
     private EntityModelConversionService entityModelConversionService;
     @Autowired
-    private SeatRequestAdminMatchService seatRequestAdminMatchService;
+    private SeatAdminMatchService seatAdminMatchService;
     @Autowired
     private SeatService seatService;
     @Autowired
@@ -82,8 +82,8 @@ public class SeatAllocationRequestService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
         // Validate the requester: check whether the requester has the right to create a seat allocation request
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(requester.getTeam().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(requesterId) || !seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(requester.getTeam().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(requesterId) || !seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Creating seat allocation request failed: you do not have the right to create such request!");
         }
 
@@ -172,7 +172,7 @@ public class SeatAllocationRequestService {
 
         // Create the initial approval ticket: escalate to the business unit level
         BusinessUnit businessUnit = requester.getTeam().getBusinessUnit();
-        SeatRequestAdminMatch nextLevelMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(businessUnit.getId());
+        SeatAdminMatch nextLevelMatch = seatAdminMatchService.retrieveMatchByHierarchyId(businessUnit.getId());
         Employee approver = nextLevelMatch.getSeatAdmin();
         String requestorComment = createSeatAllocationRequestModel.getComment();
 
@@ -472,8 +472,8 @@ public class SeatAllocationRequestService {
             seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.OFFICE);
         }
 
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seatAllocationRequest.getEscalatedHierarchyId());
-        Employee newReviewer = seatRequestAdminMatch.getSeatAdmin();
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatAllocationRequest.getEscalatedHierarchyId());
+        Employee newReviewer = seatAdminMatch.getSeatAdmin();
         newApprovalForRequest.setApprover(newReviewer);
         newApprovalForRequest.setRequester(seatAllocationRequest.getRequester());
         newApprovalForRequest.setApprovalType(ApprovalTypeEnum.SEAT_ALLOCATION);

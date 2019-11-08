@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table
-public class SeatRequestAdminMatch extends DBEntityTemplate {
+public class SeatAdminMatch extends DBEntityTemplate {
 
     @NotNull
     private HierarchyTypeEnum hierarchyType;
@@ -19,10 +19,10 @@ public class SeatRequestAdminMatch extends DBEntityTemplate {
     @OneToOne(fetch = FetchType.LAZY)
     private Employee seatAdmin;
 
-    public SeatRequestAdminMatch() {
+    public SeatAdminMatch() {
     }
 
-    public SeatRequestAdminMatch(HierarchyTypeEnum hierarchyType, String hierarchyId, Employee seatAdmin) {
+    public SeatAdminMatch(HierarchyTypeEnum hierarchyType, String hierarchyId, Employee seatAdmin) {
         this.hierarchyType = hierarchyType;
         this.hierarchyId = hierarchyId;
         this.seatAdmin = seatAdmin;

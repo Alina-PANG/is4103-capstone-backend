@@ -324,6 +324,7 @@ public class SeatManagementBackgroundService {
         seatUtilisationLog.setLevelEntityId(team.getId());
         seatUtilisationLog.setHierarchyType(HierarchyTypeEnum.TEAM);
         seatUtilisationLog.setOfficeId(team.getOffice().getId());
+        seatUtilisationLog.setHierarchyPath(team.getHierachyPath());
 
         List<Seat> seatsUnderTeam = seatRepository.findOnesByTeamId(team.getId());
 
@@ -385,6 +386,7 @@ public class SeatManagementBackgroundService {
                     SeatUtilisationLog businessUnitLog = new SeatUtilisationLog();
                     businessUnitLog.setLevelEntityId(businessUnit.getId());
                     businessUnitLog.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+                    businessUnitLog.setHierarchyPath(businessUnit.getHierachyPath());
                     businessUnitLog.setOfficeId(team.getOffice().getId());
 
                     businessUnitLog.setInventoryCount(businessUnitLog.getInventoryCount() + teamSeatUtilisationLog.getInventoryCount());
@@ -428,6 +430,7 @@ public class SeatManagementBackgroundService {
                     SeatUtilisationLog functionLog = new SeatUtilisationLog();
                     functionLog.setLevelEntityId(companyFunction.getId());
                     functionLog.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+                    functionLog.setHierarchyPath(companyFunction.getHierachyPath());
                     functionLog.setOfficeId(businessUnitLog.getOfficeId());
 
                     functionLog.setInventoryCount(functionLog.getInventoryCount() + businessUnitLog.getInventoryCount());
@@ -453,6 +456,7 @@ public class SeatManagementBackgroundService {
         SeatUtilisationLog seatUtilisationLog = new SeatUtilisationLog();
         seatUtilisationLog.setLevelEntityId(seatMap.getId());
         seatUtilisationLog.setHierarchyType(HierarchyTypeEnum.OFFICE_FLOOR);
+        seatUtilisationLog.setHierarchyPath(seatMap.getHierachyPath());
         seatUtilisationLog.setOfficeId(seatMap.getOffice().getId());
 
         List<Seat> seatsOnFloor = seatMap.getSeats();
@@ -499,6 +503,7 @@ public class SeatManagementBackgroundService {
         SeatUtilisationLog seatUtilisationLog = new SeatUtilisationLog();
         seatUtilisationLog.setLevelEntityId(office.getId());
         seatUtilisationLog.setHierarchyType(HierarchyTypeEnum.OFFICE);
+        seatUtilisationLog.setHierarchyPath(office.getHierachyPath());
         seatUtilisationLog.setOfficeId(office.getId());
 
         Date now = new Date();

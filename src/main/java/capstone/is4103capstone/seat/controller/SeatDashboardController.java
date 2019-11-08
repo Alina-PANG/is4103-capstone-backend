@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,9 +28,6 @@ public class SeatDashboardController {
     @Autowired
     private EntityModelConversionService entityModelConversionService;
 
-    // TODO: entity ID is not needed, the system checks the seat admin status of the current user and returns back the relevant data accordingly
-    //      But a user may have more than one seat admin rights, in this case the request parameter for the entityId should be passed in, otherwise the
-    //      the system cannot decide what to return.
 
     // -------------------------------------------------- Past Seat Utilisation --------------------------------------------------
 
@@ -37,20 +35,16 @@ public class SeatDashboardController {
 
 
     @GetMapping("/utilisation/entity")
-    public ResponseEntity retrieveBusinessLevelEntitySeatUtilisationAnalysis(@RequestParam(name = "entityId", required = false) String entityId,
+    public ResponseEntity retrieveBusinessLevelEntitySeatUtilisationAnalysis(@RequestParam(name = "hierarchyType") String hierarchyType,
+                                                                             @RequestParam(name = "entityId") String entityId,
+                                                                             @RequestParam(name = "officeId") String officeId,
                                                                              @RequestParam(name = "startDate") Date startDate,
                                                                              @RequestParam(name = "endDate") Date endDate) {
 
-        SeatUtilisationGroupModel seatUtilisationGroupModel = new SeatUtilisationGroupModel();
-        List<SeatUtilisationLog> seatUtilisationLogs = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatUtilisationAnalysis(entityId, startDate, endDate);
-        List<SeatUtilisationModel> seatUtilisationModels = new ArrayList<>();
-        for (SeatUtilisationLog log :
-                seatUtilisationLogs) {
-            seatUtilisationModels.add(entityModelConversionService.convertSeatUtilisationLogIntoModel(log));
-        }
-        seatUtilisationGroupModel.setSeatUtilisationModels(seatUtilisationModels);
-
-        return ResponseEntity.ok(seatUtilisationGroupModel);
+        SeatUtilisationDataModel seatUtilisationDataModel = new SeatUtilisationDataModel();
+        seatUtilisationDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatUtilisationAnalysis(hierarchyType, entityId, officeId, startDate, endDate);
+        Collections.sort(seatUtilisationDataModel.getLogs());
+        return ResponseEntity.ok(seatUtilisationDataModel);
     }
 
 
@@ -75,13 +69,13 @@ public class SeatDashboardController {
 
     @GetMapping("/blocked/use/office")
     public ResponseEntity retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(@RequestParam(name = "hierarchyType") String hierarchyType,
-                                                                           @RequestParam(name = "entityId") String entityId,
-                                                                           @RequestParam(name = "officeId") String officeId,
-                                                                             @RequestParam(name = "startDate") Date startDate,
-                                                                             @RequestParam(name = "endDate") Date endDate) {
+                                                                                      @RequestParam(name = "entityId") String entityId,
+                                                                                      @RequestParam(name = "officeId") String officeId,
+                                                                                      @RequestParam(name = "startDate") Date startDate,
+                                                                                      @RequestParam(name = "endDate") Date endDate) {
 
-        SeatBlockedForUseDateModel seatBlockedForUseDateModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(hierarchyType, entityId, officeId, startDate, endDate);
-        return ResponseEntity.ok(seatBlockedForUseDateModel);
+        SeatBlockedForUseDataModel seatBlockedForUseDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(hierarchyType, entityId, officeId, startDate, endDate);
+        return ResponseEntity.ok(seatBlockedForUseDataModel);
     }
 
 

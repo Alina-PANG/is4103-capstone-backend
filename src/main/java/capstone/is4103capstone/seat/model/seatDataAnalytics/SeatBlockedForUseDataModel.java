@@ -7,15 +7,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SeatBlockedForUseDateModel implements Serializable {
+public class SeatBlockedForUseDataModel implements Serializable {
     private GroupModel entity;
-    private List<SeatBlockedForUseDateModel> children = new ArrayList<>();
+    private List<SeatBlockedForUseDataModel> children = new ArrayList<>();
     private JSONObject seatBlockedCountWithDate;
 
-    public SeatBlockedForUseDateModel() {
+    public SeatBlockedForUseDataModel() {
     }
 
-    public SeatBlockedForUseDateModel(GroupModel entity, List<SeatBlockedForUseDateModel> children, JSONObject seatBlockedCountWithDate) {
+    public SeatBlockedForUseDataModel(GroupModel entity, List<SeatBlockedForUseDataModel> children, JSONObject seatBlockedCountWithDate) {
         this.entity = entity;
         this.children = children;
         this.seatBlockedCountWithDate = seatBlockedCountWithDate;
@@ -29,11 +29,11 @@ public class SeatBlockedForUseDateModel implements Serializable {
         this.entity = entity;
     }
 
-    public List<SeatBlockedForUseDateModel> getChildren() {
+    public List<SeatBlockedForUseDataModel> getChildren() {
         return children;
     }
 
-    public void setChildren(List<SeatBlockedForUseDateModel> children) {
+    public void setChildren(List<SeatBlockedForUseDataModel> children) {
         this.children = children;
     }
 
