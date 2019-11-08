@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -52,9 +53,7 @@ public class AdminInitialization {
 
     @PostConstruct
     public void init() {
-        // Seat management subsystem initialisation for sr2
-        seatManagementInitialisation();
-        seatInitializationService.initialiseSeatManagement();
+
 //        List<Currency> currencyList = currencyRepository.findAll();
 //        if (currencyList == null || currencyList.size() == 0) {
 //            createCurrency();
@@ -74,7 +73,9 @@ public class AdminInitialization {
 //            createEmployeeTemplate(firstNameList[i],lastNameList[i],usernameList[i],"password","huangyingshi@gmail.com",codeCpntList[i]);
 //        }
 //         createEmployeeTemplate("PO","Last name","poteam","password","huangyingshi@gmail.com","PO_TEAM-1");
-
+        // Seat management subsystem initialisation for sr2
+        seatManagementInitialisation();
+//        seatInitializationService.initialiseSeatManagement();
 
     }
     private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
@@ -87,6 +88,7 @@ public class AdminInitialization {
         employeeRepository.save(newEmployee);
 
     }
+
     public void createCurrency() {
         Currency c = new Currency("Singapore Dollars", "SGD");
         currencyRepository.save(c);
