@@ -10,18 +10,15 @@ import java.util.List;
 public class SeatUtilisationDataModel implements Serializable {
     private GroupModel entity;
     private List<SeatUtilisationDataModel> children = new ArrayList<>();
-    private JSONObject seatInventoryCountWithDate;
-    private JSONObject seatOccupancyCountWithDate;
+    private List<SeatUtilisationLogModel> logs = new ArrayList<>();
 
     public SeatUtilisationDataModel() {
     }
 
-    public SeatUtilisationDataModel(GroupModel entity, List<SeatUtilisationDataModel> children, JSONObject seatInventoryCountWithDate,
-                                    JSONObject seatOccupancyCountWithDate) {
+    public SeatUtilisationDataModel(GroupModel entity, List<SeatUtilisationDataModel> children, List<SeatUtilisationLogModel> logs) {
         this.entity = entity;
         this.children = children;
-        this.seatInventoryCountWithDate = seatInventoryCountWithDate;
-        this.seatOccupancyCountWithDate = seatOccupancyCountWithDate;
+        this.logs = logs;
     }
 
     public GroupModel getEntity() {
@@ -40,19 +37,11 @@ public class SeatUtilisationDataModel implements Serializable {
         this.children = children;
     }
 
-    public JSONObject getSeatInventoryCountWithDate() {
-        return seatInventoryCountWithDate;
+    public List<SeatUtilisationLogModel> getLogs() {
+        return logs;
     }
 
-    public void setSeatInventoryCountWithDate(JSONObject seatInventoryCountWithDate) {
-        this.seatInventoryCountWithDate = seatInventoryCountWithDate;
-    }
-
-    public JSONObject getSeatOccupancyCountWithDate() {
-        return seatOccupancyCountWithDate;
-    }
-
-    public void setSeatOccupancyCountWithDate(JSONObject seatOccupancyCountWithDate) {
-        this.seatOccupancyCountWithDate = seatOccupancyCountWithDate;
+    public void setLogs(List<SeatUtilisationLogModel> logs) {
+        this.logs = logs;
     }
 }

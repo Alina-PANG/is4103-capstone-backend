@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class SeatDashboardController {
 
         SeatUtilisationDataModel seatUtilisationDataModel = new SeatUtilisationDataModel();
         seatUtilisationDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatUtilisationAnalysis(hierarchyType, entityId, officeId, startDate, endDate);
+        Collections.sort(seatUtilisationDataModel.getLogs());
         return ResponseEntity.ok(seatUtilisationDataModel);
     }
 

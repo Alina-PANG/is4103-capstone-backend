@@ -77,12 +77,13 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
         this.setCreatedDateTime(new Date());
     }
 
-    public Seat(String objectName, String code, String hierachyPath, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap) {
+    public Seat(String objectName, String code, String hierachyPath, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap, Integer serialNumber) {
         super(objectName, code, hierachyPath);
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.seatMap = seatMap;
         this.originalSeatMapId = seatMap.getId();
+        this.serialNumber = serialNumber;
         this.setCreatedDateTime(new Date());
     }
 

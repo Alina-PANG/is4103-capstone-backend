@@ -13,7 +13,7 @@ import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.DateHelper;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatMap;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.entities.seat.SeatUtilisationLog;
 import capstone.is4103capstone.seat.model.GroupModel;
 import capstone.is4103capstone.seat.model.seatDataAnalytics.*;
@@ -23,7 +23,6 @@ import capstone.is4103capstone.seat.repository.SeatUtilisationLogRepository;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import capstone.is4103capstone.util.exception.InvalidInputException;
 import capstone.is4103capstone.util.exception.OfficeNotFoundException;
-import capstone.is4103capstone.util.exception.SeatRequestAdminMatchNotFoundException;
 import capstone.is4103capstone.util.exception.UnauthorizedActionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ import java.util.*;
 public class SeatDataAnalyticsService {
 
     @Autowired
-    private SeatRequestAdminMatchService seatRequestAdminMatchService;
+    private SeatAdminMatchService seatAdminMatchService;
     @Autowired
     private TeamService teamService;
     @Autowired
@@ -107,17 +106,17 @@ public class SeatDataAnalyticsService {
         DBEntityTemplate entity = validateBusinessEntityWithHierarchyType(hierarchyType, levelEntityId);
         if (entity.getClass().getSimpleName().equals("CompanyFunction")) {
             CompanyFunction companyFunction = (CompanyFunction)entity;
-            if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
+            if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
                 seatUtilisationDataModel = retrieveCompanyFunctionSeatUtilisationAnalysis(seatUtilisationDataModel, companyFunction, officeId, startDate, endDate);
             } else {
                 throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
             }
         } else if (entity.getClass().getSimpleName().equals("BusinessUnit")) {
             BusinessUnit businessUnit = (BusinessUnit)entity;
-            if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
+            if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
                 seatUtilisationDataModel = retrieveBusinessUnitSeatUtilisationAnalysis(seatUtilisationDataModel, businessUnit, officeId, startDate, endDate, false);
             } else {
-                if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(businessUnit.getFunction().getId(),
+                if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(businessUnit.getFunction().getId(),
                         "COMPANY_FUNCTION", currentEmployee.getId())) {
                     seatUtilisationDataModel = retrieveBusinessUnitSeatUtilisationAnalysis(seatUtilisationDataModel, businessUnit, officeId, startDate, endDate, false);
                 } else {
@@ -126,14 +125,14 @@ public class SeatDataAnalyticsService {
             }
         } else if (entity.getClass().getSimpleName().equals("Team")) {
             Team team = (Team)entity;
-            if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
+            if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
                 seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate, false);
             } else {
-                if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(team.getBusinessUnit().getId(),
+                if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(team.getBusinessUnit().getId(),
                         "BUSINESS_UNIT", currentEmployee.getId())) {
                     seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate, false);
                 } else {
-                    if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(team.getBusinessUnit().getFunction().getId(),
+                    if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(team.getBusinessUnit().getFunction().getId(),
                             "COMPANY", currentEmployee.getId())) {
                         seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate, false);
                     } else {
@@ -143,17 +142,17 @@ public class SeatDataAnalyticsService {
             }
         } else if (entity.getClass().getSimpleName().equals("Office")) {
             Office office = (Office)entity;
-            if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
+            if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
                 seatUtilisationDataModel = retrieveOfficeSeatUtilisationAnalysis(seatUtilisationDataModel, office, officeId, startDate, endDate);
             } else {
                 throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
             }
         } else if (entity.getClass().getSimpleName().equals("SeatMap")) {
             SeatMap seatMap = (SeatMap)entity;
-            if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
+            if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
                 seatUtilisationDataModel = retrieveOfficeFloorUtilisationAnalysis(seatUtilisationDataModel, seatMap, startDate, endDate, false);
             } else {
-                if (seatRequestAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(seatMap.getOffice().getId(),
+                if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(seatMap.getOffice().getId(),
                         "OFFICE", currentEmployee.getId())) {
                     seatUtilisationDataModel = retrieveOfficeFloorUtilisationAnalysis(seatUtilisationDataModel, seatMap, startDate, endDate, false);
                 } else {
@@ -177,26 +176,28 @@ public class SeatDataAnalyticsService {
         teamModel.setName(team.getObjectName());
         teamModel.setCode(team.getCode());
 
-        JSONObject jsonInventoryObject = new JSONObject();
-        JSONObject jsonOccupancyObject = new JSONObject();
+        List<SeatUtilisationLogModel> logs = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            String dateString = DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString();
-            jsonInventoryObject.put(dateString, log.getInventoryCount());
-            jsonOccupancyObject.put(dateString, log.getOccupancyCount());
+            SeatUtilisationLogModel newLog = new SeatUtilisationLogModel();
+            newLog.setDate(log.getCreatedTime());
+            newLog.setYear(log.getYear());
+            newLog.setMonth(log.getMonth());
+            newLog.setDayOfMonth(log.getDayOfMonth());
+            newLog.setInventoryCount(log.getInventoryCount());
+            newLog.setOccupancyCount(log.getOccupancyCount());
+            logs.add(newLog);
         }
 
         if (constructNew) {
             SeatUtilisationDataModel newModel = new SeatUtilisationDataModel();
             newModel.setEntity(teamModel);
-            newModel.setSeatInventoryCountWithDate(jsonInventoryObject);
-            newModel.setSeatOccupancyCountWithDate(jsonOccupancyObject);
+            newModel.setLogs(logs);
             seatUtilisationDataModel.getChildren().add(newModel);
             return seatUtilisationDataModel;
         } else {
             seatUtilisationDataModel.setEntity(teamModel);
-            seatUtilisationDataModel.setSeatInventoryCountWithDate(jsonInventoryObject);
-            seatUtilisationDataModel.setSeatOccupancyCountWithDate(jsonOccupancyObject);
+            seatUtilisationDataModel.setLogs(logs);
             return seatUtilisationDataModel;
         }
     }
@@ -213,20 +214,23 @@ public class SeatDataAnalyticsService {
         unitModel.setName(businessUnit.getObjectName());
         unitModel.setCode(businessUnit.getCode());
 
-        JSONObject jsonInventoryObject = new JSONObject();
-        JSONObject jsonOccupancyObject = new JSONObject();
+        List<SeatUtilisationLogModel> logs = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            String dateString = DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString();
-            jsonInventoryObject.put(dateString, log.getInventoryCount());
-            jsonOccupancyObject.put(dateString, log.getOccupancyCount());
+            SeatUtilisationLogModel newLog = new SeatUtilisationLogModel();
+            newLog.setDate(log.getCreatedTime());
+            newLog.setYear(log.getYear());
+            newLog.setMonth(log.getMonth());
+            newLog.setDayOfMonth(log.getDayOfMonth());
+            newLog.setInventoryCount(log.getInventoryCount());
+            newLog.setOccupancyCount(log.getOccupancyCount());
+            logs.add(newLog);
         }
 
         if (constructNew) {
             SeatUtilisationDataModel newModel = new SeatUtilisationDataModel();
             newModel.setEntity(unitModel);
-            newModel.setSeatInventoryCountWithDate(jsonInventoryObject);
-            newModel.setSeatOccupancyCountWithDate(jsonOccupancyObject);
+            newModel.setLogs(logs);
             seatUtilisationDataModel.getChildren().add(newModel);
             // Construct children: teams under the business unit
             List<Team> teams = teamRepository.findOnesUnderBusinessUnitAndOffice(businessUnit.getId(), officeId);
@@ -237,8 +241,7 @@ public class SeatDataAnalyticsService {
             return seatUtilisationDataModel;
         } else {
             seatUtilisationDataModel.setEntity(unitModel);
-            seatUtilisationDataModel.setSeatInventoryCountWithDate(jsonInventoryObject);
-            seatUtilisationDataModel.setSeatOccupancyCountWithDate(jsonOccupancyObject);
+            seatUtilisationDataModel.setLogs(logs);
             // Construct children: teams under the business unit
             List<Team> teams = teamRepository.findOnesUnderBusinessUnitAndOffice(businessUnit.getId(), officeId);
             for (Team team :
@@ -262,16 +265,19 @@ public class SeatDataAnalyticsService {
         functionModel.setCode(companyFunction.getCode());
         seatUtilisationDataModel.setEntity(functionModel);
 
-        JSONObject jsonInventoryObject = new JSONObject();
-        JSONObject jsonOccupancyObject = new JSONObject();
+        List<SeatUtilisationLogModel> logs = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            String dateString = DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString();
-            jsonInventoryObject.put(dateString, log.getInventoryCount());
-            jsonOccupancyObject.put(dateString, log.getOccupancyCount());
+            SeatUtilisationLogModel newLog = new SeatUtilisationLogModel();
+            newLog.setDate(log.getCreatedTime());
+            newLog.setYear(log.getYear());
+            newLog.setMonth(log.getMonth());
+            newLog.setDayOfMonth(log.getDayOfMonth());
+            newLog.setInventoryCount(log.getInventoryCount());
+            newLog.setOccupancyCount(log.getOccupancyCount());
+            logs.add(newLog);
         }
-        seatUtilisationDataModel.setSeatInventoryCountWithDate(jsonInventoryObject);
-        seatUtilisationDataModel.setSeatOccupancyCountWithDate(jsonOccupancyObject);
+        seatUtilisationDataModel.setLogs(logs);
 
         // Construct children: business units under the function
         List<BusinessUnit> businessUnits = businessUnitRepository.findOnesUnderCompanyFunction(companyFunction.getId());
@@ -295,26 +301,28 @@ public class SeatDataAnalyticsService {
         seatMapModel.setName(seatMap.getObjectName());
         seatMapModel.setCode(seatMap.getCode());
 
-        JSONObject jsonInventoryObject = new JSONObject();
-        JSONObject jsonOccupancyObject = new JSONObject();
+        List<SeatUtilisationLogModel> logs = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            String dateString = DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString();
-            jsonInventoryObject.put(dateString, log.getInventoryCount());
-            jsonOccupancyObject.put(dateString, log.getOccupancyCount());
+            SeatUtilisationLogModel newLog = new SeatUtilisationLogModel();
+            newLog.setDate(log.getCreatedTime());
+            newLog.setYear(log.getYear());
+            newLog.setMonth(log.getMonth());
+            newLog.setDayOfMonth(log.getDayOfMonth());
+            newLog.setInventoryCount(log.getInventoryCount());
+            newLog.setOccupancyCount(log.getOccupancyCount());
+            logs.add(newLog);
         }
 
         if (constructNew) {
             SeatUtilisationDataModel newModel = new SeatUtilisationDataModel();
             newModel.setEntity(seatMapModel);
-            newModel.setSeatInventoryCountWithDate(jsonInventoryObject);
-            newModel.setSeatOccupancyCountWithDate(jsonOccupancyObject);
+            newModel.setLogs(logs);
             seatUtilisationDataModel.getChildren().add(newModel);
             return seatUtilisationDataModel;
         } else {
             seatUtilisationDataModel.setEntity(seatMapModel);
-            seatUtilisationDataModel.setSeatInventoryCountWithDate(jsonInventoryObject);
-            seatUtilisationDataModel.setSeatOccupancyCountWithDate(jsonOccupancyObject);
+            seatUtilisationDataModel.setLogs(logs);
             return seatUtilisationDataModel;
         }
     }
@@ -331,17 +339,20 @@ public class SeatDataAnalyticsService {
         officeModel.setCode(office.getCode());
         seatUtilisationDataModel.setEntity(officeModel);
 
-        JSONObject jsonInventoryObject = new JSONObject();
-        JSONObject jsonOccupancyObject = new JSONObject();
+        List<SeatUtilisationLogModel> logs = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            String dateString = DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString();
-            jsonInventoryObject.put(dateString, log.getInventoryCount());
-            jsonOccupancyObject.put(dateString, log.getOccupancyCount());
+            SeatUtilisationLogModel newLog = new SeatUtilisationLogModel();
+            newLog.setDate(log.getCreatedTime());
+            newLog.setYear(log.getYear());
+            newLog.setMonth(log.getMonth());
+            newLog.setDayOfMonth(log.getDayOfMonth());
+            newLog.setInventoryCount(log.getInventoryCount());
+            newLog.setOccupancyCount(log.getOccupancyCount());
+            logs.add(newLog);
         }
 
-        seatUtilisationDataModel.setSeatInventoryCountWithDate(jsonInventoryObject);
-        seatUtilisationDataModel.setSeatOccupancyCountWithDate(jsonOccupancyObject);
+        seatUtilisationDataModel.setLogs(logs);
 
         // Construct children: all office floors
         List<SeatMap> seatMaps = seatMapRepository.findOnesAtOffice(officeId);
@@ -361,17 +372,16 @@ public class SeatDataAnalyticsService {
 
     // -------------------------------------- Blocked For Use (Per Office) --------------------------------------
 
-    // Office managers can see a pie chart: among all the seats the office has, how many seats each company function occupies -> company function breakdown
-    // Department heads can see a pie chart: among all the seats assigned to the company function, how many seats each business unit occupies -> unit breakdown
-    // Business unit heads can see a pie chart: among all the seats assigned to the business unit, how many seats each team occupies -> team breakdown
+    // Office managers: among all the seats the office has, how many seats each company function occupies -> office floor breakdown
+    // Department heads: among all the seats assigned to the company function, how many seats each business unit occupies -> unit breakdown
+    // Business unit heads: among all the seats assigned to the business unit, how many seats each team occupies -> team breakdown
     public SeatBlockedForUseDataModel retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(String hierarchyType, String levelEntityId,
                                                                                                   String officeId, Date startDate, Date endDate) {
 
         // Check access right
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(levelEntityId);
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        if (!seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
             throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
         }
 
@@ -386,8 +396,9 @@ public class SeatDataAnalyticsService {
         return seatBlockedForUseDataModel;
     }
 
-    // Recursive retrieval to generate the hierarchy tree -> begin with the team and then add up for aggregation
+    // Recursive retrieval to generate the hierarchy tree -> e.g., begin with the team and then add up for aggregation
     // The model returned is the parent model with newly child added in
+    // For office and office floors, occupancy is aggregated, while for other entities it's the inventory amount.
     private SeatBlockedForUseDataModel aggregateOfficeBusinessLevelEntitySeatBlockedForUseData(SeatBlockedForUseDataModel seatBlockedForUseDataModel,
                                                                                                String hierarchyType, String levelEntityId,
                                                                                                String officeId, Date startDate, Date endDate,
@@ -531,7 +542,7 @@ public class SeatDataAnalyticsService {
         JSONObject jsonObject = new JSONObject();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getInventoryCount());
+            jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getOccupancyCount());
         }
 
         if (constructNew) {
@@ -564,7 +575,7 @@ public class SeatDataAnalyticsService {
             JSONObject jsonObject = new JSONObject();
             for (SeatUtilisationLog log :
                     seatUtilisationLogs) {
-                jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getInventoryCount());
+                jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getOccupancyCount());
             }
             seatBlockedForUseDataModel.setSeatBlockedCountWithDate(jsonObject);
 
@@ -594,8 +605,8 @@ public class SeatDataAnalyticsService {
         // Check access right
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(levelEntityId);
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(levelEntityId);
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
         }
 
@@ -780,8 +791,8 @@ public class SeatDataAnalyticsService {
         if (needAccessRightChecking) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currentEmployee = (Employee) auth.getPrincipal();
-            SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seatMapId);
-            if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+            SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatMapId);
+            if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                 throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
             }
         }
@@ -815,8 +826,8 @@ public class SeatDataAnalyticsService {
         // Check access right
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(officeId);
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(officeId);
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
         }
 

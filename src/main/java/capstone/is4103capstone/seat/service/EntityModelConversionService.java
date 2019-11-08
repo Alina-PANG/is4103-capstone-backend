@@ -17,7 +17,7 @@ import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestModel;
 import capstone.is4103capstone.seat.model.seatFutureDemand.MonthlySeatFutureDemandModelForTeam;
-import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
+import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.ScheduleRecurringBasisEnum;
 import capstone.is4103capstone.util.exception.EntityModelConversionException;
@@ -35,7 +35,7 @@ import java.util.List;
 public class EntityModelConversionService {
 
     @Autowired
-    private SeatRequestAdminMatchRepository seatRequestAdminMatchRepository;
+    private SeatAdminMatchRepository seatAdminMatchRepository;
     @Autowired
     private BusinessUnitRepository businessUnitRepository;
 

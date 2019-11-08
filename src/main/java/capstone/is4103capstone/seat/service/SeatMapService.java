@@ -12,9 +12,11 @@ import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocationWithHighlight;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForSetup;
+import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
 import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
+import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import capstone.is4103capstone.util.enums.SeatAllocationTypeEnum;
 import capstone.is4103capstone.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ public class SeatMapService {
     @Autowired
     private SeatAllocationRepository seatAllocationRepository;
     @Autowired
+    private SeatAdminMatchRepository seatAdminMatchRepository;
+    @Autowired
     private OfficeRepository officeRepository;
     @Autowired
     private EmployeeRepository employeeRepository;
@@ -43,7 +47,7 @@ public class SeatMapService {
     @Autowired
     private SeatService seatService;
     @Autowired
-    private SeatRequestAdminMatchService seatRequestAdminMatchService;
+    private SeatAdminMatchService seatAdminMatchService;
     @Autowired
     private EmployeeService employeeService;
     @Autowired
@@ -92,8 +96,8 @@ public class SeatMapService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(office.getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(office.getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Creating office failed: you do not have the right to do this action!");
         }
 
@@ -152,6 +156,13 @@ public class SeatMapService {
             seatRepository.save(seat);
         }
 
+        // Create a new seat admin entry for the current user
+        SeatAdminMatch newSeatAdminMatch = new SeatAdminMatch();
+        newSeatAdminMatch.setHierarchyId(newSeatMap.getId());
+        newSeatAdminMatch.setHierarchyType(HierarchyTypeEnum.OFFICE_FLOOR);
+        newSeatAdminMatch.setSeatAdmin(currentEmployee);
+        seatAdminMatchRepository.save(newSeatAdminMatch);
+
         return newSeatMap.getId();
     }
 
@@ -205,8 +216,8 @@ public class SeatMapService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(hierarchyId);
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(hierarchyId);
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Retrieving available seat maps failed: employee " + currentEmployee.getFullName() +
                     " does not have the right to do this action!");
         }
@@ -461,8 +472,8 @@ public class SeatMapService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seatMap.getOffice().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatMap.getOffice().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Seat map update failed: you do not have the right to do this action!");
         }
 
@@ -578,8 +589,8 @@ public class SeatMapService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seatMap.getOffice().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatMap.getOffice().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Creating office failed: you do not have the right to do this action!");
         }
 

@@ -5,17 +5,18 @@ import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.Address;
 import capstone.is4103capstone.entities.helper.DateHelper;
 import capstone.is4103capstone.entities.seat.EmployeeOfficeWorkingSchedule;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.seat.repository.EmployeeOfficeWorkingScheduleRepository;
 import capstone.is4103capstone.seat.repository.ScheduleRepository;
-import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
+import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
+import capstone.is4103capstone.seat.service.SeatInitializationService;
+import capstone.is4103capstone.seat.service.SeatManagementGeneralService;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,16 +41,20 @@ public class AdminInitialization {
     @Autowired
     CostCenterRepository costCenterRepository;
     @Autowired
-    SeatRequestAdminMatchRepository seatRequestAdminMatchRepository;
+    SeatAdminMatchRepository seatAdminMatchRepository;
     @Autowired
     EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
     @Autowired
     ScheduleRepository scheduleRepository;
 
+    @Autowired
+    SeatInitializationService seatInitializationService;
+
     @PostConstruct
     public void init() {
         // Seat management subsystem initialisation for sr2
         seatManagementInitialisation();
+        seatInitializationService.initialiseSeatManagement();
 //        List<Currency> currencyList = currencyRepository.findAll();
 //        if (currencyList == null || currencyList.size() == 0) {
 //            createCurrency();
@@ -195,86 +200,86 @@ public class AdminInitialization {
 
         // Seat admin setup for different hierarchies
         // SG-Tech-FixIncTech-Dev
-        SeatRequestAdminMatch seatRequestAdminMatch1 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch1.setHierarchyId(team1.getId());
-        seatRequestAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch1.setSeatAdmin(yingshi);
+        SeatAdminMatch seatAdminMatch1 = new SeatAdminMatch();
+        seatAdminMatch1.setHierarchyId(team1.getId());
+        seatAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch1.setSeatAdmin(yingshi);
 
         // SG-Tech-FixIncTech
-        SeatRequestAdminMatch seatRequestAdminMatch2 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch2.setHierarchyId(team1.getBusinessUnit().getId());
-        seatRequestAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatRequestAdminMatch2.setSeatAdmin(joshua);
+        SeatAdminMatch seatAdminMatch2 = new SeatAdminMatch();
+        seatAdminMatch2.setHierarchyId(team1.getBusinessUnit().getId());
+        seatAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch2.setSeatAdmin(joshua);
 
         // SG-Tech-FixIncTech
-        SeatRequestAdminMatch seatRequestAdminMatch3 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch3.setHierarchyId(team1.getBusinessUnit().getFunction().getId());
-        seatRequestAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
-        seatRequestAdminMatch3.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch3 = new SeatAdminMatch();
+        seatAdminMatch3.setHierarchyId(team1.getBusinessUnit().getFunction().getId());
+        seatAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+        seatAdminMatch3.setSeatAdmin(admin);
 
         // SG-Tech-FixIncTech-ProdSupp
-        SeatRequestAdminMatch seatRequestAdminMatch4 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch4.setHierarchyId(team2.getId());
-        seatRequestAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch4.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch4 = new SeatAdminMatch();
+        seatAdminMatch4.setHierarchyId(team2.getId());
+        seatAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch4.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech-DBAdmin
-        SeatRequestAdminMatch seatRequestAdminMatch5 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch5.setHierarchyId(team3.getId());
-        seatRequestAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch5.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch5 = new SeatAdminMatch();
+        seatAdminMatch5.setHierarchyId(team3.getId());
+        seatAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch5.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech-Networks
-        SeatRequestAdminMatch seatRequestAdminMatch6 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch6.setHierarchyId(team4.getId());
-        seatRequestAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch6.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch6 = new SeatAdminMatch();
+        seatAdminMatch6.setHierarchyId(team4.getId());
+        seatAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch6.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech
-        SeatRequestAdminMatch seatRequestAdminMatch7 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch7.setHierarchyId(team4.getBusinessUnit().getId());
-        seatRequestAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatRequestAdminMatch7.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch7 = new SeatAdminMatch();
+        seatAdminMatch7.setHierarchyId(team4.getBusinessUnit().getId());
+        seatAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch7.setSeatAdmin(admin);
 
         // ORQ Office
-        SeatRequestAdminMatch seatRequestAdminMatch8 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch8.setHierarchyId(team1.getOffice().getId());
-        seatRequestAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
-        seatRequestAdminMatch8.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch8 = new SeatAdminMatch();
+        seatAdminMatch8.setHierarchyId(team1.getOffice().getId());
+        seatAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
+        seatAdminMatch8.setSeatAdmin(admin);
 
         // SG-HR-RCR-INT
-        SeatRequestAdminMatch seatRequestAdminMatch9 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch9.setHierarchyId(team5.getId());
-        seatRequestAdminMatch9.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch9.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch9 = new SeatAdminMatch();
+        seatAdminMatch9.setHierarchyId(team5.getId());
+        seatAdminMatch9.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch9.setSeatAdmin(admin);
 
         // SG-HR-RCR
-        SeatRequestAdminMatch seatRequestAdminMatch10 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch10.setHierarchyId(team5.getBusinessUnit().getId());
-        seatRequestAdminMatch10.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatRequestAdminMatch10.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch10 = new SeatAdminMatch();
+        seatAdminMatch10.setHierarchyId(team5.getBusinessUnit().getId());
+        seatAdminMatch10.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch10.setSeatAdmin(admin);
 
         // SG-HR
-        SeatRequestAdminMatch seatRequestAdminMatch11 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch11.setHierarchyId(team5.getBusinessUnit().getFunction().getId());
-        seatRequestAdminMatch11.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
-        seatRequestAdminMatch11.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch11 = new SeatAdminMatch();
+        seatAdminMatch11.setHierarchyId(team5.getBusinessUnit().getFunction().getId());
+        seatAdminMatch11.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+        seatAdminMatch11.setSeatAdmin(admin);
 
         teamRepository.saveAndFlush(team1);
         employeeRepository.saveAndFlush(yingshi);
         employeeRepository.saveAndFlush(yuqian);
         employeeRepository.saveAndFlush(joshua);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch1);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch2);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch3);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch4);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch5);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch6);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch7);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch8);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch9);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch10);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch11);
+        seatAdminMatchRepository.save(seatAdminMatch1);
+        seatAdminMatchRepository.save(seatAdminMatch2);
+        seatAdminMatchRepository.save(seatAdminMatch3);
+        seatAdminMatchRepository.save(seatAdminMatch4);
+        seatAdminMatchRepository.save(seatAdminMatch5);
+        seatAdminMatchRepository.save(seatAdminMatch6);
+        seatAdminMatchRepository.save(seatAdminMatch7);
+        seatAdminMatchRepository.save(seatAdminMatch8);
+        seatAdminMatchRepository.save(seatAdminMatch9);
+        seatAdminMatchRepository.save(seatAdminMatch10);
+        seatAdminMatchRepository.save(seatAdminMatch11);
     }
 
     public void createGeo() {
@@ -485,11 +490,13 @@ public class AdminInitialization {
 
     private void seatManagementInitialisation() {
 
+        Employee yuqian = employeeRepository.findEmployeeByUserName("caiyuqian");
+        if (yuqian != null) return;
+
         Employee admin = employeeRepository.findEmployeeByUserName("admin");
-        if (admin == null) return;
 
         // Create other employees
-        Employee yuqian = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
+        yuqian = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
         yuqian.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
         yuqian.setCode("EMPLOYEE-caiyuqian");
         yuqian.setCreatedBy("admin");
@@ -579,63 +586,63 @@ public class AdminInitialization {
 
         // Seat admin setup for different hierarchies
         // SG-Tech-FixIncTech-Dev
-        SeatRequestAdminMatch seatRequestAdminMatch1 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch1.setHierarchyId(devTeam.getId());
-        seatRequestAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch1.setSeatAdmin(hangzhi);
+        SeatAdminMatch seatAdminMatch1 = new SeatAdminMatch();
+        seatAdminMatch1.setHierarchyId(devTeam.getId());
+        seatAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch1.setSeatAdmin(hangzhi);
 
         // SG-Tech-FixIncTech
-        SeatRequestAdminMatch seatRequestAdminMatch2 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch2.setHierarchyId(devTeam.getBusinessUnit().getId());
-        seatRequestAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatRequestAdminMatch2.setSeatAdmin(joshua);
+        SeatAdminMatch seatAdminMatch2 = new SeatAdminMatch();
+        seatAdminMatch2.setHierarchyId(devTeam.getBusinessUnit().getId());
+        seatAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch2.setSeatAdmin(joshua);
 
         // SG-Tech-FixIncTech
-        SeatRequestAdminMatch seatRequestAdminMatch3 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch3.setHierarchyId(devTeam.getBusinessUnit().getFunction().getId());
-        seatRequestAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
-        seatRequestAdminMatch3.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch3 = new SeatAdminMatch();
+        seatAdminMatch3.setHierarchyId(devTeam.getBusinessUnit().getFunction().getId());
+        seatAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+        seatAdminMatch3.setSeatAdmin(admin);
 
         // SG-Tech-FixIncTech-ProdSupp
-        SeatRequestAdminMatch seatRequestAdminMatch4 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch4.setHierarchyId(prodSuppTeam.getId());
-        seatRequestAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch4.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch4 = new SeatAdminMatch();
+        seatAdminMatch4.setHierarchyId(prodSuppTeam.getId());
+        seatAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch4.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech-DBAdmin
-        SeatRequestAdminMatch seatRequestAdminMatch5 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch5.setHierarchyId(dbAdminTeam.getId());
-        seatRequestAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch5.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch5 = new SeatAdminMatch();
+        seatAdminMatch5.setHierarchyId(dbAdminTeam.getId());
+        seatAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch5.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech-Networks
-        SeatRequestAdminMatch seatRequestAdminMatch6 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch6.setHierarchyId(networksTeam.getId());
-        seatRequestAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch6.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch6 = new SeatAdminMatch();
+        seatAdminMatch6.setHierarchyId(networksTeam.getId());
+        seatAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch6.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech
-        SeatRequestAdminMatch seatRequestAdminMatch7 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch7.setHierarchyId(networksTeam.getBusinessUnit().getId());
-        seatRequestAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatRequestAdminMatch7.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch7 = new SeatAdminMatch();
+        seatAdminMatch7.setHierarchyId(networksTeam.getBusinessUnit().getId());
+        seatAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch7.setSeatAdmin(admin);
 
-        SeatRequestAdminMatch seatRequestAdminMatch8 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch8.setHierarchyId(devTeam.getOffice().getId());
-        seatRequestAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
-        seatRequestAdminMatch8.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch8 = new SeatAdminMatch();
+        seatAdminMatch8.setHierarchyId(devTeam.getOffice().getId());
+        seatAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
+        seatAdminMatch8.setSeatAdmin(admin);
 
         teamRepository.saveAndFlush(devTeam);
         employeeRepository.saveAndFlush(hangzhi);
         employeeRepository.saveAndFlush(yuqian);
         employeeRepository.saveAndFlush(joshua);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch1);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch2);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch3);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch4);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch5);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch6);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch7);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch8);
+        seatAdminMatchRepository.save(seatAdminMatch1);
+        seatAdminMatchRepository.save(seatAdminMatch2);
+        seatAdminMatchRepository.save(seatAdminMatch3);
+        seatAdminMatchRepository.save(seatAdminMatch4);
+        seatAdminMatchRepository.save(seatAdminMatch5);
+        seatAdminMatchRepository.save(seatAdminMatch6);
+        seatAdminMatchRepository.save(seatAdminMatch7);
+        seatAdminMatchRepository.save(seatAdminMatch8);
     }
 }

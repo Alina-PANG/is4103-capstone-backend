@@ -8,7 +8,7 @@ import capstone.is4103capstone.entities.helper.DateHelper;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatAllocationInactivationLog;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.seat.model.schedule.ScheduleModel;
 import capstone.is4103capstone.seat.model.seatAllocation.*;
 import capstone.is4103capstone.seat.repository.*;
@@ -57,7 +57,7 @@ public class SeatAllocationService {
     @Autowired
     private ScheduleService scheduleService;
     @Autowired
-    private SeatRequestAdminMatchService seatRequestAdminMatchService;
+    private SeatAdminMatchService seatAdminMatchService;
 
     // -----------------------------------------------Assumptions-----------------------------------------------
     // 1. the booking period is 1 year, meaning that the start date of the seat allocation cannot be later than 1 year from the current date.
@@ -76,8 +76,8 @@ public class SeatAllocationService {
         List<Seat> seats = validateSeatsInformationForAllocation(seatAllocationModelForFunction.getSeatIds(), "FUNCTION");
         CompanyFunction function = validateFunctionInformation(seatAllocationModelForFunction.getFunctionId(), seats);
 
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getSeatMap().getOffice().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getSeatMap().getOffice().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Allocating seats to function failed: employee " + currentEmployee.getFullName() +
                     " does not have the right to do this action!");
         }
@@ -110,8 +110,8 @@ public class SeatAllocationService {
 
         List<Seat> seats = validateSeatsInformationForDeallocation(bulkSeatIdsModel.getSeatIds(), "FUNCTION");
 
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getSeatMap().getOffice().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getSeatMap().getOffice().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Deallocating seats from function failed: employee " + currentEmployee.getFullName() +
                     " does not have the right to do this action!");
         }
@@ -135,8 +135,8 @@ public class SeatAllocationService {
         List<Seat> seats = validateSeatsInformationForAllocation(seatAllocationModelForBusinessUnit.getSeatIds(), "BUSINESS_UNIT");
         BusinessUnit businessUnit = validateBusinessUnitInformation(seatAllocationModelForBusinessUnit.getBusinessUnitId(), seats);
 
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(businessUnit.getFunction().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(businessUnit.getFunction().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Allocating seats to business unit failed: employee " + currentEmployee.getFullName() +
                     " does not have the right to do this action!");
         }
@@ -159,8 +159,8 @@ public class SeatAllocationService {
 
         List<Seat> seats = validateSeatsInformationForDeallocation(bulkSeatIdsModel.getSeatIds(), "BUSINESS_UNIT");
 
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getFunctionAssigned().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getFunctionAssigned().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Deallocating seats from business unit failed: employee " + currentEmployee.getFullName() +
                     " does not have the right to do this action!");
         }
@@ -185,8 +185,8 @@ public class SeatAllocationService {
         List<Seat> seats = validateSeatsInformationForAllocation(seatAllocationModelForTeam.getSeatIds(),"TEAM");
         Team team = validateTeamInformation(seatAllocationModelForTeam.getTeamId(), seats);
 
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getBusinessUnitAssigned().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getBusinessUnitAssigned().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Allocating seats to team failed: employee " + currentEmployee.getFullName() +
                     " does not have the right to do this action!");
         }
@@ -209,8 +209,8 @@ public class SeatAllocationService {
 
         List<Seat> seats = validateSeatsInformationForDeallocation(bulkSeatIdsModel.getSeatIds(), "TEAM");
 
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getBusinessUnitAssigned().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getBusinessUnitAssigned().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
                     " does not have the right to do this action!");
         }
@@ -234,8 +234,8 @@ public class SeatAllocationService {
 
         List<Seat> seats = validateSeatsInformationForAllocation(bulkSeatIdsModel.getSeatIds(), "HOT_DESK");
 
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getSeatMap().getOffice().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seats.get(0).getSeatMap().getOffice().getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Marking seats as hot desks failed: you do not have the right to do this action!");
         }
 
@@ -296,16 +296,16 @@ public class SeatAllocationService {
             Employee employeeToAllocate = employeeService.retrieveEmployeeById(seatAllocationModelForEmployee.getEmployee().getId());
 
             if (employeeToAllocate.getTeam() != null) {
-                SeatRequestAdminMatch seatRequestAdminMatch1 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(employeeToAllocate.getTeam().getId());
-                if (!seatRequestAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-                    SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
-                    if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                SeatAdminMatch seatAdminMatch1 = seatAdminMatchService.retrieveMatchByHierarchyId(employeeToAllocate.getTeam().getId());
+                if (!seatAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                    SeatAdminMatch seatAdminMatch2 = seatAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
+                    if (!seatAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                         throw new UnauthorizedActionException("Assigning hot desk failed: you not have the right to do this action!");
                     }
                 }
             } else {
-                SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
-                if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                SeatAdminMatch seatAdminMatch2 = seatAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
+                if (!seatAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                     throw new UnauthorizedActionException("Assigning hot desk failed: you not have the right to do this action!");
                 }
             }
@@ -378,17 +378,17 @@ public class SeatAllocationService {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currentEmployee = (Employee) auth.getPrincipal();
             if (employeeToAllocate.getTeam() != null) {
-                SeatRequestAdminMatch seatRequestAdminMatch1 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(employeeToAllocate.getTeam().getId());
-                if (!seatRequestAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-                    SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
-                    if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                SeatAdminMatch seatAdminMatch1 = seatAdminMatchService.retrieveMatchByHierarchyId(employeeToAllocate.getTeam().getId());
+                if (!seatAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                    SeatAdminMatch seatAdminMatch2 = seatAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
+                    if (!seatAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                         throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
                                 " does not have the right to do this action!");
                     }
                 }
             } else {
-                SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
-                if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                SeatAdminMatch seatAdminMatch2 = seatAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
+                if (!seatAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                     throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
                             " does not have the right to do this action!");
                 }
@@ -463,17 +463,17 @@ public class SeatAllocationService {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currentEmployee = (Employee) auth.getPrincipal();
             if (employeeToAllocate.getTeam() != null) {
-                SeatRequestAdminMatch seatRequestAdminMatch1 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(employeeToAllocate.getTeam().getId());
-                if (!seatRequestAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-                    SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
-                    if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                SeatAdminMatch seatAdminMatch1 = seatAdminMatchService.retrieveMatchByHierarchyId(employeeToAllocate.getTeam().getId());
+                if (!seatAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                    SeatAdminMatch seatAdminMatch2 = seatAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
+                    if (!seatAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                         throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
                                 " does not have the right to do this action!");
                     }
                 }
             } else {
-                SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
-                if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                SeatAdminMatch seatAdminMatch2 = seatAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
+                if (!seatAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                     throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
                             " does not have the right to do this action!");
                 }
@@ -664,17 +664,17 @@ public class SeatAllocationService {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currentEmployee = (Employee) auth.getPrincipal();
             if (employeeToAllocate.getTeam() != null) {
-                SeatRequestAdminMatch seatRequestAdminMatch1 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(employeeToAllocate.getTeam().getId());
-                if (!seatRequestAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-                    SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
-                    if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                SeatAdminMatch seatAdminMatch1 = seatAdminMatchService.retrieveMatchByHierarchyId(employeeToAllocate.getTeam().getId());
+                if (!seatAdminMatch1.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                    SeatAdminMatch seatAdminMatch2 = seatAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
+                    if (!seatAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                         throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
                                 " does not have the right to do this action!");
                     }
                 }
             } else {
-                SeatRequestAdminMatch seatRequestAdminMatch2 = seatRequestAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
-                if (!seatRequestAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+                SeatAdminMatch seatAdminMatch2 = seatAdminMatchService.retrieveMatchByHierarchyId(seat.getSeatMap().getOffice().getId());
+                if (!seatAdminMatch2.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                     throw new UnauthorizedActionException("Deallocating seats from team failed: employee " + currentEmployee.getFullName() +
                             " does not have the right to do this action!");
                 }
