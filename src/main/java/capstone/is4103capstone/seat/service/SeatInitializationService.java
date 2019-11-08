@@ -221,16 +221,16 @@ public class SeatInitializationService {
                     Integer serialNumber = seat.getSerialNumber();
                     if (serialNumber <= 48) {
                         seat.setFunctionAssigned(dataCenOprTeam.getBusinessUnit().getFunction());
-                        if (serialNumber >= 7 && serialNumber <= 24) {
+                        if (serialNumber > 6 && serialNumber < 25) {
                             seat.setBusinessUnitAssigned(dataCenOprTeam.getBusinessUnit());
-                            if (serialNumber <= 12) {
+                            if (serialNumber < 13) {
                                 seat.setTeamAssigned(dataCenOprTeam);
                             } else {
                                 seat.setTeamAssigned(networksTeam);
                             }
-                        } else {
+                        } else if (serialNumber > 24 && serialNumber < 49) {
                             seat.setBusinessUnitAssigned(devTeam.getBusinessUnit());
-                            if (serialNumber >= 31 && serialNumber <= 42){
+                            if (serialNumber > 30 && serialNumber < 43){
                                 seat.setTeamAssigned(devTeam);
                             } else if (serialNumber > 42) {
                                 seat.setTeamAssigned(prodSuppTeam);
@@ -406,62 +406,79 @@ public class SeatInitializationService {
         int yesterdayYear = DateHelper.getYearFromDate(yesterday);
         int yesterdayMonth = DateHelper.getMonthFromDate(yesterday);
         int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(yesterday);
+        yesterday = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
 
         // Use Fix Income Development team as the finder
         Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
         Optional<SeatUtilisationLog> optionalSeatUtilisationLog = seatUtilisationLogRepository.findOneByBusinessEntityIdAndDate(devTeam.getId(), yesterdayYear, yesterdayMonth, yesterdayDayOfMonth);
         if (!optionalSeatUtilisationLog.isPresent()) {
-            initialiseTeamSeatUtilisationLog(yesterday);
-            initialiseBusinessUnitUtilisationLog(yesterday);
-            initialiseCompanyFunctionUtilisationLog(yesterday);
+            seatUtilisationLogRepository.deleteAll();
+            initialiseTeamSeatUtilisationLog(yesterday, 32);
+            initialiseBusinessUnitUtilisationLog(yesterday, 32);
+            initialiseCompanyFunctionUtilisationLog(yesterday, 32);
         }
     }
 
-    private void initialiseTeamSeatUtilisationLog(Date date) {
-
+    private void initialiseTeamSeatUtilisationLog(Date date, int periodLength) {
+        System.out.println("****************************** initialiseTeamSeatUtilisationLog ******************************");
         // SG-Tech-FixIncTech-Dev
+        System.out.println("*************** SG-Tech-FixIncTech-Dev ***************");
         Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
         if (devTeam != null) {
-            for(int count = 0; count < 30; count++) {
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(devTeam.getId());
                 newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
                 newLog.setOfficeId(devTeam.getOffice().getId());
                 newLog.setHierarchyPath(devTeam.getHierachyPath());
                 if (count < 10) {
-                    newLog.setInventoryCount(10);
-                    newLog.setOccupancyCount(8);
+                    newLog.setInventoryCount(12);
+                    newLog.setOccupancyCount(10);
                 } else if ( count < 17) {
-                    newLog.setInventoryCount(10);
+                    newLog.setInventoryCount(12);
                     newLog.setOccupancyCount(5);
                 } else {
-                    newLog.setInventoryCount(10);
-                    newLog.setOccupancyCount(8);
+                    newLog.setInventoryCount(12);
+                    newLog.setOccupancyCount(10);
                 }
                 seatUtilisationLogRepository.save(newLog);
             }
         }
 
+        System.out.println("-----------------------------------------------------------");
         // SG-Tech-FixIncTech-ProdSupp
+        System.out.println("*************** SG-Tech-FixIncTech-ProdSupp ***************");
         Team prodSuppTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
         if (prodSuppTeam != null) {
-            for(int count = 0; count < 30; count++) {
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(prodSuppTeam.getId());
                 newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -469,14 +486,14 @@ public class SeatInitializationService {
                 newLog.setHierarchyPath(prodSuppTeam.getHierachyPath());
 
                 if (count < 10) {
-                    newLog.setInventoryCount(5);
-                    newLog.setOccupancyCount(5);
+                    newLog.setInventoryCount(6);
+                    newLog.setOccupancyCount(6);
                 } else if (count < 21) {
-                    newLog.setInventoryCount(5);
-                    newLog.setOccupancyCount(3);
+                    newLog.setInventoryCount(6);
+                    newLog.setOccupancyCount(4);
                 } else {
-                    newLog.setInventoryCount(3);
-                    newLog.setOccupancyCount(3);
+                    newLog.setInventoryCount(6);
+                    newLog.setOccupancyCount(6);
                 }
 
                 seatUtilisationLogRepository.save(newLog);
@@ -484,18 +501,26 @@ public class SeatInitializationService {
         }
 
 
+        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech-DataCenOpr
+        System.out.println("*************** SG-Tech-InfraTech-DataCenOpr ***************");
         Team dataCenOpeTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DataCenOpr");
         if (dataCenOpeTeam != null) {
-            for(int count = 0; count < 30; count++) {
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(dataCenOpeTeam.getId());
                 newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -503,63 +528,79 @@ public class SeatInitializationService {
                 newLog.setHierarchyPath(dataCenOpeTeam.getHierachyPath());
 
                 if (count < 10) {
-                    newLog.setInventoryCount(10);
-                    newLog.setOccupancyCount(9);
+                    newLog.setInventoryCount(12);
+                    newLog.setOccupancyCount(11);
                 } else if (count < 25) {
-                    newLog.setInventoryCount(10);
-                    newLog.setOccupancyCount(6);
+                    newLog.setInventoryCount(12);
+                    newLog.setOccupancyCount(8);
                 } else {
-                    newLog.setInventoryCount(10);
-                    newLog.setOccupancyCount(3);
+                    newLog.setInventoryCount(12);
+                    newLog.setOccupancyCount(5);
                 }
 
                 seatUtilisationLogRepository.save(newLog);
             }
         }
 
+        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech-Networks
+        System.out.println("*************** SG-Tech-InfraTech-Networks ***************");
         Team networksTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
         if (networksTeam != null) {
-            for(int count = 0; count < 30; count++) {
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(networksTeam.getId());
                 newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
                 newLog.setOfficeId(networksTeam.getOffice().getId());
                 newLog.setHierarchyPath(networksTeam.getHierachyPath());
                 if (count < 5) {
-                    newLog.setInventoryCount(5);
-                    newLog.setOccupancyCount(5);
+                    newLog.setInventoryCount(6);
+                    newLog.setOccupancyCount(6);
                 } else if (count < 18) {
-                    newLog.setInventoryCount(5);
-                    newLog.setOccupancyCount(4);
+                    newLog.setInventoryCount(6);
+                    newLog.setOccupancyCount(5);
                 } else if (count < 27) {
-                    newLog.setInventoryCount(5);
-                    newLog.setOccupancyCount(3);
+                    newLog.setInventoryCount(6);
+                    newLog.setOccupancyCount(4);
                 }
                 seatUtilisationLogRepository.save(newLog);
             }
         }
 
-        // SG-Tech-InfraTech-Networks
+        System.out.println("-----------------------------------------------------------");
+        // SG-Tech-InfraTech-DBAdmin
+        System.out.println("*************** SG-Tech-InfraTech-DBAdmin ***************");
         Team dbAdminTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
         if (dbAdminTeam != null) {
-            for(int count = 0; count < 30; count++) {
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(dbAdminTeam.getId());
                 newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -571,18 +612,26 @@ public class SeatInitializationService {
             }
         }
 
+        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech-EndUserCom
+        System.out.println("*************** SG-Tech-InfraTech-EndUserCom ***************");
         Team endUserComTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-EndUserCom");
         if (endUserComTeam != null) {
-            for(int count = 0; count < 30; count++) {
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(endUserComTeam.getId());
                 newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -595,18 +644,26 @@ public class SeatInitializationService {
         }
 
 
+        System.out.println("-----------------------------------------------------------");
         // SG-HR-RCR-INT
+        System.out.println("*************** SG-HR-RCR-INT ***************");
         Team intTeam = teamRepository.findTeamByCode("SG-HR-RCR-INT");
         if (intTeam != null) {
-            for(int count = 0; count < 30; count++) {
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(intTeam.getId());
                 newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -624,29 +681,35 @@ public class SeatInitializationService {
         }
     }
 
-    private void initialiseBusinessUnitUtilisationLog(Date date) {
+    private void initialiseBusinessUnitUtilisationLog(Date date, int periodLength) {
+        System.out.println("****************************** initialiseBusinessUnitUtilisationLog ******************************");
 
         Optional<Office> office = officeRepository.findByName("One Raffles Quay");
 
         // SG-Tech-FixIncTech
+        System.out.println("*************** SG-Tech-FixIncTech ***************");
         Optional<BusinessUnit> optionalFixIncTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-FixIncTech");
         Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
         Team prodSuppTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
         if (optionalFixIncTech.isPresent()) {
             BusinessUnit fixIncTech = optionalFixIncTech.get();
-            for(int count = 0; count < 30; count++) {
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 Integer inventory = 0;
                 Integer occupancy = 0;
-
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
-
                 newLog.setLevelEntityId(fixIncTech.getId());
-                newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -668,25 +731,31 @@ public class SeatInitializationService {
         }
 
 
+        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech
+        System.out.println("*************** SG-Tech-InfraTech ***************");
         Optional<BusinessUnit> optionalInfraTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-InfraTech");
         Team networksTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
         Team dataCtrOprTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DataCenOpr");
         if (optionalInfraTech.isPresent()) {
             BusinessUnit fixIncTech = optionalInfraTech.get();
-            for(int count = 0; count < 30; count++) {
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 Integer inventory = 0;
                 Integer occupancy = 0;
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
-
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
-
                 newLog.setLevelEntityId(fixIncTech.getId());
-                newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -708,24 +777,30 @@ public class SeatInitializationService {
         }
 
 
+        System.out.println("-----------------------------------------------------------");
         // SG-HR-RCR
+        System.out.println("*************** SG-HR-RCR ***************");
         Optional<BusinessUnit> optionalRecruiting = businessUnitRepository.findByCodeNonDeleted("SG-HR-RCR");
         Team interviewTeam = teamRepository.findTeamByCode("SG-HR-RCR-INT");
         if (optionalRecruiting.isPresent()) {
             BusinessUnit recruitingUnit = optionalRecruiting.get();
-            for(int count = 0; count < 30; count++) {
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 Integer inventory = 0;
                 Integer occupancy = 0;
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
-
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
-
                 newLog.setLevelEntityId(recruitingUnit.getId());
-                newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -743,7 +818,7 @@ public class SeatInitializationService {
         }
     }
 
-    private void initialiseCompanyFunctionUtilisationLog(Date date) {
+    private void initialiseCompanyFunctionUtilisationLog(Date date, int periodLength) {
         Optional<Office> office = officeRepository.findByName("One Raffles Quay");
 
         // SG-Tech
@@ -752,19 +827,23 @@ public class SeatInitializationService {
             CompanyFunction tech = optionalTech.get();
             BusinessUnit fixIncTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-FixIncTech").get();
             BusinessUnit infraTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-InfraTech").get();
-            for(int count = 0; count < 30; count++) {
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 Integer inventory = 0;
                 Integer occupancy = 0;
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
-
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
-
                 newLog.setLevelEntityId(tech.getId());
-                newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -790,19 +869,23 @@ public class SeatInitializationService {
         if (optionalHR.isPresent()) {
             CompanyFunction hr = optionalHR.get();
             BusinessUnit recruitingUnit = businessUnitRepository.findByCodeNonDeleted("SG-HR-RCR").get();
-            for(int count = 0; count < 30; count++) {
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 Integer inventory = 0;
                 Integer occupancy = 0;
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
-
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
-
                 newLog.setLevelEntityId(hr.getId());
-                newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -820,7 +903,7 @@ public class SeatInitializationService {
         }
     }
 
-    private void initialiseOfficeAndOfficeFloorUtilisationLog(Date date) {
+    private void initialiseOfficeAndOfficeFloorUtilisationLog(Date date, int periodLength) {
 
         // Office floor
         // Floor 26 only concerns tech function
@@ -828,17 +911,21 @@ public class SeatInitializationService {
         if (optionalSeatMapLvl26.isPresent()) {
             SeatMap level26 = optionalSeatMapLvl26.get();
             CompanyFunction techFunction = functionRepository.findByCode("SG-Tech").get();
-            for(int count = 0; count < 30; count++) {
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
-
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
-
                 newLog.setLevelEntityId(level26.getId());
-                newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setHierarchyType(HierarchyTypeEnum.OFFICE_FLOOR);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -858,17 +945,21 @@ public class SeatInitializationService {
         if (optionalSeatMapLvl27.isPresent()) {
             SeatMap level27 = optionalSeatMapLvl27.get();
             CompanyFunction hrFunction = functionRepository.findByCode("SG-HR").get();
-            for(int count = 0; count < 30; count++) {
+            int yesterdayYear = DateHelper.getYearFromDate(date);
+            int yesterdayMonth = DateHelper.getMonthFromDate(date);
+            int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+            for(int count = 0; count < periodLength; count++) {
+                Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+                dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+                int year = DateHelper.getYearFromDate(dateCounter);
+                int month = DateHelper.getMonthFromDate(dateCounter);
+                int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
-
-                date = DateHelper.getDaysBefore(date, count);
-                int year = DateHelper.getYearFromDate(date);
-                int month = DateHelper.getMonthFromDate(date);
-                int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
-
                 newLog.setLevelEntityId(level27.getId());
-                newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-                newLog.setCreatedTime(date);
+                newLog.setHierarchyType(HierarchyTypeEnum.OFFICE_FLOOR);
+                newLog.setCreatedTime(dateCounter);
                 newLog.setYear(year);
                 newLog.setMonth(month);
                 newLog.setDayOfMonth(dayOfMonth);
@@ -887,19 +978,23 @@ public class SeatInitializationService {
         Office office = officeRepository.findByName("One Raffles Quay").get();
         SeatMap level26 = seatMapRepository.findByCode("SG-ORQ-26").get();
         SeatMap level27 = seatMapRepository.findByCode("SG-ORQ-27").get();
-        for(int count = 0; count < 30; count++) {
+        int yesterdayYear = DateHelper.getYearFromDate(date);
+        int yesterdayMonth = DateHelper.getMonthFromDate(date);
+        int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
+        for(int count = 0; count < periodLength; count++) {
+            Date dateCounter = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
+            dateCounter = DateHelper.getDaysBefore(dateCounter, count);
+            int year = DateHelper.getYearFromDate(dateCounter);
+            int month = DateHelper.getMonthFromDate(dateCounter);
+            int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
+            System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
+
             Integer inventory = 0;
             Integer occupancy = 0;
             SeatUtilisationLog newLog = new SeatUtilisationLog();
-
-            date = DateHelper.getDaysBefore(date, count);
-            int year = DateHelper.getYearFromDate(date);
-            int month = DateHelper.getMonthFromDate(date);
-            int dayOfMonth = DateHelper.getDayOfMonthFromDate(date);
-
             newLog.setLevelEntityId(office.getId());
-            newLog.setHierarchyType(HierarchyTypeEnum.TEAM);
-            newLog.setCreatedTime(date);
+            newLog.setHierarchyType(HierarchyTypeEnum.OFFICE);
+            newLog.setCreatedTime(dateCounter);
             newLog.setYear(year);
             newLog.setMonth(month);
             newLog.setDayOfMonth(dayOfMonth);

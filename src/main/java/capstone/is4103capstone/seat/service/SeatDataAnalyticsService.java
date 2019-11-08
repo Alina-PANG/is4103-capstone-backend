@@ -89,8 +89,13 @@ public class SeatDataAnalyticsService {
 
     // By office, office floor, company function, business unit and team
     // Office managers only have the right to see the office floors level info
-    public SeatUtilisationDataModel retrieveBusinessLevelEntitySeatUtilisationAnalysis(String hierarchyType, String levelEntityId, String officeId,
-                                                                                       Date startDate, Date endDate) {
+    public SeatUtilisationDataModel retrieveBusinessLevelEntitySeatUtilisationAnalysis(SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
+
+        String hierarchyType = seatDataAnalysisRequestModel.getHierarchyType();
+        String levelEntityId = seatDataAnalysisRequestModel.getEntityId();
+        String officeId = seatDataAnalysisRequestModel.getOfficeId();
+        Date startDate = seatDataAnalysisRequestModel.getStartDate();
+        Date endDate = seatDataAnalysisRequestModel.getEndDate();
 
         startDate = DateHelper.getDateWithoutTimeUsingCalendar(startDate);
         endDate = DateHelper.getDaysAfter(DateHelper.getDateWithoutTimeUsingCalendar(endDate), 1);
@@ -375,8 +380,13 @@ public class SeatDataAnalyticsService {
     // Office managers: among all the seats the office has, how many seats each company function occupies -> office floor breakdown
     // Department heads: among all the seats assigned to the company function, how many seats each business unit occupies -> unit breakdown
     // Business unit heads: among all the seats assigned to the business unit, how many seats each team occupies -> team breakdown
-    public SeatBlockedForUseDataModel retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(String hierarchyType, String levelEntityId,
-                                                                                                  String officeId, Date startDate, Date endDate) {
+    public SeatBlockedForUseDataModel retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
+
+        String hierarchyType = seatDataAnalysisRequestModel.getHierarchyType();
+        String levelEntityId = seatDataAnalysisRequestModel.getEntityId();
+        String officeId = seatDataAnalysisRequestModel.getOfficeId();
+        Date startDate = seatDataAnalysisRequestModel.getStartDate();
+        Date endDate = seatDataAnalysisRequestModel.getEndDate();
 
         // Check access right
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
