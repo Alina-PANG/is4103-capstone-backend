@@ -6,10 +6,8 @@ import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.helper.DateHelper;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
-import capstone.is4103capstone.seat.model.EmployeeModel;
-import capstone.is4103capstone.seat.model.GroupModel;
-import capstone.is4103capstone.seat.model.seatDemandForecast.MonthlySeatForecastModelForTeam;
+import capstone.is4103capstone.entities.seat.SeatAdminMatch;
+import capstone.is4103capstone.seat.model.seatFutureDemand.MonthlySeatFutureDemandModelForTeam;
 import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
 import capstone.is4103capstone.util.exception.InvalidInputException;
 import capstone.is4103capstone.util.exception.UnauthorizedActionException;
@@ -22,12 +20,12 @@ import java.time.YearMonth;
 import java.util.*;
 
 @Service
-public class SeatDemandForecastService {
+public class SeatFutureDemandService {
 
     @Autowired
     private SeatService seatService;
     @Autowired
-    private SeatRequestAdminMatchService seatRequestAdminMatchService;
+    private SeatAdminMatchService seatAdminMatchService;
     @Autowired
     private TeamService teamService;
     @Autowired
@@ -39,7 +37,7 @@ public class SeatDemandForecastService {
     private SeatAllocationRepository seatAllocationRepository;
 
 
-    public List<MonthlySeatForecastModelForTeam> forecastSeatDemandForNext6MonthsByTeam(String teamId) {
+    public List<MonthlySeatFutureDemandModelForTeam> forecastSeatDemandForNext6MonthsByTeam(String teamId) {
 
         if(teamId == null || teamId.trim().length() ==0) {
             throw new InvalidInputException("Retrieving forecast failed because of invalid input: team ID is missing!");
@@ -48,23 +46,23 @@ public class SeatDemandForecastService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(teamId);
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(team.getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to do this action!");
         }
 
         YearMonth thisYearMonth = DateHelper.getYearMonthFromDate(new Date());
-        List<MonthlySeatForecastModelForTeam> monthlySeatForecastModelsForTeam = new ArrayList<>();
+        List<MonthlySeatFutureDemandModelForTeam> monthlySeatForecastModelsForTeam = new ArrayList<>();
         for(int i = 1; i <= 6; i++) {
             thisYearMonth = thisYearMonth.plusMonths(1);
-            MonthlySeatForecastModelForTeam monthlySeatForecastModelForTeam = forecastMonthlySeatDemandByTeam(thisYearMonth, teamId);
-            monthlySeatForecastModelForTeam.setSeqNum(i);
-            monthlySeatForecastModelsForTeam.add(monthlySeatForecastModelForTeam);
+            MonthlySeatFutureDemandModelForTeam monthlySeatFutureDemandModelForTeam = forecastMonthlySeatDemandByTeam(thisYearMonth, teamId);
+            monthlySeatFutureDemandModelForTeam.setSeqNum(i);
+            monthlySeatForecastModelsForTeam.add(monthlySeatFutureDemandModelForTeam);
         }
         return monthlySeatForecastModelsForTeam;
     }
 
-    public List<MonthlySeatForecastModelForTeam> forecastSeatDemandForNext12MonthsByTeam(String teamId) {
+    public List<MonthlySeatFutureDemandModelForTeam> forecastSeatDemandForNext12MonthsByTeam(String teamId) {
 
         if(teamId == null || teamId.trim().length() ==0) {
             throw new InvalidInputException("Retrieving forecast failed because of invalid input: team ID is missing!");
@@ -73,24 +71,24 @@ public class SeatDemandForecastService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(team.getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(team.getId());
+        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to do this action!");
         }
 
         YearMonth thisYearMonth = DateHelper.getYearMonthFromDate(new Date());
-        List<MonthlySeatForecastModelForTeam> monthlySeatForecastModelsForTeam = new ArrayList<>();
+        List<MonthlySeatFutureDemandModelForTeam> monthlySeatForecastModelsForTeam = new ArrayList<>();
         for(int i = 1; i <= 12; i++) {
             thisYearMonth = thisYearMonth.plusMonths(1);
-            MonthlySeatForecastModelForTeam monthlySeatForecastModelForTeam = forecastMonthlySeatDemandByTeam(thisYearMonth, teamId);
-            monthlySeatForecastModelForTeam.setSeqNum(i);
-            monthlySeatForecastModelsForTeam.add(monthlySeatForecastModelForTeam);
+            MonthlySeatFutureDemandModelForTeam monthlySeatFutureDemandModelForTeam = forecastMonthlySeatDemandByTeam(thisYearMonth, teamId);
+            monthlySeatFutureDemandModelForTeam.setSeqNum(i);
+            monthlySeatForecastModelsForTeam.add(monthlySeatFutureDemandModelForTeam);
         }
         return monthlySeatForecastModelsForTeam;
     }
 
     // Inventory should remain the same across all future year months because allocation of seats to teams takes an immediate effect
-    private MonthlySeatForecastModelForTeam forecastMonthlySeatDemandByTeam(YearMonth yearMonth, String teamId) {
+    private MonthlySeatFutureDemandModelForTeam forecastMonthlySeatDemandByTeam(YearMonth yearMonth, String teamId) {
         Integer inventoryCount = 0;
         Integer occupancyCount = 0;
 
@@ -103,9 +101,9 @@ public class SeatDemandForecastService {
         List<Employee> employeesWhoNeedSeats = findEmployeesWhoNeedSeatDuringYearMonthByTeam(yearMonth, team);
         List<Employee> employeesWithUnnecessaryAllocations = findEmployeesWithUnnecessaryAllocationDuringYearMonthByTeam(yearMonth, seats, team.getOffice().getId());
 
-        MonthlySeatForecastModelForTeam monthlySeatForecastModelForTeam = entityModelConversionService.createMonthlyForecastModelForTeam(team, yearMonth,
+        MonthlySeatFutureDemandModelForTeam monthlySeatFutureDemandModelForTeam = entityModelConversionService.createMonthlyForecastModelForTeam(team, yearMonth,
                 inventoryCount, occupancyCount, employeesWhoNeedSeats, employeesWithUnnecessaryAllocations);
-        return  monthlySeatForecastModelForTeam;
+        return monthlySeatFutureDemandModelForTeam;
     }
 
     // Calculate the number of assigned seats:

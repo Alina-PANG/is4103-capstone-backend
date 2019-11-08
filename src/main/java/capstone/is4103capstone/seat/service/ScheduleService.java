@@ -54,7 +54,7 @@ public class ScheduleService {
 
         // Check whether there is an existing working schedule of the employee at the office
         Optional<EmployeeOfficeWorkingSchedule> optionalEmployeeOfficeWorkingSchedule = employeeOfficeWorkingScheduleRepository.
-                findByEmployeeIdAndOfficeId(employee.getId(), office.getId());
+                findUndeletedOneByEmployeeIdAndOfficeId(employee.getId(), office.getId());
         if (optionalEmployeeOfficeWorkingSchedule.isPresent()) {
             // Try to see if can merge or not
             // Check schedule clash
@@ -91,12 +91,12 @@ public class ScheduleService {
     }
 
     public Optional<EmployeeOfficeWorkingSchedule> retrieveEmployeeOfficeWorkingSchedulesByEmployeeAndOffice(String employeeId, String officeId) {
-        Optional<EmployeeOfficeWorkingSchedule> optionalEmployeeOfficeWorkingSchedule = employeeOfficeWorkingScheduleRepository.findByEmployeeIdAndOfficeId(employeeId, officeId);
+        Optional<EmployeeOfficeWorkingSchedule> optionalEmployeeOfficeWorkingSchedule = employeeOfficeWorkingScheduleRepository.findUndeletedOneByEmployeeIdAndOfficeId(employeeId, officeId);
         return optionalEmployeeOfficeWorkingSchedule;
     }
 
     public boolean hasWorkingScheduleDuringYearMonthAtOfficeByEmployeeId(String employeeId, String officeId, YearMonth yearMonth) {
-        Optional<EmployeeOfficeWorkingSchedule> optionalEmployeeOfficeWorkingSchedule = employeeOfficeWorkingScheduleRepository.findByEmployeeIdAndOfficeId(employeeId, officeId);
+        Optional<EmployeeOfficeWorkingSchedule> optionalEmployeeOfficeWorkingSchedule = employeeOfficeWorkingScheduleRepository.findUndeletedOneByEmployeeIdAndOfficeId(employeeId, officeId);
         if (!optionalEmployeeOfficeWorkingSchedule.isPresent()) {
             return false;
         } else {
