@@ -873,6 +873,7 @@ public class EntityModelConversionService {
 
     // ---------------------------------- Seat Utilisation Analytics -----------------------------------
 
+    // Note: month is zero-based in Java, hence the method will format the year month to be one-based
     public MonthlySeatFutureDemandModelForTeam createMonthlyForecastModelForTeam(Team team, YearMonth yearMonth, Integer inventoryCount,
                                                                                  Integer occupancyCount, List<Employee> employeesWhoNeedSeats,
                                                                                  List<Employee> employeesWithUnnecessaryAllocations) {
@@ -885,7 +886,9 @@ public class EntityModelConversionService {
         teamModel.setCode(team.getCode());
         monthlySeatFutureDemandModelForTeam.setTeam(teamModel);
 
-        monthlySeatFutureDemandModelForTeam.setYearMonth(yearMonth.toString());
+        YearMonth formattedYearMonth = YearMonth.of(yearMonth.getYear(), yearMonth.getMonthValue());
+        formattedYearMonth = formattedYearMonth.plusMonths(1);
+        monthlySeatFutureDemandModelForTeam.setYearMonth(formattedYearMonth.toString());
 
         List<EmployeeModel> employeeModelsWhoNeedSeats = new ArrayList<>();
         for (Employee employee :

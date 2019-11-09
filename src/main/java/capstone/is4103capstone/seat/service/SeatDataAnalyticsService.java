@@ -91,6 +91,28 @@ public class SeatDataAnalyticsService {
     // Office managers only have the right to see the office floors level info
     public SeatUtilisationDataModel retrieveBusinessLevelEntitySeatUtilisationAnalysis(SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
 
+        if (seatDataAnalysisRequestModel.getHierarchyType() == null || seatDataAnalysisRequestModel.getHierarchyType().trim().length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: hierarchy type is required.");
+        }
+        if (seatDataAnalysisRequestModel.getEntityId() == null || seatDataAnalysisRequestModel.getEntityId().trim().length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: business entity information is required.");
+        }
+        if (seatDataAnalysisRequestModel.getOfficeId() == null || seatDataAnalysisRequestModel.getOfficeId().trim().length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: office information is required.");
+        }
+        if (seatDataAnalysisRequestModel.getStartDate() == null) {
+            throw new InvalidInputException("Retrieving analysis data failed: period start date is required.");
+        }
+        if (seatDataAnalysisRequestModel.getEndDate() == null) {
+            throw new InvalidInputException("Retrieving analysis data failed: period end date is required.");
+        }
+        if (seatDataAnalysisRequestModel.getStartDate().after(seatDataAnalysisRequestModel.getEndDate())) {
+            throw new InvalidInputException("Retrieving analysis data failed: the start date must be before the end date.");
+        }
+        if (seatDataAnalysisRequestModel.getEndDate().after(DateHelper.getDateWithoutTimeUsingCalendar(new Date()))) {
+            throw new InvalidInputException("Retrieving analysis data failed: the end date must be a historic time.");
+        }
+
         String hierarchyType = seatDataAnalysisRequestModel.getHierarchyType();
         String levelEntityId = seatDataAnalysisRequestModel.getEntityId();
         String officeId = seatDataAnalysisRequestModel.getOfficeId();
@@ -119,11 +141,11 @@ public class SeatDataAnalyticsService {
         } else if (entity.getClass().getSimpleName().equals("BusinessUnit")) {
             BusinessUnit businessUnit = (BusinessUnit)entity;
             if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
-                seatUtilisationDataModel = retrieveBusinessUnitSeatUtilisationAnalysis(seatUtilisationDataModel, businessUnit, officeId, startDate, endDate, false);
+                seatUtilisationDataModel = retrieveBusinessUnitSeatUtilisationAnalysis(seatUtilisationDataModel, businessUnit, officeId, startDate, endDate);
             } else {
                 if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(businessUnit.getFunction().getId(),
                         "COMPANY_FUNCTION", currentEmployee.getId())) {
-                    seatUtilisationDataModel = retrieveBusinessUnitSeatUtilisationAnalysis(seatUtilisationDataModel, businessUnit, officeId, startDate, endDate, false);
+                    seatUtilisationDataModel = retrieveBusinessUnitSeatUtilisationAnalysis(seatUtilisationDataModel, businessUnit, officeId, startDate, endDate);
                 } else {
                     throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
                 }
@@ -131,15 +153,15 @@ public class SeatDataAnalyticsService {
         } else if (entity.getClass().getSimpleName().equals("Team")) {
             Team team = (Team)entity;
             if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
-                seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate, false);
+                seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate);
             } else {
                 if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(team.getBusinessUnit().getId(),
                         "BUSINESS_UNIT", currentEmployee.getId())) {
-                    seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate, false);
+                    seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate);
                 } else {
                     if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(team.getBusinessUnit().getFunction().getId(),
                             "COMPANY", currentEmployee.getId())) {
-                        seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate, false);
+                        seatUtilisationDataModel = retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate);
                     } else {
                         throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
                     }
@@ -155,11 +177,11 @@ public class SeatDataAnalyticsService {
         } else if (entity.getClass().getSimpleName().equals("SeatMap")) {
             SeatMap seatMap = (SeatMap)entity;
             if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
-                seatUtilisationDataModel = retrieveOfficeFloorUtilisationAnalysis(seatUtilisationDataModel, seatMap, startDate, endDate, false);
+                seatUtilisationDataModel = retrieveOfficeFloorUtilisationAnalysis(seatUtilisationDataModel, seatMap, startDate, endDate);
             } else {
                 if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(seatMap.getOffice().getId(),
                         "OFFICE", currentEmployee.getId())) {
-                    seatUtilisationDataModel = retrieveOfficeFloorUtilisationAnalysis(seatUtilisationDataModel, seatMap, startDate, endDate, false);
+                    seatUtilisationDataModel = retrieveOfficeFloorUtilisationAnalysis(seatUtilisationDataModel, seatMap, startDate, endDate);
                 } else {
                     throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
                 }
@@ -171,7 +193,7 @@ public class SeatDataAnalyticsService {
 
 
     public SeatUtilisationDataModel retrieveTeamSeatUtilisationAnalysis(SeatUtilisationDataModel seatUtilisationDataModel, Team team,
-                                                                                   Date startDate, Date endDate, boolean constructNew) {
+                                                                                   Date startDate, Date endDate) {
 
         List<SeatUtilisationLog> seatUtilisationLogs = seatUtilisationLogRepository.findOnesByBusinessEntityIdDuringPeriodAndOffice(
                 team.getId(), startDate, endDate, team.getOffice().getId());
@@ -194,22 +216,14 @@ public class SeatDataAnalyticsService {
             logs.add(newLog);
         }
 
-        if (constructNew) {
-            SeatUtilisationDataModel newModel = new SeatUtilisationDataModel();
-            newModel.setEntity(teamModel);
-            newModel.setLogs(logs);
-            seatUtilisationDataModel.getChildren().add(newModel);
-            return seatUtilisationDataModel;
-        } else {
-            seatUtilisationDataModel.setEntity(teamModel);
-            seatUtilisationDataModel.setLogs(logs);
-            return seatUtilisationDataModel;
-        }
+        seatUtilisationDataModel.setEntity(teamModel);
+        seatUtilisationDataModel.setLogs(logs);
+        return seatUtilisationDataModel;
     }
 
 
     public SeatUtilisationDataModel retrieveBusinessUnitSeatUtilisationAnalysis(SeatUtilisationDataModel seatUtilisationDataModel, BusinessUnit businessUnit,
-                                                                        String officeId, Date startDate, Date endDate, boolean constructNew) {
+                                                                        String officeId, Date startDate, Date endDate) {
 
         List<SeatUtilisationLog> seatUtilisationLogs = seatUtilisationLogRepository.findOnesByBusinessEntityIdDuringPeriodAndOffice(
                 businessUnit.getId(), startDate, endDate, officeId);
@@ -223,7 +237,7 @@ public class SeatDataAnalyticsService {
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
             SeatUtilisationLogModel newLog = new SeatUtilisationLogModel();
-            newLog.setDate(log.getCreatedTime());
+            newLog.setDate(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()));
             newLog.setYear(log.getYear());
             newLog.setMonth(log.getMonth());
             newLog.setDayOfMonth(log.getDayOfMonth());
@@ -232,29 +246,16 @@ public class SeatDataAnalyticsService {
             logs.add(newLog);
         }
 
-        if (constructNew) {
-            SeatUtilisationDataModel newModel = new SeatUtilisationDataModel();
-            newModel.setEntity(unitModel);
-            newModel.setLogs(logs);
-            seatUtilisationDataModel.getChildren().add(newModel);
-            // Construct children: teams under the business unit
-            List<Team> teams = teamRepository.findOnesUnderBusinessUnitAndOffice(businessUnit.getId(), officeId);
-            for (Team team :
-                    teams) {
-                newModel = retrieveTeamSeatUtilisationAnalysis(newModel, team, startDate, endDate, true);
-            }
-            return seatUtilisationDataModel;
-        } else {
-            seatUtilisationDataModel.setEntity(unitModel);
-            seatUtilisationDataModel.setLogs(logs);
-            // Construct children: teams under the business unit
-            List<Team> teams = teamRepository.findOnesUnderBusinessUnitAndOffice(businessUnit.getId(), officeId);
-            for (Team team :
-                    teams) {
-                seatUtilisationDataModel.getChildren().add(retrieveTeamSeatUtilisationAnalysis(seatUtilisationDataModel, team, startDate, endDate, true));
-            }
-            return seatUtilisationDataModel;
+        seatUtilisationDataModel.setEntity(unitModel);
+        seatUtilisationDataModel.setLogs(logs);
+        // Construct children: teams under the business unit
+        List<Team> teams = teamRepository.findOnesUnderBusinessUnitAndOffice(businessUnit.getId(), officeId);
+        for (Team team :
+                teams) {
+            SeatUtilisationDataModel teamModel = new SeatUtilisationDataModel();
+            seatUtilisationDataModel.getChildren().add(retrieveTeamSeatUtilisationAnalysis(teamModel, team, startDate, endDate));
         }
+        return seatUtilisationDataModel;
     }
 
 
@@ -289,14 +290,14 @@ public class SeatDataAnalyticsService {
         for (BusinessUnit unit :
                 businessUnits) {
             SeatUtilisationDataModel childModel = new SeatUtilisationDataModel();
-            childModel = retrieveBusinessUnitSeatUtilisationAnalysis(childModel, unit, officeId, startDate, endDate, true);
+            childModel = retrieveBusinessUnitSeatUtilisationAnalysis(childModel, unit, officeId, startDate, endDate);
             seatUtilisationDataModel.getChildren().add(childModel);
         }
         return seatUtilisationDataModel;
     }
 
     public SeatUtilisationDataModel retrieveOfficeFloorUtilisationAnalysis(SeatUtilisationDataModel seatUtilisationDataModel, SeatMap seatMap,
-                                                                        Date startDate, Date endDate, boolean constructNew) {
+                                                                        Date startDate, Date endDate) {
 
         List<SeatUtilisationLog> seatUtilisationLogs = seatUtilisationLogRepository.findOnesByBusinessEntityIdDuringPeriodAndOffice(
                 seatMap.getId(), startDate, endDate, seatMap.getOffice().getId());
@@ -319,17 +320,9 @@ public class SeatDataAnalyticsService {
             logs.add(newLog);
         }
 
-        if (constructNew) {
-            SeatUtilisationDataModel newModel = new SeatUtilisationDataModel();
-            newModel.setEntity(seatMapModel);
-            newModel.setLogs(logs);
-            seatUtilisationDataModel.getChildren().add(newModel);
-            return seatUtilisationDataModel;
-        } else {
-            seatUtilisationDataModel.setEntity(seatMapModel);
-            seatUtilisationDataModel.setLogs(logs);
-            return seatUtilisationDataModel;
-        }
+        seatUtilisationDataModel.setEntity(seatMapModel);
+        seatUtilisationDataModel.setLogs(logs);
+        return seatUtilisationDataModel;
     }
 
     public SeatUtilisationDataModel retrieveOfficeSeatUtilisationAnalysis(SeatUtilisationDataModel seatUtilisationDataModel, Office office,
@@ -364,7 +357,7 @@ public class SeatDataAnalyticsService {
         for (SeatMap seatMap :
                 seatMaps) {
             SeatUtilisationDataModel childModel = new SeatUtilisationDataModel();
-            childModel = retrieveOfficeFloorUtilisationAnalysis(childModel, seatMap, startDate, endDate, true);
+            childModel = retrieveOfficeFloorUtilisationAnalysis(childModel, seatMap, startDate, endDate);
             seatUtilisationDataModel.getChildren().add(childModel);
         }
         return seatUtilisationDataModel;
@@ -381,6 +374,28 @@ public class SeatDataAnalyticsService {
     // Department heads: among all the seats assigned to the company function, how many seats each business unit occupies -> unit breakdown
     // Business unit heads: among all the seats assigned to the business unit, how many seats each team occupies -> team breakdown
     public SeatBlockedForUseDataModel retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
+
+        if (seatDataAnalysisRequestModel.getHierarchyType() == null || seatDataAnalysisRequestModel.getHierarchyType().trim().length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: hierarchy type is required.");
+        }
+        if (seatDataAnalysisRequestModel.getEntityId() == null || seatDataAnalysisRequestModel.getEntityId().trim().length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: business entity information is required.");
+        }
+        if (seatDataAnalysisRequestModel.getOfficeId() == null || seatDataAnalysisRequestModel.getOfficeId().trim().length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: office information is required.");
+        }
+        if (seatDataAnalysisRequestModel.getStartDate() == null) {
+            throw new InvalidInputException("Retrieving analysis data failed: period start date is required.");
+        }
+        if (seatDataAnalysisRequestModel.getEndDate() == null) {
+            throw new InvalidInputException("Retrieving analysis data failed: period end date is required.");
+        }
+        if (seatDataAnalysisRequestModel.getStartDate().after(seatDataAnalysisRequestModel.getEndDate())) {
+            throw new InvalidInputException("Retrieving analysis data failed: the start date must be before the end date.");
+        }
+        if (seatDataAnalysisRequestModel.getEndDate().after(DateHelper.getDateWithoutTimeUsingCalendar(new Date()))) {
+            throw new InvalidInputException("Retrieving analysis data failed: the end date must be a historic time.");
+        }
 
         String hierarchyType = seatDataAnalysisRequestModel.getHierarchyType();
         String levelEntityId = seatDataAnalysisRequestModel.getEntityId();
@@ -417,13 +432,13 @@ public class SeatDataAnalyticsService {
         if (hierarchyType.equals(HierarchyTypeEnum.OFFICE.toString())) {
             return aggregateOfficeSeatBlockedForUseData(seatBlockedForUseDataModel, levelEntityId, officeId, startDate, endDate);
         } else if (hierarchyType.equals(HierarchyTypeEnum.OFFICE_FLOOR.toString())) {
-            return aggregateOfficeFloorSeatBlockedForUseData(seatBlockedForUseDataModel, levelEntityId, officeId, startDate, endDate, false);
+            return aggregateOfficeFloorSeatBlockedForUseData(seatBlockedForUseDataModel, levelEntityId, officeId, startDate, endDate);
         } else if (hierarchyType.equals(HierarchyTypeEnum.COMPANY_FUNCTION.toString())) {
             return aggregateCompanyFunctionSeatBlockedForUseData(seatBlockedForUseDataModel, levelEntityId, officeId, startDate, endDate);
         } else if (hierarchyType.equals(HierarchyTypeEnum.BUSINESS_UNIT.toString())) {
-            return aggregateBusinessUnitSeatBlockedForUseData(seatBlockedForUseDataModel, levelEntityId, officeId, startDate, endDate, false);
+            return aggregateBusinessUnitSeatBlockedForUseData(seatBlockedForUseDataModel, levelEntityId, officeId, startDate, endDate);
         } else if (hierarchyType.equals(HierarchyTypeEnum.TEAM.toString())) {
-            return aggregateTeamSeatBlockedForUseData(seatBlockedForUseDataModel, levelEntityId, officeId, startDate, endDate, false);
+            return aggregateTeamSeatBlockedForUseData(seatBlockedForUseDataModel, levelEntityId, officeId, startDate, endDate);
         } else {
             throw new InvalidInputException("Retrieving Data failed: invalid hierarchy type.");
         }
@@ -431,8 +446,7 @@ public class SeatDataAnalyticsService {
 
 
     private SeatBlockedForUseDataModel aggregateTeamSeatBlockedForUseData(SeatBlockedForUseDataModel seatBlockedForUseDataModel,
-                                                                          String levelEntityId, String officeId, Date startDate, Date endDate,
-                                                                          boolean constructNew) {
+                                                                          String levelEntityId, String officeId, Date startDate, Date endDate) {
         Team team = teamService.retrieveTeamById(levelEntityId);
         List<SeatUtilisationLog> seatUtilisationLogs = seatUtilisationLogRepository.findOnesByBusinessEntityIdDuringPeriodAndOffice(
                 levelEntityId, startDate, endDate, officeId);
@@ -453,22 +467,13 @@ public class SeatDataAnalyticsService {
         }
         seatBlockedForUseSingleDayGroupModel.setUsageData(seatBlockedForUseSingleDayModels);
 
-        if (constructNew) {
-            SeatBlockedForUseDataModel newModel = new SeatBlockedForUseDataModel();
-            newModel.setEntity(teamModel);
-            newModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
-            seatBlockedForUseDataModel.getChildren().add(newModel);
-            return seatBlockedForUseDataModel;
-        } else {
-            seatBlockedForUseDataModel.setEntity(teamModel);
-            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
-            return seatBlockedForUseDataModel;
-        }
+        seatBlockedForUseDataModel.setEntity(teamModel);
+        seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
+        return seatBlockedForUseDataModel;
     }
 
     private SeatBlockedForUseDataModel aggregateBusinessUnitSeatBlockedForUseData(SeatBlockedForUseDataModel seatBlockedForUseDataModel,
-                                                                                  String levelEntityId, String officeId, Date startDate, Date endDate,
-                                                                                  boolean constructNew) {
+                                                                                  String levelEntityId, String officeId, Date startDate, Date endDate) {
         BusinessUnit businessUnit = businessUnitService.retrieveBusinessUnitById(levelEntityId);
         List<SeatUtilisationLog> seatUtilisationLogs = seatUtilisationLogRepository.findOnesByBusinessEntityIdDuringPeriodAndOffice(
                 levelEntityId, startDate, endDate, officeId);
@@ -489,30 +494,17 @@ public class SeatDataAnalyticsService {
         }
         seatBlockedForUseSingleDayGroupModel.setUsageData(seatBlockedForUseSingleDayModels);
 
-        if (constructNew) {
-            SeatBlockedForUseDataModel newModel = new SeatBlockedForUseDataModel();
-            newModel.setEntity(unitModel);
-            newModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
-            seatBlockedForUseDataModel.getChildren().add(newModel);
-            // Construct children: teams under the business unit
-            List<Team> teams = teamRepository.findOnesUnderBusinessUnit(levelEntityId);
-            for (Team team :
-                    teams) {
-                newModel = aggregateTeamSeatBlockedForUseData(newModel, team.getId(), officeId, startDate, endDate, true);
-            }
-            return seatBlockedForUseDataModel;
-        } else {
-            seatBlockedForUseDataModel.setEntity(unitModel);
-            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
-            // Construct children: teams under the business unit
-            List<Team> teams = teamRepository.findOnesUnderBusinessUnit(levelEntityId);
-            for (Team team :
-                    teams) {
-                seatBlockedForUseDataModel.getChildren().add(aggregateTeamSeatBlockedForUseData(seatBlockedForUseDataModel, team.getId(),
-                        officeId, startDate, endDate, true));
-            }
-            return seatBlockedForUseDataModel;
+        seatBlockedForUseDataModel.setEntity(unitModel);
+        seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
+        // Construct children: teams under the business unit
+        List<Team> teams = teamRepository.findOnesUnderBusinessUnit(levelEntityId);
+        for (Team team :
+                teams) {
+            SeatBlockedForUseDataModel teamDataModel = new SeatBlockedForUseDataModel();
+            seatBlockedForUseDataModel.getChildren().add(aggregateTeamSeatBlockedForUseData(teamDataModel, team.getId(),
+                    officeId, startDate, endDate));
         }
+        return seatBlockedForUseDataModel;
     }
 
     private SeatBlockedForUseDataModel aggregateCompanyFunctionSeatBlockedForUseData(SeatBlockedForUseDataModel seatBlockedForUseDataModel,
@@ -544,7 +536,7 @@ public class SeatDataAnalyticsService {
         for (BusinessUnit unit :
                 businessUnits) {
             SeatBlockedForUseDataModel childModel = new SeatBlockedForUseDataModel();
-            childModel = aggregateBusinessUnitSeatBlockedForUseData(childModel, unit.getId(), officeId, startDate, endDate, true);
+            childModel = aggregateBusinessUnitSeatBlockedForUseData(childModel, unit.getId(), officeId, startDate, endDate);
             seatBlockedForUseDataModel.getChildren().add(childModel);
         }
         return seatBlockedForUseDataModel;
@@ -552,8 +544,7 @@ public class SeatDataAnalyticsService {
 
     private SeatBlockedForUseDataModel aggregateOfficeFloorSeatBlockedForUseData(SeatBlockedForUseDataModel seatBlockedForUseDataModel,
                                                                                  String levelEntityId, String officeId,
-                                                                                 Date startDate, Date endDate,
-                                                                                 boolean constructNew) {
+                                                                                 Date startDate, Date endDate) {
         SeatMap seatMap = seatMapService.getSeatMapById(levelEntityId);
         List<SeatUtilisationLog> seatUtilisationLogs = seatUtilisationLogRepository.findOnesByBusinessEntityIdDuringPeriodAndOffice(
                 levelEntityId, startDate, endDate, officeId);
@@ -574,15 +565,8 @@ public class SeatDataAnalyticsService {
         }
         seatBlockedForUseSingleDayGroupModel.setUsageData(seatBlockedForUseSingleDayModels);
 
-        if (constructNew) {
-            SeatBlockedForUseDataModel newModel = new SeatBlockedForUseDataModel();
-            newModel.setEntity(seatMapModel);
-            newModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
-            seatBlockedForUseDataModel.getChildren().add(newModel);
-        } else {
-            seatBlockedForUseDataModel.setEntity(seatMapModel);
-            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
-        }
+        seatBlockedForUseDataModel.setEntity(seatMapModel);
+        seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
 
         return seatBlockedForUseDataModel;
     }
@@ -605,6 +589,7 @@ public class SeatDataAnalyticsService {
             List<SeatBlockedForUseSingleDayModel> seatBlockedForUseSingleDayModels = new ArrayList<>();
             for (SeatUtilisationLog log :
                     seatUtilisationLogs) {
+                System.out.println("******************** log created time: " + log.getCreatedTime().toString() + " ********************");
                 SeatBlockedForUseSingleDayModel seatBlockedForUseSingleDayModel = new SeatBlockedForUseSingleDayModel();
                 seatBlockedForUseSingleDayModel.setDate(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()));
                 seatBlockedForUseSingleDayModel.setNumOfSeats(log.getInventoryCount());
@@ -618,7 +603,7 @@ public class SeatDataAnalyticsService {
             for (SeatMap map :
                     seatMaps) {
                 SeatBlockedForUseDataModel childModel = new SeatBlockedForUseDataModel();
-                childModel = aggregateOfficeFloorSeatBlockedForUseData(childModel, map.getId(), officeId, startDate, endDate, false);
+                childModel = aggregateOfficeFloorSeatBlockedForUseData(childModel, map.getId(), officeId, startDate, endDate);
                 seatBlockedForUseDataModel.getChildren().add(childModel);
             }
             return seatBlockedForUseDataModel;
@@ -635,6 +620,16 @@ public class SeatDataAnalyticsService {
     // -------------------------------------- Blocked But Unused (Per Office) For > 2 Weeks --------------------------------------
 
     public SeatBlockedUnusedDataModel retrieveBusinessLevelEntitySeatBlockedButUnusedData(String hierarchyType, String levelEntityId, String officeId) {
+
+        if (hierarchyType == null || hierarchyType.trim().length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: hierarchy type is required.");
+        }
+        if (levelEntityId == null || levelEntityId.trim().length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: business entity information is required.");
+        }
+        if (officeId == null || officeId.length() == 0) {
+            throw new InvalidInputException("Retrieving analysis data failed: office information is required.");
+        }
 
         // Check access right
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
