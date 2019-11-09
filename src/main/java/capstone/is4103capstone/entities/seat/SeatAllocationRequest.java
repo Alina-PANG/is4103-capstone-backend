@@ -27,7 +27,17 @@ public class SeatAllocationRequest extends DBEntityTemplate {
     private String escalatedHierarchyId;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id", referencedColumnName = "id")
+    @JoinTable(
+            name = "seatAllocationRequest_allocationSchedules",
+            joinColumns = @JoinColumn(
+                    name = "request_id",
+                    referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "schedule_id",
+                    referencedColumnName = "id"
+            )
+    )
     private List<Schedule> seatAllocationSchedules = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "employee_of_allocation_id", referencedColumnName = "id")

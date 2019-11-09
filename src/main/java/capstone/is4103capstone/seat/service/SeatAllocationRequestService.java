@@ -159,16 +159,10 @@ public class SeatAllocationRequestService {
             }
         }
 
-        // Now it's safe to save the schedules
-        for (Schedule schedule :
-                schedules) {
-            schedule = scheduleRepository.save(schedule);
-        }
-
         // Set the new request attributes
         seatAllocationRequest.setTeam(requester.getTeam());
         seatAllocationRequest.setEmployeeOfAllocation(employeeOfAllocation);
-        seatAllocationRequest.setSeatAllocationSchedules(schedules);
+        // seatAllocationRequest.setSeatAllocationSchedules(schedules);
         seatAllocationRequest.setRequester(requester);
 
         // Create the initial approval ticket: escalate to the business unit level
@@ -176,6 +170,14 @@ public class SeatAllocationRequestService {
         SeatAdminMatch nextLevelMatch = seatAdminMatchService.retrieveMatchByHierarchyId(businessUnit.getId());
         Employee approver = nextLevelMatch.getSeatAdmin();
         String requestorComment = createSeatAllocationRequestModel.getComment();
+
+        // Now it's safe to save the schedules
+        for (Schedule schedule :
+                schedules) {
+            schedule = scheduleRepository.saveAndFlush(schedule);
+            System.out.println("*************************** Schedule ID: " + schedule.getId() + "  ***************************");
+            seatAllocationRequest.getSeatAllocationSchedules().add(schedule);
+        }
 
         // Copy from ApprovalTicketService
         ApprovalForRequest ticket = new ApprovalForRequest();
