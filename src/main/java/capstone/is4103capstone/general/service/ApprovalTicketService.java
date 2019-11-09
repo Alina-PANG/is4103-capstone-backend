@@ -244,7 +244,7 @@ public class ApprovalTicketService {
         return modifyRequest(ApprovalStatusEnum.REJECTED, ticket);
     }
 
-    public static boolean checkCurrentUserHasApprovalFor(String requestedItemId) throws  Exception{
+    public static boolean checkCurrentUserHasApprovalFor(String requestedItemId) throws Exception{
         EmployeeModel approverOfProject = getOpenTicketApproverByRequestedItem(requestedItemId);
         System.out.println(approverOfProject.getFullName()+" PROJECT "+requestedItemId);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
