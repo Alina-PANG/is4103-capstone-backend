@@ -54,13 +54,13 @@ public class AdminInitialization {
     @PostConstruct
     public void init() {
 
-        List<Currency> currencyList = currencyRepository.findAll();
-        if (currencyList == null || currencyList.size() == 0) {
-            createCurrency();
-            createGeo();
-            System.out.println("-----Created Geographies-----");
-            createEmployee();
-        }
+//        List<Currency> currencyList = currencyRepository.findAll();
+//        if (currencyList == null || currencyList.size() == 0) {
+//            createCurrency();
+//            createGeo();
+//            System.out.println("-----Created Geographies-----");
+//            createEmployee();
+//        }
 //        List<CostCenter> costCenterList = costCenterRepository.findAll();
 //        if (costCenterList == null || costCenterList.size() == 0) {
 //            createCostCenter();
@@ -74,7 +74,7 @@ public class AdminInitialization {
 //        }
 //         createEmployeeTemplate("PO","Last name","poteam","password","huangyingshi@gmail.com","PO_TEAM-1");
         // Seat management subsystem initialisation for sr2
-        // seatManagementInitialisation();
+        seatManagementInitialisation();
         seatInitializationService.initialiseSeatManagement();
 
     }
