@@ -53,6 +53,12 @@ public class CountryService {
             Country result = countryRepository.findCountryById(uuid);
             result.getFunctions().size();
             List<CompanyFunction> fs = result.getFunctions();
+            List<CompanyFunction> fsUndeleted = new ArrayList<>();
+            for (CompanyFunction f: fs){
+                if (!f.getDeleted())
+                    fsUndeleted.add(f);
+            }
+            result.setFunctions(fsUndeleted);
             return result;
         } catch (NoSuchElementException ex) {
             throw new Exception("No country with UUID " + uuid + " found in the database.");
