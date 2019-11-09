@@ -10,12 +10,12 @@ import java.util.List;
 public class SeatBlockedForUseDataModel implements Serializable {
     private GroupModel entity;
     private List<SeatBlockedForUseDataModel> children = new ArrayList<>();
-    private JSONObject seatBlockedCountWithDate;
+    private SeatBlockedForUseSingleDayGroupModel seatBlockedCountWithDate;
 
     public SeatBlockedForUseDataModel() {
     }
 
-    public SeatBlockedForUseDataModel(GroupModel entity, List<SeatBlockedForUseDataModel> children, JSONObject seatBlockedCountWithDate) {
+    public SeatBlockedForUseDataModel(GroupModel entity, List<SeatBlockedForUseDataModel> children, SeatBlockedForUseSingleDayGroupModel seatBlockedCountWithDate) {
         this.entity = entity;
         this.children = children;
         this.seatBlockedCountWithDate = seatBlockedCountWithDate;
@@ -37,11 +37,11 @@ public class SeatBlockedForUseDataModel implements Serializable {
         this.children = children;
     }
 
-    public JSONObject getSeatBlockedCountWithDate() {
+    public SeatBlockedForUseSingleDayGroupModel getSeatBlockedCountWithDate() {
         return seatBlockedCountWithDate;
     }
 
-    public void setSeatBlockedCountWithDate(JSONObject seatBlockedCountWithDate) {
+    public void setSeatBlockedCountWithDate(SeatBlockedForUseSingleDayGroupModel seatBlockedCountWithDate) {
         this.seatBlockedCountWithDate = seatBlockedCountWithDate;
     }
 }

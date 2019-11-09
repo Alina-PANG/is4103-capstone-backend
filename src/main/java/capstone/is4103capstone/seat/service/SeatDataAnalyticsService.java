@@ -442,21 +442,26 @@ public class SeatDataAnalyticsService {
         teamModel.setName(team.getObjectName());
         teamModel.setCode(team.getCode());
 
-        JSONObject jsonObject = new JSONObject();
+        SeatBlockedForUseSingleDayGroupModel seatBlockedForUseSingleDayGroupModel = new SeatBlockedForUseSingleDayGroupModel();
+        List<SeatBlockedForUseSingleDayModel> seatBlockedForUseSingleDayModels = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getInventoryCount());
+            SeatBlockedForUseSingleDayModel seatBlockedForUseSingleDayModel = new SeatBlockedForUseSingleDayModel();
+            seatBlockedForUseSingleDayModel.setDate(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()));
+            seatBlockedForUseSingleDayModel.setNumOfSeats(log.getInventoryCount());
+            seatBlockedForUseSingleDayModels.add(seatBlockedForUseSingleDayModel);
         }
+        seatBlockedForUseSingleDayGroupModel.setUsageData(seatBlockedForUseSingleDayModels);
 
         if (constructNew) {
             SeatBlockedForUseDataModel newModel = new SeatBlockedForUseDataModel();
             newModel.setEntity(teamModel);
-            newModel.setSeatBlockedCountWithDate(jsonObject);
+            newModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
             seatBlockedForUseDataModel.getChildren().add(newModel);
             return seatBlockedForUseDataModel;
         } else {
             seatBlockedForUseDataModel.setEntity(teamModel);
-            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(jsonObject);
+            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
             return seatBlockedForUseDataModel;
         }
     }
@@ -473,17 +478,21 @@ public class SeatDataAnalyticsService {
         unitModel.setName(businessUnit.getObjectName());
         unitModel.setCode(businessUnit.getCode());
 
-
-        JSONObject jsonObject = new JSONObject();
+        SeatBlockedForUseSingleDayGroupModel seatBlockedForUseSingleDayGroupModel = new SeatBlockedForUseSingleDayGroupModel();
+        List<SeatBlockedForUseSingleDayModel> seatBlockedForUseSingleDayModels = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getInventoryCount());
+            SeatBlockedForUseSingleDayModel seatBlockedForUseSingleDayModel = new SeatBlockedForUseSingleDayModel();
+            seatBlockedForUseSingleDayModel.setDate(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()));
+            seatBlockedForUseSingleDayModel.setNumOfSeats(log.getInventoryCount());
+            seatBlockedForUseSingleDayModels.add(seatBlockedForUseSingleDayModel);
         }
+        seatBlockedForUseSingleDayGroupModel.setUsageData(seatBlockedForUseSingleDayModels);
 
         if (constructNew) {
             SeatBlockedForUseDataModel newModel = new SeatBlockedForUseDataModel();
             newModel.setEntity(unitModel);
-            newModel.setSeatBlockedCountWithDate(jsonObject);
+            newModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
             seatBlockedForUseDataModel.getChildren().add(newModel);
             // Construct children: teams under the business unit
             List<Team> teams = teamRepository.findOnesUnderBusinessUnit(levelEntityId);
@@ -494,7 +503,7 @@ public class SeatDataAnalyticsService {
             return seatBlockedForUseDataModel;
         } else {
             seatBlockedForUseDataModel.setEntity(unitModel);
-            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(jsonObject);
+            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
             // Construct children: teams under the business unit
             List<Team> teams = teamRepository.findOnesUnderBusinessUnit(levelEntityId);
             for (Team team :
@@ -518,12 +527,17 @@ public class SeatDataAnalyticsService {
         functionModel.setCode(companyFunction.getCode());
         seatBlockedForUseDataModel.setEntity(functionModel);
 
-        JSONObject jsonObject = new JSONObject();
+        SeatBlockedForUseSingleDayGroupModel seatBlockedForUseSingleDayGroupModel = new SeatBlockedForUseSingleDayGroupModel();
+        List<SeatBlockedForUseSingleDayModel> seatBlockedForUseSingleDayModels = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getInventoryCount());
+            SeatBlockedForUseSingleDayModel seatBlockedForUseSingleDayModel = new SeatBlockedForUseSingleDayModel();
+            seatBlockedForUseSingleDayModel.setDate(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()));
+            seatBlockedForUseSingleDayModel.setNumOfSeats(log.getInventoryCount());
+            seatBlockedForUseSingleDayModels.add(seatBlockedForUseSingleDayModel);
         }
-        seatBlockedForUseDataModel.setSeatBlockedCountWithDate(jsonObject);
+        seatBlockedForUseSingleDayGroupModel.setUsageData(seatBlockedForUseSingleDayModels);
+        seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
 
         // Construct children: business units under the function
         List<BusinessUnit> businessUnits = businessUnitRepository.findOnesUnderCompanyFunction(levelEntityId);
@@ -549,20 +563,25 @@ public class SeatDataAnalyticsService {
         seatMapModel.setName(seatMap.getObjectName());
         seatMapModel.setCode(seatMap.getCode());
 
-        JSONObject jsonObject = new JSONObject();
+        SeatBlockedForUseSingleDayGroupModel seatBlockedForUseSingleDayGroupModel = new SeatBlockedForUseSingleDayGroupModel();
+        List<SeatBlockedForUseSingleDayModel> seatBlockedForUseSingleDayModels = new ArrayList<>();
         for (SeatUtilisationLog log :
                 seatUtilisationLogs) {
-            jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getOccupancyCount());
+            SeatBlockedForUseSingleDayModel seatBlockedForUseSingleDayModel = new SeatBlockedForUseSingleDayModel();
+            seatBlockedForUseSingleDayModel.setDate(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()));
+            seatBlockedForUseSingleDayModel.setNumOfSeats(log.getInventoryCount());
+            seatBlockedForUseSingleDayModels.add(seatBlockedForUseSingleDayModel);
         }
+        seatBlockedForUseSingleDayGroupModel.setUsageData(seatBlockedForUseSingleDayModels);
 
         if (constructNew) {
             SeatBlockedForUseDataModel newModel = new SeatBlockedForUseDataModel();
             newModel.setEntity(seatMapModel);
-            newModel.setSeatBlockedCountWithDate(jsonObject);
+            newModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
             seatBlockedForUseDataModel.getChildren().add(newModel);
         } else {
             seatBlockedForUseDataModel.setEntity(seatMapModel);
-            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(jsonObject);
+            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
         }
 
         return seatBlockedForUseDataModel;
@@ -582,19 +601,24 @@ public class SeatDataAnalyticsService {
             officeModel.setCode(office.getCode());
             seatBlockedForUseDataModel.setEntity(officeModel);
 
-            JSONObject jsonObject = new JSONObject();
+            SeatBlockedForUseSingleDayGroupModel seatBlockedForUseSingleDayGroupModel = new SeatBlockedForUseSingleDayGroupModel();
+            List<SeatBlockedForUseSingleDayModel> seatBlockedForUseSingleDayModels = new ArrayList<>();
             for (SeatUtilisationLog log :
                     seatUtilisationLogs) {
-                jsonObject.put(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()).toString(), log.getOccupancyCount());
+                SeatBlockedForUseSingleDayModel seatBlockedForUseSingleDayModel = new SeatBlockedForUseSingleDayModel();
+                seatBlockedForUseSingleDayModel.setDate(DateHelper.getDateWithoutTimeUsingCalendar(log.getCreatedTime()));
+                seatBlockedForUseSingleDayModel.setNumOfSeats(log.getInventoryCount());
+                seatBlockedForUseSingleDayModels.add(seatBlockedForUseSingleDayModel);
             }
-            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(jsonObject);
+            seatBlockedForUseSingleDayGroupModel.setUsageData(seatBlockedForUseSingleDayModels);
+            seatBlockedForUseDataModel.setSeatBlockedCountWithDate(seatBlockedForUseSingleDayGroupModel);
 
             // Construct children: business units under the function
             List<SeatMap> seatMaps = seatMapRepository.findOnesAtOffice(levelEntityId);
             for (SeatMap map :
                     seatMaps) {
                 SeatBlockedForUseDataModel childModel = new SeatBlockedForUseDataModel();
-                childModel = aggregateOfficeFloorSeatBlockedForUseData(childModel, map.getId(), officeId, startDate, endDate, true);
+                childModel = aggregateOfficeFloorSeatBlockedForUseData(childModel, map.getId(), officeId, startDate, endDate, false);
                 seatBlockedForUseDataModel.getChildren().add(childModel);
             }
             return seatBlockedForUseDataModel;

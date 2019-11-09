@@ -74,8 +74,8 @@ public class AdminInitialization {
 //        }
 //         createEmployeeTemplate("PO","Last name","poteam","password","huangyingshi@gmail.com","PO_TEAM-1");
         // Seat management subsystem initialisation for sr2
-        // seatManagementInitialisation();
-        seatInitializationService.initialiseSeatManagement();
+        seatManagementInitialisation();
+        // seatInitializationService.initialiseSeatManagement();
 
     }
     private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
@@ -492,20 +492,23 @@ public class AdminInitialization {
 
     private void seatManagementInitialisation() {
 
-        Employee yuqian = employeeRepository.findEmployeeByUserName("caiyuqian");
-        if (yuqian != null) return;
+        Employee hangzhi = employeeRepository.findEmployeeByUserName("panghangzhi");
+        if (hangzhi != null) return;
 
+        Employee yuqian = employeeRepository.findEmployeeByUserName("caiyuqian");
         Employee admin = employeeRepository.findEmployeeByUserName("admin");
 
         // Create other employees
-        yuqian = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
-        yuqian.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
-        yuqian.setCode("EMPLOYEE-caiyuqian");
-        yuqian.setCreatedBy("admin");
-        yuqian.setEmail("yuqiancai987@gmail.com");
-        yuqian.setLastModifiedBy("admin");
+        // Hierarchy: Admin (Office manager) -> Joshua (BU lead) -> Hangzhi (Team lead) -> Yuqian (team member)
 
-        Employee hangzhi = new Employee("panghangzhi", "Hangzhi", "Pang", "", "password");
+//        yuqian = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
+//        yuqian.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
+//        yuqian.setCode("EMPLOYEE-caiyuqian");
+//        yuqian.setCreatedBy("admin");
+//        yuqian.setEmail("yuqiancai987@gmail.com");
+//        yuqian.setLastModifiedBy("admin");
+
+        hangzhi = new Employee("panghangzhi", "Hangzhi", "Pang", "", "password");
         hangzhi.setEmployeeType(EmployeeTypeEnum.PERMANENT);
         hangzhi.setCode("EMPLOYEE-hangzhipang");
         hangzhi.setCreatedBy("admin");
@@ -519,7 +522,6 @@ public class AdminInitialization {
         joshua.setEmail("chewzhj@gmail.com");
         joshua.setLastModifiedBy("admin");
 
-        yuqian = employeeRepository.save(yuqian);
         joshua = employeeRepository.save(joshua);
         hangzhi = employeeRepository.save(hangzhi);
 

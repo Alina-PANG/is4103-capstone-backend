@@ -416,13 +416,12 @@ public class SeatInitializationService {
             initialiseTeamSeatUtilisationLog(yesterday, 32);
             initialiseBusinessUnitUtilisationLog(yesterday, 32);
             initialiseCompanyFunctionUtilisationLog(yesterday, 32);
+            initialiseOfficeAndOfficeFloorUtilisationLog(yesterday, 32);
         }
     }
 
     private void initialiseTeamSeatUtilisationLog(Date date, int periodLength) {
-        System.out.println("****************************** initialiseTeamSeatUtilisationLog ******************************");
         // SG-Tech-FixIncTech-Dev
-        System.out.println("*************** SG-Tech-FixIncTech-Dev ***************");
         Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
         if (devTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -434,7 +433,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(devTeam.getId());
@@ -459,9 +457,7 @@ public class SeatInitializationService {
             }
         }
 
-        System.out.println("-----------------------------------------------------------");
         // SG-Tech-FixIncTech-ProdSupp
-        System.out.println("*************** SG-Tech-FixIncTech-ProdSupp ***************");
         Team prodSuppTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
         if (prodSuppTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -473,7 +469,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(prodSuppTeam.getId());
@@ -501,9 +496,7 @@ public class SeatInitializationService {
         }
 
 
-        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech-DataCenOpr
-        System.out.println("*************** SG-Tech-InfraTech-DataCenOpr ***************");
         Team dataCenOpeTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DataCenOpr");
         if (dataCenOpeTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -515,7 +508,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(dataCenOpeTeam.getId());
@@ -542,9 +534,7 @@ public class SeatInitializationService {
             }
         }
 
-        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech-Networks
-        System.out.println("*************** SG-Tech-InfraTech-Networks ***************");
         Team networksTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
         if (networksTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -556,7 +546,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(networksTeam.getId());
@@ -581,9 +570,7 @@ public class SeatInitializationService {
             }
         }
 
-        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech-DBAdmin
-        System.out.println("*************** SG-Tech-InfraTech-DBAdmin ***************");
         Team dbAdminTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
         if (dbAdminTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -595,7 +582,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(dbAdminTeam.getId());
@@ -612,9 +598,7 @@ public class SeatInitializationService {
             }
         }
 
-        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech-EndUserCom
-        System.out.println("*************** SG-Tech-InfraTech-EndUserCom ***************");
         Team endUserComTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-EndUserCom");
         if (endUserComTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -626,7 +610,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(endUserComTeam.getId());
@@ -644,9 +627,7 @@ public class SeatInitializationService {
         }
 
 
-        System.out.println("-----------------------------------------------------------");
         // SG-HR-RCR-INT
-        System.out.println("*************** SG-HR-RCR-INT ***************");
         Team intTeam = teamRepository.findTeamByCode("SG-HR-RCR-INT");
         if (intTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -658,7 +639,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(intTeam.getId());
@@ -682,12 +662,10 @@ public class SeatInitializationService {
     }
 
     private void initialiseBusinessUnitUtilisationLog(Date date, int periodLength) {
-        System.out.println("****************************** initialiseBusinessUnitUtilisationLog ******************************");
 
         Optional<Office> office = officeRepository.findByName("One Raffles Quay");
 
         // SG-Tech-FixIncTech
-        System.out.println("*************** SG-Tech-FixIncTech ***************");
         Optional<BusinessUnit> optionalFixIncTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-FixIncTech");
         Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
         Team prodSuppTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
@@ -702,7 +680,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 Integer inventory = 0;
@@ -731,9 +708,7 @@ public class SeatInitializationService {
         }
 
 
-        System.out.println("-----------------------------------------------------------");
         // SG-Tech-InfraTech
-        System.out.println("*************** SG-Tech-InfraTech ***************");
         Optional<BusinessUnit> optionalInfraTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-InfraTech");
         Team networksTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
         Team dataCtrOprTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DataCenOpr");
@@ -748,7 +723,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 Integer inventory = 0;
                 Integer occupancy = 0;
@@ -777,9 +751,7 @@ public class SeatInitializationService {
         }
 
 
-        System.out.println("-----------------------------------------------------------");
         // SG-HR-RCR
-        System.out.println("*************** SG-HR-RCR ***************");
         Optional<BusinessUnit> optionalRecruiting = businessUnitRepository.findByCodeNonDeleted("SG-HR-RCR");
         Team interviewTeam = teamRepository.findTeamByCode("SG-HR-RCR-INT");
         if (optionalRecruiting.isPresent()) {
@@ -793,7 +765,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 Integer inventory = 0;
                 Integer occupancy = 0;
@@ -836,7 +807,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 Integer inventory = 0;
                 Integer occupancy = 0;
@@ -878,7 +848,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 Integer inventory = 0;
                 Integer occupancy = 0;
@@ -920,7 +889,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(level26.getId());
@@ -941,7 +909,7 @@ public class SeatInitializationService {
         }
 
         // Floor 27 only concerns HR function
-        Optional<SeatMap> optionalSeatMapLvl27 = seatMapRepository.findByCode("SG-ORQ-26");
+        Optional<SeatMap> optionalSeatMapLvl27 = seatMapRepository.findByCode("SG-ORQ-27");
         if (optionalSeatMapLvl27.isPresent()) {
             SeatMap level27 = optionalSeatMapLvl27.get();
             CompanyFunction hrFunction = functionRepository.findByCode("SG-HR").get();
@@ -954,7 +922,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-                System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 newLog.setLevelEntityId(level27.getId());
@@ -987,7 +954,6 @@ public class SeatInitializationService {
             int year = DateHelper.getYearFromDate(dateCounter);
             int month = DateHelper.getMonthFromDate(dateCounter);
             int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-            System.out.println("*************** Date: " + year + " " + month + " " + dayOfMonth + " ***************");
 
             Integer inventory = 0;
             Integer occupancy = 0;
