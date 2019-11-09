@@ -54,13 +54,13 @@ public class AdminInitialization {
     @PostConstruct
     public void init() {
 
-        List<Currency> currencyList = currencyRepository.findAll();
-        if (currencyList == null || currencyList.size() == 0) {
-            createCurrency();
-            createGeo();
-            System.out.println("-----Created Geographies-----");
-            createEmployee();
-        }
+//        List<Currency> currencyList = currencyRepository.findAll();
+//        if (currencyList == null || currencyList.size() == 0) {
+//            createCurrency();
+//            createGeo();
+//            System.out.println("-----Created Geographies-----");
+//            createEmployee();
+//        }
 //        List<CostCenter> costCenterList = costCenterRepository.findAll();
 //        if (costCenterList == null || costCenterList.size() == 0) {
 //            createCostCenter();
@@ -568,7 +568,7 @@ public class AdminInitialization {
         // Create management hierarchy levels
 
         // Fixed Income Development
-        Team devTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncomeTech-Dev");
+        Team devTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-Dev");
 
         hangzhi.setTeam(devTeam);
         devTeam.setTeamLeader(hangzhi);
@@ -584,7 +584,7 @@ public class AdminInitialization {
         hangzhi.setManager(joshua);
         joshua.getSubordinates().add(hangzhi);
 
-        Team prodSuppTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncomeTech-ProdSupp");
+        Team prodSuppTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-ProdSupp");
         Team dbAdminTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-DBAdmin");
         Team networksTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-Networks");
 
