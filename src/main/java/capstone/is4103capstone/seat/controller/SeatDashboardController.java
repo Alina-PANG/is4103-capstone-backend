@@ -35,14 +35,10 @@ public class SeatDashboardController {
 
 
     @GetMapping("/utilisation/entity")
-    public ResponseEntity retrieveBusinessLevelEntitySeatUtilisationAnalysis(@RequestParam(name = "hierarchyType") String hierarchyType,
-                                                                             @RequestParam(name = "entityId") String entityId,
-                                                                             @RequestParam(name = "officeId") String officeId,
-                                                                             @RequestParam(name = "startDate") Date startDate,
-                                                                             @RequestParam(name = "endDate") Date endDate) {
+    public ResponseEntity retrieveBusinessLevelEntitySeatUtilisationAnalysis(@RequestBody SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
 
         SeatUtilisationDataModel seatUtilisationDataModel = new SeatUtilisationDataModel();
-        seatUtilisationDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatUtilisationAnalysis(hierarchyType, entityId, officeId, startDate, endDate);
+        seatUtilisationDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatUtilisationAnalysis(seatDataAnalysisRequestModel);
         Collections.sort(seatUtilisationDataModel.getLogs());
         return ResponseEntity.ok(seatUtilisationDataModel);
     }
@@ -68,13 +64,9 @@ public class SeatDashboardController {
     // -------------------------------------- Blocked For Use (Per Office) --------------------------------------
 
     @GetMapping("/blocked/use/office")
-    public ResponseEntity retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(@RequestParam(name = "hierarchyType") String hierarchyType,
-                                                                                      @RequestParam(name = "entityId") String entityId,
-                                                                                      @RequestParam(name = "officeId") String officeId,
-                                                                                      @RequestParam(name = "startDate") Date startDate,
-                                                                                      @RequestParam(name = "endDate") Date endDate) {
+    public ResponseEntity retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(@RequestBody SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
 
-        SeatBlockedForUseDataModel seatBlockedForUseDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(hierarchyType, entityId, officeId, startDate, endDate);
+        SeatBlockedForUseDataModel seatBlockedForUseDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(seatDataAnalysisRequestModel);
         return ResponseEntity.ok(seatBlockedForUseDataModel);
     }
 
