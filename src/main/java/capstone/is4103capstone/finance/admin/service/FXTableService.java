@@ -126,5 +126,12 @@ public class FXTableService {
 
     }
 
+    public BigDecimal convertToDBP(String oriCurr, BigDecimal amt){
+        return convertWithLatesrCurr(oriCurr,"GBP",amt);
+    }
 
+    public BigDecimal convertWithLatesrCurr(String oriCurr, String destCurr,BigDecimal amt){
+
+        return null;
+    }
 }

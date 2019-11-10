@@ -92,7 +92,7 @@ public class SeatAllocationRequestService {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: employee info of the allocation is required!");
         }
         String employeeIdOfAllocation = createSeatAllocationRequestModel.getEmployeeIdOfAllocation();
-        Employee employeeOfAllocation = employeeService.retrieveEmployeeById(employeeIdOfAllocation);
+        Employee employeeOfAllocation = employeeService.validateUser(employeeIdOfAllocation);
         // Validate the employee: check whether the employee is under the team managed by the requester
         if (!employeeOfAllocation.getTeam().getId().equals(requester.getTeam().getId())) {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: employee " + employeeIdOfAllocation +

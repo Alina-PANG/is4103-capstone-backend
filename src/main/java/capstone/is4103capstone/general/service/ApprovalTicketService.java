@@ -7,6 +7,8 @@ import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.finance.Repository.ApprovalForRequestRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
+import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.finance.requestsMgmt.service.ProjectService;
 import capstone.is4103capstone.finance.requestsMgmt.service.TrainingService;
@@ -52,6 +54,9 @@ public class ApprovalTicketService {
     TrainingService trainingService;
     @Autowired
     ProjectService projectService;
+    @Autowired
+    BudgetService budgetService;
+
 
     @Value("${spring.mail.username}")
     private static String senderEmailAddr;
@@ -313,12 +318,22 @@ public class ApprovalTicketService {
     }
 
     private void mapApprovalType(ApprovalForRequest ticket) throws Exception{
+        ApproveBudgetReq req = null;
         switch (ticket.getApprovalType()){
             case CONTRACT:
                 System.out.println("Already implemented in other ways");
                 break;
-            case BUDGETPLAN:
-                System.out.println("Already implemented in other ways");
+            case BUDGETPLAN_BM:
+                 req = new ApproveBudgetReq(
+                        ticket.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED),
+                        ticket.getApprover().getUserName(),ticket.getRequestedItemId(),ticket.getCommentByApprover(), 0);
+                budgetService.approveBudget(req);
+                break;
+            case BUDGETPLAN_FUNCTION:
+                req = new ApproveBudgetReq(
+                        ticket.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED),
+                        ticket.getApprover().getUserName(),ticket.getRequestedItemId(),ticket.getCommentByApprover(), 1);
+                budgetService.approveBudget(req);
                 break;
             case TRAVEL:
                 travelService.travelPlanApproval(ticket);
