@@ -15,6 +15,7 @@ public class SpendingRecord extends DBEntityTemplate {
 //    private String poId;
     private String serviceId;
     private BigDecimal spendingAmt;
+    private BigDecimal spendingAmtInGBP;
     private String currencyCode;
     private String serviceName;
 
@@ -40,6 +41,14 @@ public class SpendingRecord extends DBEntityTemplate {
         this.currencyCode = currencyCode;
         this.relatedPO = relatedPO;
         this.serviceName = serviceName;
+    }
+
+    public BigDecimal getSpendingAmtInGBP() {
+        return spendingAmtInGBP;
+    }
+
+    public void setSpendingAmtInGBP(BigDecimal spendingAmtInGBP) {
+        this.spendingAmtInGBP = spendingAmtInGBP;
     }
 
     public String getServiceName() {

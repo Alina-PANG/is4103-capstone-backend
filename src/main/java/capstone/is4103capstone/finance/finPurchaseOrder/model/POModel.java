@@ -11,7 +11,7 @@ public class POModel {
     String code;
     String vendorName;
     String vendorId;
-    Double totalAmount;
+    BigDecimal totalAmount;
     String currencyCode;
     BigDecimal totalPaidAmount;
     String poStatus;
@@ -21,7 +21,7 @@ public class POModel {
     public POModel() {
     }
 
-    public POModel(String id, String code, String vendorName, String vendorId, Double totalAmount, String currencyCode) {
+    public POModel(String id, String code, String vendorName, String vendorId, BigDecimal totalAmount, String currencyCode) {
         this.id = id;
         this.code = code;
         this.vendorName = vendorName;
@@ -38,7 +38,7 @@ public class POModel {
         this.poStatus = poStatus;
     }
 
-    public POModel(String id, String code, String vendorName, String vendorId, Double totalAmount, String currencyCode, BigDecimal totalPaidAmount) {
+    public POModel(String id, String code, String vendorName, String vendorId, BigDecimal totalAmount, String currencyCode, BigDecimal totalPaidAmount) {
         this.id = id;
         this.code = code;
         this.vendorName = vendorName;
@@ -64,7 +64,7 @@ public class POModel {
         this.totalPaidAmount = totalPaidAmount;
     }
 
-    public POModel(String vendorName, String vendorId, Double totalAmount, String currencyCode) {
+    public POModel(String vendorName, String vendorId, BigDecimal totalAmount, String currencyCode) {
         this.vendorName = vendorName;
         this.vendorId = vendorId;
         this.totalAmount = totalAmount;
@@ -87,11 +87,11 @@ public class POModel {
         this.vendorId = vendorId;
     }
 
-    public Double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(Double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 

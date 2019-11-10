@@ -122,5 +122,13 @@ public class Plan extends DBEntityTemplate {
         return total;
     }
 
+    public BigDecimal calculateTotalInDBP(){
+        BigDecimal total = BigDecimal.ZERO;
+        for (PlanLineItem item: getLineItems()){
+            total = total.add(item.getBudgetAmountInGBP());
+        }
+        return total;
+    }
+
 
 }

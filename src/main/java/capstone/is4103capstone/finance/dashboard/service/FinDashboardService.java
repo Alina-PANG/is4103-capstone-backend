@@ -64,7 +64,6 @@ public class FinDashboardService {
                 serviceAndActualMapping.put(servCode, m.getTotalSpendingPerService());
             }
             allServices.add(servCode);
-            defaultCurrency = m.getSPCurrencyCode();
         }
 
         // find the budget & lastest reforecast for each service by country;
@@ -87,8 +86,6 @@ public class FinDashboardService {
             String combinedKey = ccCode +"|"+ serviceCode;
             budgetReforecastMapping.put(combinedKey,reforecastItem.getAmount());
             allServices.add(serviceCode);
-            defaultCurrency = reforecastItem.getCurrency();
-
         }
 
         HashMap<String, BigDecimal> budgetServiceMapping = new HashMap<>();
@@ -111,8 +108,6 @@ public class FinDashboardService {
             }else{
                 budgetServiceMapping.put(serviceCode,budgetModel.getAmount());
             }
-            defaultCurrency = budgetModel.getCurrency();
-
         }
 
         HashMap<String, BigDecimal> reforecastServMapping = new HashMap<>();
@@ -138,7 +133,7 @@ public class FinDashboardService {
             thisService.setActuals(serviceAndActualMapping.getOrDefault(serviceCode,BigDecimal.ZERO));
             thisService.setTotalBudget(budgetServiceMapping.getOrDefault(serviceCode,BigDecimal.ZERO));
             thisService.setLatestReforecast(reforecastServMapping.getOrDefault(serviceCode,BigDecimal.ZERO));
-            thisService.setCurrencyCode(defaultCurrency);
+            thisService.setCurrencyCode("GBP");
             serviceLevelAggre.put(serviceCode,thisService);
             results.add(thisService);
         }

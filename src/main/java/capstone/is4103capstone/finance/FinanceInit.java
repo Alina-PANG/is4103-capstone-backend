@@ -5,7 +5,12 @@ import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.Country;
 import capstone.is4103capstone.entities.finance.*;
+import capstone.is4103capstone.entities.supplyChain.ChildContract;
+import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.finance.Repository.*;
+import capstone.is4103capstone.finance.admin.service.FXTableService;
+import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
+import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +43,17 @@ public class FinanceInit {
     PurchaseOrderRepository purchaseOrderRepository;
     @Autowired
     EmployeeService employeeService;
+    @Autowired
+    FXTableService fxService;
+    @Autowired
+    ContractRepository contractRepo;
+    @Autowired
+    ChildContractRepository childContractRepo;
+    @Autowired
+    SpendingRecordRepository spendingRecordRepository;
+    @Autowired
+    StatementOfAccountLineItemRepository soaRepo;
+
 
     FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
     private String generateCode(JpaRepository repo, DBEntityTemplate entity){
@@ -52,6 +68,36 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
+//        List<StatementOfAcctLineItem> soa = soaRepo.findAll();
+//        for (StatementOfAcctLineItem s:soa){
+//            PurchaseOrder po = s.getPurchaseOrder();
+//            s.setActualPmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),s.getActualPmt()));
+//            s.setPaidAmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),s.getPaidAmt()));
+//            soaRepo.saveAndFlush(s);
+//        }
+//        List<PurchaseOrder> pos = purchaseOrderRepository.findAll();
+//        for (PurchaseOrder po: pos){
+//            po.setTotalAmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),po.getTotalAmount()));
+//            purchaseOrderRepository.saveAndFlush(po);
+//        }
+//
+//        List<SpendingRecord> sps = spendingRecordRepository.findAll();
+//        for (SpendingRecord sp: sps){
+//            sp.setSpendingAmtInGBP(fxService.convertToGBPWithLatest(sp.getCurrencyCode(),sp.getSpendingAmt()));
+//            spendingRecordRepository.saveAndFlush(sp);
+//        }
+
+//        List<Contract> contracts = contractRepo.findAll();
+//        for (Contract c:contracts){
+//            c.setContractValueInGBP(fxService.convertToGBPWithLatest(c.getCurrencyCode(),c.getTotalContractValue()));
+//            contractRepo.saveAndFlush(c);
+//        }
+//
+//        List<ChildContract> childContracts = childContractRepo.findAll();
+//        for (ChildContract c: childContracts){
+//            c.setContractValueInGBP(fxService.convertToGBPWithLatest(c.getMasterContract().getCurrencyCode(),c.getContractValue()));
+//            childContractRepo.saveAndFlush(c);
+//        }
 
 //        List<PurchaseOrder> po = purchaseOrderRepository.findAll();
 //        for (PurchaseOrder p :po){

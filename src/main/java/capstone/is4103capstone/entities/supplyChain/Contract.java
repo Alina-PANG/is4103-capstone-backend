@@ -74,28 +74,17 @@ public class Contract extends DBEntityTemplate {
 
     private String currencyCode;
 
-    public Contract(String contractDescription, PurchaseTypeEnum purchaseType, Date startDate, Date endDate, Date renewalStartDate, String contractTerm, ContractTypeEnum contractType, ContractStatusEnum contractStatus, Integer noticeDaysToExit, BigDecimal totalContractValue, Date cpgReviewAlertDate, String spendType, Vendor vendor, List<ChildContract> childContractList, Employee employeeInChargeContract, Employee approver, Team team, String currencyCode) {
-        this.contractDescription = contractDescription;
-        this.purchaseType = purchaseType;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.renewalStartDate = renewalStartDate;
-        this.contractTerm = contractTerm;
-        this.contractType = contractType;
-        this.contractStatus = contractStatus;
-        this.noticeDaysToExit = noticeDaysToExit;
-        this.totalContractValue = totalContractValue;
-        this.cpgReviewAlertDate = cpgReviewAlertDate;
-        this.spendType = spendType;
-        this.vendor = vendor;
-        this.childContractList = childContractList;
-        this.employeeInChargeContract = employeeInChargeContract;
-        this.approver = approver;
-        this.team = team;
-        this.currencyCode = currencyCode;
-    }
+    private BigDecimal contractValueInGBP;
 
     public Contract() {
+    }
+
+    public BigDecimal getContractValueInGBP() {
+        return contractValueInGBP;
+    }
+
+    public void setContractValueInGBP(BigDecimal contractValueInGBP) {
+        this.contractValueInGBP = contractValueInGBP;
     }
 
     public Employee getApprover() {
