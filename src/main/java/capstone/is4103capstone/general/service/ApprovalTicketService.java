@@ -309,7 +309,6 @@ public class ApprovalTicketService {
         String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityIdAndApproverId(requestedItem.getId(),approverId);
         if (!ticketOp.isPresent()) return false;
-
         ApprovalForRequest ticket = ticketOp.get();
         ticket.setCommentByApprover(comment);
         return modifyRequest(ApprovalStatusEnum.REJECTED, ticket);
@@ -334,7 +333,6 @@ public class ApprovalTicketService {
 
     private static boolean modifyRequest(ApprovalStatusEnum result, ApprovalForRequest ticket){
         try{
-
             ticket.setApprovalStatus(result);
             ticket.setLastModifiedBy(ticket.getRequester().getUserName());
             approvalForRequestRepo.save(ticket);
