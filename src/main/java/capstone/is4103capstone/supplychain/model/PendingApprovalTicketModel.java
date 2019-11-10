@@ -1,43 +1,46 @@
 package capstone.is4103capstone.supplychain.model;
 
+import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
+import capstone.is4103capstone.seat.model.EmployeeModel;
+import capstone.is4103capstone.util.Tools;
 
 import java.io.Serializable;
 
 public class PendingApprovalTicketModel implements Serializable {
-    private String itemId;
-    private String itemCode;
+    private GeneralEntityModel item;
     private String entityName;
     private String ticketCode;
     private String commentByRequester;
-    private GeneralEntityModel requester;
+    private EmployeeModel requester;
+    private String ticketCreatedDateTime;
 
     public PendingApprovalTicketModel() {
     }
 
-    public PendingApprovalTicketModel(String itemId, String itemCode, String entityName, String ticketCode, String commentByRequester, GeneralEntityModel requester) {
-        this.itemId = itemId;
-        this.itemCode = itemCode;
-        this.entityName = entityName;
-        this.ticketCode = ticketCode;
-        this.commentByRequester = commentByRequester;
-        this.requester = requester;
+    public PendingApprovalTicketModel(DBEntityTemplate entity, ApprovalForRequest ticket){
+        setCommentByRequester(ticket.getCommentByRequester());
+        setTicketCode(ticket.getCode());
+        setEntityName(entity.getClass().getSimpleName());
+        setItem(new GeneralEntityModel(entity));
+        setRequester(new EmployeeModel(ticket.getRequester()));
+        setTicketCreatedDateTime(Tools.datetimeFormatter.format(ticket.getCreatedDateTime()));
+    }
+    public GeneralEntityModel getItem() {
+        return item;
     }
 
-    public String getItemId() {
-        return itemId;
+    public void setItem(GeneralEntityModel item) {
+        this.item = item;
     }
 
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
+    public String getTicketCreatedDateTime() {
+        return ticketCreatedDateTime;
     }
 
-    public String getItemCode() {
-        return itemCode;
-    }
-
-    public void setItemCode(String itemCode) {
-        this.itemCode = itemCode;
+    public void setTicketCreatedDateTime(String ticketCreatedDateTime) {
+        this.ticketCreatedDateTime = ticketCreatedDateTime;
     }
 
     public String getEntityName() {
@@ -64,11 +67,11 @@ public class PendingApprovalTicketModel implements Serializable {
         this.commentByRequester = commentByRequester;
     }
 
-    public GeneralEntityModel getRequester() {
+    public EmployeeModel getRequester() {
         return requester;
     }
 
-    public void setRequester(GeneralEntityModel requester) {
+    public void setRequester(EmployeeModel requester) {
         this.requester = requester;
     }
 }
