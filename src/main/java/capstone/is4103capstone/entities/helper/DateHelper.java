@@ -7,6 +7,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DateHelper {
+
+    // ------------------------------------- Get Date -------------------------------------
+
     public static Date getDateWithoutTimeUsingCalendar(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -15,6 +18,17 @@ public class DateHelper {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
+        return calendar.getTime();
+    }
+
+    // Note: month in Java's calendar is zero-based
+    public static Date getDateByYearMonthDateHourMinute(int year, int month, int date, int hour, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month-1, date);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTime();
     }
 
@@ -38,16 +52,9 @@ public class DateHelper {
         return calendar.getTime();
     }
 
-    // Note: month in Java's calendar is zero-based
-    public static Date getDateByYearMonthDateHourMinute(int year, int month, int date, int hour, int minute) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month-1, date);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
-    }
+
+
+    // ------------------------------------- Get Time Components -------------------------------------
 
     public static DayOfWeek getDayOfWeekFromDate(Date date) {
         Calendar calendar = Calendar.getInstance();

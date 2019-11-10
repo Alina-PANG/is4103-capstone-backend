@@ -10,6 +10,7 @@ import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.seat.*;
 import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapExistenceCheckingModel;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForAllocationWithHighlight;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForSetup;
 import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
@@ -445,6 +446,16 @@ public class SeatMapService {
     public Optional<SeatMap> retrieveSeatMapWithActiveEmployeeAllocations(String seatMapId, String employeeId) throws EmployeeNotFoundException, SeatMapNotFoundException {
         Employee employee = employeeService.retrieveEmployeeById(employeeId);
         return seatMapRepository.findBySeatMapIdAndActiveEmployeeSeatAllocation(seatMapId, employee.getId());
+    }
+
+
+    public SeatMapExistenceCheckingModel checkSeatMapExistenceByOfficeAndFloor(String officeId, String floor) {
+        Optional<SeatMap> optionalSeatMap = seatMapRepository.findByOfficeIdAndFloor(officeId, floor);
+        if (optionalSeatMap.isPresent()) {
+            return new SeatMapExistenceCheckingModel(true);
+        } else {
+            return new SeatMapExistenceCheckingModel(false);
+        }
     }
 
 

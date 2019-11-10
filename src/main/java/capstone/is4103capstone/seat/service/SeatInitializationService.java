@@ -1,17 +1,13 @@
 package capstone.is4103capstone.seat.service;
 
-import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
-import capstone.is4103capstone.admin.repository.FunctionRepository;
-import capstone.is4103capstone.admin.repository.OfficeRepository;
-import capstone.is4103capstone.admin.repository.TeamRepository;
-import capstone.is4103capstone.entities.BusinessUnit;
-import capstone.is4103capstone.entities.CompanyFunction;
-import capstone.is4103capstone.entities.Office;
-import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.admin.repository.*;
+import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.DateHelper;
 import capstone.is4103capstone.entities.seat.Seat;
+import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.entities.seat.SeatUtilisationLog;
+import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.seat.repository.SeatRepository;
 import capstone.is4103capstone.seat.repository.SeatUtilisationLogRepository;
@@ -35,6 +31,8 @@ public class SeatInitializationService {
     @Autowired
     private SeatUtilisationLogRepository seatUtilisationLogRepository;
     @Autowired
+    private SeatAdminMatchRepository seatAdminMatchRepository;
+    @Autowired
     private OfficeRepository officeRepository;
     @Autowired
     private TeamRepository teamRepository;
@@ -42,6 +40,8 @@ public class SeatInitializationService {
     private BusinessUnitRepository businessUnitRepository;
     @Autowired
     private FunctionRepository functionRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
 
     public void initialiseSeatManagement() {
@@ -56,6 +56,7 @@ public class SeatInitializationService {
         }
 
         Optional<Office> office = officeRepository.findByName("One Raffles Quay");
+        Employee admin = employeeRepository.findEmployeeByUserName("admin");
         if (office.isPresent()) {
             try {
 
@@ -248,6 +249,12 @@ public class SeatInitializationService {
                 }
                 office.get().getFloors().add("26");
                 officeRepository.save(office.get());
+
+                SeatAdminMatch newSeatAdminMatch = new SeatAdminMatch();
+                newSeatAdminMatch.setHierarchyId(newSeatMapLvl26.getId());
+                newSeatAdminMatch.setHierarchyType(HierarchyTypeEnum.OFFICE_FLOOR);
+                newSeatAdminMatch.setSeatAdmin(admin);
+                seatAdminMatchRepository.save(newSeatAdminMatch);
             } catch (Exception ex) {
                 System.out.println("Seat Management Initialisation failed: " + ex.getMessage());
             }
@@ -393,6 +400,12 @@ public class SeatInitializationService {
                 }
                 office.get().getFloors().add("27");
                 officeRepository.save(office.get());
+
+                SeatAdminMatch newSeatAdminMatch = new SeatAdminMatch();
+                newSeatAdminMatch.setHierarchyId(newSeatMapLvl27.getId());
+                newSeatAdminMatch.setHierarchyType(HierarchyTypeEnum.OFFICE_FLOOR);
+                newSeatAdminMatch.setSeatAdmin(admin);
+                seatAdminMatchRepository.save(newSeatAdminMatch);
             } catch (Exception ex) {
                 System.out.println("Seat Management Initialisation failed: " + ex.getMessage());
             }

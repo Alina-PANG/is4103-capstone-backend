@@ -182,13 +182,12 @@ public class SeatAllocationRequestService {
         // Copy from ApprovalTicketService
         ApprovalForRequest ticket = new ApprovalForRequest();
         ticket.setCreatedBy(requester.getUserName());
-        ticket.setRequestedItemId(seatAllocationRequest.getId());
         ticket.setApprovalType(ApprovalTypeEnum.SEAT_ALLOCATION);
         ticket.setRequester(requester);
         ticket.setApprover(approver);
         ticket.setApprovalStatus(ApprovalStatusEnum.PENDING);
         ticket.setCommentByRequester(requestorComment);
-        ticket = approvalForRequestRepository.save(ticket);
+
         try {
             String code = seatManagementEntityCodeHPGenerator.generateCode(approvalForRequestRepository, ticket);
             ticket.setCode(code);
@@ -210,14 +209,10 @@ public class SeatAllocationRequestService {
         }
 
         ticket.setRequestedItemId(seatAllocationRequest.getId());
+        ticket = approvalForRequestRepository.save(ticket);
         seatAllocationRequest.setCurrentPendingTicket(ticket);
         seatAllocationRequest.getApprovalTickets().add(ticket);
-        requester.setMyRequestTickets(new ArrayList<>(requester.getMyRequestTickets()));
-        requester.getMyRequestTickets().add(ticket.getId());
-        approver.setMyApprovals(new ArrayList<>(approver.getMyApprovals()));
-        approver.getMyApprovals().add(ticket.getId());
 
-        approvalForRequestRepository.save(ticket);
         seatAllocationRequestRepository.save(seatAllocationRequest);
         employeeRepository.save(requester);
         employeeRepository.save(approver);
@@ -492,10 +487,6 @@ public class SeatAllocationRequestService {
         }
         seatAllocationRequest.getApprovalTickets().add(newApprovalForRequest);
         seatAllocationRequest.setCurrentPendingTicket(newApprovalForRequest);
-        newReviewer.setMyApprovals(new ArrayList<>(newReviewer.getMyApprovals()));
-        newReviewer.getMyApprovals().add(newApprovalForRequest.getId());
-        seatAllocationRequest.getRequester().setMyRequestTickets(new ArrayList<>(seatAllocationRequest.getRequester().getMyRequestTickets()));
-        seatAllocationRequest.getRequester().getMyRequestTickets().add(newApprovalForRequest.getId());
 
         approvalForRequestRepository.save(approvalForRequest);
         seatAllocationRequestRepository.save(seatAllocationRequest);
@@ -526,13 +517,7 @@ public class SeatAllocationRequestService {
                 seatAllocationRequest.getApprovalTickets()) {
             ticket.setDeleted(true);
             approvalForRequestRepository.save(ticket);
-            System.out.println("********************** check my approvals **********************");
-            System.out.println("********************** num of approvals: " + ticket.getApprover().getMyApprovals().size() + " **********************");
-            ticket.getApprover().setMyApprovals(new ArrayList<>(ticket.getApprover().getMyApprovals()));
-            ticket.getApprover().getMyApprovals().remove(ticket.getId());
             employeeRepository.save(ticket.getApprover());
-            seatAllocationRequest.getRequester().setMyRequestTickets(new ArrayList<>(seatAllocationRequest.getRequester().getMyRequestTickets()));
-            seatAllocationRequest.getRequester().getMyRequestTickets().remove(ticket.getId());
         }
         seatAllocationRequest.setDeleted(true);
         seatAllocationRequestRepository.save(seatAllocationRequest);

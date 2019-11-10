@@ -75,7 +75,7 @@ public class AdminInitialization {
 //         createEmployeeTemplate("PO","Last name","poteam","password","huangyingshi@gmail.com","PO_TEAM-1");
         // Seat management subsystem initialisation for sr2
         seatManagementInitialisation();
-        // seatInitializationService.initialiseSeatManagement();
+        seatInitializationService.initialiseSeatManagement();
 
     }
     private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
