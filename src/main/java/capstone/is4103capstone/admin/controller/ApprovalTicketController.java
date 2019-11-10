@@ -1,5 +1,7 @@
 package capstone.is4103capstone.admin.controller;
 
+import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class ApprovalTicketController {
     @Autowired
     ApprovalTicketService approvalTicketService;
+    @Autowired
+    EmployeeService employeeService;
 
     @GetMapping("/approval-ticket/{id}")
     public @ResponseBody ResponseEntity<Object> getTicketById(@PathVariable(name = "id") String ticketId, @RequestHeader(name = "Authorization", required = false) String headerUsername){
@@ -36,6 +40,7 @@ public class ApprovalTicketController {
             return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
         }
     }
+
     @PostMapping("/reject")
     public ResponseEntity<GeneralRes> rejectRequest(@RequestBody ApprovalTicketModel result){
         try{
@@ -47,4 +52,14 @@ public class ApprovalTicketController {
         }
     }
 
+    @GetMapping("/approval-tickets-waiting-list/{approverId}")
+    public @ResponseBody ResponseEntity<Object> getPendingTicketsByApproverId(@PathVariable(name = "approverId",required = false) String approverId){
+        try{
+            return ResponseEntity.ok().body(approvalTicketService.getPendingTicketsByApprover(approverId));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
+
+        }
+    }
 }
