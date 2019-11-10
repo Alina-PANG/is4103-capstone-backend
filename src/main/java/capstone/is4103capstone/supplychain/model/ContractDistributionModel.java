@@ -4,70 +4,70 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ContractDistributionModel implements Serializable {
-    private BigDecimal draftPercentage;
-    private BigDecimal pendingPercentage;
-    private BigDecimal activePercentage;
-    private BigDecimal terminatedPercentage;
-    private BigDecimal mergedPercentage;
-    private BigDecimal rejectedPercentage;
+    private BigDecimal draft;
+    private BigDecimal pending_approval;
+    private BigDecimal active;
+    private BigDecimal terminated;
+    private BigDecimal merged;
+    private BigDecimal rejected;
 
     public ContractDistributionModel() {
     }
 
-    public ContractDistributionModel(BigDecimal draftPercentage, BigDecimal pendingPercentage, BigDecimal activePercentage, BigDecimal terminatedPercentage, BigDecimal mergedPercentage, BigDecimal rejectedPercentage) {
-        this.draftPercentage = draftPercentage;
-        this.pendingPercentage = pendingPercentage;
-        this.activePercentage = activePercentage;
-        this.terminatedPercentage = terminatedPercentage;
-        this.mergedPercentage = mergedPercentage;
-        this.rejectedPercentage = rejectedPercentage;
+    public ContractDistributionModel(BigDecimal draft, BigDecimal pending_approval, BigDecimal active, BigDecimal terminated, BigDecimal merged, BigDecimal rejected) {
+        this.draft = draft;
+        this.pending_approval = pending_approval;
+        this.active = active;
+        this.terminated = terminated;
+        this.merged = merged;
+        this.rejected = rejected;
     }
 
-    public BigDecimal getDraftPercentage() {
-        return draftPercentage;
+    public BigDecimal getDraft() {
+        return draft;
     }
 
-    public void setDraftPercentage(BigDecimal draftPercentage) {
-        this.draftPercentage = draftPercentage;
+    public void setDraft(BigDecimal draft) {
+        this.draft = draft;
     }
 
-    public BigDecimal getPendingPercentage() {
-        return pendingPercentage;
+    public BigDecimal getPending_approval() {
+        return pending_approval;
     }
 
-    public void setPendingPercentage(BigDecimal pendingPercentage) {
-        this.pendingPercentage = pendingPercentage;
+    public void setPending_approval(BigDecimal pending_approval) {
+        this.pending_approval = pending_approval;
     }
 
-    public BigDecimal getActivePercentage() {
-        return activePercentage;
+    public BigDecimal getActive() {
+        return active;
     }
 
-    public void setActivePercentage(BigDecimal activePercentage) {
-        this.activePercentage = activePercentage;
+    public void setActive(BigDecimal active) {
+        this.active = active;
     }
 
-    public BigDecimal getTerminatedPercentage() {
-        return terminatedPercentage;
+    public BigDecimal getTerminated() {
+        return terminated;
     }
 
-    public void setTerminatedPercentage(BigDecimal terminatedPercentage) {
-        this.terminatedPercentage = terminatedPercentage;
+    public void setTerminated(BigDecimal terminated) {
+        this.terminated = terminated;
     }
 
-    public BigDecimal getMergedPercentage() {
-        return mergedPercentage;
+    public BigDecimal getMerged() {
+        return merged;
     }
 
-    public void setMergedPercentage(BigDecimal mergedPercentage) {
-        this.mergedPercentage = mergedPercentage;
+    public void setMerged(BigDecimal merged) {
+        this.merged = merged;
     }
 
-    public BigDecimal getRejectedPercentage() {
-        return rejectedPercentage;
+    public BigDecimal getRejected() {
+        return rejected;
     }
 
-    public void setRejectedPercentage(BigDecimal rejectedPercentage) {
-        this.rejectedPercentage = rejectedPercentage;
+    public void setRejected(BigDecimal rejected) {
+        this.rejected = rejected;
     }
 }

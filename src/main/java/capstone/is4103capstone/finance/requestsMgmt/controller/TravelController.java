@@ -31,7 +31,7 @@ public class TravelController {
 
 
     @GetMapping("/view-my-request")
-    public ResponseEntity<TTListResponse> getTravelPlansByUser(@PathVariable(name = "id",required = false) String usernameOrId){
+    public ResponseEntity<TTListResponse> getTravelPlansByUser(@RequestParam(name = "id",required = false) String usernameOrId){
         try{
             if (usernameOrId == null || usernameOrId.isEmpty()){
                 usernameOrId = employeeService.getCurrentLoginUsername();
@@ -43,7 +43,7 @@ public class TravelController {
     }
 
     @GetMapping("/view-my-approval")
-    public ResponseEntity<TTListResponse> getTravelPlansByApprover(@PathVariable(name = "id",required = false) String usernameOrId){
+    public ResponseEntity<TTListResponse> getTravelPlansByApprover(@RequestParam(name = "id",required = false) String usernameOrId){
         try{
             if (usernameOrId == null || usernameOrId.isEmpty()){
                 usernameOrId = employeeService.getCurrentLoginUsername();

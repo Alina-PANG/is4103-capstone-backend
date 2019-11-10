@@ -4,70 +4,70 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class OutsourcingAssessmentDistributionModel implements Serializable {
-    private BigDecimal pendingBMPercentage;
-    private BigDecimal pendingOutsourcingPercentage;
-    private BigDecimal approvedPercentage;
-    private BigDecimal rejectedPercentage;
-    private BigDecimal templatePercentage;
-    private BigDecimal outsourcingCreatedPercentage;
+    private BigDecimal pending_BM_approval;
+    private BigDecimal pending_outsourcing_approval;
+    private BigDecimal approved;
+    private BigDecimal rejected;
+    private BigDecimal template;
+    private BigDecimal outsourcing_record_created;
 
     public OutsourcingAssessmentDistributionModel() {
     }
 
-    public OutsourcingAssessmentDistributionModel(BigDecimal pendingBMPercentage, BigDecimal pendingOutsourcingPercentage, BigDecimal approvedPercentage, BigDecimal rejectedPercentage, BigDecimal templatePercentage, BigDecimal outsourcingCreatedPercentage) {
-        this.pendingBMPercentage = pendingBMPercentage;
-        this.pendingOutsourcingPercentage = pendingOutsourcingPercentage;
-        this.approvedPercentage = approvedPercentage;
-        this.rejectedPercentage = rejectedPercentage;
-        this.templatePercentage = templatePercentage;
-        this.outsourcingCreatedPercentage = outsourcingCreatedPercentage;
+    public OutsourcingAssessmentDistributionModel(BigDecimal pending_BM_approval, BigDecimal pending_outsourcing_approval, BigDecimal approved, BigDecimal rejected, BigDecimal template, BigDecimal outsourcing_record_created) {
+        this.pending_BM_approval = pending_BM_approval;
+        this.pending_outsourcing_approval = pending_outsourcing_approval;
+        this.approved = approved;
+        this.rejected = rejected;
+        this.template = template;
+        this.outsourcing_record_created = outsourcing_record_created;
     }
 
-    public BigDecimal getPendingBMPercentage() {
-        return pendingBMPercentage;
+    public BigDecimal getPending_BM_approval() {
+        return pending_BM_approval;
     }
 
-    public void setPendingBMPercentage(BigDecimal pendingBMPercentage) {
-        this.pendingBMPercentage = pendingBMPercentage;
+    public void setPending_BM_approval(BigDecimal pending_BM_approval) {
+        this.pending_BM_approval = pending_BM_approval;
     }
 
-    public BigDecimal getPendingOutsourcingPercentage() {
-        return pendingOutsourcingPercentage;
+    public BigDecimal getPending_outsourcing_approval() {
+        return pending_outsourcing_approval;
     }
 
-    public void setPendingOutsourcingPercentage(BigDecimal pendingOutsourcingPercentage) {
-        this.pendingOutsourcingPercentage = pendingOutsourcingPercentage;
+    public void setPending_outsourcing_approval(BigDecimal pending_outsourcing_approval) {
+        this.pending_outsourcing_approval = pending_outsourcing_approval;
     }
 
-    public BigDecimal getApprovedPercentage() {
-        return approvedPercentage;
+    public BigDecimal getApproved() {
+        return approved;
     }
 
-    public void setApprovedPercentage(BigDecimal approvedPercentage) {
-        this.approvedPercentage = approvedPercentage;
+    public BigDecimal getOutsourcing_record_created() {
+        return outsourcing_record_created;
     }
 
-    public BigDecimal getRejectedPercentage() {
-        return rejectedPercentage;
+    public void setOutsourcing_record_created(BigDecimal outsourcing_record_created) {
+        this.outsourcing_record_created = outsourcing_record_created;
     }
 
-    public void setRejectedPercentage(BigDecimal rejectedPercentage) {
-        this.rejectedPercentage = rejectedPercentage;
+    public void setApproved(BigDecimal approved) {
+        this.approved = approved;
     }
 
-    public BigDecimal getTemplatePercentage() {
-        return templatePercentage;
+    public BigDecimal getRejected() {
+        return rejected;
     }
 
-    public void setTemplatePercentage(BigDecimal templatePercentage) {
-        this.templatePercentage = templatePercentage;
+    public void setRejected(BigDecimal rejected) {
+        this.rejected = rejected;
     }
 
-    public BigDecimal getOutsourcingCreatedPercentage() {
-        return outsourcingCreatedPercentage;
+    public BigDecimal getTemplate() {
+        return template;
     }
 
-    public void setOutsourcingCreatedPercentage(BigDecimal outsourcingCreatedPercentage) {
-        this.outsourcingCreatedPercentage = outsourcingCreatedPercentage;
+    public void setTemplate(BigDecimal template) {
+        this.template = template;
     }
 }

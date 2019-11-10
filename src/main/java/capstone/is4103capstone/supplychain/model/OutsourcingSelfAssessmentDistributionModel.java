@@ -4,51 +4,51 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class OutsourcingSelfAssessmentDistributionModel implements Serializable {
-    private BigDecimal draftPercentage;
-    private BigDecimal pendingPercentage;
-    private BigDecimal rejectedPercentage;
-    private BigDecimal approvedPercentage;
+    private BigDecimal draft;
+    private BigDecimal pending_approval;
+    private BigDecimal rejected;
+    private BigDecimal approved;
 
     public OutsourcingSelfAssessmentDistributionModel() {
     }
 
-    public OutsourcingSelfAssessmentDistributionModel(BigDecimal draftPercentage, BigDecimal pendingPercentage, BigDecimal rejectedPercentage, BigDecimal approvedPercentage) {
-        this.draftPercentage = draftPercentage;
-        this.pendingPercentage = pendingPercentage;
-        this.rejectedPercentage = rejectedPercentage;
-        this.approvedPercentage = approvedPercentage;
+    public OutsourcingSelfAssessmentDistributionModel(BigDecimal draft, BigDecimal pending_approval, BigDecimal rejected, BigDecimal approved) {
+        this.draft = draft;
+        this.pending_approval = pending_approval;
+        this.rejected = rejected;
+        this.approved = approved;
     }
 
-    public BigDecimal getDraftPercentage() {
-        return draftPercentage;
+    public BigDecimal getDraft() {
+        return draft;
     }
 
-    public void setDraftPercentage(BigDecimal draftPercentage) {
-        this.draftPercentage = draftPercentage;
+    public void setDraft(BigDecimal draft) {
+        this.draft = draft;
     }
 
-    public BigDecimal getPendingPercentage() {
-        return pendingPercentage;
+    public BigDecimal getPending_approval() {
+        return pending_approval;
     }
 
-    public void setPendingPercentage(BigDecimal pendingPercentage) {
-        this.pendingPercentage = pendingPercentage;
+    public void setPending_approval(BigDecimal pending_approval) {
+        this.pending_approval = pending_approval;
     }
 
-    public BigDecimal getRejectedPercentage() {
-        return rejectedPercentage;
+    public BigDecimal getRejected() {
+        return rejected;
     }
 
-    public void setRejectedPercentage(BigDecimal rejectedPercentage) {
-        this.rejectedPercentage = rejectedPercentage;
+    public void setRejected(BigDecimal rejected) {
+        this.rejected = rejected;
     }
 
-    public BigDecimal getApprovedPercentage() {
-        return approvedPercentage;
+    public BigDecimal getApproved() {
+        return approved;
     }
 
-    public void setApprovedPercentage(BigDecimal approvedPercentage) {
-        this.approvedPercentage = approvedPercentage;
+    public void setApproved(BigDecimal approved) {
+        this.approved = approved;
     }
 }
 

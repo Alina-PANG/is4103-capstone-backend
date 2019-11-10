@@ -19,8 +19,6 @@ and p.budget_plan_status = 3 -- appproved plans
 and p.for_year = 2019 and cc.hierachy_path like '%SG%'
 group by l.service_code
      */
-    @Value("#{target.currency_code}")
-    String getCurrency();
     @Value("#{target.service_code}")
     String getServiceCode();
     @Value("#{target.amount}")

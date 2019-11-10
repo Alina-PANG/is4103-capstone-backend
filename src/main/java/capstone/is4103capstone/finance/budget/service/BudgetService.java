@@ -10,6 +10,7 @@ import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
 import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
@@ -46,6 +47,8 @@ public class BudgetService {
     ServiceRepository serviceRepository;
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    FXTableService fxService;
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -153,13 +156,14 @@ public class BudgetService {
                     newPlan.setLineItems(newItems);
             }
 
-
             newPlan.setHierachyPath(g.getPlanHP(newPlan,cc));
             for (PlanLineItem pl:newPlan.getLineItems()){
                 pl.setCode(EntityCodeHPGeneration.getCode(planLineItemRepository,pl,newPlan.getCode()));
                 pl.setHierachyPath(EntityCodeHPGeneration.setPlanItemHP(pl,newPlan.getHierachyPath()));
+                pl.setBudgetAmountInGBP(fxService.convertToGBPWithLatest(pl.getCurrencyAbbr(),pl.getBudgetAmountInGBP()));
                 planLineItemRepository.save(pl);
             }
+
             planRepository.saveAndFlush(newPlan);
 //            generateCode(planRepository,newPlan);
 
@@ -168,13 +172,10 @@ public class BudgetService {
             //TODO: create approval ticket sending email notification to the approver:
             if (createBudgetReq.getToSubmit()){
                 try{
-                    createApprovalTicket(createBudgetReq.getUsername(),cc.getBmApprover(),newPlan,"BM Approver please view the budget plan.");
-//                    createApprovalTicket(createBudgetReq.getUsername(),cc.getFunctionApprover(),newPlan,"Function approver please view the budget plan.");
+                    createApprovalTicket(createBudgetReq.getUsername(),cc.getBmApprover(),newPlan,"BM Approver please view the budget plan.",ApprovalTypeEnum.BUDGETPLAN_BM);
                 }catch (Exception emailExc){
                 }
             }
-
-
             return new GeneralRes("Successully "+(createBudgetReq.getToSubmit()?"submit":"save")+" the plan!", false);
         }catch (Exception ex){
             ex.printStackTrace();
@@ -315,9 +316,8 @@ public class BudgetService {
         else{
             plan.setBudgetPlanStatus(BudgetPlanStatusEnum.PENDING_FUNCTION_APPROVAL);
             ApprovalTicketService.approveTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
-            createApprovalTicket(approveBudgetReq.getUsername(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.");
+            createApprovalTicket(approveBudgetReq.getUsername(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.", ApprovalTypeEnum.BUDGETPLAN_FUNCTION);
         }
-
         planRepository.saveAndFlush(plan);
         logger.info("BM APPROVER Successully "+plan.getBudgetPlanStatus()+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
         return new GeneralRes("BM APPROVAL Successfully "+plan.getBudgetPlanStatus()+" the plan!", false);
@@ -385,9 +385,9 @@ public class BudgetService {
     }
 
 
-    private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content){
+    private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content, ApprovalTypeEnum approvalType){
         Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
-        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, ApprovalTypeEnum.BUDGETPLAN);
+        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, approvalType);
         //TODO: What's the message content?
     }
 

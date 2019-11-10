@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
+import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -43,6 +44,8 @@ public class ContractService {
     EmployeeRepository employeeRepository;
     @Autowired
     TeamRepository teamRepository;
+    @Autowired
+    FXTableService fxService;
 
     public GeneralRes createContract(CreateContractReq createContractReq){
         try{
@@ -61,6 +64,8 @@ public class ContractService {
             newContract.setCreatedBy(createContractReq.getModifierUsername());
             newContract.setLastModifiedBy(createContractReq.getModifierUsername());
             newContract.setTotalContractValue(createContractReq.getTotalContractValue());
+            newContract.setContractValueInGBP(fxService.convertToGBPWithLatest(createContractReq.getCurrencyCode(),createContractReq.getTotalContractValue()));
+
             newContract.setCurrencyCode(createContractReq.getCurrencyCode());
             newContract.setDeleted(false);
             newContract.setContractStatus(ContractStatusEnum.DRAFT);
@@ -269,11 +274,12 @@ public class ContractService {
             if (updateContractReq.getSpendType() != null) {
                 contract.setSpendType(updateContractReq.getSpendType());
             }
-            if(updateContractReq.getTotalContractValue() != null){
-                contract.setTotalContractValue(updateContractReq.getTotalContractValue());
-            }
             if (updateContractReq.getCurrencyCode() != null) {
                 contract.setCurrencyCode(updateContractReq.getCurrencyCode());
+            }
+            if(updateContractReq.getTotalContractValue() != null){
+                contract.setTotalContractValue(updateContractReq.getTotalContractValue());
+                contract.setContractValueInGBP(fxService.convertToGBPWithLatest(contract.getCurrencyCode(),updateContractReq.getTotalContractValue()));
             }
 
             contract.setLastModifiedBy(updateContractReq.getModifierUsername());
