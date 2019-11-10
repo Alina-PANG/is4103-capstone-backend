@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 public class ContractDistributionModel implements Serializable {
     private BigDecimal draft;
-    private BigDecimal pending;
+    private BigDecimal pending_approval;
     private BigDecimal active;
     private BigDecimal terminated;
     private BigDecimal merged;
@@ -14,9 +14,9 @@ public class ContractDistributionModel implements Serializable {
     public ContractDistributionModel() {
     }
 
-    public ContractDistributionModel(BigDecimal draft, BigDecimal pending, BigDecimal active, BigDecimal terminated, BigDecimal merged, BigDecimal rejected) {
+    public ContractDistributionModel(BigDecimal draft, BigDecimal pending_approval, BigDecimal active, BigDecimal terminated, BigDecimal merged, BigDecimal rejected) {
         this.draft = draft;
-        this.pending = pending;
+        this.pending_approval = pending_approval;
         this.active = active;
         this.terminated = terminated;
         this.merged = merged;
@@ -31,12 +31,12 @@ public class ContractDistributionModel implements Serializable {
         this.draft = draft;
     }
 
-    public BigDecimal getPending() {
-        return pending;
+    public BigDecimal getPending_approval() {
+        return pending_approval;
     }
 
-    public void setPending(BigDecimal pending) {
-        this.pending = pending;
+    public void setPending_approval(BigDecimal pending_approval) {
+        this.pending_approval = pending_approval;
     }
 
     public BigDecimal getActive() {
