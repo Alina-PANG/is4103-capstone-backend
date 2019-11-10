@@ -5,16 +5,16 @@ import java.math.BigDecimal;
 
 public class OutsourcingSelfAssessmentDistributionModel implements Serializable {
     private BigDecimal draft;
-    private BigDecimal pending;
+    private BigDecimal pending_approval;
     private BigDecimal rejected;
     private BigDecimal approved;
 
     public OutsourcingSelfAssessmentDistributionModel() {
     }
 
-    public OutsourcingSelfAssessmentDistributionModel(BigDecimal draft, BigDecimal pending, BigDecimal rejected, BigDecimal approved) {
+    public OutsourcingSelfAssessmentDistributionModel(BigDecimal draft, BigDecimal pending_approval, BigDecimal rejected, BigDecimal approved) {
         this.draft = draft;
-        this.pending = pending;
+        this.pending_approval = pending_approval;
         this.rejected = rejected;
         this.approved = approved;
     }
@@ -27,12 +27,12 @@ public class OutsourcingSelfAssessmentDistributionModel implements Serializable 
         this.draft = draft;
     }
 
-    public BigDecimal getPending() {
-        return pending;
+    public BigDecimal getPending_approval() {
+        return pending_approval;
     }
 
-    public void setPending(BigDecimal pending) {
-        this.pending = pending;
+    public void setPending_approval(BigDecimal pending_approval) {
+        this.pending_approval = pending_approval;
     }
 
     public BigDecimal getRejected() {
