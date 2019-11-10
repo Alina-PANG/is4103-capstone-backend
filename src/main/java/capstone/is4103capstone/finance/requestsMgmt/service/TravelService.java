@@ -41,9 +41,16 @@ public class TravelService {
     MailService mailService;
 
     public TTFormResponse createTravelPlan(CreateTravelRequest req) throws Exception{
+        System.out.println("Createing travel plan");
         TravelForm form = new TravelForm();
         Employee requester = employeeService.getCurrentLoginEmployee();
-        CostCenter costCenter = costCenterService.validateCostCenter(req.getCostCenter());
+        CostCenter costCenter = null;
+        if (req.getCostCenter().length() == 0){
+            costCenter = requester.getDefaultCostCenter();
+        }else{
+            costCenter = costCenterService.validateCostCenter(req.getCostCenter());
+        }
+
         form.setDestCity(req.getDestCity());
         form.setDestCountry(req.getDestCountry());
         form.setRequestDescription(req.getDescription());
@@ -54,6 +61,7 @@ public class TravelService {
         form.setRequester(requester);
         form.setApprover(requester.getManager());
         form.setCostCenter(costCenter);
+
         form.setObjectName("Travel Plan: "+requester.getFullName()+Tools.dateFormatter.format(new Date()));
         form.setCurrency(req.getCurrencyCode());
         form.setEstimatedBudget(req.getEstimatedBudget());

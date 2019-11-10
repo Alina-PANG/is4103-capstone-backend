@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
+import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
@@ -37,6 +38,8 @@ public class ChildContractService {
     EmployeeRepository employeeRepository;
     @Autowired
     ServiceRepository serviceRepository;
+    @Autowired
+    FXTableService fxService;
 
     public GeneralRes createChildContract(CreateChildContractReq createChildContractReq){
         try{
@@ -59,9 +62,11 @@ public class ChildContractService {
             newChildContract.setMasterContract(masterContract);
             masterContract.getChildContractList().add(newChildContract);
 
+            newChildContract.setContractValueInGBP(fxService.convertToGBPWithLatest(masterContract.getCurrencyCode(),newChildContract.getContractValue()));
+
             newChildContract = childContractRepository.saveAndFlush(newChildContract);
             if(newChildContract.getSeqNo() == null){
-                newChildContract.setSeqNo(new Long(childContractRepository.findAll().size()));
+                newChildContract.setSeqNo((long) childContractRepository.findAll().size());
             }
 
             AuthenticationTools.configurePermissionMap(newChildContract);
@@ -110,7 +115,7 @@ public class ChildContractService {
     public GeneralRes updateChildContract (CreateChildContractReq updateChildContractReq, String id) {
         try {
             ChildContract childContract = childContractRepository.getOne(id);
-
+            Contract itsMaster = childContract.getMasterContract();
             if(updateChildContractReq.getChildContractName() != null){
                 childContract.setObjectName(updateChildContractReq.getChildContractName());
             }
@@ -119,6 +124,7 @@ public class ChildContractService {
             }
             if(updateChildContractReq.getContractValue() != null){
                 childContract.setContractValue(updateChildContractReq.getContractValue());
+                childContract.setContractValueInGBP(fxService.convertToGBPWithLatest(itsMaster.getCurrencyCode(),childContract.getContractValue()));
             }
 
             childContract.setLastModifiedBy(updateChildContractReq.getModifierUsername());
@@ -160,7 +166,7 @@ public class ChildContractService {
             masterContract = new GeneralEntityModel(childContract.getMasterContract());
         }
 
-        Boolean canUpdate = false;
+        boolean canUpdate = false;
         ContractStatusEnum contractStatus = childContract.getMasterContract().getContractStatus();
 
         if(contractStatus.equals(ContractStatusEnum.REJECTED)||contractStatus.equals(ContractStatusEnum.DRAFT)){
@@ -172,12 +178,10 @@ public class ChildContractService {
             serviceName = service.getObjectName();
         }
 
-        ChildContractModel childContractModel = new ChildContractModel(
+        return new ChildContractModel(
                 childContract.getObjectName(), childContract.getCode(), childContract.getId(),
                 childContract.getSeqNo(), serviceName, childContract.getContractValue(),
                 masterContract, childContract.getMasterContract().getCurrencyCode(), canUpdate);
-
-        return childContractModel;
     }
 
 

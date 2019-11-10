@@ -103,6 +103,5 @@ public class EntityMappingService {
             default:
                 throw new EntityClassNameNotValidException("Class name ["+className+"]given input is not valid");
         }
-
     }
 }

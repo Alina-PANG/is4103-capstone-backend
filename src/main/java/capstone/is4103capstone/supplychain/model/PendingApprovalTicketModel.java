@@ -11,6 +11,7 @@ import java.io.Serializable;
 public class PendingApprovalTicketModel implements Serializable {
     private GeneralEntityModel item;
     private String entityName;
+    private String ticketType;
     private String ticketCode;
     private String commentByRequester;
     private EmployeeModel requester;
@@ -24,9 +25,19 @@ public class PendingApprovalTicketModel implements Serializable {
         setTicketCode(ticket.getCode());
         setEntityName(entity.getClass().getSimpleName());
         setItem(new GeneralEntityModel(entity));
+        setTicketType(ticket.getApprovalType().name());
         setRequester(new EmployeeModel(ticket.getRequester()));
         setTicketCreatedDateTime(Tools.datetimeFormatter.format(ticket.getCreatedDateTime()));
     }
+
+    public String getTicketType() {
+        return ticketType;
+    }
+
+    public void setTicketType(String ticketType) {
+        this.ticketType = ticketType;
+    }
+
     public GeneralEntityModel getItem() {
         return item;
     }

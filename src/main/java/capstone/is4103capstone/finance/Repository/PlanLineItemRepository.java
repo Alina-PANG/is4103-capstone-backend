@@ -19,7 +19,7 @@ public interface PlanLineItemRepository extends JpaRepository<PlanLineItem, Stri
     List<PlanLineItem> findItemsByServiceAndCostCenter(int forYear, String serviceCode, String ccId);
 
 
-    @Query(value = "select SUM(l.budget_amount) as amount, l.currency_abbr as currency_code, \n" +
+    @Query(value = "select SUM(l.budget_amount_ingbp) as amount,  \n" +
             "l.service_code as service_code\n" +
             "from plan_line_item l join plan p join cost_center cc\n" +
             "on l.in_plan = p.id and cc.id=p.cost_center_id\n" +
@@ -31,7 +31,7 @@ public interface PlanLineItemRepository extends JpaRepository<PlanLineItem, Stri
     //above: for budget only, not for reforecast
 
 
-    @Query(value = "select l.budget_amount as amount, l.currency_abbr as currency_code, \n" +
+    @Query(value = "select l.budget_amount_ingbp as amount,  \n" +
             "l.service_code as service_code, cc.code as cc_code\n" +
             "from plan_line_item l join plan p join cost_center cc\n" +
             "on l.in_plan = p.id and cc.id=p.cost_center_id\n" +
@@ -41,7 +41,7 @@ public interface PlanLineItemRepository extends JpaRepository<PlanLineItem, Stri
             "group by l.service_code,cc.code\n", nativeQuery = true)
     List<BudgetLineBGCCDBModel> findTotalBudgetGroupByCountryAndService(String countryOrRegionCode, int year);
 
-    @Query(value = "select l.budget_amount as amount, l.currency_abbr as currency_code, \n" +
+    @Query(value = "select l.budget_amount_ingbp as amount,  \n" +
             "l.service_code as service_code, p.for_month as lastest_reforecast_month,\n" +
             "cc.code as cc_code \n" +
             "from plan_line_item l join plan p join cost_center cc\n" +

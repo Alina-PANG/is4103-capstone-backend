@@ -77,7 +77,8 @@ public class SeatAllocationRequestService {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: requester info is required!");
         }
         String requesterId = createSeatAllocationRequestModel.getRequesterId();
-        Employee requester = employeeService.retrieveEmployeeById(requesterId);
+        Employee requester = employeeService.validateUser(requesterId);
+        requesterId = requester.getId();
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
@@ -91,7 +92,7 @@ public class SeatAllocationRequestService {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: employee info of the allocation is required!");
         }
         String employeeIdOfAllocation = createSeatAllocationRequestModel.getEmployeeIdOfAllocation();
-        Employee employeeOfAllocation = employeeService.retrieveEmployeeById(employeeIdOfAllocation);
+        Employee employeeOfAllocation = employeeService.validateUser(employeeIdOfAllocation);
         // Validate the employee: check whether the employee is under the team managed by the requester
         if (!employeeOfAllocation.getTeam().getId().equals(requester.getTeam().getId())) {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: employee " + employeeIdOfAllocation +

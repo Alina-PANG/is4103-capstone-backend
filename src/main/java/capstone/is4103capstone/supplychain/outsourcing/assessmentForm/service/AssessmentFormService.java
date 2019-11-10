@@ -366,11 +366,14 @@ public class AssessmentFormService {
             if(approved) {
                 if(isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_BM_APPROVAL) {
                     form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.PENDING_OUTSOURCING_APPROVAL);
+                    ApprovalTicketService.approveTicketByEntity(form,"",username);
+                    // functional approval is supposed to send to the whole outsourcing team, so we just don't create new ticket
                 }
                 else if(!isBMApproval && form.getOutsourcingAssessmentStatus() == OutsourcingAssessmentStatusEnum.PENDING_OUTSOURCING_APPROVAL) {
                     form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.APPROVED);
                     String receiver = employeeService.validateUser(form.getCreatedBy()).getEmail();
                     mailService.sendGeneralEmail(senderEmailAddr, receiver, "Your Outsourcing Assessment Form Has Been Approved!", "Outsourcing Assessment Form "+form.getCode()+" has been successfully approved!");
+                    bjfService.afterOutsourcing(form);
                 }
                 else {
                     logger.error("approve type is BM Approval: "+isBMApproval+" is not consistent with the pending status: "+form.getOutsourcingAssessmentStatus()+"!");
@@ -379,6 +382,7 @@ public class AssessmentFormService {
             }
             else {
                 form.setOutsourcingAssessmentStatus(OutsourcingAssessmentStatusEnum.REJECTED);
+                ApprovalTicketService.rejectTicketByEntity(form,"",username);
                 bjfService.afterOutsourcing(form);
             }
             outsourcingAssessmentRepository.saveAndFlush(form);

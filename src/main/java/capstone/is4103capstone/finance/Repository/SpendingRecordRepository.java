@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface SpendingRecordRepository extends JpaRepository<SpendingRecord,String> {
 
-    @Query(value = "select sp.currency_code, \n" +  //TODO: currency code probably different?
-            "sp.service_name,  s.code as service_code, SUM(sp.spending_amt) as total_spending_per_serv,\n" +
+    @Query(value = "select \n" +
+            "sp.service_name,  s.code as service_code, SUM(sp.spending_amt_ingbp) as total_spending_per_serv,\n" +
             "c.object_name as country_name, c.code as country_code, c.hierachy_path as country_hp\n" +
             "from spending_record sp join service s join purchase_order po join country c\n" +
             "on sp.service_id = s.id and sp.po_id = po.id and c.id=po.country_id\n" +

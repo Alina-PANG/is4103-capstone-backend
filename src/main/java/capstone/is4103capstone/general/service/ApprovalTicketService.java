@@ -6,20 +6,34 @@ import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.entities.finance.*;
+import capstone.is4103capstone.entities.seat.SeatAllocation;
+import capstone.is4103capstone.entities.supplyChain.Contract;
+import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
+import capstone.is4103capstone.entities.supplyChain.OutsourcingSelfAssessment;
 import capstone.is4103capstone.finance.Repository.*;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
+import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.finance.requestsMgmt.service.ProjectService;
 import capstone.is4103capstone.finance.requestsMgmt.service.TrainingService;
 import capstone.is4103capstone.finance.requestsMgmt.service.TravelService;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
 import capstone.is4103capstone.seat.model.EmployeeModel;
+import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
+import capstone.is4103capstone.supplychain.Repository.ContractRepository;
+import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
+import capstone.is4103capstone.supplychain.Repository.OutsourcingSelfAssessmentRepository;
+import capstone.is4103capstone.supplychain.model.ContractDistributionModel;
 import capstone.is4103capstone.supplychain.model.PendingApprovalTicketModel;
 import capstone.is4103capstone.supplychain.model.res.GetPendingApprovalTicketsRes;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
+import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +72,8 @@ public class ApprovalTicketService {
     EntityMappingService entityMappingService;
     @Autowired
     EmployeeService employeeService;
+    @Autowired
+    BudgetService budgetService;
 
 
 
@@ -229,7 +245,6 @@ public class ApprovalTicketService {
             }
             List<ApprovalForRequest> pendingApprovalTickets = approvalForRequestRepo.findPendingTicketsByApproverId(approverId);
             List<PendingApprovalTicketModel> modelList = new ArrayList<>();
-            logger.info("return list size =" + pendingApprovalTickets.size());
 
             for(ApprovalForRequest ticket : pendingApprovalTickets) {
                 if (ticket.getRequestedItemId() == null || ticket.getRequestedItemId().isEmpty() ){
@@ -240,39 +255,31 @@ public class ApprovalTicketService {
                     case CONTRACT:
                         entity = entityMappingService.getEntityByClassNameAndId("contract",ticket.getRequestedItemId());
                         break;
-
-                    case BUDGETPLAN:
+                    case BUDGETPLAN_BM:
+                    case BUDGETPLAN_FUNCTION:
                         entity = entityMappingService.getEntityByClassNameAndId("plan",ticket.getRequestedItemId());
                         break;
-
                     case TRAVEL:
                         entity = entityMappingService.getEntityByClassNameAndId("travelform",ticket.getRequestedItemId());
                         break;
-
                     case TRAINING:
                         entity = entityMappingService.getEntityByClassNameAndId("trainingform",ticket.getRequestedItemId());
                         break;
-
                     case PROJECT:
                         entity = entityMappingService.getEntityByClassNameAndId("project",ticket.getRequestedItemId());
                         break;
-
                     case BJF:
                         entity = entityMappingService.getEntityByClassNameAndId("bjf",ticket.getRequestedItemId());
                         break;
-
                     case OUTSOURCING_ASSESSMENT_FORM:
                         entity = entityMappingService.getEntityByClassNameAndId("outsourcingassessment",ticket.getRequestedItemId());
                         break;
-
                     case SEAT_ALLOCATION:
                         entity = entityMappingService.getEntityByClassNameAndId("seatallocation",ticket.getRequestedItemId());
                         break;
-
                     case OUTSOURCING_SELF_ASSESSMENT:
                         entity = entityMappingService.getEntityByClassNameAndId("outsourcingselfassessment",ticket.getRequestedItemId());
                         break;
-
                     default:
                         continue;
                 }
@@ -302,7 +309,6 @@ public class ApprovalTicketService {
         String approverId = employeeRepo.findEmployeeByUserName(approverUsername).getId();
         Optional<ApprovalForRequest> ticketOp = approvalForRequestRepo.findPendingTicketByEntityIdAndApproverId(requestedItem.getId(),approverId);
         if (!ticketOp.isPresent()) return false;
-
         ApprovalForRequest ticket = ticketOp.get();
         ticket.setCommentByApprover(comment);
         return modifyRequest(ApprovalStatusEnum.REJECTED, ticket);
@@ -327,7 +333,6 @@ public class ApprovalTicketService {
 
     private static boolean modifyRequest(ApprovalStatusEnum result, ApprovalForRequest ticket){
         try{
-
             ticket.setApprovalStatus(result);
             ticket.setLastModifiedBy(ticket.getRequester().getUserName());
             approvalForRequestRepo.save(ticket);
@@ -375,12 +380,22 @@ public class ApprovalTicketService {
     }
 
     private void mapApprovalType(ApprovalForRequest ticket) throws Exception{
+        ApproveBudgetReq req = null;
         switch (ticket.getApprovalType()){
             case CONTRACT:
                 System.out.println("Already implemented in other ways");
                 break;
-            case BUDGETPLAN:
-                System.out.println("Already implemented in other ways");
+            case BUDGETPLAN_BM:
+                 req = new ApproveBudgetReq(
+                        ticket.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED),
+                        ticket.getApprover().getUserName(),ticket.getRequestedItemId(),ticket.getCommentByApprover(), 0);
+                budgetService.approveBudget(req);
+                break;
+            case BUDGETPLAN_FUNCTION:
+                req = new ApproveBudgetReq(
+                        ticket.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED),
+                        ticket.getApprover().getUserName(),ticket.getRequestedItemId(),ticket.getCommentByApprover(), 1);
+                budgetService.approveBudget(req);
                 break;
             case TRAVEL:
                 travelService.travelPlanApproval(ticket);

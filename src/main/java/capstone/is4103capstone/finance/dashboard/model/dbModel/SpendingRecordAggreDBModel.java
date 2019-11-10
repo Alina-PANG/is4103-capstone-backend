@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public interface SpendingRecordAggreDBModel {
-    @Value("#{target.currency_code}")
-    String getSPCurrencyCode();
     @Value("#{target.service_name}")
     String getServiceName();
     @Value("#{target.service_code}")

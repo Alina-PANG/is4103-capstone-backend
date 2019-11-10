@@ -4,13 +4,14 @@ package capstone.is4103capstone.finance.finPurchaseOrder.model.req;
 import capstone.is4103capstone.entities.finance.SpendingRecord;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreatePOReq implements Serializable {
     private String currencyCode;
     private List<String> relatedBJF;
-    private Double amount;
+    private BigDecimal amount;
     private String vendorid;
     private String poNumber;
     private String approverUsername;
@@ -64,11 +65,11 @@ public class CreatePOReq implements Serializable {
         return currencyCode;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

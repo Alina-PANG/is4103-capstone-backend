@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PlanLineItem extends DBEntityTemplate {
     BigDecimal budgetAmount;
+    BigDecimal budgetAmountInGBP;
     String currencyAbbr;
     String comment;
     String serviceCode;
@@ -28,6 +29,21 @@ public class PlanLineItem extends DBEntityTemplate {
     public PlanLineItem() {
     }
 
+    public BigDecimal getBudgetAmountInGBP() {
+        return budgetAmountInGBP;
+    }
+
+    public void setBudgetAmountInGBP(BigDecimal budgetAmountInGBP) {
+        this.budgetAmountInGBP = budgetAmountInGBP;
+    }
+
+    public String getServiceCode() {
+        return serviceCode;
+    }
+
+    public void setServiceCode(String serviceCode) {
+        this.serviceCode = serviceCode;
+    }
 
     public PlanLineItem(BigDecimal budgetAmount, String currencyAbbr, String comment, String serviceCode) {
         this.budgetAmount = budgetAmount;

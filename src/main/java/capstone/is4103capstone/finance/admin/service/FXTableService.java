@@ -8,6 +8,7 @@ import capstone.is4103capstone.finance.admin.model.req.CreateFXRequest;
 import capstone.is4103capstone.finance.admin.model.req.FXRecordQueryReq;
 import capstone.is4103capstone.finance.admin.model.res.ViewFXRecordRes;
 import capstone.is4103capstone.general.service.WriteAuditTrail;
+import capstone.is4103capstone.util.exception.NoFXRecordException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FXTableService {
@@ -57,6 +59,7 @@ public class FXTableService {
 
             //retrieve and deactive
             FXRecord latest = fxRecordRepository.findLastActiveRecord(request.getBaseCurr(),request.getPriceCurr());
+
             if (latest != null || effectiveDate.after(new Date())){
                 //check whether the new record is newest than the previous ones;
                 if (!effectiveDate.after(latest.getEffectiveDate())){
@@ -123,6 +126,38 @@ public class FXTableService {
         }catch (Exception e){
             return new ViewFXRecordRes(e.getMessage(),true);
         }
+
+    }
+
+    public BigDecimal convertToGBPWithLatest(String oriCurr, BigDecimal amt) throws NoFXRecordException{
+        return convertWithLatestCurr(oriCurr,"GBP",amt);
+    }
+
+    public BigDecimal convertWithLatestCurr(String oriCurr, String destCurr,BigDecimal amt) throws NoFXRecordException{
+        if (oriCurr.equals(destCurr)){
+            return amt;
+        }
+        BigDecimal exchangeRate = getLatestEXRate(oriCurr,destCurr);
+        return exchangeRate.multiply(amt);
+    }
+
+    public BigDecimal getLatestEXRate(String base, String price) throws NoFXRecordException {
+        FXRecord latest = getLatestFXRecord(base,price);
+        return latest.getExchangeRate();
+    }
+    public FXRecord getLatestFXRecord(String base, String price) throws NoFXRecordException{
+        FXRecord latest = fxRecordRepository.findLastActiveRecord(base,price);
+        FXRecord latestInverse = fxRecordRepository.findLastActiveRecord(price,base);
+
+        if (latest == null && latestInverse == null){
+            throw new NoFXRecordException("No FX Record Active for base::"+base+" price::"+price+".");
+        }
+        if (latest != null){
+            return latest;
+        }
+
+        return new FXRecord(base,price,BigDecimal.ONE.divide(latestInverse.getExchangeRate(),6, RoundingMode.CEILING)
+                ,latestInverse.getEffectiveDate());
 
     }
 

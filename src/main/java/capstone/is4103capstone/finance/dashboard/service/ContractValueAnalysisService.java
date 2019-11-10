@@ -45,7 +45,6 @@ public class ContractValueAnalysisService {
 
         if (summary.isEmpty())
             throw new Exception("No record available for year "+year);
-
         return new VendorContractAggregationRes("Successfully retrieved",false,summary.size(),year,summary);
     }
 
