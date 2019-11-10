@@ -260,6 +260,7 @@ public class ApprovalTicketService {
         try{
             List<ApprovalForRequest> pendingApprovalTickets = approvalForRequestRepo.findPendingTicketsByApproverId(approverId);
             List<PendingApprovalTicketModel> modelList = new ArrayList<>();
+            logger.info("return list size =" + pendingApprovalTickets.size());
 
             for(ApprovalForRequest ticket : pendingApprovalTickets) {
                 Employee requester = ticket.getRequester();
@@ -272,6 +273,7 @@ public class ApprovalTicketService {
                 //get item
                 switch (ticket.getApprovalType()) {
                     case CONTRACT:
+                        logger.info("Contract...");
                         entityName = "Contract";
                         Contract contract = contractRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(contract.getId(), contract.getCode(),
@@ -281,6 +283,7 @@ public class ApprovalTicketService {
                         break;
 
                     case BUDGETPLAN:
+                        logger.info("BudgetPlan...");
                         entityName = "BudgetPlan";
                         Plan plan = planRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(plan.getId(), plan.getCode(),
@@ -290,6 +293,7 @@ public class ApprovalTicketService {
                         break;
 
                     case TRAVEL:
+                        logger.info("Travel...");
                         entityName = "Travel";
                         TravelForm travelForm = travelFormRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(travelForm.getId(), travelForm.getCode(),
@@ -299,6 +303,7 @@ public class ApprovalTicketService {
                         break;
 
                     case TRAINING:
+                        logger.info("Training...");
                         entityName = "Training";
                         TrainingForm trainingForm = trainingFormRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(trainingForm.getId(), trainingForm.getCode(),
@@ -308,6 +313,7 @@ public class ApprovalTicketService {
                         break;
 
                     case PROJECT:
+                        logger.info("Project...");
                         entityName = "Project";
                         Project project = projectRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(project.getId(), project.getCode(),
@@ -317,6 +323,7 @@ public class ApprovalTicketService {
                         break;
 
                     case BJF:
+                        logger.info("BJF...");
                         entityName = "BJF";
                         BJF bjf = bjfRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(bjf.getId(), bjf.getCode(),
@@ -326,6 +333,7 @@ public class ApprovalTicketService {
                         break;
 
                     case OUTSOURCING_ASSESSMENT_FORM:
+                        logger.info("Outsourcing Assessment Form...");
                         entityName = "OutsourcingAssessment";
                         OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(outsourcingAssessment.getId(), outsourcingAssessment.getCode(),
@@ -335,6 +343,7 @@ public class ApprovalTicketService {
                         break;
 
                     case SEAT_ALLOCATION:
+                        logger.info("Seat Allocation...");
                         entityName = "SeatAllocation";
                         SeatAllocation seatAllocation = seatAllocationRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(seatAllocation.getId(), seatAllocation.getCode(),
@@ -344,6 +353,7 @@ public class ApprovalTicketService {
                         break;
 
                     case OUTSOURCING_SELF_ASSESSMENT:
+                        logger.info("Outsourcing Self Assessment...");
                         entityName = "OutsourcingSelfAssessment";
                         OutsourcingSelfAssessment outsourcingSelfAssessment = outsourcingSelfAssessmentRepository.getOne(ticket.getRequestedItemId());
                         model = new PendingApprovalTicketModel(outsourcingSelfAssessment.getId(), outsourcingSelfAssessment.getCode(),

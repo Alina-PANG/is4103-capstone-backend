@@ -4,43 +4,51 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class OutsourcingAssessmentDistributionModel implements Serializable {
-    private BigDecimal pendingBM;
-    private BigDecimal pendingOutsourcing;
+    private BigDecimal pending_BM_approval;
+    private BigDecimal pending_outsourcing_approval;
     private BigDecimal approved;
     private BigDecimal rejected;
     private BigDecimal template;
-    private BigDecimal outsourcingCreated;
+    private BigDecimal outsourcing_record_created;
 
     public OutsourcingAssessmentDistributionModel() {
     }
 
-    public OutsourcingAssessmentDistributionModel(BigDecimal pendingBM, BigDecimal pendingOutsourcing, BigDecimal approved, BigDecimal rejected, BigDecimal template, BigDecimal outsourcingCreated) {
-        this.pendingBM = pendingBM;
-        this.pendingOutsourcing = pendingOutsourcing;
+    public OutsourcingAssessmentDistributionModel(BigDecimal pending_BM_approval, BigDecimal pending_outsourcing_approval, BigDecimal approved, BigDecimal rejected, BigDecimal template, BigDecimal outsourcing_record_created) {
+        this.pending_BM_approval = pending_BM_approval;
+        this.pending_outsourcing_approval = pending_outsourcing_approval;
         this.approved = approved;
         this.rejected = rejected;
         this.template = template;
-        this.outsourcingCreated = outsourcingCreated;
+        this.outsourcing_record_created = outsourcing_record_created;
     }
 
-    public BigDecimal getPendingBM() {
-        return pendingBM;
+    public BigDecimal getPending_BM_approval() {
+        return pending_BM_approval;
     }
 
-    public void setPendingBM(BigDecimal pendingBM) {
-        this.pendingBM = pendingBM;
+    public void setPending_BM_approval(BigDecimal pending_BM_approval) {
+        this.pending_BM_approval = pending_BM_approval;
     }
 
-    public BigDecimal getPendingOutsourcing() {
-        return pendingOutsourcing;
+    public BigDecimal getPending_outsourcing_approval() {
+        return pending_outsourcing_approval;
     }
 
-    public void setPendingOutsourcing(BigDecimal pendingOutsourcing) {
-        this.pendingOutsourcing = pendingOutsourcing;
+    public void setPending_outsourcing_approval(BigDecimal pending_outsourcing_approval) {
+        this.pending_outsourcing_approval = pending_outsourcing_approval;
     }
 
     public BigDecimal getApproved() {
         return approved;
+    }
+
+    public BigDecimal getOutsourcing_record_created() {
+        return outsourcing_record_created;
+    }
+
+    public void setOutsourcing_record_created(BigDecimal outsourcing_record_created) {
+        this.outsourcing_record_created = outsourcing_record_created;
     }
 
     public void setApproved(BigDecimal approved) {
@@ -61,13 +69,5 @@ public class OutsourcingAssessmentDistributionModel implements Serializable {
 
     public void setTemplate(BigDecimal template) {
         this.template = template;
-    }
-
-    public BigDecimal getOutsourcingCreated() {
-        return outsourcingCreated;
-    }
-
-    public void setOutsourcingCreated(BigDecimal outsourcingCreated) {
-        this.outsourcingCreated = outsourcingCreated;
     }
 }
