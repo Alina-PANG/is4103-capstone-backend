@@ -13,6 +13,8 @@ import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
 import capstone.is4103capstone.entities.supplyChain.OutsourcingSelfAssessment;
 import capstone.is4103capstone.finance.Repository.*;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
+import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
 import capstone.is4103capstone.finance.requestsMgmt.service.ProjectService;
 import capstone.is4103capstone.finance.requestsMgmt.service.TrainingService;
@@ -70,6 +72,8 @@ public class ApprovalTicketService {
     EntityMappingService entityMappingService;
     @Autowired
     EmployeeService employeeService;
+    @Autowired
+    BudgetService budgetService;
 
 
 
@@ -251,7 +255,8 @@ public class ApprovalTicketService {
                     case CONTRACT:
                         entity = entityMappingService.getEntityByClassNameAndId("contract",ticket.getRequestedItemId());
                         break;
-                    case BUDGETPLAN:
+                    case BUDGETPLAN_BM:
+                    case BUDGETPLAN_FUNCTION:
                         entity = entityMappingService.getEntityByClassNameAndId("plan",ticket.getRequestedItemId());
                         break;
                     case TRAVEL:
@@ -377,12 +382,22 @@ public class ApprovalTicketService {
     }
 
     private void mapApprovalType(ApprovalForRequest ticket) throws Exception{
+        ApproveBudgetReq req = null;
         switch (ticket.getApprovalType()){
             case CONTRACT:
                 System.out.println("Already implemented in other ways");
                 break;
-            case BUDGETPLAN:
-                System.out.println("Already implemented in other ways");
+            case BUDGETPLAN_BM:
+                 req = new ApproveBudgetReq(
+                        ticket.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED),
+                        ticket.getApprover().getUserName(),ticket.getRequestedItemId(),ticket.getCommentByApprover(), 0);
+                budgetService.approveBudget(req);
+                break;
+            case BUDGETPLAN_FUNCTION:
+                req = new ApproveBudgetReq(
+                        ticket.getApprovalStatus().equals(ApprovalStatusEnum.APPROVED),
+                        ticket.getApprover().getUserName(),ticket.getRequestedItemId(),ticket.getCommentByApprover(), 1);
+                budgetService.approveBudget(req);
                 break;
             case TRAVEL:
                 travelService.travelPlanApproval(ticket);
