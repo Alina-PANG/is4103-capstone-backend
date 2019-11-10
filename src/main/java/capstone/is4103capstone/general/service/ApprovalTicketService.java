@@ -2,6 +2,7 @@ package capstone.is4103capstone.general.service;
 
 import capstone.is4103capstone.admin.model.TicketDetailsModel;
 import capstone.is4103capstone.admin.repository.EmployeeRepository;
+import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
@@ -66,23 +67,10 @@ public class ApprovalTicketService {
     @Autowired
     ProjectService projectService;
     @Autowired
-    ContractRepository contractRepository;
+    EntityMappingService entityMappingService;
     @Autowired
-    OutsourcingSelfAssessmentRepository outsourcingSelfAssessmentRepository;
-    @Autowired
-    OutsourcingAssessmentRepository outsourcingAssessmentRepository;
-    @Autowired
-    SeatAllocationRepository seatAllocationRepository;
-    @Autowired
-    BjfRepository bjfRepository;
-    @Autowired
-    TravelFormRepository travelFormRepository;
-    @Autowired
-    TrainingFormRepository trainingFormRepository;
-    @Autowired
-    PlanRepository planRepository;
-    @Autowired
-    ProjectRepository projectRepository;
+    EmployeeService employeeService;
+
 
 
     @Value("${spring.mail.username}")
@@ -242,126 +230,63 @@ public class ApprovalTicketService {
             }
         }
         return new ApprovalTicketModel(latest);
-//        List<ApprovalForRequest> models = new ArrayList<>();
-//        for (ApprovalForRequest a: list){
-//            if (a.getApprovalStatus().equals(ApprovalStatusEnum.PENDING))
-//                models.add(a);
-//        }
-//        if (models.size() > 1){
-//            logger.error("Internal error, multiple open tickets for item");
-//            return null;
-//        }
-//        if (models.size() == 0)
-//            return null;
-//        return new ApprovalTicketModel(models.get(0));
     }
 
     public GetPendingApprovalTicketsRes getPendingTicketsByApprover(String approverId){
         try{
+            if (approverId == null){
+                approverId = employeeService.getCurrentLoginEmployee().getId();
+            }else{
+                approverId = employeeService.validateUser(approverId).getId();
+            }
             List<ApprovalForRequest> pendingApprovalTickets = approvalForRequestRepo.findPendingTicketsByApproverId(approverId);
             List<PendingApprovalTicketModel> modelList = new ArrayList<>();
 
             for(ApprovalForRequest ticket : pendingApprovalTickets) {
-                Employee requester = ticket.getRequester();
-                GeneralEntityModel requesterModel = new GeneralEntityModel(requester);
-                String commentByRequester = ticket.getCommentByRequester();
-                String ticketCode = ticket.getCode();
-                String entityName = null;
-                PendingApprovalTicketModel model = null;
-
-                //get item
+                if (ticket.getRequestedItemId() == null || ticket.getRequestedItemId().isEmpty() ){
+                    continue;
+                }
+                DBEntityTemplate entity;
                 switch (ticket.getApprovalType()) {
                     case CONTRACT:
-                        entityName = "Contract";
-                        Contract contract = contractRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(contract.getId(), contract.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("contract",ticket.getRequestedItemId());
                         break;
-
                     case BUDGETPLAN:
-                        entityName = "BudgetPlan";
-                        Plan plan = planRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(plan.getId(), plan.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("plan",ticket.getRequestedItemId());
                         break;
-
                     case TRAVEL:
-                        entityName = "Travel";
-                        TravelForm travelForm = travelFormRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(travelForm.getId(), travelForm.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("travelform",ticket.getRequestedItemId());
                         break;
-
                     case TRAINING:
-                        entityName = "Training";
-                        TrainingForm trainingForm = trainingFormRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(trainingForm.getId(), trainingForm.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("trainingform",ticket.getRequestedItemId());
                         break;
-
                     case PROJECT:
-                        entityName = "Project";
-                        Project project = projectRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(project.getId(), project.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("project",ticket.getRequestedItemId());
                         break;
-
                     case BJF:
-                        entityName = "BJF";
-                        BJF bjf = bjfRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(bjf.getId(), bjf.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("bjf",ticket.getRequestedItemId());
                         break;
-
                     case OUTSOURCING_ASSESSMENT_FORM:
-                        entityName = "OutsourcingAssessment";
-                        OutsourcingAssessment outsourcingAssessment = outsourcingAssessmentRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(outsourcingAssessment.getId(), outsourcingAssessment.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("outsourcingassessment",ticket.getRequestedItemId());
                         break;
-
                     case SEAT_ALLOCATION:
-                        entityName = "SeatAllocation";
-                        SeatAllocation seatAllocation = seatAllocationRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(seatAllocation.getId(), seatAllocation.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("seatallocation",ticket.getRequestedItemId());
                         break;
-
                     case OUTSOURCING_SELF_ASSESSMENT:
-                        entityName = "OutsourcingSelfAssessment";
-                        OutsourcingSelfAssessment outsourcingSelfAssessment = outsourcingSelfAssessmentRepository.getOne(ticket.getRequestedItemId());
-                        model = new PendingApprovalTicketModel(outsourcingSelfAssessment.getId(), outsourcingSelfAssessment.getCode(),
-                                entityName, ticketCode, commentByRequester, requesterModel);
-
-                        modelList.add(model);
+                        entity = entityMappingService.getEntityByClassNameAndId("outsourcingselfassessment",ticket.getRequestedItemId());
                         break;
-
                     default:
-                        throw new Exception("Approval type not registered");
+                        continue;
                 }
+                PendingApprovalTicketModel ticketModel = new PendingApprovalTicketModel(entity,ticket);
+                modelList.add(ticketModel);
             }
 
             return new GetPendingApprovalTicketsRes("", false, modelList);
 
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetPendingApprovalTicketsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetPendingApprovalTicketsRes(ex.getMessage(), true, null);
         }
     }
 
