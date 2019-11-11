@@ -179,23 +179,6 @@ public class SeatAllocationRequestService {
             seatAllocationRequest.getSeatAllocationSchedules().add(schedule);
         }
 
-        // Copy from ApprovalTicketService
-        ApprovalForRequest ticket = new ApprovalForRequest();
-        ticket.setCreatedBy(requester.getUserName());
-        ticket.setApprovalType(ApprovalTypeEnum.SEAT_ALLOCATION);
-        ticket.setRequester(requester);
-        ticket.setApprover(approver);
-        ticket.setApprovalStatus(ApprovalStatusEnum.PENDING);
-        ticket.setCommentByRequester(requestorComment);
-
-        try {
-            String code = seatManagementEntityCodeHPGenerator.generateCode(approvalForRequestRepository, ticket);
-            ticket.setCode(code);
-            ticket.setObjectName(code);
-        } catch (Exception ex) {
-            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " + ex.getMessage());
-        }
-
         // Update the seat allocation request
         seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.BUSINESS_UNIT);
         seatAllocationRequest.setEscalatedHierarchyId(businessUnit.getId());
@@ -208,12 +191,30 @@ public class SeatAllocationRequestService {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " + ex.getMessage());
         }
 
+        // Copy from ApprovalTicketService
+        ApprovalForRequest ticket = new ApprovalForRequest();
+        ticket.setCreatedBy(requester.getUserName());
+        ticket.setApprovalType(ApprovalTypeEnum.SEAT_ALLOCATION);
+        ticket.setRequester(requester);
+        ticket.setApprover(approver);
+        ticket.setApprovalStatus(ApprovalStatusEnum.PENDING);
+        ticket.setCommentByRequester(requestorComment);
         ticket.setRequestedItemId(seatAllocationRequest.getId());
         ticket = approvalForRequestRepository.save(ticket);
+
+        try {
+            String code = seatManagementEntityCodeHPGenerator.generateCode(approvalForRequestRepository, ticket);
+            ticket.setCode(code);
+            ticket.setObjectName(code);
+        } catch (Exception ex) {
+            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " + ex.getMessage());
+        }
+
         seatAllocationRequest.setCurrentPendingTicket(ticket);
         seatAllocationRequest.getApprovalTickets().add(ticket);
 
         seatAllocationRequestRepository.save(seatAllocationRequest);
+        approvalForRequestRepository.save(ticket);
         employeeRepository.save(requester);
         employeeRepository.save(approver);
     }
