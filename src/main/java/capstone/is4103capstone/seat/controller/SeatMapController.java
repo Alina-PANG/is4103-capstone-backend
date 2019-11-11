@@ -97,7 +97,7 @@ public class SeatMapController {
 
     @GetMapping("/existence/officeFloor")
     public ResponseEntity checkSeatMapExistenceByOfficeAndFloor(@RequestParam(name = "officeId") String officeId,
-                                                                @RequestParam(name = "officeId") String floor) {
+                                                                @RequestParam(name = "floor") String floor) {
         SeatMapExistenceCheckingModel seatMapExistenceCheckingModel = seatMapService.checkSeatMapExistenceByOfficeAndFloor(officeId, floor);
         return ResponseEntity.ok().body(seatMapExistenceCheckingModel);
     }
