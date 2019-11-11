@@ -28,7 +28,7 @@ public class VendorController {
                     .body(vendorService.createNewVendor(createVendorReq));
         } else {
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -54,7 +54,7 @@ public class VendorController {
                     .body(vendorService.getVendor(id));
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -67,7 +67,7 @@ public class VendorController {
                     .body(vendorService.getAllVendors());
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }

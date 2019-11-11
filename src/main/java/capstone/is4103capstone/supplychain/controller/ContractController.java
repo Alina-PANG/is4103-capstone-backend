@@ -29,7 +29,7 @@ public class ContractController {
                     .body(contractService.createContract(createContractReq));
         } else {
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -42,7 +42,7 @@ public class ContractController {
                     .body(contractService.getContract(id));
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -68,7 +68,7 @@ public class ContractController {
                     .body(contractService.getAllContracts());
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -81,7 +81,7 @@ public class ContractController {
                     .body(contractService.getContractsByTeamId(teamId));
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -94,7 +94,7 @@ public class ContractController {
                     .body(contractService.getContractsByVendorId(vendorId));
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -119,7 +119,7 @@ public class ContractController {
                     .body(contractService.createApprovalTicket(username, contractId, "Approver please review the contract and related child contracts."));
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
