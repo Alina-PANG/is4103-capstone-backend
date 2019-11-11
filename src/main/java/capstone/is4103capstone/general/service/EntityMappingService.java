@@ -2,6 +2,7 @@ package capstone.is4103capstone.general.service;
 
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.RequestFormTemplate;
 import capstone.is4103capstone.entities.finance.BJF;
 import capstone.is4103capstone.finance.Repository.*;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateBJFReq;
@@ -14,6 +15,7 @@ import capstone.is4103capstone.util.exception.EntityClassNameNotValidException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import sun.misc.Request;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
@@ -61,6 +63,14 @@ public class EntityMappingService {
         JpaRepository repo = getRepoByClassName(className);
 
         Optional<DBEntityTemplate> entity = repo.findById(id);
+        if (entity.isPresent())
+            return entity.get();
+        throw new EntityNotFoundException("Id ["+id+"] not found in table ["+className+"].");
+    }
+
+    public RequestFormTemplate getFormEntityByClassNameAndId(String className, String id){
+        JpaRepository repo = getRepoByClassName(className);
+        Optional<? extends RequestFormTemplate> entity = repo.findById(id);
         if (entity.isPresent())
             return entity.get();
         throw new EntityNotFoundException("Id ["+id+"] not found in table ["+className+"].");

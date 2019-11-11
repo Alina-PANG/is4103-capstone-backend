@@ -45,7 +45,7 @@ public class SeatInitializationService {
 
 
     public void initialiseSeatManagement() {
-        createSeatmaps();
+//        createSeatmaps();
         initialiseSeatUtilisationLog();
     }
 
@@ -213,10 +213,10 @@ public class SeatInitializationService {
 
                 // Assign company functions, business units and teams
                 Collections.sort(newSeatMapLvl26.getSeats());
-                Team dataCenOprTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DataCenOpr");
-                Team networksTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
-                Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
-                Team prodSuppTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
+                Team dataCenOprTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-DataCenOpr");
+                Team networksTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-Networks");
+                Team devTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-Dev");
+                Team prodSuppTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-ProdSupp");
                 for (Seat seat :
                         newSeatMapLvl26.getSeats()) {
                     Integer serialNumber = seat.getSerialNumber();
@@ -422,7 +422,7 @@ public class SeatInitializationService {
         yesterday = DateHelper.getDateByYearMonthDateHourMinuteSecond(yesterdayYear, yesterdayMonth, yesterdayDayOfMonth, 23, 59, 0);
 
         // Use Fix Income Development team as the finder
-        Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
+        Team devTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-Dev");
         Optional<SeatUtilisationLog> optionalSeatUtilisationLog = seatUtilisationLogRepository.findOneByBusinessEntityIdAndDate(devTeam.getId(), yesterdayYear, yesterdayMonth, yesterdayDayOfMonth);
         if (!optionalSeatUtilisationLog.isPresent()) {
             seatUtilisationLogRepository.deleteAll();
@@ -435,7 +435,7 @@ public class SeatInitializationService {
 
     private void initialiseTeamSeatUtilisationLog(Date date, int periodLength) {
         // SG-Tech-FixIncTech-Dev
-        Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
+        Team devTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-Dev");
         if (devTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
@@ -471,7 +471,7 @@ public class SeatInitializationService {
         }
 
         // SG-Tech-FixIncTech-ProdSupp
-        Team prodSuppTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
+        Team prodSuppTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-ProdSupp");
         if (prodSuppTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
@@ -510,7 +510,7 @@ public class SeatInitializationService {
 
 
         // SG-Tech-InfraTech-DataCenOpr
-        Team dataCenOpeTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DataCenOpr");
+        Team dataCenOpeTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-DataCenOpr");
         if (dataCenOpeTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
@@ -548,7 +548,7 @@ public class SeatInitializationService {
         }
 
         // SG-Tech-InfraTech-Networks
-        Team networksTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
+        Team networksTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-Networks");
         if (networksTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
@@ -584,7 +584,7 @@ public class SeatInitializationService {
         }
 
         // SG-Tech-InfraTech-DBAdmin
-        Team dbAdminTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
+        Team dbAdminTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-DBAdmin");
         if (dbAdminTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
@@ -612,7 +612,7 @@ public class SeatInitializationService {
         }
 
         // SG-Tech-InfraTech-EndUserCom
-        Team endUserComTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-EndUserCom");
+        Team endUserComTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-EndUserCom");
         if (endUserComTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
@@ -641,7 +641,7 @@ public class SeatInitializationService {
 
 
         // SG-HR-RCR-INT
-        Team intTeam = teamRepository.findTeamByCode("SG-HR-RCR-INT");
+        Team intTeam = teamRepository.findTeamByCode("T-SG-HR-RCR-INT");
         if (intTeam != null) {
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
@@ -679,9 +679,9 @@ public class SeatInitializationService {
         Optional<Office> office = officeRepository.findByName("One Raffles Quay");
 
         // SG-Tech-FixIncTech
-        Optional<BusinessUnit> optionalFixIncTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-FixIncTech");
-        Team devTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
-        Team prodSuppTeam = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
+        Optional<BusinessUnit> optionalFixIncTech = businessUnitRepository.findByCodeNonDeleted("BU-SG-Tech-FixIncTech");
+        Team devTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-Dev");
+        Team prodSuppTeam = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-ProdSupp");
         if (optionalFixIncTech.isPresent()) {
             BusinessUnit fixIncTech = optionalFixIncTech.get();
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -722,9 +722,9 @@ public class SeatInitializationService {
 
 
         // SG-Tech-InfraTech
-        Optional<BusinessUnit> optionalInfraTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-InfraTech");
-        Team networksTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
-        Team dataCtrOprTeam = teamRepository.findTeamByCode("SG-Tech-InfraTech-DataCenOpr");
+        Optional<BusinessUnit> optionalInfraTech = businessUnitRepository.findByCodeNonDeleted("BU-SG-Tech-InfraTech");
+        Team networksTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-Networks");
+        Team dataCtrOprTeam = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-DataCenOpr");
         if (optionalInfraTech.isPresent()) {
             BusinessUnit fixIncTech = optionalInfraTech.get();
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -765,8 +765,8 @@ public class SeatInitializationService {
 
 
         // SG-HR-RCR
-        Optional<BusinessUnit> optionalRecruiting = businessUnitRepository.findByCodeNonDeleted("SG-HR-RCR");
-        Team interviewTeam = teamRepository.findTeamByCode("SG-HR-RCR-INT");
+        Optional<BusinessUnit> optionalRecruiting = businessUnitRepository.findByCodeNonDeleted("BU-SG-HR-RCR");
+        Team interviewTeam = teamRepository.findTeamByCode("T-SG-HR-RCR-INT");
         if (optionalRecruiting.isPresent()) {
             BusinessUnit recruitingUnit = optionalRecruiting.get();
             int yesterdayYear = DateHelper.getYearFromDate(date);
@@ -806,11 +806,11 @@ public class SeatInitializationService {
         Optional<Office> office = officeRepository.findByName("One Raffles Quay");
 
         // SG-Tech
-        Optional<CompanyFunction> optionalTech = functionRepository.findByCode("SG-Tech");
+        Optional<CompanyFunction> optionalTech = functionRepository.findByCode("F-SG-Tech");
         if (optionalTech.isPresent()) {
             CompanyFunction tech = optionalTech.get();
-            BusinessUnit fixIncTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-FixIncTech").get();
-            BusinessUnit infraTech = businessUnitRepository.findByCodeNonDeleted("SG-Tech-InfraTech").get();
+            BusinessUnit fixIncTech = businessUnitRepository.findByCodeNonDeleted("BU-SG-Tech-FixIncTech").get();
+            BusinessUnit infraTech = businessUnitRepository.findByCodeNonDeleted("BU-SG-Tech-InfraTech").get();
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
             int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
@@ -848,10 +848,10 @@ public class SeatInitializationService {
         }
 
         // SG-HR
-        Optional<CompanyFunction> optionalHR = functionRepository.findByCode("SG-HR");
+        Optional<CompanyFunction> optionalHR = functionRepository.findByCode("F-SG-HR");
         if (optionalHR.isPresent()) {
             CompanyFunction hr = optionalHR.get();
-            BusinessUnit recruitingUnit = businessUnitRepository.findByCodeNonDeleted("SG-HR-RCR").get();
+            BusinessUnit recruitingUnit = businessUnitRepository.findByCodeNonDeleted("BU-SG-HR-RCR").get();
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
             int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
@@ -892,7 +892,7 @@ public class SeatInitializationService {
         Optional<SeatMap> optionalSeatMapLvl26 = seatMapRepository.findByCode("SG-ORQ-26");
         if (optionalSeatMapLvl26.isPresent()) {
             SeatMap level26 = optionalSeatMapLvl26.get();
-            CompanyFunction techFunction = functionRepository.findByCode("SG-Tech").get();
+            CompanyFunction techFunction = functionRepository.findByCode("F-SG-Tech").get();
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
             int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);
@@ -925,7 +925,7 @@ public class SeatInitializationService {
         Optional<SeatMap> optionalSeatMapLvl27 = seatMapRepository.findByCode("SG-ORQ-27");
         if (optionalSeatMapLvl27.isPresent()) {
             SeatMap level27 = optionalSeatMapLvl27.get();
-            CompanyFunction hrFunction = functionRepository.findByCode("SG-HR").get();
+            CompanyFunction hrFunction = functionRepository.findByCode("F-SG-HR").get();
             int yesterdayYear = DateHelper.getYearFromDate(date);
             int yesterdayMonth = DateHelper.getMonthFromDate(date);
             int yesterdayDayOfMonth = DateHelper.getDayOfMonthFromDate(date);

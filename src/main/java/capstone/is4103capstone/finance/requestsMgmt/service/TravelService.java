@@ -110,13 +110,13 @@ public class TravelService {
         return models;
     }
 
-    public TTFormResponse getTravelPlanDetails(String planId) throws Exception{
+    public TravelModel getTravelPlanDetails(String planId) throws Exception{
         Optional<TravelForm> tOps = travelFormRepository.findById(planId);
         if (!tOps.isPresent())
             throw new EntityNotFoundException("Travel Plan with id ["+planId+"] not found.");
         try {
             TravelModel travelModel = new TravelModel(tOps.get());
-            return new TTFormResponse("Successfully retrieved travel plan",false,travelModel);
+            return travelModel;
         }catch (NullPointerException e){
             throw new NullPointerException("[internal error] Travel Plan in the database is not valid.");
         }
