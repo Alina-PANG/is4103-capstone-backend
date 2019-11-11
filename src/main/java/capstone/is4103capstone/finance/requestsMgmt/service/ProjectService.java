@@ -112,14 +112,19 @@ public class ProjectService {
             }
             Employee projectOwner = p.getProjectOwner();
             Employee projectSupervisory = p.getProjectSupervisor();
-            if (req.getProjectOwner() != null)
+            if (req.getProjectOwner() != null) {
                 projectOwner = employeeService.validateUser(req.getProjectOwner());
                 p.setProjectOwner(projectOwner);
-            if (req.getProjectSupervisor() != null)
+            }
+            if (req.getProjectSupervisor() != null){
                 projectSupervisory = employeeService.validateUser(req.getProjectSupervisor());
                 p.setProjectSupervisor(projectSupervisory);
+                Employee preApprover = p.getApprover();
                 p.setApprover(projectSupervisory);
-
+                if (!preApprover.getId().equals(projectSupervisory.getId()) && p.getProjectLifeCycleStatus().equals(ProjectStatus.PENDING_APPROVAL)){
+                    ApprovalTicketService.createTicketAndSendEmail(employeeService.getCurrentLoginEmployee(),projectSupervisory,p,"Project plan."+p.getRequestDescription(), ApprovalTypeEnum.PROJECT);
+                }
+            }
             for (String member:req.getTeamMembers())
                 employeeService.validateUser(member);
 

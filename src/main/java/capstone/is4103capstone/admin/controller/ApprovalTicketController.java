@@ -34,7 +34,7 @@ public class ApprovalTicketController {
     @PostMapping("/approve")
     public ResponseEntity<GeneralRes> approveRequest(@RequestBody ApprovalTicketModel result){
         try{
-            return ResponseEntity.ok().body(approvalTicketService.approveTicketAPI(result.getRequestedItemId(),result.getApproverComment(),true));
+            return ResponseEntity.ok().body(approvalTicketService.approveTicketAPI(result,true));
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
@@ -44,7 +44,19 @@ public class ApprovalTicketController {
     @PostMapping("/reject")
     public ResponseEntity<GeneralRes> rejectRequest(@RequestBody ApprovalTicketModel result){
         try{
-            return ResponseEntity.ok().body(approvalTicketService.approveTicketAPI(result.getRequestedItemId(),result.getApproverComment(),false));
+            return ResponseEntity.ok().body(approvalTicketService.approveTicketAPI(result,false));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
+        }
+    }
+
+
+    @GetMapping("/approval-tickets-waiting-list")
+    public @ResponseBody ResponseEntity<Object> getPendingTicketsByCurrentUser(){
+        try{
+            String approverId = employeeService.getCurrentLoginEmployee().getId();
+            return ResponseEntity.ok().body(approvalTicketService.getPendingTicketsByApprover(approverId));
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));

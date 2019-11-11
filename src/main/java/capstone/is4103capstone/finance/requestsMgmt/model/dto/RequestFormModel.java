@@ -18,6 +18,7 @@ public class RequestFormModel implements Serializable {
     private String currencyCode;
     private String approvalStatus;
     private String id;
+    private String name;
     private String createdDateTime;
     private EmployeeModel approver;
 
@@ -43,9 +44,16 @@ public class RequestFormModel implements Serializable {
         setId(e.getId());
         setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
         setApprover(new EmployeeModel(e.getApprover()));
+        setName(e.getObjectName());
     }
 
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getCreatedDateTime() {
         return createdDateTime;

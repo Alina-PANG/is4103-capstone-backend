@@ -1,6 +1,7 @@
 package capstone.is4103capstone.finance.requestsMgmt.controller;
 
 import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.finance.requestsMgmt.model.dto.TrainingModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateTrainingRequest;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateTravelRequest;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
@@ -55,7 +56,8 @@ public class TrainingController {
     @GetMapping("/{id}")
     public ResponseEntity<TTFormResponse> getTrainingPlanDetails(@PathVariable(name = "id") String planId){
         try{
-            return ResponseEntity.ok().body(trainingService.getTrainingPlanDetails(planId));
+            TrainingModel model = trainingService.getTrainingPlanDetails(planId);
+            return ResponseEntity.ok().body(new TTFormResponse("Successfully retrieved",false,model));
         }catch (Exception ex){
             return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
         }

@@ -113,13 +113,13 @@ public class TrainingService {
     }
 
 
-    public TTFormResponse getTrainingPlanDetails(String planId){
+    public TrainingModel getTrainingPlanDetails(String planId){
         Optional<TrainingForm> tOps = trainingFormRepository.findById(planId);
         if (!tOps.isPresent())
             throw new EntityNotFoundException("Travel Plan with id ["+planId+"] not found.");
         try {
             TrainingModel trainingModel = new TrainingModel(tOps.get());
-            return new TTFormResponse("Successfully retrieved training plan",false,trainingModel);
+            return trainingModel;
         }catch (NullPointerException e){
             throw new NullPointerException("[internal error] Training Plan in the database is not valid.");
         }

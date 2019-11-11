@@ -2,6 +2,7 @@ package capstone.is4103capstone.finance.requestsMgmt.controller;
 
 import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.entities.Employee;
+import capstone.is4103capstone.finance.requestsMgmt.model.dto.TravelModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.req.CreateTravelRequest;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTFormResponse;
 import capstone.is4103capstone.finance.requestsMgmt.model.res.TTListResponse;
@@ -57,7 +58,8 @@ public class TravelController {
     @GetMapping("/{id}")
     public ResponseEntity<TTFormResponse> getTravelPlanDetails(@PathVariable(name = "id") String planId){
         try{
-            return ResponseEntity.ok().body(travelService.getTravelPlanDetails(planId));
+            TravelModel model = travelService.getTravelPlanDetails(planId);
+            return ResponseEntity.ok().body(new TTFormResponse("Successfully retrieved travel plan",false,model));
         }catch (Exception ex){
             return ResponseEntity.badRequest().body(new TTFormResponse(ex.getMessage(),true));
         }

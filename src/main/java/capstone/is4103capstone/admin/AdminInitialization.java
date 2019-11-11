@@ -74,8 +74,9 @@ public class AdminInitialization {
 //        }
 //         createEmployeeTemplate("PO","Last name","poteam","password","huangyingshi@gmail.com","PO_TEAM-1");
         // Seat management subsystem initialisation for sr2
-        seatManagementInitialisation();
-        seatInitializationService.initialiseSeatManagement();
+
+//        seatManagementInitialisation();
+//        seatInitializationService.initialiseSeatManagement();
 
     }
     private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
@@ -403,49 +404,49 @@ public class AdminInitialization {
 
         // ---------------------------------- Team ----------------------------------
 
-        Team endUserComputingTeam = new Team("End User Computing", "SG-Tech-InfraTech-EndUserCom", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-EndUserCom");
+        Team endUserComputingTeam = new Team("End User Computing", "T-SG-Tech-InfraTech-EndUserCom", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-EndUserCom");
         endUserComputingTeam.setCreatedBy("admin");
         endUserComputingTeam.setLastModifiedBy("admin");
         endUserComputingTeam.setOffice(office);
         endUserComputingTeam = teamRepository.save(endUserComputingTeam);
         endUserComputingTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team dataCenterOpeTeam = new Team("Data Center Operation", "SG-Tech-InfraTech-DataCenOpr", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-DataCenOpr");
+        Team dataCenterOpeTeam = new Team("Data Center Operation", "T-SG-Tech-InfraTech-DataCenOpr", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-DataCenOpr");
         dataCenterOpeTeam.setCreatedBy("admin");
         dataCenterOpeTeam.setLastModifiedBy("admin");
         dataCenterOpeTeam.setOffice(office);
         dataCenterOpeTeam = teamRepository.save(dataCenterOpeTeam);
         dataCenterOpeTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team databaseAdminTeam = new Team("Database Admin", "SG-Tech-InfraTech-DBAdmin", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-DBAdmin");
+        Team databaseAdminTeam = new Team("Database Admin", "T-SG-Tech-InfraTech-DBAdmin", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-DBAdmin");
         databaseAdminTeam.setCreatedBy("admin");
         databaseAdminTeam.setLastModifiedBy("admin");
         databaseAdminTeam.setOffice(office);
         databaseAdminTeam = teamRepository.save(databaseAdminTeam);
         databaseAdminTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team networkTeam = new Team("Networks", "SG-Tech-InfraTech-Networks", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-Networks");
+        Team networkTeam = new Team("Networks", "T-SG-Tech-InfraTech-Networks", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-InfraTech-Networks");
         networkTeam.setCreatedBy("admin");
         networkTeam.setLastModifiedBy("admin");
         networkTeam.setOffice(office);
         networkTeam = teamRepository.save(networkTeam);
         networkTeam.setBusinessUnit(businessUnitInfraTech);
 
-        Team productionSupportTeam = new Team("Production Support", "SG-Tech-FixIncTech-ProdSupp", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-FixIncTech-ProdSupp");
+        Team productionSupportTeam = new Team("Production Support", "T-SG-Tech-FixIncTech-ProdSupp", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-FixIncTech-ProdSupp");
         productionSupportTeam.setCreatedBy("admin");
         productionSupportTeam.setLastModifiedBy("admin");
         productionSupportTeam.setOffice(office);
         productionSupportTeam = teamRepository.save(productionSupportTeam);
         productionSupportTeam.setBusinessUnit(businessUnitFixIncomeTech);
 
-        Team developmentTeam = new Team("Development", "SG-Tech-FixIncTech-Dev", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-FixIncTech-Dev");
+        Team developmentTeam = new Team("Development", "T-SG-Tech-FixIncTech-Dev", "APAC:SG:F-SG-Tech:BU-SG-Tech-InfraTech:T-SG-Tech-FixIncTech-Dev");
         developmentTeam.setCreatedBy("admin");
         developmentTeam.setLastModifiedBy("admin");
         developmentTeam.setOffice(office);
         developmentTeam = teamRepository.save(developmentTeam);
         developmentTeam.setBusinessUnit(businessUnitFixIncomeTech);
 
-        Team interviewTeam = new Team("Interview", "SG-HR-RCR-INT", "APAC:SG:F-SG-HR:BU-SG-HR-RCR:T-SG-HR-RCR-INT");
+        Team interviewTeam = new Team("Interview", "T-SG-HR-RCR-INT", "APAC:SG:F-SG-HR:BU-SG-HR-RCR:T-SG-HR-RCR-INT");
         interviewTeam.setCreatedBy("admin");
         interviewTeam.setLastModifiedBy("admin");
         interviewTeam.setOffice(office);
@@ -474,13 +475,13 @@ public class AdminInitialization {
         teamRepository.saveAndFlush(developmentTeam);
         teamRepository.saveAndFlush(interviewTeam);
 
-        office.getFunctionsCodeInOffice().add("SG-Tech");
-        office.getFunctionsCodeInOffice().add("SG-HR");
-        office.getFunctionsCodeInOffice().add("SG-Sales");
-        office.getBusinessUnitsCodeInOffice().add("SG-Tech-InfraTech");
-        office.getBusinessUnitsCodeInOffice().add("SG-Tech-CurrTech");
-        office.getBusinessUnitsCodeInOffice().add("SG-Tech-FixIncTech");
-        office.getBusinessUnitsCodeInOffice().add("SG-HR-RCR");
+        office.getFunctionsCodeInOffice().add("F-SG-Tech");
+        office.getFunctionsCodeInOffice().add("F-SG-HR");
+        office.getFunctionsCodeInOffice().add("F-SG-Sales");
+        office.getBusinessUnitsCodeInOffice().add("BU-SG-Tech-InfraTech");
+        office.getBusinessUnitsCodeInOffice().add("BU-SG-Tech-CurrTech");
+        office.getBusinessUnitsCodeInOffice().add("BU-SG-Tech-FixIncTech");
+        office.getBusinessUnitsCodeInOffice().add("BU-SG-HR-RCR");
         techFunctionSG.getOfficesCodeOfFunction().add("ORQ");
         hrFunctionSG.getOfficesCodeOfFunction().add("ORQ");
         salesFunctionSG.getOfficesCodeOfFunction().add("ORQ");
