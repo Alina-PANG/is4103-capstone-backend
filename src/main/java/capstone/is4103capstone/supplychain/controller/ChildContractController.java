@@ -28,7 +28,7 @@ public class ChildContractController {
                     .body(childContractService.createChildContract(createChildContractReq));
         } else {
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -41,7 +41,7 @@ public class ChildContractController {
                     .body(childContractService.getChildContract(id));
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -67,7 +67,7 @@ public class ChildContractController {
                     .body(childContractService.getChildContractsByMasterContractId(masterContractId));
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
