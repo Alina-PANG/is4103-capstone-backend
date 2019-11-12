@@ -11,6 +11,7 @@ import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoAByInv
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoAByScheduleReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetSoARes;
+import capstone.is4103capstone.general.model.GeneralEntityRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.util.Tools;
 import org.joda.time.DateTime;
@@ -94,7 +95,7 @@ public class StatementOfAccountService {
 
             po.setStatementOfAccount(items);
             purchaseOrderRepository.saveAndFlush(po);
-            return ResponseEntity.ok().body(new GeneralRes("Successfully saved the statement of accounts!", false));
+            return ResponseEntity.ok().body(new GeneralEntityRes("Successfully saved the statement of accounts!", false));
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -186,7 +187,7 @@ public class StatementOfAccountService {
                 else
                     result.add(new SOAModel(l.getId(), l.getPaidAmt(), l.getActualPmt(), l.getScheduleDate()));
             }
-            return ResponseEntity.ok().body(new GetSoARes("Successfully retrieved the statement of accounts!", true, result));
+            return ResponseEntity.ok().body(new GetSoARes("Successfully retrieved the statement of accounts!", false, result));
         }
         catch (Exception ex){
             ex.printStackTrace();

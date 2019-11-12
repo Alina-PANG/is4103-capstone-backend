@@ -58,6 +58,8 @@ public class SessionKeyAuthenticationFilter extends OncePerRequestFilter {
                     employee = employeeRepository.findEmployeeByUserName("outsourcing1");
                 }else if (xAuth.equalsIgnoreCase("panghangzhi")){
                     employee = employeeRepository.findEmployeeByUserName("panghangzhi");
+                }else if (xAuth.equalsIgnoreCase("poteam")){
+                    employee = employeeRepository.findEmployeeByUserName("poteam");
                 }
                 else {
                     if (!userAuthenticationService.checkSessionKeyValidity(xAuth))

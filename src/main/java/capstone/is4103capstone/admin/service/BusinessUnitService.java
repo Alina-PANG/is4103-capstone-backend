@@ -8,6 +8,8 @@ import capstone.is4103capstone.util.exception.BusinessUnitNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Entity;
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -93,4 +95,18 @@ public class BusinessUnitService {
         return businessUnits;
     }
 
+    public BusinessUnit validationBusinessUnit(String idOrCode) throws EntityNotFoundException {
+        Optional<BusinessUnit> buOp = businessUnitRepository.findById(idOrCode);
+        if (buOp.isPresent()){
+            if (buOp.get().getDeleted())
+                throw new EntityNotFoundException("Business Unit already removed");
+            return buOp.get();
+        }
+
+        BusinessUnit e = businessUnitRepository.findByCode(idOrCode);
+        if (e != null || !e.getDeleted())
+            return e;
+
+        throw new EntityNotFoundException("code or id not valid");
+    }
 }
