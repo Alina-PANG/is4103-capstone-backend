@@ -5,20 +5,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeatAdminMatchGroupModel implements Serializable {
-    private List<GroupModel> accessibleEntities = new ArrayList<>();
+    private List<SeatAdminMatchModel> accessibleEntities = new ArrayList<>();
 
     public SeatAdminMatchGroupModel() {
     }
 
-    public SeatAdminMatchGroupModel(List<GroupModel> accessibleEntities) {
+    public SeatAdminMatchGroupModel(List<SeatAdminMatchModel> accessibleEntities) {
         this.accessibleEntities = accessibleEntities;
     }
 
-    public List<GroupModel> getAccessibleEntities() {
+    public List<SeatAdminMatchModel> getAccessibleEntities() {
         return accessibleEntities;
     }
 
-    public void setAccessibleEntities(List<GroupModel> accessibleEntities) {
+    public void setAccessibleEntities(List<SeatAdminMatchModel> accessibleEntities) {
         this.accessibleEntities = accessibleEntities;
     }
 }

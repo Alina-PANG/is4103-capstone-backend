@@ -7,6 +7,7 @@ import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.seat.model.GroupModel;
 import capstone.is4103capstone.seat.model.SeatAdminMatchGroupModel;
+import capstone.is4103capstone.seat.model.SeatAdminMatchModel;
 import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
@@ -62,7 +63,7 @@ public class SeatAdminMatchService {
     public SeatAdminMatchGroupModel retrieveAccessibleHierarchyLevels() {
 
         SeatAdminMatchGroupModel seatAdminMatchGroupModel = new SeatAdminMatchGroupModel();
-        List<GroupModel> groupModels = new ArrayList<>();
+        List<SeatAdminMatchModel> groupModels = new ArrayList<>();
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
@@ -76,31 +77,31 @@ public class SeatAdminMatchService {
                 groupModel.setId(companyFunction.getId());
                 groupModel.setName(companyFunction.getObjectName());
                 groupModel.setCode(companyFunction.getCode());
-                groupModels.add(groupModel);
+                groupModels.add(new SeatAdminMatchModel(groupModel, HierarchyTypeEnum.COMPANY_FUNCTION.toString()));
             } else if (match.getHierarchyType().equals(HierarchyTypeEnum.BUSINESS_UNIT)) {
                 BusinessUnit businessUnit = businessUnitRepository.findByIdNonDeleted(match.getHierarchyId()).get();
                 groupModel.setId(businessUnit.getId());
                 groupModel.setName(businessUnit.getObjectName());
                 groupModel.setCode(businessUnit.getCode());
-                groupModels.add(groupModel);
+                groupModels.add(new SeatAdminMatchModel(groupModel, HierarchyTypeEnum.BUSINESS_UNIT.toString()));
             } else if (match.getHierarchyType().equals(HierarchyTypeEnum.TEAM)) {
                 Team team = teamRepository.findById(match.getHierarchyId()).get();
                 groupModel.setId(team.getId());
                 groupModel.setName(team.getObjectName());
                 groupModel.setCode(team.getCode());
-                groupModels.add(groupModel);
+                groupModels.add(new SeatAdminMatchModel(groupModel, HierarchyTypeEnum.TEAM.toString()));
             } else if (match.getHierarchyType().equals(HierarchyTypeEnum.OFFICE)) {
                 Office office = officeRepository.findById(match.getHierarchyId()).get();
                 groupModel.setId(office.getId());
                 groupModel.setName(office.getObjectName());
                 groupModel.setCode(office.getCode());
-                groupModels.add(groupModel);
+                groupModels.add(new SeatAdminMatchModel(groupModel, HierarchyTypeEnum.OFFICE.toString()));
             } else {
                 SeatMap seatMap = seatMapRepository.findById(match.getHierarchyId()).get();
                 groupModel.setId(seatMap.getId());
                 groupModel.setName(seatMap.getObjectName());
                 groupModel.setCode(seatMap.getCode());
-                groupModels.add(groupModel);
+                groupModels.add(new SeatAdminMatchModel(groupModel, HierarchyTypeEnum.OFFICE_FLOOR.toString()));
             }
         }
         seatAdminMatchGroupModel.setAccessibleEntities(groupModels);
@@ -110,7 +111,7 @@ public class SeatAdminMatchService {
     public SeatAdminMatchGroupModel retrieveAccessibleOffices() {
 
         SeatAdminMatchGroupModel seatAdminMatchGroupModel = new SeatAdminMatchGroupModel();
-        List<GroupModel> groupModels = new ArrayList<>();
+        List<SeatAdminMatchModel> groupModels = new ArrayList<>();
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
@@ -164,7 +165,7 @@ public class SeatAdminMatchService {
             groupModel.setId(officeId);
             groupModel.setName(office.getObjectName());
             groupModel.setCode(office.getCode());
-            groupModels.add(groupModel);
+            groupModels.add(new SeatAdminMatchModel(groupModel, HierarchyTypeEnum.OFFICE.toString()));
         }
         seatAdminMatchGroupModel.setAccessibleEntities(groupModels);
         return seatAdminMatchGroupModel;
