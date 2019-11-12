@@ -23,4 +23,15 @@ public interface OfficeRepository extends JpaRepository<Office, String> {
     @Query(value = "SELECT * FROM office o WHERE o.is_deleted=false", nativeQuery = true)
     List<Office> findAllUndeleted();
 
+    @Query(value = "SELECT * FROM office o WHERE o.id IN ( " +
+            "SELECT a.office_id FROM team a WHERE " +
+            "a.is_deleted=false AND a.business_unit_id=?1)", nativeQuery = true)
+    List<Office> findOnesUnderBusinessUnit(String businessUnit);
+
+    @Query(value = "SELECT * FROM office o WHERE o.id IN ( " +
+            "SELECT a.office_id FROM team a, business_unit b WHERE " +
+            "a.is_deleted=false AND a.business_unit_id=b.id AND " +
+            "b.is_deleted=false AND b.function_id=?1)", nativeQuery = true)
+    List<Office> findOnesUnderCompanyFunction(String functionId);
+
 }
