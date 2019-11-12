@@ -15,6 +15,8 @@ public interface BusinessUnitRepository extends JpaRepository<BusinessUnit, Stri
     @Query(value = "SELECT * FROM business_unit b WHERE b.code = ?1 AND b.is_deleted=false", nativeQuery = true)
     Optional<BusinessUnit> findByCodeNonDeleted(String code);
 
+    BusinessUnit findByCode(String code);
+
     @Query(value = "SELECT * FROM business_unit b WHERE b.is_deleted=false", nativeQuery = true)
     List<BusinessUnit> findAllUndeleted();
 

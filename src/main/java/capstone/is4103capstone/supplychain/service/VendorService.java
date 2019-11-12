@@ -1,11 +1,12 @@
 package capstone.is4103capstone.supplychain.service;
 
-import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.admin.repository.TeamRepository;
+import capstone.is4103capstone.admin.service.BusinessUnitService;
 import capstone.is4103capstone.entities.BusinessUnit;
 import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
+import capstone.is4103capstone.general.model.GeneralEntityRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
@@ -14,6 +15,7 @@ import capstone.is4103capstone.supplychain.model.VendorModel;
 import capstone.is4103capstone.supplychain.model.req.CreateVendorReq;
 import capstone.is4103capstone.supplychain.model.res.GetVendorsRes;
 import capstone.is4103capstone.supplychain.model.res.GetVendorRes;
+import net.bytebuddy.asm.Advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,76 +31,70 @@ public class VendorService {
     @Autowired
     private VendorRepository vendorRepository;
     @Autowired
-    private TeamRepository teamRepository;
-    @Autowired
-    private ContractRepository contractRepository;
-    @Autowired
-    private ContractService contractService;
-    @Autowired
-    private BusinessUnitRepository businessUnitRepository;
+    private BusinessUnitService businessUnitService;
 
     public VendorService() {
     }
 
-    public GeneralRes createNewVendor(CreateVendorReq createVendorReq){
-        try{
-            Vendor newVendor = new Vendor();
-            newVendor.setObjectName(createVendorReq.getVendorName());
-            newVendor.setServiceDescription(createVendorReq.getServiceDescription());
-            newVendor.setBillingContactName(createVendorReq.getBillingContactName());
-            newVendor.setBillingContactEmail(createVendorReq.getBillingContactEmail());
-            newVendor.setEscalationContactName(createVendorReq.getEscalationContactName());
-            newVendor.setEscalationContactEmail(createVendorReq.getEscalationContactEmail());
-            newVendor.setRelationshipManagerName(createVendorReq.getRelationshipManagerName());
-            newVendor.setRelationshipManagerEmail(createVendorReq.getRelationshipManagerEmail());
-            newVendor.setCreatedBy(createVendorReq.getUsername());
-            newVendor.setLastModifiedBy(createVendorReq.getUsername());
-            newVendor.setBusinessUnits(createVendorReq.getBusinessUnitIds());
-            AuthenticationTools.configurePermissionMap(newVendor);
+    public GeneralRes createNewVendor(CreateVendorReq createVendorReq) throws Exception {
 
-            newVendor = vendorRepository.saveAndFlush(newVendor);
-            if (newVendor.getSeqNo() == null) {
-                newVendor.setSeqNo(new Long(vendorRepository.findAll().size()));
-            }
-            newVendor.setCode(SCMEntityCodeHPGeneration.getCode(vendorRepository,newVendor));
-            vendorRepository.saveAndFlush(newVendor);
-            logger.info("Successfully created a new vendor! -- "+createVendorReq.getUsername()+" "+new Date());
-            return new GeneralRes("Successully created a new vendor!", false);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+        Vendor newVendor = new Vendor();
+        newVendor.setObjectName(createVendorReq.getVendorName());
+        newVendor.setServiceDescription(createVendorReq.getServiceDescription());
+        newVendor.setBillingContactName(createVendorReq.getBillingContactName());
+        newVendor.setBillingContactEmail(createVendorReq.getBillingContactEmail());
+        newVendor.setEscalationContactName(createVendorReq.getEscalationContactName());
+        newVendor.setEscalationContactEmail(createVendorReq.getEscalationContactEmail());
+        newVendor.setRelationshipManagerName(createVendorReq.getRelationshipManagerName());
+        newVendor.setRelationshipManagerEmail(createVendorReq.getRelationshipManagerEmail());
+        newVendor.setCreatedBy(createVendorReq.getUsername());
+        newVendor.setLastModifiedBy(createVendorReq.getUsername());
+
+        List<String> buIds = new ArrayList<>();
+        for (String buIdOrCode : createVendorReq.getBusinessUnitIds()) {
+            String id = businessUnitService.validationBusinessUnit(buIdOrCode).getId();
+            buIds.add(id);
         }
+        newVendor.setBusinessUnits(buIds);
+        AuthenticationTools.configurePermissionMap(newVendor);
+
+        newVendor = vendorRepository.saveAndFlush(newVendor);
+        if (newVendor.getSeqNo() == null) {
+            newVendor.setSeqNo((long) vendorRepository.findAll().size());
+        }
+        newVendor.setCode(SCMEntityCodeHPGeneration.getCode(vendorRepository, newVendor));
+        vendorRepository.saveAndFlush(newVendor);
+        logger.info("Successfully created a new vendor! -- " + createVendorReq.getUsername() + " " + new Date());
+        return new GeneralEntityRes("Successully created a new vendor!", false,new GeneralEntityModel(newVendor));
     }
 
-    public GetVendorRes getVendor(String id){
+    public GetVendorRes getVendor(String id) {
         try {
             logger.info("Getting vendor by vendor id: " + id);
             Vendor vendor = vendorRepository.getOne(id);
 
             if (vendor == null) {
                 return new GetVendorRes("There is no vendor in the database with id " + id, true, null);
-            }
-            else if(vendor.getDeleted()){
+            } else if (vendor.getDeleted()) {
                 return new GetVendorRes("This vendor is deleted.", true, null);
-            }
-            else {
+            } else {
                 VendorModel vendorModel = transformToGeneralEntityModelDetails(vendor);
                 return new GetVendorRes("Successfully retrieved the vendor with id " + id, false, vendorModel);
             }
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-            return new GetVendorRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetVendorRes("An unexpected error happens: " + ex.getMessage(), true, null);
         }
     }
 
-    public GetVendorsRes getAllVendors(){
+    public GetVendorsRes getAllVendors() {
         try {
             logger.info("Getting all vendors");
             List<VendorModel> returnList = new ArrayList<>();
             List<Vendor> vendorList = vendorRepository.findAll();
 
-            for(Vendor vendor: vendorList){
-                if(vendor.getDeleted()){
+            for (Vendor vendor : vendorList) {
+                if (vendor.getDeleted()) {
                     continue;
                 }
 
@@ -106,65 +102,65 @@ public class VendorService {
                 returnList.add(vendorModel);
             }
 
-            if(returnList.size() == 0){
+            if (returnList.size() == 0) {
                 throw new Exception("No vendor available.");
             }
 
             return new GetVendorsRes("Successfully retrieved all vendors", false, returnList);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-            return new GetVendorsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetVendorsRes("An unexpected error happens: " + ex.getMessage(), true, null);
         }
     }
 
-    public GeneralRes updateVendor(CreateVendorReq updateVendorReq, String id){
-        try{
+    public GeneralRes updateVendor(CreateVendorReq updateVendorReq, String id) {
+        try {
             Vendor vendor = vendorRepository.getOne(id);
             if (updateVendorReq.getVendorName() != null) {
                 vendor.setObjectName(updateVendorReq.getVendorName());
             }
-            if(updateVendorReq.getBillingContactName() != null){
+            if (updateVendorReq.getBillingContactName() != null) {
                 vendor.setBillingContactName(updateVendorReq.getBillingContactName());
             }
-            if(updateVendorReq.getBillingContactEmail() != null){
+            if (updateVendorReq.getBillingContactEmail() != null) {
                 vendor.setBillingContactEmail(updateVendorReq.getBillingContactEmail());
             }
-            if(updateVendorReq.getEscalationContactName() != null){
+            if (updateVendorReq.getEscalationContactName() != null) {
                 vendor.setEscalationContactName(updateVendorReq.getEscalationContactName());
             }
-            if(updateVendorReq.getEscalationContactEmail() != null){
+            if (updateVendorReq.getEscalationContactEmail() != null) {
                 vendor.setEscalationContactEmail(updateVendorReq.getEscalationContactEmail());
             }
-            if(updateVendorReq.getRelationshipManagerName() != null){
+            if (updateVendorReq.getRelationshipManagerName() != null) {
                 vendor.setRelationshipManagerName(updateVendorReq.getRelationshipManagerName());
             }
-            if(updateVendorReq.getRelationshipManagerEmail() != null){
+            if (updateVendorReq.getRelationshipManagerEmail() != null) {
                 vendor.setRelationshipManagerEmail(updateVendorReq.getRelationshipManagerEmail());
             }
-            if(updateVendorReq.getServiceDescription() != null){
+            if (updateVendorReq.getServiceDescription() != null) {
                 vendor.setServiceDescription(updateVendorReq.getServiceDescription());
             }
 
             //update businessUnits
-            if(updateVendorReq.getBusinessUnitIds() != null) {
+            if (updateVendorReq.getBusinessUnitIds() != null) {
                 vendor.setBusinessUnits(updateVendorReq.getBusinessUnitIds());
             }
 
             vendor.setLastModifiedBy(updateVendorReq.getUsername());
             vendorRepository.saveAndFlush(vendor);
             return new GeneralRes("Successfully updated the vendor!", false);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+            return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
         }
     }
 
-    private VendorModel transformToGeneralEntityModelDetails(Vendor vendor){
+    private VendorModel transformToGeneralEntityModelDetails(Vendor vendor) {
         List<GeneralEntityModel> businessUnits = new ArrayList<>();
 
-        if(vendor.getBusinessUnits() != null) {
+        if (vendor.getBusinessUnits() != null) {
             for (String id : vendor.getBusinessUnits()) {
-                BusinessUnit b = businessUnitRepository.getOne(id);
+                BusinessUnit b = businessUnitService.retrieveBusinessUnitById(id);
                 GeneralEntityModel businessUnit = new GeneralEntityModel(b);
                 businessUnits.add(businessUnit);
             }
@@ -180,7 +176,7 @@ public class VendorService {
     }
 
     //faster to load overview information
-    private VendorModel transformToGeneralEntityModelOverview(Vendor vendor){
+    private VendorModel transformToGeneralEntityModelOverview(Vendor vendor) {
         List<GeneralEntityModel> businessUnits = new ArrayList<>();
 
         VendorModel vendorModel = new VendorModel(
@@ -194,7 +190,7 @@ public class VendorService {
 
     public Vendor validateVendor(String idOrUsername) throws EntityNotFoundException {
         Optional<Vendor> vendorOps = vendorRepository.findById(idOrUsername);
-        if (vendorOps.isPresent()){
+        if (vendorOps.isPresent()) {
             if (vendorOps.get().getDeleted())
                 throw new EntityNotFoundException("vendor already removed");
             return vendorOps.get();

@@ -22,14 +22,16 @@ public class VendorController {
 
     @PostMapping("/create-vendor")
     public ResponseEntity<GeneralRes> createVendor(@RequestBody CreateVendorReq createVendorReq) {
-        if (AuthenticationTools.authenticateUser(createVendorReq.getUsername())) {
+        try {
+
             return ResponseEntity
                     .ok()
                     .body(vendorService.createNewVendor(createVendorReq));
-        } else {
+        }
+        catch (Exception ex){
             return ResponseEntity
                     .badRequest()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+                    .body(new GeneralRes(ex.getMessage(), true));
         }
     }
 
