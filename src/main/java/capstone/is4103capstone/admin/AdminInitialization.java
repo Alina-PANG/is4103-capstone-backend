@@ -195,10 +195,10 @@ public class AdminInitialization {
         yingshi.setManager(joshua);
         joshua.getSubordinates().add(yingshi);
 
-        Team team2 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
-        Team team3 = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
-        Team team4 = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
-        Team team5 = teamRepository.findTeamByCode("SG-HR-RCR-INT");
+        Team team2 = teamRepository.findTeamByCode("T-SG-Tech-FixIncTech-ProdSupp");
+        Team team3 = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-DBAdmin");
+        Team team4 = teamRepository.findTeamByCode("T-SG-Tech-InfraTech-Networks");
+        Team team5 = teamRepository.findTeamByCode("T-SG-HR-RCR-INT");
 
 
         // Seat admin setup for different hierarchies

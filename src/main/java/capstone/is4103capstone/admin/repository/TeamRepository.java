@@ -27,7 +27,7 @@ public interface TeamRepository extends JpaRepository<Team, String> {
     List<Team> findUndeletedAll();
 
     @Query(value = "SELECT * FROM team t WHERE t.is_deleted=false AND t.business_unit_id=?1", nativeQuery = true)
-    List<Team> findOnesUnderBusinessUnit(String businesUnitId);
+    List<Team> findOnesUnderBusinessUnit(String businessUnitId);
 
     @Query(value = "SELECT * FROM team t WHERE t.is_deleted=false AND t.office_id=?1", nativeQuery = true)
     List<Team> findOnesUnderOffice(String officeId);
