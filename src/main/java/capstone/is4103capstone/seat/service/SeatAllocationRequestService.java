@@ -54,6 +54,8 @@ public class SeatAllocationRequestService {
     @Autowired
     private SeatAllocationRequestRepository seatAllocationRequestRepository;
     @Autowired
+    private SeatAdminMatchRepository seatAdminMatchRepository;
+    @Autowired
     private ApprovalForRequestRepository approvalForRequestRepository;
     @Autowired
     private SeatAllocationRepository seatAllocationRepository;
@@ -83,8 +85,8 @@ public class SeatAllocationRequestService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
         // Validate the requester: check whether the requester has the right to create a seat allocation request
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(requester.getTeam().getId());
-        if (!seatAdminMatch.getSeatAdmin().getId().equals(requesterId) || !seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
+        Optional<SeatAdminMatch> optionalSeatAdminMatch = seatAdminMatchRepository.findUndeletedOneByEntityAndAdminId(requester.getTeam().getId(), currentEmployee.getId());
+        if (!optionalSeatAdminMatch.isPresent()) {
             throw new UnauthorizedActionException("Creating seat allocation request failed: you do not have the right to create such request!");
         }
 

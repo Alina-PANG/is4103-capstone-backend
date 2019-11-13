@@ -6,11 +6,6 @@ import capstone.is4103capstone.admin.service.EmployeeService;
 import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.ApprovalForRequest;
 import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.finance.*;
-import capstone.is4103capstone.entities.seat.SeatAllocation;
-import capstone.is4103capstone.entities.supplyChain.Contract;
-import capstone.is4103capstone.entities.supplyChain.OutsourcingAssessment;
-import capstone.is4103capstone.entities.supplyChain.OutsourcingSelfAssessment;
 import capstone.is4103capstone.finance.Repository.*;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
@@ -24,16 +19,10 @@ import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.model.Mail;
 import capstone.is4103capstone.seat.model.EmployeeModel;
-import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
-import capstone.is4103capstone.supplychain.Repository.ContractRepository;
-import capstone.is4103capstone.supplychain.Repository.OutsourcingAssessmentRepository;
-import capstone.is4103capstone.supplychain.Repository.OutsourcingSelfAssessmentRepository;
-import capstone.is4103capstone.supplychain.model.ContractDistributionModel;
 import capstone.is4103capstone.supplychain.model.PendingApprovalTicketModel;
 import capstone.is4103capstone.supplychain.model.res.GetPendingApprovalTicketsRes;
 import capstone.is4103capstone.util.enums.ApprovalStatusEnum;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
-import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -238,59 +228,72 @@ public class ApprovalTicketService {
         return new ApprovalTicketModel(latest);
     }
 
-    public GetPendingApprovalTicketsRes getPendingTicketsByApprover(String approverId) {
-        try {
-            approverId = employeeService.validateUser(approverId).getId();
-            List<ApprovalForRequest> pendingApprovalTickets = approvalForRequestRepo.findPendingTicketsByApproverId(approverId);
-            List<PendingApprovalTicketModel> modelList = new ArrayList<>();
+    public GetPendingApprovalTicketsRes getPendingTicketsByApprover(String approverId) throws Exception{
+        approverId = employeeService.validateUser(approverId).getId();
+        List<ApprovalForRequest> pendingApprovalTickets = approvalForRequestRepo.findPendingTicketsByApproverId(approverId);
+        List<PendingApprovalTicketModel> modelList = new ArrayList<>();
 
-            for (ApprovalForRequest ticket : pendingApprovalTickets) {
-                if (ticket.getRequestedItemId() == null || ticket.getRequestedItemId().isEmpty()) {
-                    continue;
-                }
-                DBEntityTemplate entity;
-                switch (ticket.getApprovalType()) {
-                    case CONTRACT:
-                        entity = entityMappingService.getEntityByClassNameAndId("contract", ticket.getRequestedItemId());
-                        break;
-                    case BUDGETPLAN_BM:
-                    case BUDGETPLAN_FUNCTION:
-                        entity = entityMappingService.getEntityByClassNameAndId("plan", ticket.getRequestedItemId());
-                        break;
-                    case TRAVEL:
-                        entity = entityMappingService.getEntityByClassNameAndId("travelform", ticket.getRequestedItemId());
-                        break;
-                    case TRAINING:
-                        entity = entityMappingService.getEntityByClassNameAndId("trainingform", ticket.getRequestedItemId());
-                        break;
-                    case PROJECT:
-                        entity = entityMappingService.getEntityByClassNameAndId("project", ticket.getRequestedItemId());
-                        break;
-                    case BJF:
-                        entity = entityMappingService.getEntityByClassNameAndId("bjf", ticket.getRequestedItemId());
-                        break;
-                    case OUTSOURCING_ASSESSMENT_FORM:
-                        entity = entityMappingService.getEntityByClassNameAndId("outsourcingassessment", ticket.getRequestedItemId());
-                        break;
-                    case SEAT_ALLOCATION:
-                        entity = entityMappingService.getEntityByClassNameAndId("seatallocation", ticket.getRequestedItemId());
-                        break;
-                    case OUTSOURCING_SELF_ASSESSMENT:
-                        entity = entityMappingService.getEntityByClassNameAndId("outsourcingselfassessment", ticket.getRequestedItemId());
-                        break;
-                    default:
-                        continue;
-                }
-                PendingApprovalTicketModel ticketModel = new PendingApprovalTicketModel(entity, ticket);
-                modelList.add(ticketModel);
+        BigDecimal contract = new BigDecimal(0);
+        BigDecimal budgetPlan = new BigDecimal(0);
+        BigDecimal travel = new BigDecimal(0);
+        BigDecimal training = new BigDecimal(0);
+        BigDecimal project = new BigDecimal(0);
+        BigDecimal bjf = new BigDecimal(0);
+        BigDecimal outsourcing_assessment_form = new BigDecimal(0);
+        BigDecimal seat_allocation = new BigDecimal(0);
+        BigDecimal outsourcing_self_assessment = new BigDecimal(0);
+
+        for (ApprovalForRequest ticket : pendingApprovalTickets) {
+            if (ticket.getRequestedItemId() == null || ticket.getRequestedItemId().isEmpty()) {
+                continue;
             }
-
-            return new GetPendingApprovalTicketsRes("", false, modelList);
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return new GetPendingApprovalTicketsRes(ex.getMessage(), true, null);
+            DBEntityTemplate entity;
+            switch (ticket.getApprovalType()) {
+                case CONTRACT:
+                    entity = entityMappingService.getEntityByClassNameAndId("contract", ticket.getRequestedItemId());
+                    contract = contract.add(new BigDecimal(1));
+                    break;
+                case BUDGETPLAN_BM:
+                case BUDGETPLAN_FUNCTION:
+                    entity = entityMappingService.getEntityByClassNameAndId("plan", ticket.getRequestedItemId());
+                    budgetPlan = budgetPlan.add(new BigDecimal(1));
+                    break;
+                case TRAVEL:
+                    entity = entityMappingService.getEntityByClassNameAndId("travelform", ticket.getRequestedItemId());
+                    travel = travel.add(new BigDecimal(1));
+                    break;
+                case TRAINING:
+                    entity = entityMappingService.getEntityByClassNameAndId("trainingform", ticket.getRequestedItemId());
+                    training = training.add(new BigDecimal(1));
+                    break;
+                case PROJECT:
+                    entity = entityMappingService.getEntityByClassNameAndId("project", ticket.getRequestedItemId());
+                    project = project.add(new BigDecimal(1));
+                    break;
+                case BJF:
+                    entity = entityMappingService.getEntityByClassNameAndId("bjf", ticket.getRequestedItemId());
+                    bjf = bjf.add(new BigDecimal(1));
+                    break;
+                case OUTSOURCING_ASSESSMENT_FORM:
+                    entity = entityMappingService.getEntityByClassNameAndId("outsourcingassessment", ticket.getRequestedItemId());
+                    outsourcing_assessment_form = outsourcing_assessment_form.add(new BigDecimal(1));
+                    break;
+                case SEAT_ALLOCATION:
+                    entity = entityMappingService.getEntityByClassNameAndId("seatallocation", ticket.getRequestedItemId());
+                    seat_allocation = seat_allocation.add(new BigDecimal(1));
+                    break;
+                case OUTSOURCING_SELF_ASSESSMENT:
+                    entity = entityMappingService.getEntityByClassNameAndId("outsourcingselfassessment", ticket.getRequestedItemId());
+                    outsourcing_self_assessment = outsourcing_self_assessment.add(new BigDecimal(1));
+                    break;
+                default:
+                    continue;
+            }
+            PendingApprovalTicketModel ticketModel = new PendingApprovalTicketModel(entity, ticket);
+            modelList.add(ticketModel);
         }
+
+        return new GetPendingApprovalTicketsRes("", false, modelList, contract, budgetPlan, travel, training, project,bjf, outsourcing_assessment_form, seat_allocation, outsourcing_self_assessment);
     }
 
     public static boolean approveTicketByEntity(DBEntityTemplate requestedItem, String comment, String approverUsername) {
