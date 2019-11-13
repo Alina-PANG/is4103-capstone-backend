@@ -54,6 +54,26 @@ public class SupplyChainDashboardController {
         }
     }
 
+    @GetMapping("/get-expire-soon-contracts/")
+    public ResponseEntity<GeneralRes> getContractsExpireInOneMonth() {
+        try {
+            return ResponseEntity.ok().body(supplyChainDashboardService.getExpireInOneMonthContracts());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(), true));
+        }
+    }
+
+    @GetMapping("/get-renew-soon-contracts/")
+    public ResponseEntity<GeneralRes> getContractsRenewInOneMonth() {
+        try {
+            return ResponseEntity.ok().body(supplyChainDashboardService.getContractsRenewInOneMonth());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(), true));
+        }
+    }
+
     @GetMapping("/get-assessments-by-status/{status}")
     public ResponseEntity<GeneralRes> getAssessmentsByStatus(@PathVariable("status") String status) {
         try {

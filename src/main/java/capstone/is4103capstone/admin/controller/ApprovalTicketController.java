@@ -63,15 +63,4 @@ public class ApprovalTicketController {
 
         }
     }
-
-    @GetMapping("/approval-tickets-waiting-list/{approverId}")
-    public @ResponseBody ResponseEntity<Object> getPendingTicketsByApproverId(@PathVariable(name = "approverId",required = false) String approverId){
-        try{
-            return ResponseEntity.ok().body(approvalTicketService.getPendingTicketsByApprover(approverId));
-        }catch (Exception ex){
-            ex.printStackTrace();
-            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
-
-        }
-    }
 }
