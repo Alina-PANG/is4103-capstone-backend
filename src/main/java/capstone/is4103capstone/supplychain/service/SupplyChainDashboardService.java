@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -116,7 +118,7 @@ public class SupplyChainDashboardService {
         for(Contract c : contractList){
             GeneralContractModel model = new GeneralContractModel(
                     c.getContractDescription(), c.getObjectName(),
-                    c.getCode(), c.getContractStatus());
+                    c.getCode(), c.getContractStatus(), c.getEndDate(), c.getRenewalStartDate());
 
             result.add(model);
         }
@@ -203,5 +205,48 @@ public class SupplyChainDashboardService {
         }
 
         return new GetGeneralSelfAssessmentsRes("", false, result);
+    }
+
+    //contract status must be "ACTIVE' or "MERGED"
+    public GetGeneralContractsRes getExpireInOneMonthContracts() throws Exception {
+        logger.info("Getting Contracts that will expire within 1 month:");
+
+        Date date = Date.from(ZonedDateTime.now().plusMonths(1).toInstant());
+        String dateString = date.toString();
+        logger.info("Date: " + dateString);
+
+        List<Contract> contractsExpireSoon = contractRepository.findExpireContracts(date);
+
+        //transform Contract to GeneralContractModel
+        List<GeneralContractModel> result = new ArrayList<>();
+        for(Contract c : contractsExpireSoon){
+            GeneralContractModel model = new GeneralContractModel(
+                    c.getContractDescription(), c.getObjectName(),
+                    c.getCode(), c.getContractStatus(), c.getEndDate(), c.getRenewalStartDate());
+
+            result.add(model);
+        }
+
+        return new GetGeneralContractsRes("", false, result);
+    }
+
+    //contract status must be "ACTIVE' or "MERGED" or "TERMINATED"
+    public GetGeneralContractsRes getContractsRenewInOneMonth() throws Exception {
+        logger.info("Getting Contracts that needs to be renewed within 1 month:");
+
+        Date date = Date.from(ZonedDateTime.now().plusMonths(1).toInstant());
+        List<Contract> contractsExpireSoon = contractRepository.findRenewContracts(date);
+
+        //transform Contract to GeneralContractModel
+        List<GeneralContractModel> result = new ArrayList<>();
+        for(Contract c : contractsExpireSoon){
+            GeneralContractModel model = new GeneralContractModel(
+                    c.getContractDescription(), c.getObjectName(),
+                    c.getCode(), c.getContractStatus(), c.getEndDate(), c.getRenewalStartDate());
+
+            result.add(model);
+        }
+
+        return new GetGeneralContractsRes("", false, result);
     }
 }
