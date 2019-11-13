@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.PreUpdate;
+import java.util.Date;
+
 @RestController
 @RequestMapping("/api/dashboard/fin")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -51,5 +54,31 @@ public class FinanceDashboardController {
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new FinDashboardRes(ex.getMessage(),true));
         }
+    }
+
+    @GetMapping("/po/month/{country}")
+    public ResponseEntity<GeneralRes> poHistroyIntegrate(@PathVariable(name = "country") String countryId,
+                                                         @RequestParam(name = "type") int type,
+                                                         @RequestParam(name = "timeFrame")int timeFrame){
+        try{
+            return ResponseEntity.ok().body(finDashboardService.retrievePODashboard(countryId,type,timeFrame));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
+        }
+    }
+
+    @GetMapping("/po/date/{country}")
+    public ResponseEntity<GeneralRes> poHistroyIntegrateByDate(@PathVariable(name = "country") String countryId,
+                                                         @RequestParam(name = "type") int type,
+                                                         @RequestParam(name = "startDate") String startDate,
+                                                         @RequestParam(name = "endDate") String endDate){
+        try{
+            return ResponseEntity.ok().body(finDashboardService.retrievePODashboard(countryId,type,startDate,endDate));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
+        }
+
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -176,5 +177,13 @@ public class CountryService {
         }else{
             return true;
         }
+    }
+
+    public Country validateCountry(String idOrCode) throws EntityNotFoundException{
+        Optional<Country> country = countryRepository.getCountryByIdOrCode(idOrCode);
+        if (country.isPresent()){
+            return country.get();
+        }
+        throw new EntityNotFoundException("Country with code or id not found");
     }
 }
