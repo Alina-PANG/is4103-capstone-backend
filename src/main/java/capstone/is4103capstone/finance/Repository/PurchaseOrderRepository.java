@@ -14,4 +14,11 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder,Str
 
     @Query(value = "SELECT * FROM purchase_order p WHERE p.is_deleted=false AND p.created_by=?1",nativeQuery = true)
     public List<PurchaseOrder> findAllByCreatedBy(String requestor);
+
+    @Query(value = "select * from purchase_order \n" +
+            "where is_deleted=0 and created_date_time<=?3 and created_date_time >=?2 and country_id=?1 ",nativeQuery = true)
+    public List<PurchaseOrder> findPOCreatedBetweenInCountry(String country, String startDate, String endDate);
+
+
+
 }
