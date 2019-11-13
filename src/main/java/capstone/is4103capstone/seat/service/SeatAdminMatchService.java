@@ -2,7 +2,6 @@ package capstone.is4103capstone.seat.service;
 
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
-import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.seat.model.GroupModel;
@@ -53,7 +52,7 @@ public class SeatAdminMatchService {
     public boolean passCheckOfAdminRightByHierarchyIdLevelAndAdmin(String hierarchyId, String hierarchyType, String adminId)
             throws SeatRequestAdminMatchNotFoundException {
         Optional<SeatAdminMatch> optionalSeatRequestAdminMatch = seatAdminMatchRepository.
-                findUndeletedOnesByEntityAndAdminAndHierarchyType(hierarchyId,adminId, HierarchyTypeEnum.valueOf(hierarchyType).ordinal());
+                findUndeletedOneByEntityAndAdminAndHierarchyType(hierarchyId,adminId, HierarchyTypeEnum.valueOf(hierarchyType).ordinal());
         if (!optionalSeatRequestAdminMatch.isPresent()) {
             return false;
         }
