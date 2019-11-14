@@ -392,10 +392,14 @@ public class BudgetService {
     //amount currency is GBP
     public BudgetDashboardRes getBudgetPlanAmountForYear() throws Exception {
         List<String> yearList = new ArrayList<>();
-        yearList.add("2017");
-        yearList.add("2018");
-        yearList.add("2019");
-        yearList.add("2020");
+
+        Calendar now = Calendar.getInstance();
+        int currentYear = now.get(Calendar.YEAR);
+
+        yearList.add(String.valueOf(currentYear-2));
+        yearList.add(String.valueOf(currentYear-1));
+        yearList.add(String.valueOf(currentYear));
+        yearList.add(String.valueOf(currentYear+1));
 
         List<BigDecimal> amountList = new ArrayList<>();
 
