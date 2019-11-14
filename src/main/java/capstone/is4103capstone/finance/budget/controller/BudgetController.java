@@ -1,5 +1,6 @@
 package capstone.is4103capstone.finance.budget.controller;
 
+import capstone.is4103capstone.finance.budget.model.res.BudgetDashboardRes;
 import capstone.is4103capstone.finance.budget.service.BudgetService;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
@@ -88,6 +89,19 @@ public class BudgetController {
             return ResponseEntity
                     .ok()
                     .body(comparisonService.getPlanComparisonResult(reforecastPlanId));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body(new GeneralRes(ex.getMessage(), true));
+        }
+    }
+
+    @GetMapping("/plan_amount")
+    public ResponseEntity<GeneralRes> getPlanAmountForYears(){
+        try{
+            return ResponseEntity
+                    .ok()
+                    .body(budgetService.getBudgetPlanAmountForYear());
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest()

@@ -13,10 +13,7 @@ import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
 import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
-import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
-import capstone.is4103capstone.finance.budget.model.res.BudgetModel;
-import capstone.is4103capstone.finance.budget.model.res.GetBudgetListRes;
-import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
+import capstone.is4103capstone.finance.budget.model.res.*;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
@@ -31,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -391,6 +389,27 @@ public class BudgetService {
         //TODO: What's the message content?
     }
 
+    //amount currency is GBP
+    public BudgetDashboardRes getBudgetPlanAmountForYear() throws Exception {
+        List<String> yearList = new ArrayList<>();
 
+        Calendar now = Calendar.getInstance();
+        int currentYear = now.get(Calendar.YEAR);
+
+        yearList.add(String.valueOf(currentYear-2));
+        yearList.add(String.valueOf(currentYear-1));
+        yearList.add(String.valueOf(currentYear));
+        yearList.add(String.valueOf(currentYear+1));
+
+        List<BigDecimal> amountList = new ArrayList<>();
+
+        for (String year : yearList) {
+            BigDecimal amountForThisYear = planRepository.findTotalAmountByPlanYear(year);
+            amountList.add(amountForThisYear);
+        }
+
+        return new BudgetDashboardRes("Successfully get budget plan total amount for four years.", false,
+                amountList.get(0), amountList.get(1), amountList.get(2), amountList.get(3));
+    }
 }
 

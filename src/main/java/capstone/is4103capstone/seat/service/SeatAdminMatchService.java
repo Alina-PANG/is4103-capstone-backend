@@ -1,16 +1,21 @@
 package capstone.is4103capstone.seat.service;
 
 import capstone.is4103capstone.admin.repository.*;
+import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.configuration.DBEntityTemplate;
 import capstone.is4103capstone.entities.*;
+import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAdminMatch;
+import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.seat.model.GroupModel;
 import capstone.is4103capstone.seat.model.SeatAdminMatchGroupModel;
 import capstone.is4103capstone.seat.model.SeatAdminMatchModel;
 import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
+import capstone.is4103capstone.seat.repository.SeatAllocationRequestRepository;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
-import capstone.is4103capstone.util.exception.SeatRequestAdminMatchNotFoundException;
+import capstone.is4103capstone.util.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,26 +42,78 @@ public class SeatAdminMatchService {
     private FunctionRepository functionRepository;
     @Autowired
     private EmployeeRepository employeeRepository;
+    @Autowired
+    private SeatAllocationRequestRepository seatAllocationRequestRepository;
 
-    public SeatAdminMatch retrieveMatchByHierarchyId(String hierarchyId) throws SeatRequestAdminMatchNotFoundException {
+    @Autowired
+    private EmployeeService employeeService;
+    @Autowired
+    private SeatManagementGeneralService seatManagementGeneralService;
+
+
+    // ---------------------------------- Create New Rights ----------------------------------
+
+    // Note: currently there is no mechanism in place to check whether the user creating the new seat admin match has the right to do this action.
+    //          Checking logic should be put in place for security reasons.
+    public void createNewSeatAdminMatch(String entityId, String hierarchyType, String adminId) throws CreateSeatAdminMatchException, InvalidInputException {
+
+        if (entityId == null || entityId.trim().length() == 0) {
+            throw new InvalidInputException("Creating new seat admin access right failed: business entity info is missing.");
+        }
+        entityId = entityId.trim();
+        if (hierarchyType == null || hierarchyType.trim().length() == 0) {
+            throw new InvalidInputException("Creating new seat admin access right failed: hierarchy type info is missing.");
+        }
+        hierarchyType = hierarchyType.trim();
+        if (adminId == null || adminId.trim().length() == 0) {
+            throw new InvalidInputException("Creating new seat admin access right failed: admin user info is missing.");
+        }
+        adminId = adminId.trim();
+
+        Optional<SeatAdminMatch> optionalSeatAdminMatch = seatAdminMatchRepository.findUndeletedOneByEntityAndAdminId(entityId, adminId);
+        if (optionalSeatAdminMatch.isPresent()) {
+            throw new CreateSeatAdminMatchException("Creating new seat admin access right failed: the access right already exists.");
+        }
+
+        try {
+            Employee admin = employeeService.getEmployeeEntityByUuid(adminId);
+            SeatAdminMatch newMatch = new SeatAdminMatch();
+            newMatch.setSeatAdmin(admin);
+            // Get the entity right
+            DBEntityTemplate entity = seatManagementGeneralService.validateBusinessEntityWithHierarchyType(hierarchyType, entityId);
+            if (entity.getClass().getSimpleName().equals("CompanyFunction")) {
+                newMatch.setHierarchyId(entityId);
+                newMatch.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+            } else if (entity.getClass().getSimpleName().equals("BusinessUnit")) {
+                newMatch.setHierarchyId(entityId);
+                newMatch.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+            } else if (entity.getClass().getSimpleName().equals("Team")) {
+                newMatch.setHierarchyId(entityId);
+                newMatch.setHierarchyType(HierarchyTypeEnum.TEAM);
+            } else if (entity.getClass().getSimpleName().equals("Office")) {
+                newMatch.setHierarchyId(entityId);
+                newMatch.setHierarchyType(HierarchyTypeEnum.OFFICE);
+            } else if (entity.getClass().getSimpleName().equals("SeatMap")) {
+                newMatch.setHierarchyId(entityId);
+                newMatch.setHierarchyType(HierarchyTypeEnum.OFFICE_FLOOR);
+            }
+            seatAdminMatchRepository.save(newMatch);
+        } catch (Exception ex) {
+            throw new CreateSeatAdminMatchException("Creating new seat admin access right failed: " +ex.getMessage());
+        }
+    }
+
+    // ---------------------------------- Retrieve ----------------------------------
+
+    public SeatAdminMatch retrieveMatchByHierarchyIdAndAdminId(String hierarchyId, String adminId) throws SeatRequestAdminMatchNotFoundException {
         if (hierarchyId == null || hierarchyId.trim().length() == 0) {
             throw new SeatRequestAdminMatchNotFoundException("Invalid hierarchy ID given!");
         }
-        Optional<SeatAdminMatch> optionalSeatRequestAdminMatch = seatAdminMatchRepository.findUndeletedByHierarchyId(hierarchyId);
+        Optional<SeatAdminMatch> optionalSeatRequestAdminMatch = seatAdminMatchRepository.findUndeletedOneByEntityAndAdminId(hierarchyId, adminId);
         if (!optionalSeatRequestAdminMatch.isPresent()) {
             throw new SeatRequestAdminMatchNotFoundException("Seat Request Admin Match under hierarchy ID " + hierarchyId + " does not exist!");
         }
         return optionalSeatRequestAdminMatch.get();
-    }
-
-    public boolean passCheckOfAdminRightByHierarchyIdLevelAndAdmin(String hierarchyId, String hierarchyType, String adminId)
-            throws SeatRequestAdminMatchNotFoundException {
-        Optional<SeatAdminMatch> optionalSeatRequestAdminMatch = seatAdminMatchRepository.
-                findUndeletedOneByEntityAndAdminAndHierarchyType(hierarchyId,adminId, HierarchyTypeEnum.valueOf(hierarchyType).ordinal());
-        if (!optionalSeatRequestAdminMatch.isPresent()) {
-            return false;
-        }
-        return true;
     }
 
     public SeatAdminMatchGroupModel retrieveAccessibleHierarchyLevels() {
@@ -168,6 +225,52 @@ public class SeatAdminMatchService {
         }
         seatAdminMatchGroupModel.setAccessibleEntities(groupModels);
         return seatAdminMatchGroupModel;
+    }
+
+
+
+    // ---------------------------------- Delete Rights ----------------------------------
+
+    public void deleteSeatAdminMatch(String entityId, String adminId) throws SeatAdminMatchNotFoundException, InvalidInputException, DeleteSeatAdminMatchException {
+
+        if (entityId == null || entityId.trim().length() == 0) {
+            throw new InvalidInputException("Deleting new seat admin access right failed: business entity info is missing.");
+        }
+        entityId = entityId.trim();
+        if (adminId == null || adminId.trim().length() == 0) {
+            throw new InvalidInputException("Deleting new seat admin access right failed: admin user info is missing.");
+        }
+        adminId = adminId.trim();
+
+        Optional<SeatAdminMatch> optionalSeatAdminMatch = seatAdminMatchRepository.findUndeletedOneByEntityAndAdminId(entityId, adminId);
+        if (optionalSeatAdminMatch.isPresent()) {
+            SeatAdminMatch seatAdminMatch = optionalSeatAdminMatch.get();
+            // Check whether the admin has any pending seat allocation requests to handle
+            List<SeatAllocationRequest> pendingRequestsAssignedToAdmin = seatAllocationRequestRepository.findUndeletedPendingOnesByReviewerId(adminId);
+            if (pendingRequestsAssignedToAdmin != null || pendingRequestsAssignedToAdmin.size() > 0) {
+                throw new DeleteSeatAdminMatchException("Deleting new seat admin access right failed: the user has pending seat allocation requests assigned to him/her.");
+            }
+
+            List<SeatAllocationRequest> pendingRequestsCreatedByAdmin = seatAllocationRequestRepository.findUndeletedPendingOnesByRequesterId(adminId);
+            if (pendingRequestsCreatedByAdmin != null || pendingRequestsCreatedByAdmin.size() > 0) {
+                throw new DeleteSeatAdminMatchException("Deleting new seat admin access right failed: the user has pending seat allocation requests created by him/her.");
+            }
+            seatAdminMatchRepository.delete(seatAdminMatch);
+        } else {
+            throw new SeatAdminMatchNotFoundException("Deleting seat admin right failed: the seat admin right does not exist.");
+        }
+    }
+
+    // ---------------------------------- Logic Checking ----------------------------------
+
+    public boolean passCheckOfAdminRightByHierarchyIdLevelAndAdmin(String hierarchyId, String hierarchyType, String adminId)
+            throws SeatRequestAdminMatchNotFoundException {
+        Optional<SeatAdminMatch> optionalSeatRequestAdminMatch = seatAdminMatchRepository.
+                findUndeletedOneByEntityAndAdminAndHierarchyType(hierarchyId,adminId, HierarchyTypeEnum.valueOf(hierarchyType).ordinal());
+        if (!optionalSeatRequestAdminMatch.isPresent()) {
+            return false;
+        }
+        return true;
     }
 
 }

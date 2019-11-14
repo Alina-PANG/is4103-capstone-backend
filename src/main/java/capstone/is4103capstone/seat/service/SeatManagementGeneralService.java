@@ -2,21 +2,21 @@ package capstone.is4103capstone.seat.service;
 
 import capstone.is4103capstone.admin.repository.BusinessUnitRepository;
 import capstone.is4103capstone.admin.repository.TeamRepository;
-import capstone.is4103capstone.entities.ApprovalForRequest;
-import capstone.is4103capstone.entities.BusinessUnit;
-import capstone.is4103capstone.entities.Employee;
-import capstone.is4103capstone.entities.Team;
+import capstone.is4103capstone.admin.service.BusinessUnitService;
+import capstone.is4103capstone.admin.service.CompanyFunctionService;
+import capstone.is4103capstone.admin.service.OfficeService;
+import capstone.is4103capstone.admin.service.TeamService;
+import capstone.is4103capstone.configuration.DBEntityTemplate;
+import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.DateHelper;
-import capstone.is4103capstone.entities.seat.EmployeeOfficeWorkingSchedule;
-import capstone.is4103capstone.entities.seat.SeatAllocationRequest;
-import capstone.is4103capstone.entities.seat.SeatAdminMatch;
-import capstone.is4103capstone.entities.seat.SeatUtilisationLog;
+import capstone.is4103capstone.entities.seat.*;
 import capstone.is4103capstone.finance.Repository.ApprovalForRequestRepository;
 import capstone.is4103capstone.seat.repository.EmployeeOfficeWorkingScheduleRepository;
 import capstone.is4103capstone.seat.repository.SeatAllocationRequestRepository;
 import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
 import capstone.is4103capstone.seat.repository.SeatUtilisationLogRepository;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
+import capstone.is4103capstone.util.exception.InvalidInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +29,16 @@ public class SeatManagementGeneralService {
 
     @Autowired
     private SeatAllocationService seatAllocationService;
+    @Autowired
+    private TeamService teamService;
+    @Autowired
+    private BusinessUnitService businessUnitService;
+    @Autowired
+    private CompanyFunctionService companyFunctionService;
+    @Autowired
+    private OfficeService officeService;
+    @Autowired
+    private SeatMapService seatMapService;
 
     @Autowired
     private EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
@@ -71,7 +81,6 @@ public class SeatManagementGeneralService {
             seatAdminMatchRepository.save(match);
         }
     }
-
 
     private void deleteAssociatedSeatAllocationRequests(String employeeId) {
         // Pending seat requests created for this employee
@@ -117,6 +126,36 @@ public class SeatManagementGeneralService {
                 approvalForRequestRepository.save(ticket);
             }
             seatAllocationRequestRepository.save(request);
+        }
+    }
+
+    public DBEntityTemplate validateBusinessEntityWithHierarchyType(String hierarchyType, String levelEntityId) throws InvalidInputException {
+
+        if (hierarchyType == null || hierarchyType.trim().length() == 0 || levelEntityId == null || levelEntityId.trim().length() == 0) {
+            throw new InvalidInputException("Business entity information input is incomplete.");
+        }
+
+        if (hierarchyType.equals("COMPANY_FUNCTION")) {
+            CompanyFunction companyFunction = companyFunctionService.retrieveCompanyFunctionById(levelEntityId);
+            return companyFunction;
+        } else if (hierarchyType.equals("BUSINESS_UNIT")) {
+            BusinessUnit businessUnit = businessUnitService.retrieveBusinessUnitById(levelEntityId);
+            return businessUnit;
+        } else if (hierarchyType.equals("TEAM")) {
+            Team team = teamService.retrieveTeamById(levelEntityId);
+            return team;
+        } else if (hierarchyType.equals("OFFICE")) {
+            try {
+                Office office = officeService.getOfficeEntityByUuid(levelEntityId);
+                return office;
+            } catch (Exception ex) {
+                throw new InvalidInputException("Office with ID " + levelEntityId + " does not exist.");
+            }
+        } else if (hierarchyType.equals("OFFICE_FLOOR")) {
+            SeatMap seatMap = seatMapService.getSeatMapById(levelEntityId);
+            return seatMap;
+        } else {
+            throw new InvalidInputException("Invalid hierarchy type.");
         }
     }
 }
