@@ -14,6 +14,16 @@ public class SeatAdminMatchController {
     @Autowired
     private SeatAdminMatchService seatAdminMatchService;
 
+    // ---------------------------------- POST: Create ----------------------------------
+
+    @PostMapping
+    public ResponseEntity createNewSeatAdminMatch(@RequestParam(name = "entityId") String entityId,
+                                                  @RequestParam(name = "hierarchyType") String hierarchyType,
+                                                  @RequestParam(name = "adminId") String adminId) {
+        seatAdminMatchService.createNewSeatAdminMatch(entityId, hierarchyType, adminId);
+        return ResponseEntity.ok("Create seat admin access successfully!");
+    }
+
     // ---------------------------------- GET: Retrieve ----------------------------------
 
     @GetMapping("/hierarchy")
@@ -26,5 +36,14 @@ public class SeatAdminMatchController {
     public ResponseEntity retrieveAccessibleOffices() {
         SeatAdminMatchGroupModel seatAdminMatchGroupModel = seatAdminMatchService.retrieveAccessibleOffices();
         return ResponseEntity.ok(seatAdminMatchGroupModel);
+    }
+
+    // ---------------------------------- DELETE: Delete ----------------------------------
+
+    @DeleteMapping
+    public ResponseEntity deleteSeatAdminMatch(@RequestParam(name = "entityId") String entityId,
+                                               @RequestParam(name = "adminId") String adminId) {
+        seatAdminMatchService.deleteSeatAdminMatch(entityId, adminId);
+        return ResponseEntity.ok("Deleted seat admin access successfully!");
     }
 }
