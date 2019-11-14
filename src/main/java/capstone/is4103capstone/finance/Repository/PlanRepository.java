@@ -38,6 +38,7 @@ public interface PlanRepository extends JpaRepository<Plan,String> {
             ,nativeQuery = true)
     List<CompareLineItemModel> findPlanLineItemsWithPlanId(String planId);
 
-    @Query(value = "select SUM(i.budget_amount_ingbp) from plan_line_item i join plan p on i.in_plan=p.id where p.for_year=?1",nativeQuery = true)
+    @Query(value = "select SUM(i.budget_amount_ingbp) from plan_line_item i join plan p on i.in_plan=p.id" +
+            " where p.for_year=?1 and i.is_deleted=0 and p.is_deleted=0 and p.budget_plan_status = 3 and p.plan_type=0 ",nativeQuery = true)
     BigDecimal findTotalAmountByPlanYear(String year);
 }
