@@ -169,7 +169,7 @@ public class SeatAllocationRequestService {
 
         // Create the initial approval ticket: escalate to the business unit level
         BusinessUnit businessUnit = requester.getTeam().getBusinessUnit();
-        SeatAdminMatch nextLevelMatch = seatAdminMatchService.retrieveMatchByHierarchyId(businessUnit.getId());
+        SeatAdminMatch nextLevelMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(businessUnit.getId(), currentEmployee.getId());
         Employee approver = nextLevelMatch.getSeatAdmin();
         String requestorComment = createSeatAllocationRequestModel.getComment();
 
@@ -473,7 +473,7 @@ public class SeatAllocationRequestService {
             seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.OFFICE);
         }
 
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatAllocationRequest.getEscalatedHierarchyId());
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(seatAllocationRequest.getEscalatedHierarchyId(), currentEmployee.getId());
         Employee newReviewer = seatAdminMatch.getSeatAdmin();
         newApprovalForRequest.setApprover(newReviewer);
         newApprovalForRequest.setRequester(seatAllocationRequest.getRequester());

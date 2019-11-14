@@ -8,6 +8,7 @@ import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatAllocation;
 import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.seat.model.seatFutureDemand.MonthlySeatFutureDemandModelForTeam;
+import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
 import capstone.is4103capstone.seat.repository.SeatAllocationRepository;
 import capstone.is4103capstone.util.exception.InvalidInputException;
 import capstone.is4103capstone.util.exception.UnauthorizedActionException;
@@ -35,6 +36,8 @@ public class SeatFutureDemandService {
 
     @Autowired
     private SeatAllocationRepository seatAllocationRepository;
+    @Autowired
+    private SeatAdminMatchRepository seatAdminMatchRepository;
 
 
     public List<MonthlySeatFutureDemandModelForTeam> forecastSeatDemandForNext6MonthsByTeam(String teamId) {
@@ -46,9 +49,9 @@ public class SeatFutureDemandService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(team.getId());
-        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-            throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to do this action!");
+        Optional<SeatAdminMatch> optionalSeatAdminMatch = seatAdminMatchRepository.findUndeletedOneByEntityAndAdminId(teamId, currentEmployee.getId());
+        if (!optionalSeatAdminMatch.isPresent()) {
+            throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to create such request!");
         }
 
         YearMonth thisYearMonth = DateHelper.getYearMonthFromDate(new Date());
@@ -71,9 +74,9 @@ public class SeatFutureDemandService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(team.getId());
-        if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-            throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to do this action!");
+        Optional<SeatAdminMatch> optionalSeatAdminMatch = seatAdminMatchRepository.findUndeletedOneByEntityAndAdminId(teamId, currentEmployee.getId());
+        if (!optionalSeatAdminMatch.isPresent()) {
+            throw new UnauthorizedActionException("Retrieving forecast failed: you do not have the right to create such request!");
         }
 
         YearMonth thisYearMonth = DateHelper.getYearMonthFromDate(new Date());

@@ -97,7 +97,7 @@ public class SeatMapService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(office.getId());
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(office.getId(), currentEmployee.getId());
         if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Creating office failed: you do not have the right to do this action!");
         }
@@ -217,7 +217,7 @@ public class SeatMapService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(hierarchyId);
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(hierarchyId, currentEmployee.getId());
         if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Retrieving available seat maps failed: employee " + currentEmployee.getFullName() +
                     " does not have the right to do this action!");
@@ -483,7 +483,7 @@ public class SeatMapService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatMap.getOffice().getId());
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(seatMap.getOffice().getId(), currentEmployee.getId());
         if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Seat map update failed: you do not have the right to do this action!");
         }
@@ -600,7 +600,7 @@ public class SeatMapService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatMap.getOffice().getId());
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(seatMap.getOffice().getId(), currentEmployee.getId());
         if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Creating office failed: you do not have the right to do this action!");
         }

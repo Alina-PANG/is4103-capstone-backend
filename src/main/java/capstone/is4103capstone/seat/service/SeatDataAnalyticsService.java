@@ -24,7 +24,6 @@ import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import capstone.is4103capstone.util.exception.InvalidInputException;
 import capstone.is4103capstone.util.exception.OfficeNotFoundException;
 import capstone.is4103capstone.util.exception.UnauthorizedActionException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,6 +46,8 @@ public class SeatDataAnalyticsService {
     private SeatMapService seatMapService;
     @Autowired
     private OfficeService officeService;
+    @Autowired
+    private SeatManagementGeneralService seatManagementGeneralService;
 
     @Autowired
     private TeamRepository teamRepository;
@@ -130,7 +131,7 @@ public class SeatDataAnalyticsService {
         Employee currentEmployee = (Employee) auth.getPrincipal();
 
         // Get the entity right
-        DBEntityTemplate entity = validateBusinessEntityWithHierarchyType(hierarchyType, levelEntityId);
+        DBEntityTemplate entity = seatManagementGeneralService.validateBusinessEntityWithHierarchyType(hierarchyType, levelEntityId);
         if (entity.getClass().getSimpleName().equals("CompanyFunction")) {
             CompanyFunction companyFunction = (CompanyFunction)entity;
             if (seatAdminMatchService.passCheckOfAdminRightByHierarchyIdLevelAndAdmin(levelEntityId, hierarchyType, currentEmployee.getId())) {
@@ -634,7 +635,7 @@ public class SeatDataAnalyticsService {
         // Check access right
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(levelEntityId);
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(levelEntityId, currentEmployee.getId());
         if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
         }
@@ -803,16 +804,6 @@ public class SeatDataAnalyticsService {
 
 
 
-
-
-
-    // -------------------------------------- Future Supply & Demand --------------------------------------
-
-
-
-
-
-
     // -------------------------------------- Office: Used & Empty --------------------------------------
 
     public OfficeFloorOfficeSeatUtilisationDataModel retrieveOfficeFloorOfficeSeatsUtilisationData(String seatMapId, boolean needAccessRightChecking) {
@@ -820,7 +811,7 @@ public class SeatDataAnalyticsService {
         if (needAccessRightChecking) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Employee currentEmployee = (Employee) auth.getPrincipal();
-            SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatMapId);
+            SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(seatMapId, currentEmployee.getId());
             if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
                 throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
             }
@@ -855,7 +846,7 @@ public class SeatDataAnalyticsService {
         // Check access right
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
-        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(officeId);
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyIdAndAdminId(officeId, currentEmployee.getId());
         if (!seatAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
             throw new UnauthorizedActionException("Accessing seat utilisation data failed: you do not have the right to do this action!");
         }
@@ -895,33 +886,5 @@ public class SeatDataAnalyticsService {
 
     // -------------------------------------- Helper method --------------------------------------
 
-    private DBEntityTemplate validateBusinessEntityWithHierarchyType(String hierarchyType, String levelEntityId) throws InvalidInputException {
 
-        if (hierarchyType == null || hierarchyType.trim().length() == 0 || levelEntityId == null || levelEntityId.trim().length() == 0) {
-            throw new InvalidInputException("Business entity information input is incomplete.");
-        }
-
-        if (hierarchyType.equals("COMPANY_FUNCTION")) {
-            CompanyFunction companyFunction = companyFunctionService.retrieveCompanyFunctionById(levelEntityId);
-            return companyFunction;
-        } else if (hierarchyType.equals("BUSINESS_UNIT")) {
-            BusinessUnit businessUnit = businessUnitService.retrieveBusinessUnitById(levelEntityId);
-            return businessUnit;
-        } else if (hierarchyType.equals("TEAM")) {
-            Team team = teamService.retrieveTeamById(levelEntityId);
-            return team;
-        } else if (hierarchyType.equals("OFFICE")) {
-            try {
-                Office office = officeService.getOfficeEntityByUuid(levelEntityId);
-                return office;
-            } catch (Exception ex) {
-                throw new InvalidInputException("Office with ID " + levelEntityId + " does not exist.");
-            }
-        } else if (hierarchyType.equals("OFFICE_FLOOR")) {
-            SeatMap seatMap = seatMapService.getSeatMapById(levelEntityId);
-            return seatMap;
-        } else {
-            throw new InvalidInputException("Invalid hierarchy type.");
-        }
-    }
 }
