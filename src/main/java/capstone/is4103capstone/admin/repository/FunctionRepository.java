@@ -20,4 +20,7 @@ public interface FunctionRepository extends JpaRepository<CompanyFunction, Strin
 
     @Query(value = "SELECT * FROM company_function c WHERE c.code = ?1 AND c.is_deleted=false", nativeQuery = true)
     Optional<CompanyFunction> findByCode(String code);
+
+    CompanyFunction getByCode(String code);
+
 }

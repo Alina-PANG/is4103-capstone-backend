@@ -50,6 +50,11 @@ public class Country extends DBEntityTemplate {
         super(countryName, countryCode, hierachyPath);
     }
 
+    public Country(String objectName, String code, String hierachyPath, String createdBy, Region region) {
+        super(objectName, code, hierachyPath, createdBy, createdBy);
+        this.region = region;
+    }
+
     public Region getRegion() {
         return region;
     }

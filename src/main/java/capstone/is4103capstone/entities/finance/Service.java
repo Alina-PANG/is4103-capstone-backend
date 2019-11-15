@@ -51,6 +51,15 @@ public class Service extends DBEntityTemplate {
         this.currencyCode = currencyCode;
     }
 
+    public Service(String objectName, String code,  String createdBy, BudgetSub2 budgetSub2) {
+        super(objectName, code, "", createdBy, createdBy);
+        this.budgetSub2 = budgetSub2;
+        setHierachyPath(budgetSub2.getHierachyPath()+":"+code);
+        setMeasureUnit("N/A");
+        setReferencePrice(BigDecimal.ZERO);
+
+    }
+
     public Service(String objectName, BudgetSub2 budgetSub2, List<Vendor> vendor, String measureUnit, BigDecimal referencePrice, String currencyCode) {
         super(objectName);
         this.budgetSub2 = budgetSub2;

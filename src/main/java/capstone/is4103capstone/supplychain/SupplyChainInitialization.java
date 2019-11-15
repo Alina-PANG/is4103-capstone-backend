@@ -123,7 +123,6 @@ public class SupplyChainInitialization {
         contract1.setCreatedDateTime(new Date());
         contract1.setLastModifiedBy("xuhong");
         contract1.setLastModifiedDateTime(new Date());
-
         contract1 = contractRepository.save(contract1);
 
 //        banana.setCurrentContractCode("Contract1");

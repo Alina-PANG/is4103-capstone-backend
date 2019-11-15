@@ -39,6 +39,17 @@ public class FXRecord extends DBEntityTemplate {
         SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
         this.setObjectName(this.baseCurrencyAbbr + "-" + this.priceCurrencyAbbr+"-"+format.format(this.effectiveDate));
     }
+    public FXRecord(String baseCurrencyAbbr, String priceCurrencyAbbr, BigDecimal exchangeRate, Date effectiveDate,String createdBy) {
+        this.baseCurrencyAbbr = baseCurrencyAbbr;
+        this.priceCurrencyAbbr = priceCurrencyAbbr;
+        this.exchangeRate = exchangeRate;
+        this.effectiveDate = effectiveDate;
+        SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+        this.setObjectName(this.baseCurrencyAbbr + "-" + this.priceCurrencyAbbr+"-"+format.format(this.effectiveDate));
+        setCreatedBy(createdBy);
+        setLastModifiedBy(createdBy);
+    }
+
 
     public Boolean getHasExpired() {
         return hasExpired;
