@@ -15,4 +15,13 @@ public class WebAppPermissionMap {
     private boolean accessSupplyChainManagementModule = false;
     private boolean accessFinancialManagementModule = false;
 
+    public WebAppPermissionMap() {
+    }
+
+    public WebAppPermissionMap(boolean accessAdminModule, boolean accessSeatManagementModule, boolean accessSupplyChainManagementModule, boolean accessFinancialManagementModule) {
+        this.accessAdminModule = accessAdminModule;
+        this.accessSeatManagementModule = accessSeatManagementModule;
+        this.accessSupplyChainManagementModule = accessSupplyChainManagementModule;
+        this.accessFinancialManagementModule = accessFinancialManagementModule;
+    }
 }
