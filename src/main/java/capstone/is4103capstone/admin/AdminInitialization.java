@@ -95,16 +95,20 @@ public class AdminInitialization {
 
         switch (adminRight){
             case "normal":
-                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(false,true,false,true));
+                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(
+                        false,true,false,true,false));
                 break;
             case "all":
-                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(true,true,true,true));
+                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(true,true,true,true,true));
                 break;
             case "supply":
-                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(false,true,true,true));
+                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(false,true,true,true,false));
+                break;
+            case "dashboard":
+                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(false,true,true,true,true));
                 break;
             default:
-                return;
+                break;
         }
 
 
@@ -118,7 +122,7 @@ public class AdminInitialization {
         String[] lastNameList = {"", "Manager", "Huang", "Xu", "Green", "Brown", "Cook", "Staff", "Pang", "Cai", "Chew", "Sim", "Nguyen"};
         String[] usernameList = {"admin", "poteam", "yingshi2502", "xuhong", "user01", "user02", "user03", "outsourcing1", "panghangzhi", "caiyuqian", "joshuachew", "ryan", "viet"};
         String[] codeCpntList = {"1", "PO_TEAM", "2", "5", "6", "7", "8", "OUTSOURCING", "PHZ", "CYQ", "JC", "RS", "VN"};
-        String[] adminRightConf = {"normal","all","hasSupply"};
+        String[] adminRightConf = {"all","normal","dashboard","normal","normal","normal","normal","supply","dashboard","dashboard","dashboard","dashboard","dashboard"};
         HashMap usernameEmail = new HashMap<String, String>() {{
             put("yingshi2502", "yingshi.h@u.nus.edu");
             put("ryan", "simweijie@gmail.com");

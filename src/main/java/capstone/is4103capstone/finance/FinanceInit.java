@@ -8,18 +8,24 @@ import capstone.is4103capstone.entities.finance.*;
 import capstone.is4103capstone.entities.supplyChain.ChildContract;
 import capstone.is4103capstone.entities.supplyChain.Contract;
 import capstone.is4103capstone.finance.Repository.*;
+import capstone.is4103capstone.finance.admin.model.req.CreateFXRequest;
+import capstone.is4103capstone.finance.admin.model.req.CreateServiceRequest;
+import capstone.is4103capstone.finance.admin.model.req.CreateSub1Sub2Request;
 import capstone.is4103capstone.finance.admin.service.FXTableService;
+import capstone.is4103capstone.finance.admin.service.ServiceServ;
+import capstone.is4103capstone.finance.admin.service.Sub1Service;
+import capstone.is4103capstone.finance.admin.service.Sub2Service;
 import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.util.FinanceEntityCodeHPGenerator;
+import capstone.is4103capstone.util.Tools;
 import capstone.is4103capstone.util.exception.RepositoryEntityMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @org.springframework.stereotype.Service
 public class FinanceInit {
@@ -53,7 +59,12 @@ public class FinanceInit {
     SpendingRecordRepository spendingRecordRepository;
     @Autowired
     StatementOfAccountLineItemRepository soaRepo;
-
+    @Autowired
+    Sub1Service sub1Service;
+    @Autowired
+    Sub2Service sub2Service;
+    @Autowired
+    ServiceServ serviceServ;
 
     FinanceEntityCodeHPGenerator g = new FinanceEntityCodeHPGenerator();
     private String generateCode(JpaRepository repo, DBEntityTemplate entity){
@@ -68,149 +79,139 @@ public class FinanceInit {
 
     @PostConstruct
     public void financeInit(){
-//        List<StatementOfAcctLineItem> soa = soaRepo.findAll();
-//        for (StatementOfAcctLineItem s:soa){
-//            PurchaseOrder po = s.getPurchaseOrder();
-//            s.setActualPmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),s.getActualPmt()));
-//            s.setPaidAmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),s.getPaidAmt()));
-//            soaRepo.saveAndFlush(s);
-//        }
-//        List<PurchaseOrder> pos = purchaseOrderRepository.findAll();
-//        for (PurchaseOrder po: pos){
-//            po.setTotalAmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),po.getTotalAmount()));
-//            purchaseOrderRepository.saveAndFlush(po);
-//        }
-//
-//        List<SpendingRecord> sps = spendingRecordRepository.findAll();
-//        for (SpendingRecord sp: sps){
-//            sp.setSpendingAmtInGBP(fxService.convertToGBPWithLatest(sp.getCurrencyCode(),sp.getSpendingAmt()));
-//            spendingRecordRepository.saveAndFlush(sp);
-//        }
-
-//        List<Contract> contracts = contractRepo.findAll();
-//        for (Contract c:contracts){
-//            c.setContractValueInGBP(fxService.convertToGBPWithLatest(c.getCurrencyCode(),c.getTotalContractValue()));
-//            contractRepo.saveAndFlush(c);
-//        }
-//
-//        List<ChildContract> childContracts = childContractRepo.findAll();
-//        for (ChildContract c: childContracts){
-//            c.setContractValueInGBP(fxService.convertToGBPWithLatest(c.getMasterContract().getCurrencyCode(),c.getContractValue()));
-//            childContractRepo.saveAndFlush(c);
-//        }
-
-//        List<PurchaseOrder> po = purchaseOrderRepository.findAll();
-//        for (PurchaseOrder p :po){
-//            p.setCountryId(employeeService.getCountryEmployeeBelongTo(p.getCreatedBy()).getId());
-//            purchaseOrderRepository.saveAndFlush(p);
-//        }
-
-//        String thisUser = "yingshi2502";
-//        Country country = countryRepository.findCountryByCode("SG");
-//
-//        List<FXRecord> fxRecords = fxRecordRepository.findAll();
-//        if(fxRecords == null || fxRecords.size() == 0){
-//            createFXRecord(thisUser);
-//            String catCode = createCategories(thisUser);
-//            String sub2Code = createSubCategories(thisUser,catCode);
-//            createservice(thisUser,sub2Code);
-//        }
-    }
-
-
-
-
-    public void createFXRecord(String userOps){
-        FXRecord fx = new FXRecord("SGD","CNY", BigDecimal.valueOf(5.16),new Date());
-        fx.setCreatedBy(userOps);
-        fx.setLastModifiedBy(userOps);
-        fx = fxRecordRepository.save(fx);
-        generateCode(fxRecordRepository,fx);
-    }
-
-
-
-    public String createCategories(String thisUser){
-        Country country = countryRepository.findCountryByCode("SG");
-        if (country == null){
-            Country countrySG = new Country("Singapore","SG","APAC-SG");
-            countrySG.setCreatedBy(thisUser);
-            countrySG.setLastModifiedBy(thisUser);
-            country = countryRepository.save(countrySG);
+        if (fxRecordRepository.findAll().isEmpty()){
+            createFXRecord();
         }
-        BudgetCategory cat = new BudgetCategory("Telecom255");
-
-        cat.setHierachyPath(g.generateHierachyPath(country,cat));
-
-        cat.setCreatedBy(thisUser);
-        cat.setLastModifiedBy(thisUser);
-        budgetCategoryRepository.save(cat);
-        cat.setCountry(country);
-        budgetCategoryRepository.saveAndFlush(cat);
-
-        String catCode = generateCode(budgetCategoryRepository,cat);
-
-        int size = budgetCategoryRepository.findBudgetCategoriesByCountry_Id(country.getId()).size();
-        System.out.println(size);
-
-        return catCode;
-    }
-    /*
-        1. Always set createdBy/LastModifiedBy = username
-           (front-end should always communicate the active user with backend)
-        2. Logical Delete:  setIsDeleted = True
-           When retrieving objects: WHERE is_deleted = false/ or filter out the isDeleted = True ones
-        3. Setup objectCode/HierachyPath generation rules
-
-
-     */
-    public String createSubCategories(String thisUser,String catCode){
-        BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(catCode);
-        BudgetSub1 sub1 = new BudgetSub1("Data3");
-
-        sub1.setHierachyPath(g.generateHierachyPath(cat,sub1));
-
-
-        sub1.setCreatedBy(thisUser);
-        sub1.setLastModifiedBy(thisUser);
-
-
-        sub1 = budgetSub1Repository.save(sub1);
-        cat.getBudgetSub1s().size();
-        sub1.setBudgetCategory(cat);
-        cat.getBudgetSub1s().add(sub1);
-        sub1 = budgetSub1Repository.save(sub1);
-        budgetCategoryRepository.save(cat);
-        String sub1Code = generateCode(budgetSub1Repository,sub1);
-
-        BudgetSub2 sub2 = new BudgetSub2("Data Center3");
-        sub1 = budgetSub1Repository.findBudgetSub1ByCode(sub1Code);
-        sub2.setHierachyPath(g.generateHierachyPath(sub1,sub2));
-
-        sub2.setCreatedBy(thisUser);
-        sub2.setLastModifiedBy(thisUser);
-        sub2 = budgetSub2Repository.save(sub2);
-        sub1.getBudgetSub2s().add(sub2);
-        sub2.setBudgetSub1(sub1);
-        String sub2Code = generateCode(budgetSub2Repository,sub2);
-
-        budgetSub2Repository.saveAndFlush(sub2);
-        budgetSub1Repository.saveAndFlush(sub1);
-
-        return sub2Code;
+        if (budgetCategoryRepository.findAll().isEmpty()){
+            createCategory();
+            createSub1();
+            createSub2();
+            createServices();
+        }
     }
 
-    public void createservice(String thisUser,String sub2Code){
-        Service m = new Service("Data Link","MER-DL-12","SG-TELECOM-DATA-DATA_LINK-SINGTEL","bps",thisUser);
-        serviceRepository.save(m);
+    public void createCategory(){
+        Country sg = countryRepository.findCountryByCode("SG");
+        String[] catNames = {"Office Supplies","Warranty Services","IT Asset","Miscellaneous","Telecom"};
+        String[] catCodes= {"CAT-OFFICE_SUPPLIES-4","CAT-WARRANTY_SERVICES-5","CAT-IT_ASSET-3","CAT-MISCELLANEOUS-1","CAT-TELECOM-2"};
+        for (int i=0;i<catNames.length;i++){
+            BudgetCategory category = new BudgetCategory(catNames[i],catCodes[i],sg.getHierachyPath()+":"+catCodes[i],"admin",sg);
+            category = budgetCategoryRepository.saveAndFlush(category);
+        }
+    }
 
-        BudgetSub2 sub2 = budgetSub2Repository.findBudgetSub2ByCode(sub2Code);
-//        System.out.println(sub2.getId());
-        sub2.getservices().size();
-        sub2.getservices().add(m);
-        m.setBudgetSub2(sub2);
+    private void createSub1(){
+        String[][] catsub1 = {
+                {"CAT-WARRANTY_SERVICES-5", "Software Liscence"},
+                {"CAT-TELECOM-2", "Data"},
+                {"CAT-MISCELLANEOUS-1", "Travel"},
+                {"CAT-MISCELLANEOUS-1", "Miscellaneous"},
+                {"CAT-OFFICE_SUPPLIES-4", "Desk"},
+                {"CAT-IT_ASSET-3", "Monitor"},
+                {"CAT-OFFICE_SUPPLIES-4", "Chair"},
+                {"CAT-WARRANTY_SERVICES-5", "Hardware Warranty"},
+                {"CAT-TELECOM-2", "Voice"},
+                {"CAT-IT_ASSET-3", "Personal Desktop"},
+                {"CAT-MISCELLANEOUS-1", "Training"},
+                {"CAT-OFFICE_SUPPLIES-4", "Desktop Devices"}
+        };
+        for (int i=0;i<catsub1.length;i++){
+            CreateSub1Sub2Request req = new CreateSub1Sub2Request(catsub1[i][0],catsub1[i][1],"admin");
+            sub1Service.createSub1(req);
+        }
+    }
+    public void createSub2(){
+        String[][] sub1sub2 = {
+                {"CATS1-CHAIR-3", "meeting room chair"},
+                {"CATS1-CHAIR-3", "office chair"},
+                {"CATS1-DATA-7", "Data Link"},
+                {"CATS1-DESK-4", "Office Desk"},
+                {"CATS1-DESKTOP_DEVICES-9", "Input Hardware"},
+                {"CATS1-HARDWARE_WARRANTY-11", "Maintainess"},
+                {"CATS1-MISCELLANEOUS-10", "Miscellaneous"},
+                {"CATS1-MONITOR-5", "Desktop Monitory"},
+                {"CATS1-MONITOR-5", "Meeting Room Monitor"},
+                {"CATS1-MONITOR-5", "Elevator Monitor"},
+                {"CATS1-PERSONAL_DESKTOP-6", "Windows Machine"},
+                {"CATS1-PERSONAL_DESKTOP-6", "MacOS Machine"},
+                {"CATS1-PERSONAL_DESKTOP-6", "Lunix Machine"},
+                {"CATS1-SOFTWARE_LISCENCE-12", "Apple Services"},
+                {"CATS1-SOFTWARE_LISCENCE-12", "Messaging Service"},
+                {"CATS1-TRAINING-2", "Internal Training"},
+                {"CATS1-TRAINING-2", "External Training"},
+                {"CATS1-TRAVEL-1", "Planned Biz Trip"},
+                {"CATS1-TRAVEL-1", "Ad-hoc Travel"},
+                {"CATS1-VOICE-8", "Personal Voice Equip"},
+                {"CATS1-VOICE-8", "Company Voice Equip"},
+        };
+        for (int i=0;i<sub1sub2.length;i++){
+            CreateSub1Sub2Request req = new CreateSub1Sub2Request(sub1sub2[i][0],sub1sub2[i][1],"admin");
+            sub2Service.createSub2(req);
+        }
+    }
+    public void createServices(){
+        String[][] sub2serv = {
+                {"CATS2-EXTERNAL_TRAINING-7", "External Training"},
+                {"CATS2-PLANNED_BIZ_TRIP-5", "Business Trip"},
+                {"CATS2-MISCELLANEOUS-17", "MISC"},
+                {"CATS2-MACOS_MACHINE-14", "Macbook"},
+                {"CATS2-AD-HOC_TRAVEL-4", "Ad-hoc-Business Trip"},
+                {"CATS2-WINDOWS_MACHINE-13", "Dell Desktop"},
+                {"CATS2-DATA_LINK-1", "Data Link A"},
+                {"CATS2-DATA_LINK-1", "Data Link B"},
+                {"CATS2-COMPANY_VOICE_EQUIP-3", "Speaker"},
+                {"CATS2-MEETING_ROOM_MONITOR-9", "Video Meeting Camera"},
+                {"CATS2-INPUT_HARDWARE-16", "Keyboard"},
+                {"CATS2-INPUT_HARDWARE-16", "Mouse"},
+                {"CATS2-DESKTOP_MONITORY-8", "Personal 24inch"},
+                {"CATS2-PERSONAL_VOICE_EQUIP-2", "Headset"},
+                {"CATS2-DESKTOP_MONITORY-8", "20-24 Vertical"},
+                {"CATS2-OFFICE_DESK-18", "Employee Desks"},
+                {"CATS2-APPLE_SERVICES-21", "Apple Care"},
+                {"CATS2-APPLE_SERVICES-21", "Apple Cloud"},
+                {"CATS2-MAINTAINESS-20", "Data Link Maintainese"},
+                {"CATS2-MESSAGING_SERVICE-19", "Symphony"},
+                {"CATS2-MESSAGING_SERVICE-19", "Skype"},
+                {"CATS2-OFFICE_CHAIR-11", "Engineering Chair"},
+                {"CATS2-MEETING_ROOM_CHAIR-12", "Meeting Room Chair"},
+                {"CATS2-INTERNAL_TRAINING-6", "Internal Training"},
+        };
+        try {
+            for (int i=0;i<sub2serv.length;i++){
+                CreateServiceRequest req = new CreateServiceRequest(sub2serv[i][1],sub2serv[i][0],"n/a",BigDecimal.ZERO,"GBP","admin");
+                serviceServ.createService(req);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
 
-        budgetSub2Repository.saveAndFlush(sub2);
-        serviceRepository.saveAndFlush(m);
+    }
+
+    public void createFXRecord(){
+        try {
+            double[] fxRatesgdgbp = {1.7303,1.811,1.740,1.716,1.753};
+            String[] dates = {"2019-01-01","2019-03-15","2019-05-31","2019-09-15","2019-11-15"};
+            for (int i=0;i<fxRatesgdgbp.length;i++){
+                CreateFXRequest req = new CreateFXRequest("GBP","SGD",dates[i],BigDecimal.valueOf(fxRatesgdgbp[i]),"admin");
+                fxService.createFXRecord(req);
+            }
+
+            double[] fxRategbphkd = {9.979,10.131,10.080};
+            for (int i=0;i<fxRategbphkd.length;i+=2){
+                CreateFXRequest req = new CreateFXRequest("GBP","HKD",dates[i],BigDecimal.valueOf(fxRategbphkd[i]),"admin");
+                fxService.createFXRecord(req);
+            }
+
+            double[] fxRategbpcny = {9.939,9.983,10.081};
+            for (int i=0;i<fxRategbphkd.length;i+=2){
+                CreateFXRequest req = new CreateFXRequest("GBP","CNY",dates[i],BigDecimal.valueOf(fxRategbpcny[i]),"admin");
+                fxService.createFXRecord(req);
+            }
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+
     }
 }

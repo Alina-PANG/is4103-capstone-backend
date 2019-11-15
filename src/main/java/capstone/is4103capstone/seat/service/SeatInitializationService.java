@@ -424,11 +424,15 @@ public class SeatInitializationService {
         Team devTeam = teamRepository.findTeamByCode("T-SG-FixIncTech-Dev");
         Optional<SeatUtilisationLog> optionalSeatUtilisationLog = seatUtilisationLogRepository.findOneByBusinessEntityIdAndDate(devTeam.getId(), yesterdayYear, yesterdayMonth, yesterdayDayOfMonth);
         if (!optionalSeatUtilisationLog.isPresent()) {
-            seatUtilisationLogRepository.deleteAll();
-            initialiseTeamSeatUtilisationLog(yesterday, 32);
-            initialiseBusinessUnitUtilisationLog(yesterday, 32);
-            initialiseCompanyFunctionUtilisationLog(yesterday, 32);
-            initialiseOfficeAndOfficeFloorUtilisationLog(yesterday, 32);
+            try{
+                seatUtilisationLogRepository.deleteAll();
+                initialiseTeamSeatUtilisationLog(yesterday, 32);
+                initialiseBusinessUnitUtilisationLog(yesterday, 32);
+                initialiseCompanyFunctionUtilisationLog(yesterday, 32);
+                initialiseOfficeAndOfficeFloorUtilisationLog(yesterday, 32);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -674,7 +678,6 @@ public class SeatInitializationService {
     }
 
     private void initialiseBusinessUnitUtilisationLog(Date date, int periodLength) {
-
         Optional<Office> office = officeRepository.findByName("One Raffles Quay");
 
         // SG-Tech-FixIncTech
@@ -692,7 +695,6 @@ public class SeatInitializationService {
                 int year = DateHelper.getYearFromDate(dateCounter);
                 int month = DateHelper.getMonthFromDate(dateCounter);
                 int dayOfMonth = DateHelper.getDayOfMonthFromDate(dateCounter);
-
                 SeatUtilisationLog newLog = new SeatUtilisationLog();
                 Integer inventory = 0;
                 Integer occupancy = 0;
@@ -764,7 +766,7 @@ public class SeatInitializationService {
 
 
         // SG-HR-RCR
-        Optional<BusinessUnit> optionalRecruiting = businessUnitRepository.findByCodeNonDeleted("BU-HR-RCR");
+        Optional<BusinessUnit> optionalRecruiting = businessUnitRepository.findByCodeNonDeleted("BU-SG-RCR");
         Team interviewTeam = teamRepository.findTeamByCode("T-SG-RCR-INT");
         if (optionalRecruiting.isPresent()) {
             BusinessUnit recruitingUnit = optionalRecruiting.get();
