@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -33,12 +34,14 @@ public class SeatDashboardController {
 
     // -------------------------------------- Inventory vs Occupancy --------------------------------------
 
-
     @GetMapping("/utilisation/entity")
-    public ResponseEntity retrieveBusinessLevelEntitySeatUtilisationAnalysis(@RequestBody SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
-
+    public ResponseEntity retrieveBusinessLevelEntitySeatUtilisationAnalysis(@RequestParam(name = "entityId") String entityId,
+                                                                             @RequestParam(name = "hierarchyType") String hierarchyType,
+                                                                             @RequestParam(name = "officeId") String officeId,
+                                                                             @RequestParam(name = "startDate") String startDate,
+                                                                             @RequestParam(name = "endDate") String endDate) {
         SeatUtilisationDataModel seatUtilisationDataModel = new SeatUtilisationDataModel();
-        seatUtilisationDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatUtilisationAnalysis(seatDataAnalysisRequestModel);
+        seatUtilisationDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatUtilisationAnalysis(entityId, hierarchyType, officeId, startDate, endDate);
         Collections.sort(seatUtilisationDataModel.getLogs());
         return ResponseEntity.ok(seatUtilisationDataModel);
     }
@@ -64,9 +67,13 @@ public class SeatDashboardController {
     // -------------------------------------- Blocked For Use (Per Office) --------------------------------------
 
     @GetMapping("/blocked/use/office")
-    public ResponseEntity retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(@RequestBody SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
+    public ResponseEntity retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(@RequestParam(name = "entityId") String entityId,
+                                                                                      @RequestParam(name = "hierarchyType") String hierarchyType,
+                                                                                      @RequestParam(name = "officeId") String officeId,
+                                                                                      @RequestParam(name = "startDate") String startDate,
+                                                                                      @RequestParam(name = "endDate") String endDate) {
 
-        SeatBlockedForUseDataModel seatBlockedForUseDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(seatDataAnalysisRequestModel);
+        SeatBlockedForUseDataModel seatBlockedForUseDataModel = seatDataAnalyticsService.retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(entityId, hierarchyType, officeId, startDate, endDate);
         return ResponseEntity.ok(seatBlockedForUseDataModel);
     }
 
