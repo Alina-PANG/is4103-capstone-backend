@@ -55,7 +55,6 @@ public class AdminInitialization {
     @Autowired
     SeatInitializationService seatInitializationService;
 
-    @PostConstruct
     public void init() {
         if (currencyRepository.findAll().isEmpty()) {
             createCurrency();

@@ -77,7 +77,6 @@ public class FinanceInit {
         }
     }
 
-    @PostConstruct
     public void financeInit(){
         if (fxRecordRepository.findAll().isEmpty()){
             createFXRecord();
@@ -86,6 +85,9 @@ public class FinanceInit {
             createCategory();
             createSub1();
             createSub2();
+        }
+
+        if (serviceRepository.findAll().isEmpty()){
             createServices();
         }
     }
@@ -116,75 +118,93 @@ public class FinanceInit {
                 {"CAT-OFFICE_SUPPLIES-4", "Desktop Devices"}
         };
         for (int i=0;i<catsub1.length;i++){
-            CreateSub1Sub2Request req = new CreateSub1Sub2Request(catsub1[i][0],catsub1[i][1],"admin");
-            sub1Service.createSub1(req);
+            BudgetCategory cat = budgetCategoryRepository.findBudgetCategoryByCode(catsub1[i][0]);
+            BudgetSub1 sub1 = new BudgetSub1(catsub1[i][1],convert("CATS1",catsub1[i][1],i),"admin",cat);
+            sub1 = budgetSub1Repository.saveAndFlush(sub1);
+            cat.getBudgetSub1s().add(sub1);
+            budgetCategoryRepository.saveAndFlush(cat);
         }
+    }
+    private String convert(String pre, String name,int i){
+        String s = pre+"-"+name+"-"+i;
+        s = s.replaceAll(" ","_");
+        return s.toUpperCase();
+
     }
     public void createSub2(){
         String[][] sub1sub2 = {
-                {"CATS1-CHAIR-3", "meeting room chair"},
-                {"CATS1-CHAIR-3", "office chair"},
-                {"CATS1-DATA-7", "Data Link"},
-                {"CATS1-DESK-4", "Office Desk"},
-                {"CATS1-DESKTOP_DEVICES-9", "Input Hardware"},
-                {"CATS1-HARDWARE_WARRANTY-11", "Maintainess"},
-                {"CATS1-MISCELLANEOUS-10", "Miscellaneous"},
-                {"CATS1-MONITOR-5", "Desktop Monitory"},
-                {"CATS1-MONITOR-5", "Meeting Room Monitor"},
-                {"CATS1-MONITOR-5", "Elevator Monitor"},
-                {"CATS1-PERSONAL_DESKTOP-6", "Windows Machine"},
-                {"CATS1-PERSONAL_DESKTOP-6", "MacOS Machine"},
-                {"CATS1-PERSONAL_DESKTOP-6", "Lunix Machine"},
-                {"CATS1-SOFTWARE_LISCENCE-12", "Apple Services"},
-                {"CATS1-SOFTWARE_LISCENCE-12", "Messaging Service"},
-                {"CATS1-TRAINING-2", "Internal Training"},
-                {"CATS1-TRAINING-2", "External Training"},
-                {"CATS1-TRAVEL-1", "Planned Biz Trip"},
-                {"CATS1-TRAVEL-1", "Ad-hoc Travel"},
-                {"CATS1-VOICE-8", "Personal Voice Equip"},
-                {"CATS1-VOICE-8", "Company Voice Equip"},
+                {"CHAIR-", "meeting room chair"},
+                {"CHAIR-", "office chair"},
+                {"DATA-", "Data Link"},
+                {"DESK-", "Office Desk"},
+                {"DESKTOP_DEVICES-", "Input Hardware"},
+                {"HARDWARE_WARRANTY-", "Maintainess"},
+                {"MISCELLANEOUS-", "Miscellaneous"},
+                {"MONITOR-", "Desktop Monitory"},
+                {"MONITOR-", "Meeting Room Monitor"},
+                {"MONITOR-", "Elevator Monitor"},
+                {"PERSONAL_DESKTOP-", "Windows Machine"},
+                {"PERSONAL_DESKTOP-", "MacOS Machine"},
+                {"PERSONAL_DESKTOP-", "Lunix Machine"},
+                {"SOFTWARE_LISCENCE-", "Apple Services"},
+                {"SOFTWARE_LISCENCE-", "Messaging Service"},
+                {"TRAINING-", "Internal Training"},
+                {"TRAINING-", "External Training"},
+                {"TRAVEL-", "Planned Biz Trip"},
+                {"TRAVEL-", "Ad-hoc Travel"},
+                {"VOICE-", "Personal Voice Equip"},
+                {"VOICE-", "Company Voice Equip"},
         };
+        
         for (int i=0;i<sub1sub2.length;i++){
-            CreateSub1Sub2Request req = new CreateSub1Sub2Request(sub1sub2[i][0],sub1sub2[i][1],"admin");
-            sub2Service.createSub2(req);
+            BudgetSub1 cat = budgetSub1Repository.findBudgetSub1ByCodeLike(sub1sub2[i][0]);
+            BudgetSub2 sub2 = new BudgetSub2(sub1sub2[i][1],convert("CATS2",sub1sub2[i][1],i),"admin",cat);
+            sub2 = budgetSub2Repository.saveAndFlush(sub2);
+            cat.getBudgetSub2s().add(sub2);
+            budgetSub1Repository.saveAndFlush(cat);
         }
     }
     public void createServices(){
         String[][] sub2serv = {
-                {"CATS2-EXTERNAL_TRAINING-7", "External Training"},
-                {"CATS2-PLANNED_BIZ_TRIP-5", "Business Trip"},
-                {"CATS2-MISCELLANEOUS-17", "MISC"},
-                {"CATS2-MACOS_MACHINE-14", "Macbook"},
-                {"CATS2-AD-HOC_TRAVEL-4", "Ad-hoc-Business Trip"},
-                {"CATS2-WINDOWS_MACHINE-13", "Dell Desktop"},
-                {"CATS2-DATA_LINK-1", "Data Link A"},
-                {"CATS2-DATA_LINK-1", "Data Link B"},
-                {"CATS2-COMPANY_VOICE_EQUIP-3", "Speaker"},
-                {"CATS2-MEETING_ROOM_MONITOR-9", "Video Meeting Camera"},
-                {"CATS2-INPUT_HARDWARE-16", "Keyboard"},
-                {"CATS2-INPUT_HARDWARE-16", "Mouse"},
-                {"CATS2-DESKTOP_MONITORY-8", "Personal 24inch"},
-                {"CATS2-PERSONAL_VOICE_EQUIP-2", "Headset"},
-                {"CATS2-DESKTOP_MONITORY-8", "20-24 Vertical"},
-                {"CATS2-OFFICE_DESK-18", "Employee Desks"},
-                {"CATS2-APPLE_SERVICES-21", "Apple Care"},
-                {"CATS2-APPLE_SERVICES-21", "Apple Cloud"},
-                {"CATS2-MAINTAINESS-20", "Data Link Maintainese"},
-                {"CATS2-MESSAGING_SERVICE-19", "Symphony"},
-                {"CATS2-MESSAGING_SERVICE-19", "Skype"},
-                {"CATS2-OFFICE_CHAIR-11", "Engineering Chair"},
-                {"CATS2-MEETING_ROOM_CHAIR-12", "Meeting Room Chair"},
-                {"CATS2-INTERNAL_TRAINING-6", "Internal Training"},
+                {"EXTERNAL_TRAINING-", "External Training"},
+                {"PLANNED_BIZ_TRIP-", "Business Trip"},
+                {"MISCELLANEOUS-", "MISC"},
+                {"MACOS_MACHINE-", "Macbook"},
+                {"AD-HOC_TRAVEL-", "Ad-hoc-Business Trip"},
+                {"WINDOWS_MACHINE-", "Dell Desktop"},
+                {"DATA_LINK-", "Data Link A"},
+                {"DATA_LINK", "Data Link B"},
+                {"COMPANY_VOICE_EQUIP", "Speaker"},
+                {"MEETING_ROOM_MONITOR", "Video Meeting Camera"},
+                {"INPUT_HARDWARE", "Keyboard"},
+                {"INPUT_HARDWARE", "Mouse"},
+                {"DESKTOP_MONITORY", "Personal 24inch"},
+                {"PERSONAL_VOICE_EQUIP", "Headset"},
+                {"DESKTOP_MONITORY", "2024 Vertical"},
+                {"OFFICE_DESK", "Employee Desks"},
+                {"APPLE_SERVICES", "Apple Care"},
+                {"APPLE_SERVICES", "Apple Cloud"},
+                {"MAINTAINESS", "Data Link Maintainese"},
+                {"MESSAGING_SERVICE", "Symphony"},
+                {"MESSAGING_SERVICE", "Skype"},
+                {"OFFICE_CHAIR", "Engineering Chair"},
+                {"MEETING_ROOM_CHAIR", "Meeting Room Chair"},
+                {"INTERNAL_TRAINING", "Internal Training"},
         };
-        try {
-            for (int i=0;i<sub2serv.length;i++){
-                CreateServiceRequest req = new CreateServiceRequest(sub2serv[i][1],sub2serv[i][0],"n/a",BigDecimal.ZERO,"GBP","admin");
-                serviceServ.createService(req);
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
 
+            for (int i=0;i<sub2serv.length;i++){
+                try {
+                    BudgetSub2 sub2 = budgetSub2Repository.findBudgetSub2ByCodeLike(sub2serv[i][0]);
+                    Service s = new Service(sub2serv[i][1], convert("S", sub2serv[i][1], i), "admin", sub2);
+                    serviceRepository.save(s);
+                    sub2.getservices().add(s);
+                    budgetSub2Repository.saveAndFlush(sub2);
+
+                } catch (Exception ex) {
+                    System.out.println(i+" "+sub2serv[i][0]);
+                    ex.printStackTrace();
+                }
+            }
     }
 
     public void createFXRecord(){
@@ -211,7 +231,5 @@ public class FinanceInit {
         }catch (Exception ex){
             ex.printStackTrace();
         }
-
-
     }
 }
