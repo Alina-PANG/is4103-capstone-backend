@@ -70,9 +70,9 @@ public class SeatAdminMatchService {
         }
         adminId = adminId.trim();
 
-        Optional<SeatAdminMatch> optionalSeatAdminMatch = seatAdminMatchRepository.findUndeletedOneByEntityAndAdminId(entityId, adminId);
+        Optional<SeatAdminMatch> optionalSeatAdminMatch = seatAdminMatchRepository.findUndeletedByHierarchyId(entityId);
         if (optionalSeatAdminMatch.isPresent()) {
-            throw new CreateSeatAdminMatchException("Creating new seat admin access right failed: the access right already exists.");
+            throw new CreateSeatAdminMatchException("Creating new seat admin access right failed: the access right already exists under an employee.");
         }
 
         try {
@@ -114,6 +114,22 @@ public class SeatAdminMatchService {
             throw new SeatRequestAdminMatchNotFoundException("Seat Request Admin Match under hierarchy ID " + hierarchyId + " does not exist!");
         }
         return optionalSeatRequestAdminMatch.get();
+    }
+
+    public SeatAdminMatch retrieveMatchByHierarchyId(String hierarchyId) throws SeatRequestAdminMatchNotFoundException {
+        if (hierarchyId == null || hierarchyId.trim().length() == 0) {
+            throw new SeatRequestAdminMatchNotFoundException("Invalid hierarchy ID given!");
+        }
+        try {
+            Optional<SeatAdminMatch> optionalSeatRequestAdminMatch = seatAdminMatchRepository.findUndeletedByHierarchyId(hierarchyId);
+            if (!optionalSeatRequestAdminMatch.isPresent()) {
+                throw new SeatRequestAdminMatchNotFoundException("Seat Request Admin Match under hierarchy ID " + hierarchyId + " does not exist!");
+            }
+            return optionalSeatRequestAdminMatch.get();
+        } catch (Exception ex) {
+            throw new SeatRequestAdminMatchNotFoundException(ex.getMessage());
+        }
+
     }
 
     public SeatAdminMatchGroupModel retrieveAccessibleHierarchyLevels() {
