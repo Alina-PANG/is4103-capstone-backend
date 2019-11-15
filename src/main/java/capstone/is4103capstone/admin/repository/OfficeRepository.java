@@ -34,4 +34,6 @@ public interface OfficeRepository extends JpaRepository<Office, String> {
             "b.is_deleted=false AND b.function_id=?1)", nativeQuery = true)
     List<Office> findOnesUnderCompanyFunction(String functionId);
 
+    Office getOfficeByCode(String code);
+
 }

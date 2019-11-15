@@ -47,6 +47,12 @@ public class Team extends DBEntityTemplate {
         super(teamName, teamCode, hierarchyPath);
     }
 
+    public Team(String objectName, String code, String hierachyPath, String createdBy, BusinessUnit businessUnit, Office office) {
+        super(objectName, code, hierachyPath, createdBy, createdBy);
+        this.businessUnit = businessUnit;
+        this.office = office;
+    }
+
     public List<Contract> getContracts() {
         return contracts;
     }

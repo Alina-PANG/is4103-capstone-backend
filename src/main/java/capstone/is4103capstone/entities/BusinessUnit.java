@@ -34,6 +34,11 @@ public class BusinessUnit extends DBEntityTemplate {
         super(businessUnitName, businessUnitCode, hierarchyPath);
     }
 
+    public BusinessUnit(String objectName, String code, String hierachyPath, String createdBy, CompanyFunction function) {
+        super(objectName, code, hierachyPath, createdBy, createdBy);
+        setFunction(function);
+    }
+
     public CompanyFunction getFunction() {
         return function;
     }
