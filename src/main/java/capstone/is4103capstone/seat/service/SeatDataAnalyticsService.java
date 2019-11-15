@@ -29,6 +29,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -90,35 +92,45 @@ public class SeatDataAnalyticsService {
 
     // By office, office floor, company function, business unit and team
     // Office managers only have the right to see the office floors level info
-    public SeatUtilisationDataModel retrieveBusinessLevelEntitySeatUtilisationAnalysis(SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
+    public SeatUtilisationDataModel retrieveBusinessLevelEntitySeatUtilisationAnalysis(String levelEntityId, String hierarchyType, String officeId,
+                                                                                       String startDateString, String endDateString) {
 
-        if (seatDataAnalysisRequestModel.getHierarchyType() == null || seatDataAnalysisRequestModel.getHierarchyType().trim().length() == 0) {
+        if (hierarchyType == null || hierarchyType.trim().length() == 0) {
             throw new InvalidInputException("Retrieving analysis data failed: hierarchy type is required.");
         }
-        if (seatDataAnalysisRequestModel.getEntityId() == null || seatDataAnalysisRequestModel.getEntityId().trim().length() == 0) {
+        if (levelEntityId == null || levelEntityId.trim().length() == 0) {
             throw new InvalidInputException("Retrieving analysis data failed: business entity information is required.");
         }
-        if (seatDataAnalysisRequestModel.getOfficeId() == null || seatDataAnalysisRequestModel.getOfficeId().trim().length() == 0) {
+        if (officeId == null || officeId.trim().length() == 0) {
             throw new InvalidInputException("Retrieving analysis data failed: office information is required.");
         }
-        if (seatDataAnalysisRequestModel.getStartDate() == null) {
+        if (startDateString == null) {
             throw new InvalidInputException("Retrieving analysis data failed: period start date is required.");
         }
-        if (seatDataAnalysisRequestModel.getEndDate() == null) {
+        if (endDateString == null) {
             throw new InvalidInputException("Retrieving analysis data failed: period end date is required.");
         }
-        if (seatDataAnalysisRequestModel.getStartDate().after(seatDataAnalysisRequestModel.getEndDate())) {
-            throw new InvalidInputException("Retrieving analysis data failed: the start date must be before the end date.");
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = new Date();
+        Date endDate = new Date();
+        try {
+            startDate = simpleDateFormat.parse(startDateString);
+        } catch (ParseException ex) {
+            throw new InvalidInputException("Retrieving analysis data failed: invalid format of the start date.");
         }
-        if (seatDataAnalysisRequestModel.getEndDate().after(DateHelper.getDateWithoutTimeUsingCalendar(new Date()))) {
-            throw new InvalidInputException("Retrieving analysis data failed: the end date must be a historic time.");
+        try {
+            endDate = simpleDateFormat.parse(endDateString);
+        } catch (ParseException ex) {
+            throw new InvalidInputException("Retrieving analysis data failed: invalid format of the end date.");
         }
 
-        String hierarchyType = seatDataAnalysisRequestModel.getHierarchyType();
-        String levelEntityId = seatDataAnalysisRequestModel.getEntityId();
-        String officeId = seatDataAnalysisRequestModel.getOfficeId();
-        Date startDate = seatDataAnalysisRequestModel.getStartDate();
-        Date endDate = seatDataAnalysisRequestModel.getEndDate();
+        if (startDate.after(endDate)) {
+            throw new InvalidInputException("Retrieving analysis data failed: the start date must be before the end date.");
+        }
+        if (endDate.after(DateHelper.getDateWithoutTimeUsingCalendar(new Date()))) {
+            throw new InvalidInputException("Retrieving analysis data failed: the end date must be a historic time.");
+        }
 
         startDate = DateHelper.getDateWithoutTimeUsingCalendar(startDate);
         endDate = DateHelper.getDaysAfter(DateHelper.getDateWithoutTimeUsingCalendar(endDate), 1);
@@ -374,35 +386,45 @@ public class SeatDataAnalyticsService {
     // Office managers: among all the seats the office has, how many seats each company function occupies -> office floor breakdown
     // Department heads: among all the seats assigned to the company function, how many seats each business unit occupies -> unit breakdown
     // Business unit heads: among all the seats assigned to the business unit, how many seats each team occupies -> team breakdown
-    public SeatBlockedForUseDataModel retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(SeatDataAnalysisRequestModel seatDataAnalysisRequestModel) {
+    public SeatBlockedForUseDataModel retrieveBusinessLevelEntitySeatBlockedForUseInOneOfficeData(String levelEntityId, String hierarchyType, String officeId,
+                                                                                                  String startDateString, String endDateString) {
 
-        if (seatDataAnalysisRequestModel.getHierarchyType() == null || seatDataAnalysisRequestModel.getHierarchyType().trim().length() == 0) {
+        if (hierarchyType == null || hierarchyType.trim().length() == 0) {
             throw new InvalidInputException("Retrieving analysis data failed: hierarchy type is required.");
         }
-        if (seatDataAnalysisRequestModel.getEntityId() == null || seatDataAnalysisRequestModel.getEntityId().trim().length() == 0) {
+        if (levelEntityId == null || levelEntityId.trim().length() == 0) {
             throw new InvalidInputException("Retrieving analysis data failed: business entity information is required.");
         }
-        if (seatDataAnalysisRequestModel.getOfficeId() == null || seatDataAnalysisRequestModel.getOfficeId().trim().length() == 0) {
+        if (officeId == null || officeId.trim().length() == 0) {
             throw new InvalidInputException("Retrieving analysis data failed: office information is required.");
         }
-        if (seatDataAnalysisRequestModel.getStartDate() == null) {
+        if (startDateString == null) {
             throw new InvalidInputException("Retrieving analysis data failed: period start date is required.");
         }
-        if (seatDataAnalysisRequestModel.getEndDate() == null) {
+        if (endDateString == null) {
             throw new InvalidInputException("Retrieving analysis data failed: period end date is required.");
         }
-        if (seatDataAnalysisRequestModel.getStartDate().after(seatDataAnalysisRequestModel.getEndDate())) {
-            throw new InvalidInputException("Retrieving analysis data failed: the start date must be before the end date.");
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDate = new Date();
+        Date endDate = new Date();
+        try {
+            startDate = simpleDateFormat.parse(startDateString);
+        } catch (ParseException ex) {
+            throw new InvalidInputException("Retrieving analysis data failed: invalid format of the start date.");
         }
-        if (seatDataAnalysisRequestModel.getEndDate().after(DateHelper.getDateWithoutTimeUsingCalendar(new Date()))) {
-            throw new InvalidInputException("Retrieving analysis data failed: the end date must be a historic time.");
+        try {
+            endDate = simpleDateFormat.parse(endDateString);
+        } catch (ParseException ex) {
+            throw new InvalidInputException("Retrieving analysis data failed: invalid format of the end date.");
         }
 
-        String hierarchyType = seatDataAnalysisRequestModel.getHierarchyType();
-        String levelEntityId = seatDataAnalysisRequestModel.getEntityId();
-        String officeId = seatDataAnalysisRequestModel.getOfficeId();
-        Date startDate = seatDataAnalysisRequestModel.getStartDate();
-        Date endDate = seatDataAnalysisRequestModel.getEndDate();
+        if (startDate.after(endDate)) {
+            throw new InvalidInputException("Retrieving analysis data failed: the start date must be before the end date.");
+        }
+        if (endDate.after(DateHelper.getDateWithoutTimeUsingCalendar(new Date()))) {
+            throw new InvalidInputException("Retrieving analysis data failed: the end date must be a historic time.");
+        }
 
         // Check access right
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
