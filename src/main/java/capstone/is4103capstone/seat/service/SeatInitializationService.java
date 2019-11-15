@@ -45,7 +45,7 @@ public class SeatInitializationService {
 
 
     public void initialiseSeatManagement() {
-//        createSeatmaps();
+        createSeatmaps();
         initialiseSeatUtilisationLog();
     }
 

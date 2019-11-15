@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +77,8 @@ public class AdminInitialization {
         // Seat management subsystem initialisation for sr2
 
 //        seatManagementInitialisation();
-//        seatInitializationService.initialiseSeatManagement();
+          seatInitializationService.initialiseSeatManagement();
+
 
     }
     private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
