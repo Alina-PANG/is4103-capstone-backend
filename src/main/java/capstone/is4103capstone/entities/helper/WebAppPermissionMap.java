@@ -14,5 +14,6 @@ public class WebAppPermissionMap {
     private boolean accessSeatManagementModule = false;
     private boolean accessSupplyChainManagementModule = false;
     private boolean accessFinancialManagementModule = false;
+    private boolean accessDashboardModule = false;
 
 }
