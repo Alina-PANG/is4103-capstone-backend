@@ -126,7 +126,7 @@ public class AdminInitialization {
             put("yingshi2502", "yingshi.h@u.nus.edu");
             put("ryan", "simweijie@gmail.com");
             put("viet", "viet200798@gmail.com");
-            put("vaiyuqian", "yuqiancai987@gmail.com");
+            put("caiyuqian", "yuqiancai987@gmail.com");
             put("joshuachew", "chewzhj@gmail.com");
         }};
         String defaultEmailAddr = "lonelytown98@gmail.com";
