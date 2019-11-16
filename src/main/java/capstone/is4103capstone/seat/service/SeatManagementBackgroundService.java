@@ -15,6 +15,7 @@ import capstone.is4103capstone.util.enums.SeatTypeEnum;
 import capstone.is4103capstone.util.exception.ScheduleClashException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -162,16 +163,16 @@ public class SeatManagementBackgroundService {
     // "0 0 9-17 * * MON-FRI" = on the hour nine-to-five weekdays
     // "0 0 0 25 12 ?" = every Christmas Day at midnight
     // Generation tool at: https://www.freeformatter.com/cron-expression-generator-quartz.html
-    // @Scheduled(cron = "*/5 * 9-18 * * MON-FRI")
+    @Scheduled(cron = "*/5 * 9-18 * * MON-FRI")
     private void inactivateAllocations() {
 
-        System.out.println("******************** Seat Management Background Service: inactivate allocations at " + new Date().toString() + " ********************");
+        // System.out.println("******************** Seat Management Background Service: inactivate allocations at " + new Date().toString() + " ********************");
         List<SeatAllocationInactivationLog> allocationsToInactivate = seatAllocationInactivationLogRepository.getUndoneLogs();
         for (SeatAllocationInactivationLog allocationToInactivate :
                 allocationsToInactivate) {
-            System.out.println("********** allocation ID: " + allocationToInactivate.getAllocation_id() + " **********");
-            System.out.println("********** inactivate time: " + allocationToInactivate.getInactivate_time().toString() + " **********");
-            System.out.println("********** now: " + new Date().toString() + " **********");
+            // System.out.println("********** allocation ID: " + allocationToInactivate.getAllocation_id() + " **********");
+            // System.out.println("********** inactivate time: " + allocationToInactivate.getInactivate_time().toString() + " **********");
+            // System.out.println("********** now: " + new Date().toString() + " **********");
             if (allocationToInactivate.getInactivate_time().before(new Date())) {
                 Optional<Seat> optionalSeat = seatRepository.findByActiveSeatAllocationId(allocationToInactivate.getAllocation_id());
                 if (optionalSeat.isPresent()) {
@@ -180,7 +181,7 @@ public class SeatManagementBackgroundService {
                     while(iterator.hasNext()) {
                         SeatAllocation activeAllocation = iterator.next();
                         if (activeAllocation.getId().equals(allocationToInactivate.getAllocation_id())) {
-                            System.out.println("********** inactivate seat allocation: " + activeAllocation.getId() + " **********");
+                            // System.out.println("********** inactivate seat allocation: " + activeAllocation.getId() + " **********");
                             activeAllocation.setActive(false);
                             allocationToInactivate.setDone(true);
                             allocationToInactivate.setCompletion_time(new Date());
@@ -203,20 +204,20 @@ public class SeatManagementBackgroundService {
         }
     }
 
-    // @Scheduled(cron = "*/5 * 9-18 * * MON-FRI")
+    @Scheduled(cron = "*/5 * 9-18 * * MON-FRI")
     private void updateCurrentOccupancy() {
 
-        System.out.println("******************** Seat Management Background Service: update current occupancy ********************");
+        // System.out.println("******************** Seat Management Background Service: update current occupancy ********************");
         List<Seat> seats = seatRepository.findAllUndeleted();
         for (Seat seat :
                 seats) {
-            System.out.println("********** checking seat: " + seat.getId() + " **********");
+            // System.out.println("********** checking seat: " + seat.getId() + " **********");
             List<SeatAllocation> activeAllocations = seat.getActiveSeatAllocations();
-            System.out.println("********** number of active allocations: " + activeAllocations.size() + " **********");
+            // System.out.println("********** number of active allocations: " + activeAllocations.size() + " **********");
             Collections.sort(activeAllocations);
             for (SeatAllocation activeAllocation :
                     activeAllocations) {
-                System.out.println("***** checking allocation: " + activeAllocation.getId() + " *****");
+                // System.out.println("***** checking allocation: " + activeAllocation.getId() + " *****");
                 if (activeAllocation.getAllocationType() == SeatAllocationTypeEnum.FIXED) {
                     if (activeAllocation.getSchedule().getStartDateTime().compareTo(new Date()) <= 0 &&
                             (seat.getCurrentOccupancy() == null || !seat.getCurrentOccupancy().getId().equals(activeAllocation.getId())) ) {
@@ -278,7 +279,7 @@ public class SeatManagementBackgroundService {
     // --- By Team
     // --- Blocked for use
     // --- Blocked but unused for more than 2 weeks
-    // @Scheduled(cron = "0 0 23 * * MON-FRI")
+    @Scheduled(cron = "0 0 23 * * MON-FRI")
     private void generateDailySeatUtilisationLog() {
 
         // Team
