@@ -405,7 +405,11 @@ public class BudgetService {
 
         for (String year : yearList) {
             BigDecimal amountForThisYear = planRepository.findTotalAmountByPlanYear(year);
-            amountList.add(amountForThisYear);
+            if(amountForThisYear != null) {
+                amountList.add(amountForThisYear);
+            }else{
+                amountList.add(new BigDecimal(0));
+            }
         }
 
         return new BudgetDashboardRes("Successfully get budget plan total amount for four years.", false,
