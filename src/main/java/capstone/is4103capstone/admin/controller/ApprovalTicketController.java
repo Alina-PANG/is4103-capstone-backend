@@ -1,5 +1,7 @@
 package capstone.is4103capstone.admin.controller;
 
+import capstone.is4103capstone.admin.service.EmployeeService;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.general.AuthenticationTools;
 import capstone.is4103capstone.general.DefaultData;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class ApprovalTicketController {
     @Autowired
     ApprovalTicketService approvalTicketService;
+    @Autowired
+    EmployeeService employeeService;
 
     @GetMapping("/approval-ticket/{id}")
     public @ResponseBody ResponseEntity<Object> getTicketById(@PathVariable(name = "id") String ticketId, @RequestHeader(name = "Authorization", required = false) String headerUsername){
@@ -30,21 +34,33 @@ public class ApprovalTicketController {
     @PostMapping("/approve")
     public ResponseEntity<GeneralRes> approveRequest(@RequestBody ApprovalTicketModel result){
         try{
-            return ResponseEntity.ok().body(approvalTicketService.approveTicketAPI(result.getRequestedItemId(),result.getApproverComment(),true));
+            return ResponseEntity.ok().body(approvalTicketService.approveTicketAPI(result,true));
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
         }
     }
+
     @PostMapping("/reject")
     public ResponseEntity<GeneralRes> rejectRequest(@RequestBody ApprovalTicketModel result){
         try{
-            return ResponseEntity.ok().body(approvalTicketService.approveTicketAPI(result.getRequestedItemId(),result.getApproverComment(),false));
+            return ResponseEntity.ok().body(approvalTicketService.approveTicketAPI(result,false));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
+        }
+    }
+
+
+    @GetMapping("/approval-tickets-waiting-list")
+    public @ResponseBody ResponseEntity<Object> getPendingTicketsByCurrentUser(){
+        try{
+            String approverId = employeeService.getCurrentLoginEmployee().getId();
+            return ResponseEntity.ok().body(approvalTicketService.getPendingTicketsByApprover(approverId));
         }catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
 
         }
     }
-
 }

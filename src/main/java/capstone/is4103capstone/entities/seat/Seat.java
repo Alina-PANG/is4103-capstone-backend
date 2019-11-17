@@ -53,6 +53,8 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
 
     @OneToOne
     private SeatAllocation currentOccupancy;
+    @OneToOne
+    private SeatAllocation lastOccupancy;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seatmap_id")
     @JsonIgnore
@@ -75,12 +77,13 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
         this.setCreatedDateTime(new Date());
     }
 
-    public Seat(String objectName, String code, String hierachyPath, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap) {
+    public Seat(String objectName, String code, String hierachyPath, Integer xCoordinate, Integer yCoordinate, @NotNull SeatMap seatMap, Integer serialNumber) {
         super(objectName, code, hierachyPath);
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.seatMap = seatMap;
         this.originalSeatMapId = seatMap.getId();
+        this.serialNumber = serialNumber;
         this.setCreatedDateTime(new Date());
     }
 
@@ -194,6 +197,14 @@ public class Seat extends DBEntityTemplate implements Comparable<Seat> {
     public void setCurrentOccupancy(SeatAllocation currentOccupancy) {
         this.currentOccupancy = currentOccupancy;
         this.setLastModifiedDateTime(new Date());
+    }
+
+    public SeatAllocation getLastOccupancy() {
+        return lastOccupancy;
+    }
+
+    public void setLastOccupancy(SeatAllocation lastOccupancy) {
+        this.lastOccupancy = lastOccupancy;
     }
 
     public List<SeatAllocation> getActiveSeatAllocations() {

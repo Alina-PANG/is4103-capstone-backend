@@ -71,6 +71,7 @@ public class Employee extends DBEntityTemplate {
             inverseJoinColumns = @JoinColumn(name = "ticket_id"),
             inverseForeignKey = @ForeignKey(name = "id")
     )
+    @Column(length = 5000)
     private List<String> myRequestTickets = new ArrayList<>();
     @Convert(converter = StringListConverter.class)
     @JoinTable(name = "my_approvals",
@@ -79,6 +80,7 @@ public class Employee extends DBEntityTemplate {
             inverseJoinColumns = @JoinColumn(name = "ticket_id"),
             inverseForeignKey = @ForeignKey(name = "id")
     )
+    @Column(length = 5000)
     private List<String> myApprovals = new ArrayList<>();
 
     //    @LazyCollection(LazyCollectionOption.FALSE)
@@ -117,13 +119,6 @@ public class Employee extends DBEntityTemplate {
         this.securityId = "S-" + UUID.randomUUID();
     }
 
-//    public List<ChildContract> getChildContractsApproved() {
-//        return childContractsApproved;
-//    }
-//
-//    public void setChildContractsApproved(List<ChildContract> childContractsApproved) {
-//        this.childContractsApproved = childContractsApproved;
-//    }
 
     public CostCenter getDefaultCostCenter() {
         return defaultCostCenter;

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 @Service
@@ -53,6 +54,12 @@ public class CountryService {
             Country result = countryRepository.findCountryById(uuid);
             result.getFunctions().size();
             List<CompanyFunction> fs = result.getFunctions();
+            List<CompanyFunction> fsUndeleted = new ArrayList<>();
+            for (CompanyFunction f: fs){
+                if (!f.getDeleted())
+                    fsUndeleted.add(f);
+            }
+            result.setFunctions(fsUndeleted);
             return result;
         } catch (NoSuchElementException ex) {
             throw new Exception("No country with UUID " + uuid + " found in the database.");
@@ -70,7 +77,7 @@ public class CountryService {
         return entityToDto(countries, true);
     }
 
-    // === UPDATE ===
+// === UPDATE ===
 //    @Transactional
 //    public Country updateCountryEntity(Country country) throws Exception {
 //        try {
@@ -170,5 +177,13 @@ public class CountryService {
         }else{
             return true;
         }
+    }
+
+    public Country validateCountry(String idOrCode) throws EntityNotFoundException{
+        Optional<Country> country = countryRepository.getCountryByIdOrCode(idOrCode);
+        if (country.isPresent()){
+            return country.get();
+        }
+        throw new EntityNotFoundException("Country with code or id not found");
     }
 }

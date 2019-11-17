@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class SpendingModel {
     private String lastModifiedDateTime;
     private String serviceId;
+    private String serviceName;
     private BigDecimal spendingAmt;
     private String currencyCode;
     private String code;
@@ -18,9 +19,16 @@ public class SpendingModel {
         setServiceId(s.getServiceId());
         setSpendingAmt(s.getSpendingAmt());
         setLastModifiedDateTime(Tools.datetimeFormatter.format(s.getLastModifiedDateTime()));
+        setServiceName(s.getServiceName());
     }
 
+    public String getServiceName() {
+        return serviceName;
+    }
 
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 
     public String getLastModifiedDateTime() {
         return lastModifiedDateTime;

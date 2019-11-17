@@ -4,12 +4,14 @@ import capstone.is4103capstone.entities.finance.PurchaseOrder;
 import capstone.is4103capstone.entities.finance.StatementOfAcctLineItem;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.Repository.StatementOfAccountLineItemRepository;
+import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.finance.finPurchaseOrder.POEntityCodeHPGeneration;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.SOAModel;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoAByInvoiceReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreateSoAByScheduleReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetSoARes;
+import capstone.is4103capstone.general.model.GeneralEntityRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.util.Tools;
 import org.joda.time.DateTime;
@@ -38,6 +40,9 @@ public class StatementOfAccountService {
     PurchaseOrderRepository purchaseOrderRepository;
     @Autowired
     StatementOfAccountLineItemRepository statementOfAccountLineItemRepository;
+    @Autowired
+    FXTableService fxService;
+
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     public ResponseEntity<GeneralRes> createBySchedule(CreateSoAByScheduleReq createSoAByScheduleReq, String username){
@@ -77,16 +82,20 @@ public class StatementOfAccountService {
             }
             BigDecimal actualPmt = createSoAByScheduleReq.getTotalAmount().divide(BigDecimal.valueOf(numberOfLoops), 2, RoundingMode.HALF_UP);
 
+            String oriCurrency = po.getCurrencyCode();
             for(StatementOfAcctLineItem s: items){
                 s.setActualPmt(actualPmt);
                 s.setPaidAmt(BigDecimal.ZERO);
+                s.setActualPmtInGBP(fxService.convertToGBPWithLatest(oriCurrency,s.getActualPmt()));
+                s.setPaidAmtInGBP(fxService.convertToGBPWithLatest(oriCurrency,s.getPaidAmt()));
+
                 s.setCode(POEntityCodeHPGeneration.getCode(statementOfAccountLineItemRepository,s));
                 statementOfAccountLineItemRepository.saveAndFlush(s);
             }
 
             po.setStatementOfAccount(items);
             purchaseOrderRepository.saveAndFlush(po);
-            return ResponseEntity.ok().body(new GeneralRes("Successfully saved the statement of accounts!", false));
+            return ResponseEntity.ok().body(new GeneralEntityRes("Successfully saved the statement of accounts!", false));
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -101,21 +110,23 @@ public class StatementOfAccountService {
             PurchaseOrder po = purchaseOrderRepository.getOne(createSoAByInvoiceReq.getPoId());
             if(po == null) return ResponseEntity.notFound().build();
 
-            StatementOfAcctLineItem statementOfAcctLineItem = new StatementOfAcctLineItem();
-            statementOfAcctLineItem.setScheduleDate(dateFormatter.parse(createSoAByInvoiceReq.getReceiveDate()));
-            statementOfAcctLineItem.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
-            statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getPaidAmt());
-//            statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
-            statementOfAcctLineItem.setPurchaseOrder(po);
-            statementOfAcctLineItem.setCreatedBy(username);
-            statementOfAcctLineItem.setCreatedDateTime(new Date());
+            StatementOfAcctLineItem s = new StatementOfAcctLineItem();
+            s.setScheduleDate(dateFormatter.parse(createSoAByInvoiceReq.getReceiveDate()));
+            s.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
+            s.setActualPmt(createSoAByInvoiceReq.getPaidAmt());
+            s.setActualPmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),s.getActualPmt()));
+            s.setPaidAmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),s.getPaidAmt()));
+//            s.setActualPmt(createSoAByInvoiceReq.getActualPmt());
+            s.setPurchaseOrder(po);
+            s.setCreatedBy(username);
+            s.setCreatedDateTime(new Date());
 
-            statementOfAcctLineItem = statementOfAccountLineItemRepository.saveAndFlush(statementOfAcctLineItem);
-            statementOfAcctLineItem.setCode(POEntityCodeHPGeneration.getCode(statementOfAccountLineItemRepository,statementOfAcctLineItem));
-            statementOfAccountLineItemRepository.saveAndFlush(statementOfAcctLineItem);
+            s = statementOfAccountLineItemRepository.saveAndFlush(s);
+            s.setCode(POEntityCodeHPGeneration.getCode(statementOfAccountLineItemRepository,s));
+            statementOfAccountLineItemRepository.saveAndFlush(s);
 
             if(po.getStatementOfAccount() == null) po.setStatementOfAccount(new ArrayList<StatementOfAcctLineItem>());
-            po.getStatementOfAccount().add(statementOfAcctLineItem);
+            po.getStatementOfAccount().add(s);
             purchaseOrderRepository.saveAndFlush(po);
 
            return ResponseEntity.ok().body(new GeneralRes("Successfully created the statement of accounts!", false));
@@ -132,11 +143,15 @@ public class StatementOfAccountService {
         try{
             StatementOfAcctLineItem statementOfAcctLineItem = statementOfAccountLineItemRepository.getOne(id);
             if(statementOfAcctLineItem == null) return ResponseEntity.notFound().build();
-
-            if(createSoAByInvoiceReq.getActualPmt() != null)
+            PurchaseOrder po = statementOfAcctLineItem.getPurchaseOrder();
+            if(createSoAByInvoiceReq.getActualPmt() != null){
                 statementOfAcctLineItem.setActualPmt(createSoAByInvoiceReq.getActualPmt());
+                statementOfAcctLineItem.setActualPmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),statementOfAcctLineItem.getActualPmt()));
+            }
             if(createSoAByInvoiceReq.getPaidAmt() != null) {
                 statementOfAcctLineItem.setPaidAmt(createSoAByInvoiceReq.getPaidAmt());
+                statementOfAcctLineItem.setPaidAmtInGBP(fxService.convertToGBPWithLatest(po.getCurrencyCode(),statementOfAcctLineItem.getPaidAmt()));
+
                 if(statementOfAcctLineItem.getInvoice() != null){
                     statementOfAcctLineItem.getInvoice().setPaymentAmount(createSoAByInvoiceReq.getPaidAmt());
                 }
@@ -172,7 +187,7 @@ public class StatementOfAccountService {
                 else
                     result.add(new SOAModel(l.getId(), l.getPaidAmt(), l.getActualPmt(), l.getScheduleDate()));
             }
-            return ResponseEntity.ok().body(new GetSoARes("Successfully retrieved the statement of accounts!", true, result));
+            return ResponseEntity.ok().body(new GetSoARes("Successfully retrieved the statement of accounts!", false, result));
         }
         catch (Exception ex){
             ex.printStackTrace();

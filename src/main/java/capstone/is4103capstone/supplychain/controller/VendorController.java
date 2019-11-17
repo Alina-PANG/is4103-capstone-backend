@@ -22,14 +22,16 @@ public class VendorController {
 
     @PostMapping("/create-vendor")
     public ResponseEntity<GeneralRes> createVendor(@RequestBody CreateVendorReq createVendorReq) {
-        if (AuthenticationTools.authenticateUser(createVendorReq.getUsername())) {
+        try {
+
             return ResponseEntity
                     .ok()
                     .body(vendorService.createNewVendor(createVendorReq));
-        } else {
+        }
+        catch (Exception ex){
             return ResponseEntity
-                    .ok()
-                    .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
+                    .badRequest()
+                    .body(new GeneralRes(ex.getMessage(), true));
         }
     }
 
@@ -54,7 +56,7 @@ public class VendorController {
                     .body(vendorService.getVendor(id));
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }
@@ -67,7 +69,7 @@ public class VendorController {
                     .body(vendorService.getAllVendors());
         }else{
             return ResponseEntity
-                    .ok()
+                    .badRequest()
                     .body(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG, true));
         }
     }

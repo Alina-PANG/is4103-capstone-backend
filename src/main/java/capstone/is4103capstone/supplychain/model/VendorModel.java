@@ -21,6 +21,7 @@ public class VendorModel implements Serializable {
     private String escalationContactEmail;
 
 
+
     public VendorModel(String id, String code, String vendorName, Long seqNo, List<GeneralEntityModel> businessUnits, String serviceDescription, String relationshipManagerName, String relationshipManagerEmail, String billingContactName, String billingContactEmail, String escalationContactName, String escalationContactEmail) {
         this.id = id;
         this.code = code;

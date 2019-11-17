@@ -24,13 +24,12 @@ public class ServiceController {
 
     @PostMapping("/create")
     public @ResponseBody
-    ResponseEntity<Object> createservice(@RequestBody CreateServiceRequest req) {
-
-        if(AuthenticationTools.authenticateUser(req.getUsername())){
-            return new ResponseEntity<Object>(serviceService.createService(req).toString(), HttpStatus.OK);
+    ResponseEntity<GeneralRes> createservice(@RequestBody CreateServiceRequest req) {
+        try{
+            return ResponseEntity.ok().body(serviceService.createService(req));
+        }catch (Exception ex) {
+            return ResponseEntity.badRequest().body(new GeneralRes(ex.getMessage(),true));
         }
-        else
-            return new ResponseEntity<Object>(new GeneralRes(DefaultData.AUTHENTICATION_ERROR_MSG,true), HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/view")

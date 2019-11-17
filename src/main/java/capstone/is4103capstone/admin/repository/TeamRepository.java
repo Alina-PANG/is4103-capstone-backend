@@ -22,4 +22,16 @@ public interface TeamRepository extends JpaRepository<Team, String> {
 
     @Query(value = "SELECT * FROM team t WHERE t.team_leader_id = ?1 AND t.is_deleted=false", nativeQuery = true)
     Optional<Team> findByTeamLeadUuid(String teamLeadUuid);
+
+    @Query(value = "SELECT * FROM team t WHERE t.is_deleted=false", nativeQuery = true)
+    List<Team> findUndeletedAll();
+
+    @Query(value = "SELECT * FROM team t WHERE t.is_deleted=false AND t.business_unit_id=?1", nativeQuery = true)
+    List<Team> findOnesUnderBusinessUnit(String businessUnitId);
+
+    @Query(value = "SELECT * FROM team t WHERE t.is_deleted=false AND t.office_id=?1", nativeQuery = true)
+    List<Team> findOnesUnderOffice(String officeId);
+
+    @Query(value = "SELECT * FROM team t WHERE t.is_deleted=false AND t.business_unit_id=?1 AND t.office_id=?2", nativeQuery = true)
+    List<Team> findOnesUnderBusinessUnitAndOffice(String businessUnitId, String officeId);
 }

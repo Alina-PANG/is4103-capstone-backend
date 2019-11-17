@@ -6,6 +6,7 @@ import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.seat.Seat;
 import capstone.is4103capstone.entities.seat.SeatMap;
 import capstone.is4103capstone.finance.budget.controller.BudgetController;
+import capstone.is4103capstone.seat.model.seatMap.SeatMapExistenceCheckingModel;
 import capstone.is4103capstone.seat.model.seatMap.SeatMapModelForSetup;
 import capstone.is4103capstone.seat.model.seat.SeatModelForSeatMap;
 import capstone.is4103capstone.seat.repository.SeatMapRepository;
@@ -92,6 +93,13 @@ public class SeatMapController {
             response.add(seatMapModelForSetup);
         }
         return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping("/existence/officeFloor")
+    public ResponseEntity checkSeatMapExistenceByOfficeAndFloor(@RequestParam(name = "officeId") String officeId,
+                                                                @RequestParam(name = "floor") String floor) {
+        SeatMapExistenceCheckingModel seatMapExistenceCheckingModel = seatMapService.checkSeatMapExistenceByOfficeAndFloor(officeId, floor);
+        return ResponseEntity.ok().body(seatMapExistenceCheckingModel);
     }
 
     // ---------------------------------- PUT: Update ----------------------------------

@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface FXRecordRepository extends JpaRepository<FXRecord,String> {
 
@@ -15,4 +16,6 @@ public interface FXRecordRepository extends JpaRepository<FXRecord,String> {
 
     @Query(value = "SELECT * FROM fx_record fx WHERE fx.is_deleted=false AND fx.base_currency_abbr = ?1 AND fx.price_currency_abbr=?2 AND fx.has_expired=false", nativeQuery = true)
     FXRecord findLastActiveRecord(String base, String price);
+
+
 }

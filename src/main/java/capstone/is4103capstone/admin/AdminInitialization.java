@@ -4,18 +4,24 @@ import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.Address;
 import capstone.is4103capstone.entities.helper.DateHelper;
+import capstone.is4103capstone.entities.helper.WebAppPermissionMap;
 import capstone.is4103capstone.entities.seat.EmployeeOfficeWorkingSchedule;
-import capstone.is4103capstone.entities.seat.SeatRequestAdminMatch;
+import capstone.is4103capstone.entities.seat.SeatAdminMatch;
 import capstone.is4103capstone.seat.repository.EmployeeOfficeWorkingScheduleRepository;
 import capstone.is4103capstone.seat.repository.ScheduleRepository;
-import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
+import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
+import capstone.is4103capstone.seat.service.SeatInitializationService;
+import capstone.is4103capstone.seat.service.SeatManagementGeneralService;
 import capstone.is4103capstone.util.enums.EmployeeTypeEnum;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -40,108 +46,268 @@ public class AdminInitialization {
     @Autowired
     CostCenterRepository costCenterRepository;
     @Autowired
-    SeatRequestAdminMatchRepository seatRequestAdminMatchRepository;
+    SeatAdminMatchRepository seatAdminMatchRepository;
     @Autowired
     EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
     @Autowired
     ScheduleRepository scheduleRepository;
 
-    @PostConstruct
+    @Autowired
+    SeatInitializationService seatInitializationService;
+
     public void init() {
-//
-        List<Currency> currencyList = currencyRepository.findAll();
-        if (currencyList == null || currencyList.size() == 0) {
+        if (currencyRepository.findAll().isEmpty()) {
             createCurrency();
-            createGeo();
-            System.out.println("-----Created Geographies-----");
-            createEmployee();
         }
-//        List<CostCenter> costCenterList = costCenterRepository.findAll();
-//        if (costCenterList == null || costCenterList.size() == 0) {
-//            createCostCenter();
-//        }
-//        String[] firstNameList = {"Hong","Tom","Amy","Daivd","Outsourcing","BM","Function"};
-//        String[] lastNameList = {"Xu","Green","Brown","Cook","Staff","Approver","Approver"};
-//        String[] usernameList = {"xuhong","user01","user02","user03","outsourcing1","bmapprover","funcapprover"};
-//        String[] codeCpntList = {"5","6","7","8","OUTSOURCING","BM01","FUNC01"};
-//        for (int i=0;i<firstNameList.length;i++){
-//            createEmployeeTemplate(firstNameList[i],lastNameList[i],usernameList[i],"password","huangyingshi@gmail.com",codeCpntList[i]);
-//        }
-//         createEmployeeTemplate("PO","Last name","poteam","password","huangyingshi@gmail.com","PO_TEAM-1");
-
-
+        if (regionRepository.findAll().isEmpty()) {
+            createRegionCountry();
+        }
+        if (employeeRepository.findAll().isEmpty()) {
+            createEmployees();
+            configureEmployeeHier();
+        }
+        if (officeRepository.findAll().isEmpty()) {
+            createOffice();
+        }
+        if (functionRepository.findAll().isEmpty()) {
+            createFunctions();
+        }
+        if (businessUnitRepository.findAll().isEmpty()){
+            createBU();
+        }
+        if (teamRepository.findAll().isEmpty()){
+            createTeamAndCC();
+        }
+        if (seatAdminMatchRepository.findAll().isEmpty()){
+            seatManagementInitialisation();
+            seatInitializationService.initialiseSeatManagement();
+        }
     }
-    private void createEmployeeTemplate(String fName, String lName, String username, String password, String email,String codeCPnt){
+
+    private void createEmployeeTemplate(String fName, String lName, String username, String password, String email, String codeCPnt, String adminRight) {
         Employee newEmployee = new Employee(username, fName, lName, "", password);
         newEmployee.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        newEmployee.setCode("EMP-"+codeCPnt);
+        newEmployee.setCode("EMP-" + codeCPnt);
         newEmployee.setCreatedBy("admin");
         newEmployee.setEmail(email);
         newEmployee.setLastModifiedBy("admin");
+
+        switch (adminRight){
+            case "normal":
+                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(
+                        false,true,false,true,false));
+                break;
+            case "all":
+                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(true,true,true,true,true));
+                break;
+            case "supply":
+                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(false,true,true,true,false));
+                break;
+            case "dashboard":
+                newEmployee.setWebAppPermissionMap(new WebAppPermissionMap(false,true,true,true,true));
+                break;
+            default:
+                break;
+        }
+
+
+
+
         employeeRepository.save(newEmployee);
 
     }
-    public void createCurrency() {
-        Currency c = new Currency("Singapore Dollars", "SGD");
-        currencyRepository.save(c);
+    private void createEmployees() {
+        String[] firstNameList = {"Admin", "PO", "Yingshi", "Hong", "Tom", "Amy", "Daivd", "Outsourcing", "Hangzhi", "Yuqian", "Joshua", "Ryan", "Viet"};
+        String[] lastNameList = {"", "Manager", "Huang", "Xu", "Green", "Brown", "Cook", "Staff", "Pang", "Cai", "Chew", "Sim", "Nguyen"};
+        String[] usernameList = {"admin", "poteam", "yingshi2502", "xuhong", "user01", "user02", "user03", "outsourcing1", "panghangzhi", "caiyuqian", "joshuachew", "ryan", "viet"};
+        String[] codeCpntList = {"1", "PO_TEAM", "2", "5", "6", "7", "8", "OUTSOURCING", "PHZ", "CYQ", "JC", "RS", "VN"};
+        String[] adminRightConf = {"all","normal","dashboard","normal","normal","normal","normal","supply","dashboard","dashboard","dashboard","dashboard","dashboard"};
+        HashMap usernameEmail = new HashMap<String, String>() {{
+            put("yingshi2502", "yingshi.h@u.nus.edu");
+            put("ryan", "simweijie@gmail.com");
+            put("viet", "viet200798@gmail.com");
+            put("caiyuqian", "yuqiancai987@gmail.com");
+            put("joshuachew", "chewzhj@gmail.com");
+        }};
+        String defaultEmailAddr = "lonelytown98@gmail.com";
+        for (int i = 0; i < firstNameList.length; i++) {
+            createEmployeeTemplate(firstNameList[i], lastNameList[i], usernameList[i], "password", (String) usernameEmail.getOrDefault(usernameList[i], defaultEmailAddr), codeCpntList[i],adminRightConf[i]);
+        }
     }
 
-    public void createCostCenter() {
-        CostCenter costCenter = new CostCenter();
-//        costCenter.setCountry(countryRepository.findCountryByCode("SG"));
-        costCenter.setCostCenterManager(employeeRepository.findEmployeeByUserName("yingshi2502"));
-        costCenter.setCreatedBy("test");
-        costCenter.setCode("TEST_COSTCENTER");
-        costCenterRepository.save(costCenter);
+    @Transactional
+    public void configureEmployeeHier() {
+        Employee admin = employeeRepository.findEmployeeByUserName("admin");
+        Employee yingshi = employeeRepository.findEmployeeByUserName("yingshi2502");
+        List<Employee> all = employeeRepository.findAll();
+        for (Employee e : all) {
+            if (e.getUserName().contains("user")) {
+                e.setManager(yingshi);
+                yingshi.getSubordinates().add(e);
+            } else if (!e.getUserName().equals("admin")) {
+                e.setManager(admin);
+                admin.getSubordinates().add(e);
+            }
+        }
+    }
+    private void createCurrency() {
+        String[] defaultCurrencyCode = {"SGD", "GBP", "USD", "HKD", "JPY", "EURO", "CNY"};
+        String[] defaultCurrencyName = {"Singapore Dollars", "Pound Sterling", "US Dollars", "Hong Kong Dollars", "Japan Yen", "Euro", "Chinese Yuan"};
+        String[] defaultCurrCountryCode = {"SG", "UK", "US", "HK", "JP", "CN"};//usually this field won't be used
+        for (int i = 0; i < defaultCurrCountryCode.length; i++) {
+            Currency c = new Currency(defaultCurrencyName[i], defaultCurrCountryCode[i], defaultCurrencyCode[i]);
+            currencyRepository.save(c);
+        }
+        //TODO: Initialize some history fx rate;
+    }
+    private void createRegionCountry() {
+        String[] regionName = {"Asia-Pacific", "The United Kingdom", "Europe"};
+        String[] regionCode = {"APAC", "UK", "EU"};
+        for (int i = 0; i < regionName.length; i++) {
+            Region r = new Region(regionName[i], regionCode[i], ":" + regionCode[i]);
+            regionRepository.saveAndFlush(r);
+        }
+
+        Region regionAPAC = regionRepository.getRegionByCode("APAC");
+        String[] apacCountries = {"Singapore", "Hong Kong", "China", "Japan"};
+        String[] apacCountryCode = {"SG", "HK", "CN", "JP"};
+        for (int i = 0; i < apacCountries.length; i++) {
+            Country c = new Country(apacCountries[i], apacCountryCode[i], regionAPAC.getHierachyPath() + ":" + apacCountryCode[i], "admin", regionAPAC);
+            c = countryRepository.saveAndFlush(c);
+            regionAPAC.getCountries().add(c);
+        }
+        regionAPAC = regionRepository.saveAndFlush(regionAPAC);
+
+        Region regionUK = regionRepository.getRegionByCode("UK");
+        Country uk = new Country("United Kingdom", "UK", regionUK.getHierachyPath() + ":" + "UK", "admin", regionUK);
+        uk = countryRepository.saveAndFlush(uk);
+        regionUK.getCountries().add(uk);
+        regionUK = regionRepository.save(regionUK);
+    }
+    private void createOffice() {
+        Country sg = countryRepository.findCountryByCode("SG");
+        Office office = new Office("One Raffles Quay", "ORQ", sg.getHierachyPath()+":"+"ORQ");
+        Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG");
+        office.setAddress(orqAddress);
+        office.setNumOfFloors(2);
+        office.setCreatedBy("admin");
+        office.setCountry(sg);
+        office = officeRepository.saveAndFlush(office);
+        sg.getOffices().add(office);
+        sg = countryRepository.saveAndFlush(sg);
+    }
+    private void createFunctions() {
+        Country sg = countryRepository.findCountryByCode("SG");
+        Office office = officeRepository.getOfficeByCode("ORQ");
+        String[] sgFuncsName = {"Administration", "Human Resource", "Technology", "Sales"};
+        String[] sgFuncsCode = {"F-SG-ADMIN", "F-SG-HR", "F-SG-TECH", "F-SG-SALES"};
+        for (int i = 0; i < sgFuncsCode.length; i++) {
+            CompanyFunction f = new CompanyFunction(sgFuncsName[i], sgFuncsCode[i], sg.getHierachyPath() + ":" + sgFuncsCode[i], "admin", sg);
+            f.getOfficesCodeOfFunction().add(office.getCode());
+            f = functionRepository.saveAndFlush(f);
+            sg.getFunctions().add(f);
+            office.getFunctionsCodeInOffice().add(sgFuncsCode[i]);
+        }
+        sg = countryRepository.saveAndFlush(sg);
+
+        officeRepository.saveAndFlush(office);
+    }
+    private void createBU(){
+        Office office = officeRepository.getOfficeByCode("ORQ");
+
+        CompanyFunction techFunc = functionRepository.getByCode("F-SG-TECH");
+        String[] buTechNames = {"Infrastructure Tech","Currency Tech","Fix Income Tech"};
+        String[] buTechCodes = {"BU-SG-InfraTech","BU-SG-CurrTech","BU-SG-FixIncTech"};
+
+        for (int i=0;i<buTechNames.length;i++){
+            BusinessUnit bu = new BusinessUnit(buTechNames[i],buTechCodes[i],techFunc.getHierachyPath()+":"+buTechCodes[i],"admin",techFunc);
+            bu = businessUnitRepository.saveAndFlush(bu);
+            office.getBusinessUnitsCodeInOffice().add(buTechCodes[i]);
+        }
+
+        CompanyFunction hrFunc = functionRepository.getByCode("F-SG-HR");
+        String[] buHRNames = {"Recruiting"};
+        String[] buHRCodes = {"BU-SG-RCR"};
+        for (int i=0;i<buHRNames.length;i++){
+            BusinessUnit bu = new BusinessUnit(buHRNames[i],buHRCodes[i],hrFunc.getHierachyPath()+":"+buHRCodes[i],"admin",hrFunc);
+            bu = businessUnitRepository.saveAndFlush(bu);
+            office.getBusinessUnitsCodeInOffice().add(buHRCodes[i]);
+
+        }
+        officeRepository.saveAndFlush(office);
     }
 
-    public void createEmployee() {
-        Employee yingshi = new Employee("yingshi2502", "Yingshi", "Huang", "", "password");
-        yingshi.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        yingshi.setCode("EMPLOYEE-yingshi2502");
-        yingshi.setCreatedBy("admin");
-        yingshi.setEmail("yuqiancai987@gmail.com");
-        yingshi.setLastModifiedBy("admin");
+    private void createTeamAndCC(){
+        Office orq = officeRepository.getOfficeByCode("ORQ");
+        Employee yingshi = employeeRepository.findEmployeeByUserName("yingshi2502");
+        Employee admin = employeeRepository.findEmployeeByUserName("admin");
 
-        Employee yuqian = new Employee("caiyuqian", "Yuqian", "Cai", "", "password");
-        yuqian.setEmployeeType(EmployeeTypeEnum.TEMPORARY);
-        yuqian.setCode("EMPLOYEE-caiyuqian");
-        yuqian.setCreatedBy("admin");
-        yuqian.setEmail("yuqiancai987@gmail.com");
-        yuqian.setLastModifiedBy("admin");
+        //-------------------------Infrastructure Tech team creation--------------
+        BusinessUnit infraTech = businessUnitRepository.findByCode("BU-SG-InfraTech");
+        String[] infraTeamNames = {"End User Computing","Data Center Operation","Database Admin","Networks"};
+        String[] infraTechCode = {"T-SG-Tech-EndUserCom","T-SG-InfraTech-DataCenOpr","T-SG-InfraTech-DBAdmin","T-SG-InfraTech-Networks"};
 
-        Employee joshua = new Employee("joshuachew", "Joshua", "Chew", "", "password");
-        joshua.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        joshua.setCode("EMPLOYEE-joshuachew");
-        joshua.setCreatedBy("admin");
-        joshua.setEmail("chewzhj@gmail.com");
-        joshua.setLastModifiedBy("admin");
+        for (int i=0;i<infraTeamNames.length;i++){
+            Team t = new Team(infraTeamNames[i],infraTechCode[i],infraTech.getHierachyPath()+":"+infraTechCode[i],"admin",infraTech,orq);
+            t.setTeamLeader(yingshi);// define team lead
+            t = teamRepository.saveAndFlush(t);
+            infraTech.getTeams().add(t);
+            createCCofTeam(t,admin);
+            orq.getTeams().add(t);
+        }
+        infraTech = businessUnitRepository.saveAndFlush(infraTech);
 
-        Employee admin = new Employee("admin", "adminFirstName", "adminLastName", "adminMiddleName", "password");
-        admin.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        admin.setCreatedBy("admin");
-        admin.setCode("EMPLOYEE-admin");
-        admin.setLastModifiedBy("admin");
+        //----------------------- Fix Income BU Team creation--------------
+
+        BusinessUnit fixIncTechBU = businessUnitRepository.findByCode("BU-SG-FixIncTech");
+        String[] fixIncName = {"FixInc Production Support","FixInc Development"};
+        String[] fixIncCode = {"T-SG-FixIncTech-ProdSupp","T-SG-FixIncTech-Dev"};
+
+        for (int i=0;i<fixIncName.length;i++){
+            Team t = new Team(fixIncName[i],fixIncCode[i],fixIncTechBU.getHierachyPath()+":"+fixIncCode[i],"admin",fixIncTechBU,orq);
+            t.setTeamLeader(yingshi);// define team lead
+            t = teamRepository.saveAndFlush(t);
+            infraTech.getTeams().add(t);
+            createCCofTeam(t,admin);
+            orq.getTeams().add(t);
+        }
+        fixIncTechBU = businessUnitRepository.saveAndFlush(infraTech);
 
 
-        // REST API Testing
-        /*
-        Employee restApiTestUser = new Employee("testuser", "Test", "User", "", "password");
-        restApiTestUser.setEmployeeType(EmployeeTypeEnum.PERMANENT);
-        restApiTestUser.setCode("ENPLOYEE-yingshi2502");
-        restApiTestUser.setCreatedBy("admin");
-        restApiTestUser.setLastModifiedBy("admin");
-        */
+        //-------------- HR Recruiting Team creation------------
+        BusinessUnit hrReruBu = businessUnitRepository.findByCode("BU-SG-RCR");
+        Team interviewTeam = new Team("RCR Interview", "T-SG-RCR-INT", hrReruBu.getHierachyPath()+":"+"T-SG-RCR-INT","admin",hrReruBu,orq);
+        interviewTeam.setTeamLeader(yingshi);
+        interviewTeam = teamRepository.saveAndFlush(interviewTeam);
+        hrReruBu.getTeams().add(interviewTeam);
+        createCCofTeam(interviewTeam,admin);
+        orq.getTeams().add(interviewTeam);
+        officeRepository.saveAndFlush(orq);
 
-        yingshi = employeeRepository.save(yingshi);
-        yuqian = employeeRepository.save(yuqian);
-        joshua = employeeRepository.save(joshua);
-        admin = employeeRepository.save(admin);
+
+    }
+
+    private CostCenter createCCofTeam(Team t, Employee funcApprover){
+        CostCenter costCenter = new CostCenter(t.getObjectName()+"Cost Center","CC-"+t.getCode(),t.getHierachyPath()+":+CC-"+t.getCode(),"admin",t);
+        costCenter.setBmApprover(t.getTeamLeader());
+        costCenter.setCostCenterManager(t.getTeamLeader());
+        costCenter.setFunctionApprover(funcApprover);
+
+        costCenter = costCenterRepository.save(costCenter);
+        t.setCostCenter(costCenter);
+        t = teamRepository.saveAndFlush(t);
+        return costCenter;
+    }
+
+    private void seatManagementInitialisation() {
+        Employee hangzhi = employeeRepository.findEmployeeByUserName("panghangzhi");
+        Employee yuqian = employeeRepository.findEmployeeByUserName("caiyuqian");
+        Employee admin = employeeRepository.findEmployeeByUserName("admin");
+        Employee joshua = employeeRepository.findEmployeeByUserName("joshuachew");
 
         // Create Employee Office Working Schedule
-        Optional<Office> optionalOffice = officeRepository.findByName("One Raffles Quay");
-        if (optionalOffice.isPresent()) {
-            Office office = optionalOffice.get();
+        Office office = officeRepository.getOfficeByCode("ORQ");
+        if (office!=null) {
 
             EmployeeOfficeWorkingSchedule yuqianWorkingSchedule = new EmployeeOfficeWorkingSchedule();
             Schedule yuqianSchedule1 = new Schedule();
@@ -157,277 +323,109 @@ public class AdminInitialization {
             yuqianWorkingSchedule.setEmployee(yuqian);
             yuqianWorkingSchedule.setOffice(office);
 
-            EmployeeOfficeWorkingSchedule yingshiWorkingSchedule = new EmployeeOfficeWorkingSchedule();
-            Schedule yingshiSchedule = new Schedule();
-            yingshiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
-            yingshiSchedule = scheduleRepository.save(yingshiSchedule);
-            yingshiWorkingSchedule.getSchedules().add(yingshiSchedule);
-            yingshiWorkingSchedule.setEmployee(yingshi);
-            yingshiWorkingSchedule.setOffice(office);
+            EmployeeOfficeWorkingSchedule hangzhiWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule hangzhiSchedule = new Schedule();
+            hangzhiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
+            hangzhiSchedule = scheduleRepository.save(hangzhiSchedule);
+            hangzhiWorkingSchedule.getSchedules().add(hangzhiSchedule);
+            hangzhiWorkingSchedule.setEmployee(hangzhi);
+            hangzhiWorkingSchedule.setOffice(office);
+
+            EmployeeOfficeWorkingSchedule joshuaWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule joshuaSchedule = new Schedule();
+            joshuaSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
+            joshuaSchedule = scheduleRepository.save(joshuaSchedule);
+            joshuaWorkingSchedule.getSchedules().add(joshuaSchedule);
+            joshuaWorkingSchedule.setEmployee(joshua);
+            joshuaWorkingSchedule.setOffice(office);
 
             employeeOfficeWorkingScheduleRepository.save(yuqianWorkingSchedule);
-            employeeOfficeWorkingScheduleRepository.save(yingshiWorkingSchedule);
+            employeeOfficeWorkingScheduleRepository.save(hangzhiWorkingSchedule);
+            employeeOfficeWorkingScheduleRepository.save(joshuaWorkingSchedule);
         }
 
+        // Create management hierarchy levels
 
-        Team team1 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-Dev");
+        // Fixed Income Development
+        Team devTeam = teamRepository.findTeamByCode("T-SG-FixIncTech-Dev");
 
-        yingshi.setTeam(team1);
-        team1.setTeamLeader(yingshi);
-        yuqian.setTeam(team1);
-        team1.getMembers().add(yingshi);
-        team1.getMembers().add(yuqian);
-        yingshi.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-yingshi2502");
-        yuqian.setHierachyPath("APAC-SG-Tech-FixIncTech-Dev-caiyuqian");
+        hangzhi.setTeam(devTeam);
+        devTeam.setTeamLeader(hangzhi);
+        yuqian.setTeam(devTeam);
+        devTeam.getMembers().add(hangzhi);
+        devTeam.getMembers().add(yuqian);
+        hangzhi.setHierachyPath(devTeam.getHierachyPath()+":"+hangzhi.getCode());
+        yuqian.setHierachyPath(devTeam.getHierachyPath()+":"+yuqian.getCode());
 
-        yuqian.setManager(yingshi);
-        yingshi.getSubordinates().add(yuqian);
+        yuqian.setManager(hangzhi);
+        hangzhi.getSubordinates().add(yuqian);
 
-        yingshi.setManager(joshua);
-        joshua.getSubordinates().add(yingshi);
+        hangzhi.setManager(joshua);
+        joshua.getSubordinates().add(hangzhi);
 
-        Team team2 = teamRepository.findTeamByCode("SG-Tech-FixIncTech-ProdSupp");
-        Team team3 = teamRepository.findTeamByCode("SG-Tech-InfraTech-DBAdmin");
-        Team team4 = teamRepository.findTeamByCode("SG-Tech-InfraTech-Networks");
+        Team prodSuppTeam = teamRepository.findTeamByCode("T-SG-FixIncTech-ProdSupp");
+        Team dbAdminTeam = teamRepository.findTeamByCode("T-SG-InfraTech-DBAdmin");
+        Team networksTeam = teamRepository.findTeamByCode("T-SG-InfraTech-Networks");
 
         // Seat admin setup for different hierarchies
         // SG-Tech-FixIncTech-Dev
-        SeatRequestAdminMatch seatRequestAdminMatch1 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch1.setHierarchyId(team1.getId());
-        seatRequestAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch1.setSeatAdmin(yingshi);
+        SeatAdminMatch seatAdminMatch1 = new SeatAdminMatch();
+        seatAdminMatch1.setHierarchyId(devTeam.getId());
+        seatAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch1.setSeatAdmin(hangzhi);
 
         // SG-Tech-FixIncTech
-        SeatRequestAdminMatch seatRequestAdminMatch2 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch2.setHierarchyId(team1.getBusinessUnit().getId());
-        seatRequestAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatRequestAdminMatch2.setSeatAdmin(joshua);
+        SeatAdminMatch seatAdminMatch2 = new SeatAdminMatch();
+        seatAdminMatch2.setHierarchyId(devTeam.getBusinessUnit().getId());
+        seatAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch2.setSeatAdmin(joshua);
 
         // SG-Tech-FixIncTech
-        SeatRequestAdminMatch seatRequestAdminMatch3 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch3.setHierarchyId(team1.getBusinessUnit().getFunction().getId());
-        seatRequestAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
-        seatRequestAdminMatch3.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch3 = new SeatAdminMatch();
+        seatAdminMatch3.setHierarchyId(devTeam.getBusinessUnit().getFunction().getId());
+        seatAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+        seatAdminMatch3.setSeatAdmin(admin);
 
         // SG-Tech-FixIncTech-ProdSupp
-        SeatRequestAdminMatch seatRequestAdminMatch4 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch4.setHierarchyId(team2.getId());
-        seatRequestAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch4.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch4 = new SeatAdminMatch();
+        seatAdminMatch4.setHierarchyId(prodSuppTeam.getId());
+        seatAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch4.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech-DBAdmin
-        SeatRequestAdminMatch seatRequestAdminMatch5 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch5.setHierarchyId(team3.getId());
-        seatRequestAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch5.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch5 = new SeatAdminMatch();
+        seatAdminMatch5.setHierarchyId(dbAdminTeam.getId());
+        seatAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch5.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech-Networks
-        SeatRequestAdminMatch seatRequestAdminMatch6 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch6.setHierarchyId(team4.getId());
-        seatRequestAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatRequestAdminMatch6.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch6 = new SeatAdminMatch();
+        seatAdminMatch6.setHierarchyId(networksTeam.getId());
+        seatAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch6.setSeatAdmin(admin);
 
         // SG-Tech-InfraTech
-        SeatRequestAdminMatch seatRequestAdminMatch7 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch7.setHierarchyId(team4.getBusinessUnit().getId());
-        seatRequestAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatRequestAdminMatch7.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch7 = new SeatAdminMatch();
+        seatAdminMatch7.setHierarchyId(networksTeam.getBusinessUnit().getId());
+        seatAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch7.setSeatAdmin(admin);
 
-        SeatRequestAdminMatch seatRequestAdminMatch8 = new SeatRequestAdminMatch();
-        seatRequestAdminMatch8.setHierarchyId(team1.getOffice().getId());
-        seatRequestAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
-        seatRequestAdminMatch8.setSeatAdmin(admin);
+        SeatAdminMatch seatAdminMatch8 = new SeatAdminMatch();
+        seatAdminMatch8.setHierarchyId(devTeam.getOffice().getId());
+        seatAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
+        seatAdminMatch8.setSeatAdmin(admin);
 
-        teamRepository.saveAndFlush(team1);
-        employeeRepository.saveAndFlush(yingshi);
+        teamRepository.saveAndFlush(devTeam);
+        employeeRepository.saveAndFlush(hangzhi);
         employeeRepository.saveAndFlush(yuqian);
         employeeRepository.saveAndFlush(joshua);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch1);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch2);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch3);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch4);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch5);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch6);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch7);
-        seatRequestAdminMatchRepository.save(seatRequestAdminMatch8);
-    }
-
-    public void createGeo() {
-
-        // ---------------------------------- Region ----------------------------------
-
-        Region region = new Region("Asia-Pacific", "APAC", "APAC");
-        region.setCreatedBy("admin");
-        region.setLastModifiedBy("admin");
-        region = regionRepository.save(region);
-
-        Region region2 = new Region("The United Kingdom", "UK", "UK");
-        region2.setCreatedBy("admin");
-        region2.setLastModifiedBy("admin");
-        region2 = regionRepository.save(region2);
-
-        Region region3 = new Region("Europe", "EUR", "EUR");
-        region3.setCreatedBy("admin");
-        region3.setLastModifiedBy("admin");
-        region3 = regionRepository.save(region3);
-
-        // ---------------------------------- Country ----------------------------------
-
-        Country countrySG = new Country("Singapore", "SG", "APAC-SG");
-        countrySG.setCreatedBy("admin");
-        countrySG.setLastModifiedBy("admin");
-        countrySG = countryRepository.save(countrySG);
-        countrySG.setRegion(region);
-
-        Country countryHK = new Country("Hong Kong", "HK", "APAC-HK");
-        countryHK.setCreatedBy("admin");
-        countryHK.setLastModifiedBy("admin");
-        countryHK = countryRepository.save(countryHK);
-        countryHK.setRegion(region);
-
-        Country countryIND = new Country("India", "IND", "APAC-IND");
-        countryIND.setCreatedBy("admin");
-        countryIND.setLastModifiedBy("admin");
-        countryIND = countryRepository.save(countryIND);
-        countryIND.setRegion(region);
-
-        region.getCountries().add(countrySG);
-        region.getCountries().add(countryHK);
-        region.getCountries().add(countryIND);
-
-        // ---------------------------------- Function ----------------------------------
-
-        CompanyFunction techFunctionSG = new CompanyFunction("Technology", "SG-Tech", "SG-Tech");
-        techFunctionSG.setCreatedBy("admin");
-        techFunctionSG.setLastModifiedBy("admin");
-        techFunctionSG = functionRepository.save(techFunctionSG);
-        techFunctionSG.setCountry(countrySG);
-        countrySG.getFunctions().add(techFunctionSG);
-
-        CompanyFunction hrFunctionSG = new CompanyFunction("Human Resource", "SG-HR", "SG-HR");
-        hrFunctionSG.setCreatedBy("admin");
-        hrFunctionSG.setLastModifiedBy("admin");
-        hrFunctionSG = functionRepository.save(hrFunctionSG);
-        hrFunctionSG.setCountry(countrySG);
-        countrySG.getFunctions().add(hrFunctionSG);
-
-        CompanyFunction salesFunctionSG = new CompanyFunction("Sales", "SG-Sales", "SG-Sales");
-        salesFunctionSG.setCreatedBy("admin");
-        salesFunctionSG.setLastModifiedBy("admin");
-        salesFunctionSG = functionRepository.save(hrFunctionSG);
-        salesFunctionSG.setCountry(countrySG);
-        countrySG.getFunctions().add(salesFunctionSG);
-
-
-        // ---------------------------------- Office ----------------------------------
-
-        Office office = new Office("One Raffles Quay", "ORQ", "APAC-SG-ORQ");
-        Address orqAddress = new Address("1 Raffles Quay", "", "048583", "Singapore", "SG");
-        office.setAddress(orqAddress);
-        office.setNumOfFloors(2);
-
-        office.setCreatedBy("admin");
-        office.setLastModifiedBy("admin");
-        office = officeRepository.save(office);
-        office.setCountry(countrySG);
-        countrySG.getOffices().add(office);
-
-        // ---------------------------------- Business Unit ----------------------------------
-
-        BusinessUnit businessUnitInfraTech = new BusinessUnit("Infrastructure Tech", "SG-Tech-InfraTech", "SG-Tech-InfraTech");
-        businessUnitInfraTech.setCreatedBy("admin");
-        businessUnitInfraTech.setLastModifiedBy("admin");
-        businessUnitInfraTech = businessUnitRepository.save(businessUnitInfraTech);
-        businessUnitInfraTech.setFunction(techFunctionSG);
-
-        BusinessUnit businessUnitCurrencyTech = new BusinessUnit("Currency Tech", "SG-Tech-CurrTech", "SG-Tech-CurrTech");
-        businessUnitCurrencyTech.setCreatedBy("admin");
-        businessUnitCurrencyTech.setLastModifiedBy("admin");
-        businessUnitCurrencyTech = businessUnitRepository.save(businessUnitCurrencyTech);
-        businessUnitCurrencyTech.setFunction(techFunctionSG);
-
-        BusinessUnit businessUnitFixIncomeTech = new BusinessUnit("Fix Income Tech", "SG-Tech-FixIncTech", "SG-Tech-FixIncTech");
-        businessUnitFixIncomeTech.setCreatedBy("admin");
-        businessUnitFixIncomeTech.setLastModifiedBy("admin");
-        businessUnitFixIncomeTech = businessUnitRepository.save(businessUnitFixIncomeTech);
-        businessUnitFixIncomeTech.setFunction(techFunctionSG);
-
-        // ---------------------------------- Team ----------------------------------
-
-        Team endUserComputingTeam = new Team("End User Computing", "SG-Tech-InfraTech-EndUserCom", "SG-Tech-InfraTech-EndUserCom");
-        endUserComputingTeam.setCreatedBy("admin");
-        endUserComputingTeam.setLastModifiedBy("admin");
-        endUserComputingTeam.setOffice(office);
-        endUserComputingTeam = teamRepository.save(endUserComputingTeam);
-        endUserComputingTeam.setBusinessUnit(businessUnitInfraTech);
-
-        Team dataCenterOpeTeam = new Team("Data Center Operation", "SG-Tech-InfraTech-DataCenOpr", "SG-Tech-InfraTech-DataCenOpr");
-        dataCenterOpeTeam.setCreatedBy("admin");
-        dataCenterOpeTeam.setLastModifiedBy("admin");
-        dataCenterOpeTeam.setOffice(office);
-        dataCenterOpeTeam = teamRepository.save(dataCenterOpeTeam);
-        dataCenterOpeTeam.setBusinessUnit(businessUnitInfraTech);
-
-        Team databaseAdminTeam = new Team("Database Admin", "SG-Tech-InfraTech-DBAdmin", "SG-Tech-InfraTech-DBAdmin");
-        databaseAdminTeam.setCreatedBy("admin");
-        databaseAdminTeam.setLastModifiedBy("admin");
-        databaseAdminTeam.setOffice(office);
-        databaseAdminTeam = teamRepository.save(databaseAdminTeam);
-        databaseAdminTeam.setBusinessUnit(businessUnitInfraTech);
-
-        Team networkTeam = new Team("Networks", "SG-Tech-InfraTech-Networks", "SG-Tech-InfraTech-Networks");
-        networkTeam.setCreatedBy("admin");
-        networkTeam.setLastModifiedBy("admin");
-        networkTeam.setOffice(office);
-        networkTeam = teamRepository.save(networkTeam);
-        networkTeam.setBusinessUnit(businessUnitInfraTech);
-
-        Team productionSupportTeam = new Team("Production Support", "SG-Tech-FixIncTech-ProdSupp", "SG-Tech-FixIncTech-ProdSupp");
-        productionSupportTeam.setCreatedBy("admin");
-        productionSupportTeam.setLastModifiedBy("admin");
-        productionSupportTeam.setOffice(office);
-        productionSupportTeam = teamRepository.save(productionSupportTeam);
-        productionSupportTeam.setBusinessUnit(businessUnitFixIncomeTech);
-
-        Team developmentTeam = new Team("Development", "SG-Tech-FixIncTech-Dev", "SG-Tech-FixIncTech-Dev");
-        developmentTeam.setCreatedBy("admin");
-        developmentTeam.setLastModifiedBy("admin");
-        developmentTeam.setOffice(office);
-        developmentTeam = teamRepository.save(developmentTeam);
-        developmentTeam.setBusinessUnit(businessUnitFixIncomeTech);
-
-        //last update
-        regionRepository.saveAndFlush(region);
-        regionRepository.saveAndFlush(region2);
-        regionRepository.saveAndFlush(region3);
-        countryRepository.saveAndFlush(countryHK);
-        countryRepository.saveAndFlush(countrySG);
-        countryRepository.saveAndFlush(countryIND);
-        functionRepository.saveAndFlush(techFunctionSG);
-        functionRepository.saveAndFlush(hrFunctionSG);
-        officeRepository.saveAndFlush(office);
-        businessUnitRepository.saveAndFlush(businessUnitInfraTech);
-        businessUnitRepository.saveAndFlush(businessUnitCurrencyTech);
-        businessUnitRepository.saveAndFlush(businessUnitFixIncomeTech);
-        teamRepository.saveAndFlush(endUserComputingTeam);
-        teamRepository.saveAndFlush(dataCenterOpeTeam);
-        teamRepository.saveAndFlush(databaseAdminTeam);
-        teamRepository.saveAndFlush(networkTeam);
-        teamRepository.saveAndFlush(productionSupportTeam);
-        teamRepository.saveAndFlush(developmentTeam);
-
-        office.getFunctionsCodeInOffice().add("SG-Tech");
-        office.getFunctionsCodeInOffice().add("SG-HR");
-        office.getFunctionsCodeInOffice().add("SG-Sales");
-        office.getBusinessUnitsCodeInOffice().add("SG-Tech-InfraTech");
-        office.getBusinessUnitsCodeInOffice().add("SG-Tech-CurrTech");
-        office.getBusinessUnitsCodeInOffice().add("SG-Tech-FixIncTech");
-        techFunctionSG.getOfficesCodeOfFunction().add("ORQ");
-        hrFunctionSG.getOfficesCodeOfFunction().add("ORQ");
-        salesFunctionSG.getOfficesCodeOfFunction().add("ORQ");
-        officeRepository.save(office);
-        functionRepository.save(techFunctionSG);
-        functionRepository.save(hrFunctionSG);
-        functionRepository.save(salesFunctionSG);
+        seatAdminMatchRepository.save(seatAdminMatch1);
+        seatAdminMatchRepository.save(seatAdminMatch2);
+        seatAdminMatchRepository.save(seatAdminMatch3);
+        seatAdminMatchRepository.save(seatAdminMatch4);
+        seatAdminMatchRepository.save(seatAdminMatch5);
+        seatAdminMatchRepository.save(seatAdminMatch6);
+        seatAdminMatchRepository.save(seatAdminMatch7);
+        seatAdminMatchRepository.save(seatAdminMatch8);
     }
 }

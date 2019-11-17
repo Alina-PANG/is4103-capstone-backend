@@ -22,4 +22,19 @@ public interface SeatRepository extends JpaRepository<Seat, String> {
     @Query(value = "SELECT * FROM seat s WHERE s.is_deleted=false AND s.team_id IS NOT NULL AND s.team_id=?1", nativeQuery = true)
     List<Seat> findOnesByTeamId(String teamId);
 
+    @Query(value = "SELECT * FROM seat s WHERE s.is_deleted=false AND s.business_unit_id IS NOT NULL AND s.business_unit_id=?1", nativeQuery = true)
+    List<Seat> findOnesByBusinessUnitId(String businessUnitId);
+
+    @Query(value = "SELECT * FROM seat s WHERE s.is_deleted=false AND s.function_id IS NOT NULL AND s.function_id=?1", nativeQuery = true)
+    List<Seat> findOnesByCompanyFunctionId(String functionId);
+
+    @Query(value = "SELECT * FROM seat s WHERE s.is_deleted=false AND s.in IN " +
+            "(SELECT a.id FROM seat a, seat_map b WHERE " +
+            "a.seat_map_id=b.id AND " +
+            "a.is_deleted=false AND b.is_deleted=false AND " +
+            "b.office_id=?1)", nativeQuery = true)
+    List<Seat> findOnesByOfficeId(String office);
+
+    @Query(value = "SELECT * FROM seat s WHERE s.is_deleted=false AND s.seatmap_id=?1 AND s.under_office=true", nativeQuery = true)
+    List<Seat> findOfficeOnesBySeatMapId(String seatMapId);
 }

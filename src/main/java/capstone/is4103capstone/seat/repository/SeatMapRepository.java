@@ -16,6 +16,9 @@ public interface SeatMapRepository extends JpaRepository<SeatMap, String> {
     @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.office_id=?1 AND s.floor=?2", nativeQuery = true)
     Optional<SeatMap> findByOfficeIdAndFloor(String officeId, String floor);
 
+    @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.code=?1", nativeQuery = true)
+    Optional<SeatMap> findByCode(String code);
+
     @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false", nativeQuery = true)
     List<SeatMap> findAllUndeleted();
 
@@ -48,5 +51,8 @@ public interface SeatMapRepository extends JpaRepository<SeatMap, String> {
             "a.seatmap_id=s.id AND a.is_deleted=false AND " +
             "b.id=?1 AND b.is_deleted=false)", nativeQuery = true)
     List<SeatMap> findOnesWithSeatsAllocatedToFunction(String functionId);
+
+    @Query(value = "SELECT * FROM seat_map s WHERE s.is_deleted=false AND s.office_id=?1", nativeQuery = true)
+    List<SeatMap> findOnesAtOffice(String officeId);
 
 }

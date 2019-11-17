@@ -39,9 +39,11 @@ public class SeatAllocationRequestService {
     @Autowired
     private EntityModelConversionService entityModelConversionService;
     @Autowired
-    private SeatRequestAdminMatchService seatRequestAdminMatchService;
+    private SeatAdminMatchService seatAdminMatchService;
     @Autowired
     private SeatService seatService;
+    @Autowired
+    private ScheduleService scheduleService;
     @Autowired
     private BusinessUnitService businessUnitService;
     @Autowired
@@ -51,6 +53,8 @@ public class SeatAllocationRequestService {
     private SeatRepository seatRepository;
     @Autowired
     private SeatAllocationRequestRepository seatAllocationRequestRepository;
+    @Autowired
+    private SeatAdminMatchRepository seatAdminMatchRepository;
     @Autowired
     private ApprovalForRequestRepository approvalForRequestRepository;
     @Autowired
@@ -75,22 +79,22 @@ public class SeatAllocationRequestService {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: requester info is required!");
         }
         String requesterId = createSeatAllocationRequestModel.getRequesterId();
-        Employee requester = employeeService.retrieveEmployeeById(requesterId);
+        Employee requester = employeeService.validateUser(requesterId);
+        requesterId = requester.getId();
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Employee currentEmployee = (Employee) auth.getPrincipal();
         // Validate the requester: check whether the requester has the right to create a seat allocation request
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(requester.getTeam().getId());
-        if (!seatRequestAdminMatch.getSeatAdmin().getId().equals(requesterId) || !seatRequestAdminMatch.getSeatAdmin().getId().equals(currentEmployee.getId())) {
-            throw new UnauthorizedActionException("Creating seat allocation request failed: employee with ID " + requesterId +
-                    " does not have the right to create such request!");
+        Optional<SeatAdminMatch> optionalSeatAdminMatch = seatAdminMatchRepository.findUndeletedOneByEntityAndAdminId(requester.getTeam().getId(), currentEmployee.getId());
+        if (!optionalSeatAdminMatch.isPresent()) {
+            throw new UnauthorizedActionException("Creating seat allocation request failed: you do not have the right to create such request!");
         }
 
         if (createSeatAllocationRequestModel.getEmployeeIdOfAllocation() == null || createSeatAllocationRequestModel.getEmployeeIdOfAllocation().trim().length() == 0) {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: employee info of the allocation is required!");
         }
         String employeeIdOfAllocation = createSeatAllocationRequestModel.getEmployeeIdOfAllocation();
-        Employee employeeOfAllocation = employeeService.retrieveEmployeeById(employeeIdOfAllocation);
+        Employee employeeOfAllocation = employeeService.validateUser(employeeIdOfAllocation);
         // Validate the employee: check whether the employee is under the team managed by the requester
         if (!employeeOfAllocation.getTeam().getId().equals(requester.getTeam().getId())) {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: employee " + employeeIdOfAllocation +
@@ -111,6 +115,7 @@ public class SeatAllocationRequestService {
         } else {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: invalid allocation type!");
         }
+
         List<Schedule> schedules = new ArrayList<>();
         for (ScheduleModel scheduleModel:
                 createSeatAllocationRequestModel.getSchedules()) {
@@ -124,45 +129,56 @@ public class SeatAllocationRequestService {
             oneYearLater.roll(Calendar.YEAR,1);
             Date oneYearLaterDate = oneYearLater.getTime();
             if (schedule.getStartDateTime().after(oneYearLaterDate)) {
-                throw new SeatAllocationException("Assigning seat failed: the start date time of the occupancy cannot be later than 1 year " +
+                throw new SeatAllocationException("Creating seat allocation request failed: the start date time of the occupancy cannot be later than 1 year " +
                         "after the current date!");
             }
             if (schedule.getEndDateTime() != null && schedule.getEndDateTime().before(schedule.getStartDateTime())) {
                 throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: end date time cannot be before start date time!");
             }
 
-            schedule = scheduleRepository.save(schedule);
             schedules.add(schedule);
+        }
+
+        // Check whether there is already a seat allocation request created for this employee
+        List<SeatAllocationRequest> existingSeatAllocationRequests = seatAllocationRequestRepository.findUndeletedPendingOnesByEmployeeOfAllocationId(employeeIdOfAllocation);
+        for (SeatAllocationRequest existingSeatAllocationRequest :
+                existingSeatAllocationRequests) {
+            if (seatAllocationRequest.getAllocationType().equals(existingSeatAllocationRequest.getAllocationType())) {
+                // Check whether there exists any overlapping schedule
+                for (Schedule existingSchedule :
+                        existingSeatAllocationRequest.getSeatAllocationSchedules()) {
+                    for (Schedule newSchedule :
+                            schedules) {
+                        try {
+                            scheduleService.checkClashBetweenTwoGeneralSchedules(existingSchedule, newSchedule);
+                        } catch (ScheduleClashException ex) {
+                            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " +
+                                    "there is a pending seat allocation request with overlapping schedule created for " +
+                                    "employee " + employeeOfAllocation.getFullName() + "!");
+                        }
+                    }
+                }
+            }
         }
 
         // Set the new request attributes
         seatAllocationRequest.setTeam(requester.getTeam());
         seatAllocationRequest.setEmployeeOfAllocation(employeeOfAllocation);
-        seatAllocationRequest.setSeatAllocationSchedules(schedules);
+        // seatAllocationRequest.setSeatAllocationSchedules(schedules);
         seatAllocationRequest.setRequester(requester);
 
         // Create the initial approval ticket: escalate to the business unit level
         BusinessUnit businessUnit = requester.getTeam().getBusinessUnit();
-        SeatRequestAdminMatch nextLevelMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(businessUnit.getId());
+        SeatAdminMatch nextLevelMatch = seatAdminMatchService.retrieveMatchByHierarchyId(businessUnit.getId());
         Employee approver = nextLevelMatch.getSeatAdmin();
         String requestorComment = createSeatAllocationRequestModel.getComment();
 
-        // Copy from ApprovalTicketService
-        ApprovalForRequest ticket = new ApprovalForRequest();
-        ticket.setCreatedBy(requester.getUserName());
-        ticket.setRequestedItemId(seatAllocationRequest.getId());
-        ticket.setApprovalType(ApprovalTypeEnum.SEAT_ALLOCATION);
-        ticket.setRequester(requester);
-        ticket.setApprover(approver);
-        ticket.setApprovalStatus(ApprovalStatusEnum.PENDING);
-        ticket.setCommentByRequester(requestorComment);
-        ticket = approvalForRequestRepository.save(ticket);
-        try {
-            String code = seatManagementEntityCodeHPGenerator.generateCode(approvalForRequestRepository, ticket);
-            ticket.setCode(code);
-            ticket.setObjectName(code);
-        } catch (Exception ex) {
-            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " + ex.getMessage());
+        // Now it's safe to save the schedules
+        for (Schedule schedule :
+                schedules) {
+            schedule = scheduleRepository.saveAndFlush(schedule);
+            System.out.println("*************************** Schedule ID: " + schedule.getId() + "  ***************************");
+            seatAllocationRequest.getSeatAllocationSchedules().add(schedule);
         }
 
         // Update the seat allocation request
@@ -177,16 +193,30 @@ public class SeatAllocationRequestService {
             throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " + ex.getMessage());
         }
 
+        // Copy from ApprovalTicketService
+        ApprovalForRequest ticket = new ApprovalForRequest();
+        ticket.setCreatedBy(requester.getUserName());
+        ticket.setApprovalType(ApprovalTypeEnum.SEAT_ALLOCATION);
+        ticket.setRequester(requester);
+        ticket.setApprover(approver);
+        ticket.setApprovalStatus(ApprovalStatusEnum.PENDING);
+        ticket.setCommentByRequester(requestorComment);
         ticket.setRequestedItemId(seatAllocationRequest.getId());
+        ticket = approvalForRequestRepository.save(ticket);
+
+        try {
+            String code = seatManagementEntityCodeHPGenerator.generateCode(approvalForRequestRepository, ticket);
+            ticket.setCode(code);
+            ticket.setObjectName(code);
+        } catch (Exception ex) {
+            throw new CreateSeatAllocationRequestException("Creating seat allocation request failed: " + ex.getMessage());
+        }
+
         seatAllocationRequest.setCurrentPendingTicket(ticket);
         seatAllocationRequest.getApprovalTickets().add(ticket);
-        requester.setMyRequestTickets(new ArrayList<>(requester.getMyRequestTickets()));
-        requester.getMyRequestTickets().add(ticket.getId());
-        approver.setMyApprovals(new ArrayList<>(approver.getMyApprovals()));
-        approver.getMyApprovals().add(ticket.getId());
 
-        approvalForRequestRepository.save(ticket);
         seatAllocationRequestRepository.save(seatAllocationRequest);
+        approvalForRequestRepository.save(ticket);
         employeeRepository.save(requester);
         employeeRepository.save(approver);
     }
@@ -236,7 +266,7 @@ public class SeatAllocationRequestService {
         }
 
         List<SeatAllocationRequest> seatAllocationRequests = new ArrayList<>();
-        seatAllocationRequests = seatAllocationRequestRepository.findOnesByReviewerId(reviewerId);
+        seatAllocationRequests = seatAllocationRequestRepository.findUndeletedOnesByReviewerId(reviewerId);
 
         return seatAllocationRequests;
     }
@@ -246,7 +276,7 @@ public class SeatAllocationRequestService {
             throw new InvalidInputException("Invalid input: requesterId ID is required for this retrieval!");
         }
         List<SeatAllocationRequest> seatAllocationRequests = new ArrayList<>();
-        seatAllocationRequests = seatAllocationRequestRepository.findOnesByRequesterId(requesterId);
+        seatAllocationRequests = seatAllocationRequestRepository.findUndeletedOnesByRequesterId(requesterId);
         return seatAllocationRequests;
     }
 
@@ -428,17 +458,23 @@ public class SeatAllocationRequestService {
 
         ApprovalForRequest newApprovalForRequest = new ApprovalForRequest();
         // Find the new escalate hierarchy and the corresponding unit
-        if (seatAllocationRequest.getEscalatedHierarchyLevel().equals(HierarchyTypeEnum.COMPANY_FUNCTION)) {
+        if (seatAllocationRequest.getEscalatedHierarchyLevel().equals(HierarchyTypeEnum.OFFICE)) {
             throw new SeatAllocationRequestProcessingException("Processing seat allocation request failed: this request cannot be escalated further because" +
-                    " this is already the highest level. Please negotiate with the office manager to manually arrange for another seat. E.g., a new seat can be" +
+                    " this is already the highest level. Please manually arrange for another seat. E.g., a new seat can be" +
                     " added in the office.");
+        } else if (seatAllocationRequest.getEscalatedHierarchyLevel().equals(HierarchyTypeEnum.BUSINESS_UNIT)) { // escalate to the company function level
+            BusinessUnit businessUnit = businessUnitService.retrieveBusinessUnitById(seatAllocationRequest.getEscalatedHierarchyId());
+            CompanyFunction companyFunction = businessUnit.getFunction();
+            seatAllocationRequest.setEscalatedHierarchyId(companyFunction.getId());
+            seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.COMPANY_FUNCTION);
+        } else if (seatAllocationRequest.getEscalatedHierarchyLevel().equals(HierarchyTypeEnum.BUSINESS_UNIT)) { // escalate to the office level
+            Office office = seatAllocationRequest.getTeam().getOffice();
+            seatAllocationRequest.setEscalatedHierarchyId(office.getId());
+            seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.OFFICE);
         }
-        BusinessUnit businessUnit = businessUnitService.retrieveBusinessUnitById(seatAllocationRequest.getEscalatedHierarchyId());
-        CompanyFunction companyFunction = businessUnit.getFunction();
-        seatAllocationRequest.setEscalatedHierarchyId(companyFunction.getId());
-        seatAllocationRequest.setEscalatedHierarchyLevel(HierarchyTypeEnum.COMPANY_FUNCTION);
-        SeatRequestAdminMatch seatRequestAdminMatch = seatRequestAdminMatchService.retrieveMatchByHierarchyId(companyFunction.getId());
-        Employee newReviewer = seatRequestAdminMatch.getSeatAdmin();
+
+        SeatAdminMatch seatAdminMatch = seatAdminMatchService.retrieveMatchByHierarchyId(seatAllocationRequest.getEscalatedHierarchyId());
+        Employee newReviewer = seatAdminMatch.getSeatAdmin();
         newApprovalForRequest.setApprover(newReviewer);
         newApprovalForRequest.setRequester(seatAllocationRequest.getRequester());
         newApprovalForRequest.setApprovalType(ApprovalTypeEnum.SEAT_ALLOCATION);
@@ -454,10 +490,6 @@ public class SeatAllocationRequestService {
         }
         seatAllocationRequest.getApprovalTickets().add(newApprovalForRequest);
         seatAllocationRequest.setCurrentPendingTicket(newApprovalForRequest);
-        newReviewer.setMyApprovals(new ArrayList<>(newReviewer.getMyApprovals()));
-        newReviewer.getMyApprovals().add(newApprovalForRequest.getId());
-        seatAllocationRequest.getRequester().setMyRequestTickets(new ArrayList<>(seatAllocationRequest.getRequester().getMyRequestTickets()));
-        seatAllocationRequest.getRequester().getMyRequestTickets().add(newApprovalForRequest.getId());
 
         approvalForRequestRepository.save(approvalForRequest);
         seatAllocationRequestRepository.save(seatAllocationRequest);
@@ -488,13 +520,7 @@ public class SeatAllocationRequestService {
                 seatAllocationRequest.getApprovalTickets()) {
             ticket.setDeleted(true);
             approvalForRequestRepository.save(ticket);
-            System.out.println("********************** check my approvals **********************");
-            System.out.println("********************** num of approvals: " + ticket.getApprover().getMyApprovals().size() + " **********************");
-            ticket.getApprover().setMyApprovals(new ArrayList<>(ticket.getApprover().getMyApprovals()));
-            ticket.getApprover().getMyApprovals().remove(ticket.getId());
             employeeRepository.save(ticket.getApprover());
-            seatAllocationRequest.getRequester().setMyRequestTickets(new ArrayList<>(seatAllocationRequest.getRequester().getMyRequestTickets()));
-            seatAllocationRequest.getRequester().getMyRequestTickets().remove(ticket.getId());
         }
         seatAllocationRequest.setDeleted(true);
         seatAllocationRequestRepository.save(seatAllocationRequest);

@@ -10,10 +10,12 @@ import java.util.Optional;
 
 public class SeatManagementEntityCodeHPGenerator {
 
+    // Code
     // SAR-Team-seqNo	SAR-SG-Tech-InfraTech-EndUserCom-01
-    private final String SEAT_ALLOCATION_REQUEST_TEMPLATE = "SAR-%1$s-%2$s";
+    private final String SEAT_ALLOCATION_REQUEST_CODE_TEMPLATE = "SAR-%1$s-%2$s";
     // RT+requesterUsername + seqNo.	RT-yingshi2502-1
-    private final String APPROVAL_FOR_REQUEST_TEMPLATE = "RT-%1$s-%2$s";
+    private final String APPROVAL_FOR_REQUEST_CODE_TEMPLATE = "RT-%1$s-%2$s";
+
 
 
     public String generateCode(JpaRepository repo, DBEntityTemplate entity, String additionalInfo) throws Exception {
@@ -42,12 +44,12 @@ public class SeatManagementEntityCodeHPGenerator {
             try {
                 switch (entityClassName) {
                     case "ApprovalForRequest":
-                        code = String.format(APPROVAL_FOR_REQUEST_TEMPLATE, entity.getCreatedBy() == null ?
+                        code = String.format(APPROVAL_FOR_REQUEST_CODE_TEMPLATE, entity.getCreatedBy() == null ?
                                 ((ApprovalForRequest)entity).getRequester().getUserName():entity.getCreatedBy(), seqNoStr);
                         break;
                     case "SeatAllocationRequest":
                         SeatAllocationRequest seatAllocationRequest = (SeatAllocationRequest)entity;
-                        code = String.format(SEAT_ALLOCATION_REQUEST_TEMPLATE, seatAllocationRequest.getTeam().getCode(), entity.getSeqNo());
+                        code = String.format(SEAT_ALLOCATION_REQUEST_CODE_TEMPLATE, seatAllocationRequest.getTeam().getCode(), entity.getSeqNo());
                         break;
                     default:
                         System.out.println("Entity class name is not found in seat management subsystem.");

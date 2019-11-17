@@ -52,6 +52,18 @@ public class CostCenter extends DBEntityTemplate {
     public CostCenter() {
     }
 
+    public CostCenter(String objectName, String code, String hierachyPath, String createdBy,Team team) {
+        super(objectName, code, hierachyPath, createdBy, createdBy);
+        setTeam(team);
+    }
+
+    public CostCenter(String objectName, String code, String hierachyPath, String createdBy, Employee costCenterManager, Team team, Employee bmApprover, Employee functionApprover) {
+        super(objectName, code, hierachyPath, createdBy, createdBy);
+        this.costCenterManager = costCenterManager;
+        this.team = team;
+        this.bmApprover = bmApprover;
+        this.functionApprover = functionApprover;
+    }
 
     public Team getTeam() {
         return team;

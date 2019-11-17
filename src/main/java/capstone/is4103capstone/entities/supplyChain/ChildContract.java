@@ -17,6 +17,7 @@ public class ChildContract extends DBEntityTemplate {
     @NotNull
     private String serviceCode;
     private BigDecimal contractValue;
+    private BigDecimal contractValueInGBP;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "master_contract")
@@ -26,10 +27,12 @@ public class ChildContract extends DBEntityTemplate {
     public ChildContract() {
     }
 
-    public ChildContract(@NotNull String serviceCode, BigDecimal contractValue, Contract masterContract) {
-        this.serviceCode = serviceCode;
-        this.contractValue = contractValue;
-        this.masterContract = masterContract;
+    public BigDecimal getContractValueInGBP() {
+        return contractValueInGBP;
+    }
+
+    public void setContractValueInGBP(BigDecimal contractValueInGBP) {
+        this.contractValueInGBP = contractValueInGBP;
     }
 
     public String getServiceCode() {

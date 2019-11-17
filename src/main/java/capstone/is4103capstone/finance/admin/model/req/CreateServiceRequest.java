@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 
 public class CreateServiceRequest implements Serializable {
 
-    private String vendorCode;
     private String itemName;
     private String sub2Code;
     private String measureUnit;
@@ -42,13 +41,6 @@ public class CreateServiceRequest implements Serializable {
         this.username = username;
     }
 
-    public String getVendorCode() {
-        return vendorCode;
-    }
-
-    public void setVendorCode(String vendorCode) {
-        this.vendorCode = vendorCode;
-    }
 
     public String getItemName() {
         return itemName;

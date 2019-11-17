@@ -15,6 +15,7 @@ import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
 import capstone.is4103capstone.finance.requestsMgmt.model.BjfAnalysisModel;
 import capstone.is4103capstone.finance.requestsMgmt.model.dto.BJFAggregateModel;
@@ -73,6 +74,8 @@ public class BJFService {
     ChildContractRepository childContractRepository;
     @Autowired
     ContractRepository contractRepository;
+    @Autowired
+    FXTableService fxService;
 
     //TODO: can't same person created another request for same item before approval
     public BJFModel createBJF(CreateBJFReq req, boolean isUpdate) throws Exception{
@@ -118,8 +121,8 @@ public class BJFService {
         newBjf.setApprover(approver);
         newBjf.setObjectName(service.getObjectName()+"-"+vendor.getObjectName());
 
-        newBjf.setRequestDescription(req.getJustification());
-        newBjf.setAdditionalInfo(req.getSponsor());
+        newBjf.setRequestDescription(req.getJustification() == null? "":req.getJustification());
+        newBjf.setAdditionalInfo("");
         newBjf.setCurrency("GBP");
         newBjf.setEstimatedBudget(req.getTotalBudget());
         newBjf.setCoverage(req.getCoverage());
@@ -201,10 +204,10 @@ public class BJFService {
             Service service = serviceServ.validateService(bjf.getServiceId());
             Vendor vendor = vendorService.validateVendor(bjf.getVendorId());
             CostCenter cc = bjf.getCostCenter();
-            response.put("Analysis Title","BJF and related spending summary: Service["+service.getObjectName()+
-                    "], Vendor["+vendor.getObjectName()+"], Cost Center["+cc.getCode()+"].");
-            response.put("service",service.getCode());
-            response.put("vendor",vendor.getCode());
+//            response.put("Analysis Title","BJF and related spending summary: Service["+service.getObjectName()+
+//                    "], Vendor["+vendor.getObjectName()+"], Cost Center["+cc.getCode()+"].");
+//            response.put("service",service.getCode());
+//            response.put("vendor",vendor.getCode());
 
             //Contract and Service and Vendor
             //这里应该只需要check committed，也就是related，approved且已经有purchase order，
@@ -218,9 +221,9 @@ public class BJFService {
             }else{
                 for (PlanLineItem pl: allPlanItemsThisYear){
                     if (pl.getItemType().equals(BudgetPlanEnum.BUDGET)){
-                        budgetHistory.put(thisYear+" Budget Amount",pl.getBudgetAmount());
+                        budgetHistory.put(thisYear+" Budget Amount",pl.getBudgetAmountInGBP());
                     }else{
-                        budgetHistory.put(getUsefulInfoInPlanItemCode(pl.getCode()),pl.getBudgetAmount());
+                        budgetHistory.put(getUsefulInfoInPlanItemCode(pl.getCode()),pl.getBudgetAmountInGBP());
                     }
                 }
 
@@ -234,11 +237,11 @@ public class BJFService {
                 if (e.getDeleted() || !Tools.isSameYear(e.getCreatedDateTime(),thisYear))
                     continue;
                 if (e.getBjfStatus().equals(BJFStatusEnum.POVALUE_UPDATED) ||e.getBjfStatus().equals(BJFStatusEnum.PENDING_PAYMENTS) || e.getBjfStatus().equals(BJFStatusEnum.DELIVERED)){
-                    commitedBudget.add(e.getTotalSpending() == null || e.getTotalSpending().equals(BigDecimal.ZERO)?e.getEstimatedBudget():e.getTotalSpending());
+                    commitedBudget.add(e.getTotalSpending() == null || e.getTotalSpending().equals(BigDecimal.ZERO)? e.getEstimatedBudget():e.getTotalSpending());
                 }
             }
 
-            response.put(thisYear+" Commited Value within cost center",commitedBudget);
+            response.put(thisYear+" Commited Value for this service within cost center",commitedBudget);
             response.put("BJF Estimated Budget",bjf.getEstimatedBudget());
             // current year
             // bjf status
@@ -255,7 +258,7 @@ public class BJFService {
                 }
             }
 
-            response.put(thisYear+" Commited Value with vendor",yearlySpendingWithVendor);
+            response.put(thisYear+" Commited Value with vendor ",yearlySpendingWithVendor);
 
             JSONObject contractAnalysis = new JSONObject();
 
@@ -280,7 +283,7 @@ public class BJFService {
                     }
                 }
                 if (activeContracts.isEmpty()){
-                    contractAnalysis.put("Master Contract Status","No Master Contract available with Vendor"+vendor.getObjectName());
+                    contractAnalysis.put("Master Contract Status","No Master Contract available with "+vendor.getObjectName());
                     //really have no contract to check
                     contractAnalysis.put("With in 20k?",yearlySpendingWithVendor.compareTo(BigDecimal.valueOf(20000.0))<0);
                 }else{
@@ -298,9 +301,9 @@ public class BJFService {
                 }
                 ContractAndChildAggre childAggre = activeChildContractInfos.get(0);
                 contractAnalysis.put("Child Contract Value",childAggre.getChildContractValue());
-                contractAnalysis.put("Child Contract Code",childAggre.getChildContractCode());
-                contractAnalysis.put("Contract Start Date",childAggre.getContractStartDate());
-                contractAnalysis.put("Contract End Date",childAggre.getContractEndDate());
+//                contractAnalysis.put("Child Contract Code",childAggre.getChildContractCode());
+                contractAnalysis.put("Contract Term",childAggre.getContractStartDate()+" to "+childAggre.getContractEndDate());
+//                contractAnalysis.put("Contract End Date",childAggre.getContractEndDate());
                 contractAnalysis.put("Contract Status",childAggre.getContractStatus());
             }
             response.put("Contract Value Analysis",contractAnalysis);
@@ -309,7 +312,6 @@ public class BJFService {
             // check previuos purchase -> compare against contract value;
             // check budget plan money;
             // check contract value;
-            response.put("hasError",false);
         }catch (Exception ex){
             response.put("hasError",true);
             response.put("errrorMessage",ex.getMessage());
@@ -421,8 +423,11 @@ public class BJFService {
         }
 
         BJF e = bjfRepository.getBJFByCode(idOrCode);
-        if (e != null || !e.getDeleted())
-            return e;
+        if (e != null){
+            if (!e.getDeleted()){
+                return e;
+            }
+        }
 
         throw new EntityNotFoundException("BJF Code or Id not valid");
 

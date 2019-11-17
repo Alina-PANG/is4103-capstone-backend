@@ -15,7 +15,9 @@ public class SpendingRecord extends DBEntityTemplate {
 //    private String poId;
     private String serviceId;
     private BigDecimal spendingAmt;
+    private BigDecimal spendingAmtInGBP;
     private String currencyCode;
+    private String serviceName;
 
     @ManyToOne(fetch = FetchType.LAZY,optional = true)
     @JoinColumn(name = "po_id",nullable = true)
@@ -30,7 +32,7 @@ public class SpendingRecord extends DBEntityTemplate {
     public SpendingRecord() {
     }
 
-    public SpendingRecord(String serviceId, BigDecimal spendingAmt, String currencyCode, PurchaseOrder relatedPO) {
+    public SpendingRecord(String serviceId, BigDecimal spendingAmt, String currencyCode, PurchaseOrder relatedPO, String serviceName) {
         this.serviceId = serviceId;
         if (spendingAmt == null)
             this.spendingAmt = BigDecimal.ZERO;
@@ -38,9 +40,24 @@ public class SpendingRecord extends DBEntityTemplate {
             this.spendingAmt = spendingAmt;
         this.currencyCode = currencyCode;
         this.relatedPO = relatedPO;
+        this.serviceName = serviceName;
     }
 
+    public BigDecimal getSpendingAmtInGBP() {
+        return spendingAmtInGBP;
+    }
 
+    public void setSpendingAmtInGBP(BigDecimal spendingAmtInGBP) {
+        this.spendingAmtInGBP = spendingAmtInGBP;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 
     public PurchaseOrder getRelatedPO() {
         return relatedPO;

@@ -15,6 +15,7 @@ public class TrainingModel extends RequestFormModel {
     private String trainerEmail;
     private String trainerCompany;// if internal: empty
     private String trainingType;
+    private String budegtType;
 
     public TrainingModel() {
     }
@@ -29,6 +30,7 @@ public class TrainingModel extends RequestFormModel {
         setRequester(new EmployeeModel(e.getRequester()));
         setApprovalStatus(e.getApprovalStatus().name());
         setId(e.getId());
+        setBudegtType(e.getTrainingType().name());
         setCreatedDateTime(Tools.datetimeFormatter.format(e.getCreatedDateTime()));
     }
 
@@ -45,6 +47,15 @@ public class TrainingModel extends RequestFormModel {
         setTrainerCompany(e.getTrainerCompany());
         setTrainerEmail(e.getTrainerEmail());
         setTrainerName(e.getTrainerName());
+        setBudegtType(e.getTrainingType().name());
+    }
+
+    public String getBudegtType() {
+        return budegtType;
+    }
+
+    public void setBudegtType(String budegtType) {
+        this.budegtType = budegtType;
     }
 
     public TrainingModel(String startDate, String endDate, String trainingLocation, String targetAudience, String trainingTitle, String trainerName, String trainerEmail, String trainerCompany, String trainingType) {

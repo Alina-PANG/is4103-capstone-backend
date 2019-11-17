@@ -8,6 +8,7 @@ import capstone.is4103capstone.entities.supplyChain.Vendor;
 import capstone.is4103capstone.finance.Repository.BjfRepository;
 import capstone.is4103capstone.finance.Repository.PurchaseOrderRepository;
 import capstone.is4103capstone.finance.Repository.SpendingRecordRepository;
+import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.finance.admin.service.ServiceServ;
 import capstone.is4103capstone.finance.finPurchaseOrder.POEntityCodeHPGeneration;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.POModel;
@@ -16,6 +17,8 @@ import capstone.is4103capstone.finance.finPurchaseOrder.model.req.CreatePOReq;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderListRes;
 import capstone.is4103capstone.finance.finPurchaseOrder.model.res.GetPurchaseOrderRes;
 import capstone.is4103capstone.finance.requestsMgmt.service.BJFService;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
+import capstone.is4103capstone.general.model.GeneralEntityRes;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
@@ -55,6 +58,8 @@ public class PurchaseOrderService {
     ServiceServ serviceServ;
     @Autowired
     SpendingRecordRepository spendingRecordRepository;
+    @Autowired
+    FXTableService fxService;
 
     public ResponseEntity<GeneralRes> createPO(CreatePOReq createPOReq){
         logger.info("Creating new purchase order...");
@@ -70,14 +75,18 @@ public class PurchaseOrderService {
             if (createPOReq.getSpendingRecordList().isEmpty())
                 throw new Exception("Please select at least 1 service");
 
+            String currentUsername = employeeService.getCurrentLoginUsername();
             purchaseOrder.setVendor(v);
             purchaseOrder.setStatus(ApprovalStatusEnum.APPROVED);
             purchaseOrder.setTotalAmount(createPOReq.getAmount());
             purchaseOrder.setCurrencyCode(createPOReq.getCurrencyCode());
-            purchaseOrder.setCreatedBy(employeeService.getCurrentLoginUsername());
+            purchaseOrder.setTotalAmtInGBP(fxService.convertToGBPWithLatest(purchaseOrder.getCurrencyCode(),purchaseOrder.getTotalAmount()));
+            purchaseOrder.setCreatedBy(currentUsername);
             purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
             purchaseOrder.setCode(createPOReq.getPoNumber());
             purchaseOrder.setObjectName(createPOReq.getPoNumber());
+
+            purchaseOrder.setCountryId(employeeService.getCountryEmployeeBelongTo(currentUsername).getId());
 
             purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
             purchaseOrder.setApprover(createPOReq.getApproverUsername());
@@ -94,7 +103,8 @@ public class PurchaseOrderService {
 
             for (SpendingRecord spending:createPOReq.getSpendingRecordList()){
                 Service service = serviceServ.validateService(spending.getServiceId());
-                SpendingRecord s = new SpendingRecord(service.getId(),spending.getSpendingAmt(),purchaseOrder.getCurrencyCode(),purchaseOrder);
+                SpendingRecord s = new SpendingRecord(service.getId(),spending.getSpendingAmt(),purchaseOrder.getCurrencyCode(),purchaseOrder,service.getObjectName());
+                s.setSpendingAmtInGBP(fxService.convertToGBPWithLatest(s.getCurrencyCode(),s.getSpendingAmt()));
                 s.setCode("SP-"+purchaseOrder.getCode()+"-"+service.getCode()+"-"+codeCnt);
                 s = spendingRecordRepository.save(s);
                 spendings.add(s);
@@ -102,16 +112,11 @@ public class PurchaseOrderService {
             }
 
             purchaseOrder.setDetailedSpending(spendings);
-
-            purchaseOrderRepository.saveAndFlush(purchaseOrder);
-
-
+            purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
             bjfService.afterPOUpdated(purchaseOrder);
-
-
             return ResponseEntity
                     .ok()
-                    .body(new GeneralRes("Successfully Created The PO! ID["+purchaseOrder.getId()+"]", false));
+                    .body(new GeneralEntityRes("Successfully Created The PO! ID["+purchaseOrder.getId()+"]", false, new GeneralEntityModel(purchaseOrder)));
         } catch (Exception ex){
             ex.printStackTrace();
             return ResponseEntity
@@ -126,39 +131,45 @@ public class PurchaseOrderService {
         if (purchaseOrder == null)
             throw new EntityNotFoundException("PO not found.");
 
-        if (createPOReq.getSpendingRecordList().isEmpty())
-            throw new Exception("Please select at least 1 service");
+        if (createPOReq.getAmount() != null){
+            purchaseOrder.setTotalAmount(createPOReq.getAmount());
+        }
+        purchaseOrder.setCurrencyCode(createPOReq.getCurrencyCode() == null? purchaseOrder.getCurrencyCode():createPOReq.getCurrencyCode());
+        purchaseOrder.setTotalAmtInGBP(fxService.convertToGBPWithLatest(purchaseOrder.getCurrencyCode(),purchaseOrder.getTotalAmount()));
 
-        purchaseOrder.setTotalAmount(createPOReq.getAmount());
-        purchaseOrder.setCurrencyCode(createPOReq.getCurrencyCode());
         purchaseOrder.setLastModifiedBy(employeeService.getCurrentLoginUsername());
-        purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
+        if (createPOReq.getRelatedBJF() != null){
+            purchaseOrder.setRelatedBJF(createPOReq.getRelatedBJF());
+        }
 
         purchaseOrder = purchaseOrderRepository.saveAndFlush(purchaseOrder);
 
-        List<SpendingRecord> spendings = purchaseOrder.getDetailedSpending();
-        //去重
+        if (createPOReq.getSpendingRecordList()!=null){
+            List<SpendingRecord> spendings = purchaseOrder.getDetailedSpending();
+            //去重
 
-        for (SpendingRecord existing: spendings){
-            existing.setDeleted(true);
-            existing.setSpendingAmt(BigDecimal.ZERO);
-            existing.setCode(null);
-            existing.setRelatedPO(null);
-            spendingRecordRepository.saveAndFlush(existing);
+            for (SpendingRecord existing: spendings){
+                existing.setDeleted(true);
+                existing.setSpendingAmt(BigDecimal.ZERO);
+                existing.setCode(null);
+                existing.setRelatedPO(null);
+                spendingRecordRepository.saveAndFlush(existing);
+            }
+            purchaseOrder.setDetailedSpending(new ArrayList<>());
+
+            int codeCnt = 0;
+            for (SpendingRecord spending:createPOReq.getSpendingRecordList()){
+                Service requestServ = serviceServ.validateService(spending.getServiceId());
+                SpendingRecord s = new SpendingRecord(requestServ.getId(),spending.getSpendingAmt(),purchaseOrder.getCurrencyCode(),purchaseOrder,requestServ.getObjectName());
+                s.setSpendingAmtInGBP(fxService.convertToGBPWithLatest(s.getCurrencyCode(),s.getSpendingAmt()));
+                s.setCode("SP-"+purchaseOrder.getCode()+"-"+requestServ.getCode()+"-"+codeCnt);
+                s = spendingRecordRepository.saveAndFlush(s);
+                spendings.add(s);
+                codeCnt ++;
+            }
+
+            purchaseOrder.setDetailedSpending(spendings);
         }
-        purchaseOrder.setDetailedSpending(new ArrayList<>());
-
-        int codeCnt = 0;
-        for (SpendingRecord spending:createPOReq.getSpendingRecordList()){
-            Service requestServ = serviceServ.validateService(spending.getServiceId());
-            SpendingRecord s = new SpendingRecord(requestServ.getId(),spending.getSpendingAmt(),purchaseOrder.getCurrencyCode(),purchaseOrder);
-            s.setCode("SP-"+purchaseOrder.getCode()+"-"+requestServ.getCode()+"-"+codeCnt);
-            s = spendingRecordRepository.saveAndFlush(s);
-            spendings.add(s);
-            codeCnt ++;
-        }
-
-        purchaseOrder.setDetailedSpending(spendings);
         System.out.println("IsClosePOInstruct "+createPOReq.isClosePOInstruc());
         if (createPOReq.isClosePOInstruc()) {
             bjfService.purchaseOrderClosed(purchaseOrder);
@@ -166,7 +177,6 @@ public class PurchaseOrderService {
         }
         purchaseOrderRepository.saveAndFlush(purchaseOrder);
 
-/////
         return ResponseEntity
                 .ok()
                 .body(new GeneralRes("Successfully updated The PO! ID["+purchaseOrder.getId()+"]", false));

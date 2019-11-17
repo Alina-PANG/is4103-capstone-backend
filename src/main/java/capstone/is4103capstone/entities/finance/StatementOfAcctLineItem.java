@@ -26,6 +26,8 @@ public class StatementOfAcctLineItem extends DBEntityTemplate {
 
     private BigDecimal paidAmt;
     private BigDecimal actualPmt;
+    private BigDecimal paidAmtInGBP;
+    private BigDecimal actualPmtInGBP;
 
     public StatementOfAcctLineItem() {
     }
@@ -36,6 +38,22 @@ public class StatementOfAcctLineItem extends DBEntityTemplate {
         this.invoice = invoice;
         this.paidAmt = paidAmt;
         this.actualPmt = actualPmt;
+    }
+
+    public BigDecimal getPaidAmtInGBP() {
+        return paidAmtInGBP;
+    }
+
+    public void setPaidAmtInGBP(BigDecimal paidAmtInGBP) {
+        this.paidAmtInGBP = paidAmtInGBP;
+    }
+
+    public BigDecimal getActualPmtInGBP() {
+        return actualPmtInGBP;
+    }
+
+    public void setActualPmtInGBP(BigDecimal actualPmtInGBP) {
+        this.actualPmtInGBP = actualPmtInGBP;
     }
 
     public Invoice getInvoice() {

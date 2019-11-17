@@ -2,6 +2,7 @@ package capstone.is4103capstone.finance.Repository;
 
 import capstone.is4103capstone.entities.Office;
 import capstone.is4103capstone.entities.finance.Plan;
+import capstone.is4103capstone.entities.finance.PlanLineItem;
 import capstone.is4103capstone.finance.budget.model.CompareLineItemModel;
 import capstone.is4103capstone.util.enums.BudgetPlanEnum;
 import capstone.is4103capstone.util.enums.BudgetPlanStatusEnum;
@@ -9,6 +10,8 @@ import org.mockito.stubbing.ValidableAnswer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
+import java.text.Bidi;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,5 +38,7 @@ public interface PlanRepository extends JpaRepository<Plan,String> {
             ,nativeQuery = true)
     List<CompareLineItemModel> findPlanLineItemsWithPlanId(String planId);
 
-
+    @Query(value = "select SUM(i.budget_amount_ingbp) from plan_line_item i join plan p on i.in_plan=p.id" +
+            " where p.for_year=?1 and i.is_deleted=0 and p.is_deleted=0 and p.budget_plan_status = 3 and p.plan_type=0 ",nativeQuery = true)
+    BigDecimal findTotalAmountByPlanYear(String year);
 }

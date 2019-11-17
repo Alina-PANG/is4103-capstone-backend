@@ -29,6 +29,11 @@ public class CompanyFunction extends DBEntityTemplate {
         super(functionName, functionCode, hierarchyPath);
     }
 
+    public CompanyFunction(String objectName, String code, String hierachyPath, String createdBy, Country country) {
+        super(objectName, code, hierachyPath, createdBy, createdBy);
+        this.country = country;
+    }
+
     public Country getCountry() { return country; }
 
     public void setCountry(Country country) { this.country = country; }

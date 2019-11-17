@@ -12,6 +12,8 @@ import capstone.is4103capstone.finance.admin.model.ServiceModel;
 import capstone.is4103capstone.finance.admin.model.req.CreateServiceRequest;
 import capstone.is4103capstone.finance.admin.model.res.ServiceListRes;
 import capstone.is4103capstone.general.AuthenticationTools;
+import capstone.is4103capstone.general.model.GeneralEntityModel;
+import capstone.is4103capstone.general.model.GeneralEntityRes;
 import capstone.is4103capstone.supplychain.Repository.ChildContractRepository;
 import capstone.is4103capstone.supplychain.Repository.ContractRepository;
 import capstone.is4103capstone.supplychain.Repository.VendorRepository;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,33 +51,22 @@ public class ServiceServ {
 
     //assume you can give either vendor code or id?
     @Transactional
-    public JSONObject createService(CreateServiceRequest req){
-        try{
-            Vendor vendor = vendorRepository.findVendorByCode(req.getVendorCode());
-            if (vendor == null || vendor.getDeleted()){
-                Optional<Vendor> v = vendorRepository.findById(req.getVendorCode());
-                if (v.isPresent())
-                    vendor = v.get();
-                else{
-                    throw new Exception("Vendor with code/id ["+req.getVendorCode()+"] does not exists!");
-                }
-            }
-
+    public GeneralEntityRes createService(CreateServiceRequest req) throws Exception{
             BudgetSub2 sub2 = sub2Repository.findBudgetSub2ByCode(req.getSub2Code());
             if (sub2 == null || sub2.getDeleted()){
                 Optional<BudgetSub2> s = sub2Repository.findById(req.getSub2Code());;
                 if (s.isPresent())
                     sub2 = s.get();
                 else{
-                    throw new Exception("Sub2 category with code/id ["+req.getVendorCode()+"] does not exists!");
+                    throw new Exception("Sub2 category with code/id ["+req.getSub2Code()+"] does not exists!");
                 }
             }
 
-
-            checkRepeatedName(sub2.getId(), vendor.getId(),req.getItemName());
-
             if (req.getMeasureUnit()==null){
-                throw new Exception("Measure Unit field cannot be null!");
+                req.setMeasureUnit("N/A");
+            }
+            if (req.getReferencePrice() == null){
+                req.setReferencePrice(BigDecimal.ZERO);
             }
 
             Service newItem = new Service(req.getItemName().trim(),req.getMeasureUnit(),req.getReferencePrice(),req.getCurrency());
@@ -84,30 +76,9 @@ public class ServiceServ {
             newItem = serviceRepository.save(newItem);
 
             newItem.setCode(EntityCodeHPGeneration.getCode(serviceRepository,newItem));
-//            newItem.setVendor(vendor);
             newItem.setBudgetSub2(sub2);
-//            vendor.getservices().size();
-//            sub2.getservices().size();
-//            vendor.getservices().add(newItem);
-//            sub2.getservices().add(newItem);
 
-
-            JSONObject res = new JSONObject();
-
-            ServiceModel newItemModel = new ServiceModel(newItem.getObjectName(),newItem.getCode(),newItem.getMeasureUnit(),newItem.getReferencePrice(),newItem.getCurrencyCode());
-
-            res.put("newItem", new JSONObject(newItemModel));
-
-            res.put("message","Successfully created new item");
-            res.put("hasError",false);
-
-            return res;
-        }catch (Exception e){
-            JSONObject res = new JSONObject();
-            res.put("hasError",true);
-            res.put("message",e.getMessage());
-            return res;
-        }
+            return new GeneralEntityRes("Successfully created service",false,new GeneralEntityModel(newItem));
     }
 
     public ServiceListRes retrieveAllService() throws Exception{

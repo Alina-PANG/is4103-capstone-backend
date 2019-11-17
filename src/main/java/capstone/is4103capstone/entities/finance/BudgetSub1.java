@@ -29,6 +29,11 @@ public class BudgetSub1 extends DBEntityTemplate {
         super(sub1CatName);
     }
 
+    public BudgetSub1(String objectName, String code, String createdBy, BudgetCategory budgetCategory) {
+        super(objectName,code, "", createdBy, createdBy);
+        setHierachyPath(budgetCategory.getHierachyPath()+":"+code);
+        this.budgetCategory = budgetCategory;
+    }
 
     public BudgetCategory getBudgetCategory() {
         return budgetCategory;

@@ -16,4 +16,8 @@ public interface BudgetSub2Repository extends JpaRepository<BudgetSub2,String> {
 
     @Query(value = "SELECT COUNT(*) FROM budget_sub2 cat WHERE cat.is_deleted=false and cat.budget_sub1_id=?1 and UPPER(cat.object_name)=UPPER(?2)",nativeQuery = true)
     public Integer countByNameAndSub1(String countryId,String newName);
+
+
+    @Query(value = "SELECT * FROM budget_sub2 s WHERE s.code LIKE %?1% ",nativeQuery = true)
+    BudgetSub2 findBudgetSub2ByCodeLike(String code);
 }

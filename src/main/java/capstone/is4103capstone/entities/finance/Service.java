@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -48,6 +49,15 @@ public class Service extends DBEntityTemplate {
         this.measureUnit = measureUnit;
         this.referencePrice = referencePrice;
         this.currencyCode = currencyCode;
+    }
+
+    public Service(String objectName, String code,  String createdBy, BudgetSub2 budgetSub2) {
+        super(objectName, code, "", createdBy, createdBy);
+        this.budgetSub2 = budgetSub2;
+        setHierachyPath(budgetSub2.getHierachyPath()+":"+code);
+        setMeasureUnit("N/A");
+        setReferencePrice(BigDecimal.ZERO);
+
     }
 
     public Service(String objectName, BudgetSub2 budgetSub2, List<Vendor> vendor, String measureUnit, BigDecimal referencePrice, String currencyCode) {

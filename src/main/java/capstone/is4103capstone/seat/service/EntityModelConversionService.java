@@ -16,8 +16,8 @@ import capstone.is4103capstone.seat.model.seat.SeatModelForAllocation;
 import capstone.is4103capstone.seat.model.seat.SeatModelWithHighlighting;
 import capstone.is4103capstone.seat.model.seatAllocation.SeatAllocationModelForEmployee;
 import capstone.is4103capstone.seat.model.seatAllocationRequest.SeatAllocationRequestModel;
-import capstone.is4103capstone.seat.model.seatDemandForecast.MonthlySeatForecastModelForTeam;
-import capstone.is4103capstone.seat.repository.SeatRequestAdminMatchRepository;
+import capstone.is4103capstone.seat.model.seatFutureDemand.MonthlySeatFutureDemandModelForTeam;
+import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
 import capstone.is4103capstone.util.enums.ApprovalTypeEnum;
 import capstone.is4103capstone.util.enums.ScheduleRecurringBasisEnum;
 import capstone.is4103capstone.util.exception.EntityModelConversionException;
@@ -35,7 +35,7 @@ import java.util.List;
 public class EntityModelConversionService {
 
     @Autowired
-    private SeatRequestAdminMatchRepository seatRequestAdminMatchRepository;
+    private SeatAdminMatchRepository seatAdminMatchRepository;
     @Autowired
     private BusinessUnitRepository businessUnitRepository;
 
@@ -871,21 +871,24 @@ public class EntityModelConversionService {
 
 
 
-    // ---------------------------------- Seat Demand Forecast -----------------------------------
+    // ---------------------------------- Seat Utilisation Analytics -----------------------------------
 
-    public MonthlySeatForecastModelForTeam createMonthlyForecastModelForTeam(Team team, YearMonth yearMonth, Integer inventoryCount,
-                                                                             Integer occupancyCount, List<Employee> employeesWhoNeedSeats,
-                                                                             List<Employee> employeesWithUnnecessaryAllocations) {
+    // Note: month is zero-based in Java, hence the method will format the year month to be one-based
+    public MonthlySeatFutureDemandModelForTeam createMonthlyForecastModelForTeam(Team team, YearMonth yearMonth, Integer inventoryCount,
+                                                                                 Integer occupancyCount, List<Employee> employeesWhoNeedSeats,
+                                                                                 List<Employee> employeesWithUnnecessaryAllocations) {
 
-        MonthlySeatForecastModelForTeam monthlySeatForecastModelForTeam = new MonthlySeatForecastModelForTeam();
+        MonthlySeatFutureDemandModelForTeam monthlySeatFutureDemandModelForTeam = new MonthlySeatFutureDemandModelForTeam();
 
         GroupModel teamModel = new GroupModel();
         teamModel.setId(team.getId());
         teamModel.setName(team.getObjectName());
         teamModel.setCode(team.getCode());
-        monthlySeatForecastModelForTeam.setTeam(teamModel);
+        monthlySeatFutureDemandModelForTeam.setTeam(teamModel);
 
-        monthlySeatForecastModelForTeam.setYearMonth(yearMonth.toString());
+        YearMonth formattedYearMonth = YearMonth.of(yearMonth.getYear(), yearMonth.getMonthValue());
+        formattedYearMonth = formattedYearMonth.plusMonths(1);
+        monthlySeatFutureDemandModelForTeam.setYearMonth(formattedYearMonth.toString());
 
         List<EmployeeModel> employeeModelsWhoNeedSeats = new ArrayList<>();
         for (Employee employee :
@@ -895,7 +898,7 @@ public class EntityModelConversionService {
             employeeModel.setFullName(employee.getFullName());
             employeeModelsWhoNeedSeats.add(employeeModel);
         }
-        monthlySeatForecastModelForTeam.setEmployeesWhoNeedSeats(employeeModelsWhoNeedSeats);
+        monthlySeatFutureDemandModelForTeam.setEmployeesWhoNeedSeats(employeeModelsWhoNeedSeats);
 
         List<EmployeeModel> employeeModelsWithUnnecessaryAllocations = new ArrayList<>();
         for (Employee employee :
@@ -905,11 +908,12 @@ public class EntityModelConversionService {
             employeeModel.setFullName(employee.getFullName());
             employeeModelsWithUnnecessaryAllocations.add(employeeModel);
         }
-        monthlySeatForecastModelForTeam.setEmployeesWithUnnecessaryAllocations(employeeModelsWithUnnecessaryAllocations);
+        monthlySeatFutureDemandModelForTeam.setEmployeesWithUnnecessaryAllocations(employeeModelsWithUnnecessaryAllocations);
 
-        monthlySeatForecastModelForTeam.setInventoryCount(inventoryCount);
-        monthlySeatForecastModelForTeam.setNumOfSeatsOccupied(occupancyCount);
+        monthlySeatFutureDemandModelForTeam.setInventoryCount(inventoryCount);
+        monthlySeatFutureDemandModelForTeam.setNumOfSeatsOccupied(occupancyCount);
 
-        return  monthlySeatForecastModelForTeam;
+        return monthlySeatFutureDemandModelForTeam;
     }
+
 }

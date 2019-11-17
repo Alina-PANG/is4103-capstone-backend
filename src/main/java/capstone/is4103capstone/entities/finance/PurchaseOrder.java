@@ -18,20 +18,26 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class PurchaseOrder extends DBEntityTemplate {
     @Convert(converter = StringListConverter.class)
+    @JsonIgnore
     private List<String> relatedBJF;
 
     @OneToMany(mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<StatementOfAcctLineItem> statementOfAccount = new ArrayList<>();
 
     @OneToMany(mappedBy = "relatedPO",fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<SpendingRecord> detailedSpending = new ArrayList<>();
 
     @Column(name = "status")
     private ApprovalStatusEnum status;
 
+    private String countryId;
+
     private String currencyCode;
 
-    private Double totalAmount;
+    private BigDecimal totalAmount;
+    private BigDecimal totalAmtInGBP;
 
     private String approver;
 
@@ -42,6 +48,22 @@ public class PurchaseOrder extends DBEntityTemplate {
 
     public PurchaseOrder() {
 
+    }
+
+    public BigDecimal getTotalAmtInGBP() {
+        return totalAmtInGBP;
+    }
+
+    public void setTotalAmtInGBP(BigDecimal totalAmtInGBP) {
+        this.totalAmtInGBP = totalAmtInGBP;
+    }
+
+    public String getCountryId() {
+        return countryId;
+    }
+
+    public void setCountryId(String countryId) {
+        this.countryId = countryId;
     }
 
     public List<SpendingRecord> getDetailedSpending() {
@@ -100,11 +122,11 @@ public class PurchaseOrder extends DBEntityTemplate {
         this.currencyCode = currencyCode;
     }
 
-    public Double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(Double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 }

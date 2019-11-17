@@ -10,12 +10,10 @@ import capstone.is4103capstone.finance.Repository.PlanLineItemRepository;
 import capstone.is4103capstone.finance.Repository.PlanRepository;
 import capstone.is4103capstone.finance.Repository.ServiceRepository;
 import capstone.is4103capstone.finance.admin.EntityCodeHPGeneration;
+import capstone.is4103capstone.finance.admin.service.FXTableService;
 import capstone.is4103capstone.finance.budget.model.req.ApproveBudgetReq;
 import capstone.is4103capstone.finance.budget.model.req.CreateBudgetReq;
-import capstone.is4103capstone.finance.budget.model.res.BudgetLineItemModel;
-import capstone.is4103capstone.finance.budget.model.res.BudgetModel;
-import capstone.is4103capstone.finance.budget.model.res.GetBudgetListRes;
-import capstone.is4103capstone.finance.budget.model.res.GetBudgetRes;
+import capstone.is4103capstone.finance.budget.model.res.*;
 import capstone.is4103capstone.general.model.ApprovalTicketModel;
 import capstone.is4103capstone.general.model.GeneralRes;
 import capstone.is4103capstone.general.service.ApprovalTicketService;
@@ -30,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -46,6 +45,8 @@ public class BudgetService {
     ServiceRepository serviceRepository;
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    FXTableService fxService;
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     private final SimpleDateFormat datetimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -121,7 +122,9 @@ public class BudgetService {
             else{//reforecast
                 List<Plan> plansOfCC = cc.getPlans();
                 for (Plan p:plansOfCC){
-                    if (p.getForYear().equals(createBudgetReq.getYear()) && p.getPlanType().equals(BudgetPlanEnum.REFORECAST) && (!p.getDeleted() && !p.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.REJECTED))){
+                    if (p.getForYear().equals(createBudgetReq.getYear()) && p.getPlanType().equals(BudgetPlanEnum.REFORECAST) &&
+                           p.getForMonth().equals((new Date()).getMonth()+1) &&
+                            (!p.getDeleted() && !p.getBudgetPlanStatus().equals(BudgetPlanStatusEnum.REJECTED))){
                         throw new Exception("Reforecast plan for year "+createBudgetReq.getYear()+", month "+p.getForMonth()+" of cost center ["+cc.getCode()+"] already exists!");
                     }
                 }
@@ -151,13 +154,14 @@ public class BudgetService {
                     newPlan.setLineItems(newItems);
             }
 
-
             newPlan.setHierachyPath(g.getPlanHP(newPlan,cc));
             for (PlanLineItem pl:newPlan.getLineItems()){
                 pl.setCode(EntityCodeHPGeneration.getCode(planLineItemRepository,pl,newPlan.getCode()));
                 pl.setHierachyPath(EntityCodeHPGeneration.setPlanItemHP(pl,newPlan.getHierachyPath()));
+                pl.setBudgetAmountInGBP(fxService.convertToGBPWithLatest(pl.getCurrencyAbbr(),pl.getBudgetAmount()));
                 planLineItemRepository.save(pl);
             }
+
             planRepository.saveAndFlush(newPlan);
 //            generateCode(planRepository,newPlan);
 
@@ -166,13 +170,10 @@ public class BudgetService {
             //TODO: create approval ticket sending email notification to the approver:
             if (createBudgetReq.getToSubmit()){
                 try{
-                    createApprovalTicket(createBudgetReq.getUsername(),cc.getBmApprover(),newPlan,"BM Approver please view the budget plan.");
-//                    createApprovalTicket(createBudgetReq.getUsername(),cc.getFunctionApprover(),newPlan,"Function approver please view the budget plan.");
+                    createApprovalTicket(createBudgetReq.getUsername(),cc.getBmApprover(),newPlan,"BM Approver please view the budget plan.",ApprovalTypeEnum.BUDGETPLAN_BM);
                 }catch (Exception emailExc){
                 }
             }
-
-
             return new GeneralRes("Successully "+(createBudgetReq.getToSubmit()?"submit":"save")+" the plan!", false);
         }catch (Exception ex){
             ex.printStackTrace();
@@ -313,9 +314,8 @@ public class BudgetService {
         else{
             plan.setBudgetPlanStatus(BudgetPlanStatusEnum.PENDING_FUNCTION_APPROVAL);
             ApprovalTicketService.approveTicketByEntity(plan,approveBudgetReq.getComment(),approveBudgetReq.getUsername());
-            createApprovalTicket(approveBudgetReq.getUsername(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.");
+            createApprovalTicket(approveBudgetReq.getUsername(),plan.getCostCenter().getFunctionApprover(),plan,"BM Approver approved, Function approver please view the budget plan.", ApprovalTypeEnum.BUDGETPLAN_FUNCTION);
         }
-
         planRepository.saveAndFlush(plan);
         logger.info("BM APPROVER Successully "+plan.getBudgetPlanStatus()+" the new plan! -- "+approveBudgetReq.getUsername()+" "+new Date());
         return new GeneralRes("BM APPROVAL Successfully "+plan.getBudgetPlanStatus()+" the plan!", false);
@@ -383,12 +383,37 @@ public class BudgetService {
     }
 
 
-    private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content){
+    private void createApprovalTicket(String requesterUsername, Employee receiver, Plan newPlan, String content, ApprovalTypeEnum approvalType){
         Employee requesterEntity = employeeRepository.findEmployeeByUserName(requesterUsername);
-        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, ApprovalTypeEnum.BUDGETPLAN);
+        ApprovalTicketService.createTicketAndSendEmail(requesterEntity,receiver,newPlan,content, approvalType);
         //TODO: What's the message content?
     }
 
+    //amount currency is GBP
+    public BudgetDashboardRes getBudgetPlanAmountForYear() throws Exception {
+        List<String> yearList = new ArrayList<>();
 
+        Calendar now = Calendar.getInstance();
+        int currentYear = now.get(Calendar.YEAR);
+
+        yearList.add(String.valueOf(currentYear-2));
+        yearList.add(String.valueOf(currentYear-1));
+        yearList.add(String.valueOf(currentYear));
+        yearList.add(String.valueOf(currentYear+1));
+
+        List<BigDecimal> amountList = new ArrayList<>();
+
+        for (String year : yearList) {
+            BigDecimal amountForThisYear = planRepository.findTotalAmountByPlanYear(year);
+            if(amountForThisYear != null) {
+                amountList.add(amountForThisYear);
+            }else{
+                amountList.add(new BigDecimal(0));
+            }
+        }
+
+        return new BudgetDashboardRes("Successfully get budget plan total amount for four years.", false,
+                amountList.get(0), amountList.get(1), amountList.get(2), amountList.get(3));
+    }
 }
 

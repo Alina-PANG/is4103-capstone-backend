@@ -11,6 +11,8 @@ public interface RegionRepository extends JpaRepository<Region, String> {
 
     Region getRegionByObjectName(String objectName);
 
+    Region getRegionByCode(String code);
+
     Region findRegionById(String id);
 
     @Query(value = "SELECT * From region r WHERE r.is_deleted=false AND r.id=?1", nativeQuery = true)
