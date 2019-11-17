@@ -158,7 +158,7 @@ public class BudgetService {
             for (PlanLineItem pl:newPlan.getLineItems()){
                 pl.setCode(EntityCodeHPGeneration.getCode(planLineItemRepository,pl,newPlan.getCode()));
                 pl.setHierachyPath(EntityCodeHPGeneration.setPlanItemHP(pl,newPlan.getHierachyPath()));
-                pl.setBudgetAmountInGBP(fxService.convertToGBPWithLatest(pl.getCurrencyAbbr(),pl.getBudgetAmountInGBP()));
+                pl.setBudgetAmountInGBP(fxService.convertToGBPWithLatest(pl.getCurrencyAbbr(),pl.getBudgetAmount()));
                 planLineItemRepository.save(pl);
             }
 

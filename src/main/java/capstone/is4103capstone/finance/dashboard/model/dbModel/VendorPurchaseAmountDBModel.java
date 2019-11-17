@@ -15,6 +15,6 @@ public interface VendorPurchaseAmountDBModel {
     @Value("#{target.actual_sum}")
     BigDecimal getTotalActual();
     @Value("#{target.paid_sum}")
-    BigDecimal getTotalPaid(); // need to manuall calculate the accurals.
+    BigDecimal getTotalPaid();
 
 }

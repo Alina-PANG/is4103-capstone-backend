@@ -17,8 +17,6 @@ import java.util.List;
 @Service
 public class ContractValueAnalysisService {
 
-    //TODO: handle currency exchange!
-
     @Autowired
     VendorRepository vendorRepository;
 
@@ -31,7 +29,6 @@ public class ContractValueAnalysisService {
         for (VendorAndContractDBModel m:vendorAndContracts)
             vendorCodeMapping.put(m.getVendorCode(),m);
 
-        //只需要one-to-one的map就行，因为目前只在vendor level上面
         List<VendorContractAggreLineModel>  summary = new ArrayList<>();
 
         for (VendorPurchaseAmountDBModel m:vendorAndPurchase){

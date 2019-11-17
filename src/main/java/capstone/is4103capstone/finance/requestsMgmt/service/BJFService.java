@@ -237,11 +237,11 @@ public class BJFService {
                 if (e.getDeleted() || !Tools.isSameYear(e.getCreatedDateTime(),thisYear))
                     continue;
                 if (e.getBjfStatus().equals(BJFStatusEnum.POVALUE_UPDATED) ||e.getBjfStatus().equals(BJFStatusEnum.PENDING_PAYMENTS) || e.getBjfStatus().equals(BJFStatusEnum.DELIVERED)){
-                    commitedBudget.add(e.getTotalSpending() == null || e.getTotalSpending().equals(BigDecimal.ZERO)?e.getEstimatedBudget():e.getTotalSpending());
+                    commitedBudget.add(e.getTotalSpending() == null || e.getTotalSpending().equals(BigDecimal.ZERO)? e.getEstimatedBudget():e.getTotalSpending());
                 }
             }
 
-            response.put(thisYear+" Commited Value within cost center",commitedBudget);
+            response.put(thisYear+" Commited Value for this service within cost center",commitedBudget);
             response.put("BJF Estimated Budget",bjf.getEstimatedBudget());
             // current year
             // bjf status
@@ -258,7 +258,7 @@ public class BJFService {
                 }
             }
 
-            response.put(thisYear+" Commited Value with vendor",yearlySpendingWithVendor);
+            response.put(thisYear+" Commited Value with vendor ",yearlySpendingWithVendor);
 
             JSONObject contractAnalysis = new JSONObject();
 
@@ -283,7 +283,7 @@ public class BJFService {
                     }
                 }
                 if (activeContracts.isEmpty()){
-                    contractAnalysis.put("Master Contract Status","No Master Contract available with Vendor"+vendor.getObjectName());
+                    contractAnalysis.put("Master Contract Status","No Master Contract available with "+vendor.getObjectName());
                     //really have no contract to check
                     contractAnalysis.put("With in 20k?",yearlySpendingWithVendor.compareTo(BigDecimal.valueOf(20000.0))<0);
                 }else{
@@ -301,9 +301,9 @@ public class BJFService {
                 }
                 ContractAndChildAggre childAggre = activeChildContractInfos.get(0);
                 contractAnalysis.put("Child Contract Value",childAggre.getChildContractValue());
-                contractAnalysis.put("Child Contract Code",childAggre.getChildContractCode());
-                contractAnalysis.put("Contract Start Date",childAggre.getContractStartDate());
-                contractAnalysis.put("Contract End Date",childAggre.getContractEndDate());
+//                contractAnalysis.put("Child Contract Code",childAggre.getChildContractCode());
+                contractAnalysis.put("Contract Term",childAggre.getContractStartDate()+" to "+childAggre.getContractEndDate());
+//                contractAnalysis.put("Contract End Date",childAggre.getContractEndDate());
                 contractAnalysis.put("Contract Status",childAggre.getContractStatus());
             }
             response.put("Contract Value Analysis",contractAnalysis);

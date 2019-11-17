@@ -37,11 +37,11 @@ public class PlanLineItem extends DBEntityTemplate {
         this.budgetAmountInGBP = budgetAmountInGBP;
     }
 
-    public String getServiceCode() {
+    public String getserviceCode() {
         return serviceCode;
     }
 
-    public void setServiceCode(String serviceCode) {
+    public void setserviceCode(String serviceCode) {
         this.serviceCode = serviceCode;
     }
 
@@ -74,14 +74,6 @@ public class PlanLineItem extends DBEntityTemplate {
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public String getserviceCode() {
-        return serviceCode;
-    }
-
-    public void setserviceCode(String serviceCode) {
-        this.serviceCode = serviceCode;
     }
 
     public BudgetPlanEnum getItemType() {

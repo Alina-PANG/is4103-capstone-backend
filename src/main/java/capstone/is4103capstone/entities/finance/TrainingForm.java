@@ -22,7 +22,7 @@ public class TrainingForm extends RequestFormTemplate {
 
     private String trainingLocation;
 
-    private String targetAudience; // just briefly descripted;
+    private String targetAudience;
 
     private String trainingTitle;
 
@@ -30,7 +30,7 @@ public class TrainingForm extends RequestFormTemplate {
 
     private String trainerEmail;
 
-    private String trainerCompany;// if internal: empty
+    private String trainerCompany;
 
     private TrainingTypeEnum trainerType;
     private TravelTrainingTypeEnum trainingType;
