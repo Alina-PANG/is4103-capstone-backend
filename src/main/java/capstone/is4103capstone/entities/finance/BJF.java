@@ -14,8 +14,6 @@ import java.math.BigDecimal;
 @Table
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BJF extends RequestFormTemplate {
-
-    //justification == form description
     private String serviceId;
     private String vendorId;
 

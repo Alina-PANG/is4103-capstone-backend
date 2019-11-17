@@ -119,13 +119,6 @@ public class Employee extends DBEntityTemplate {
         this.securityId = "S-" + UUID.randomUUID();
     }
 
-//    public List<ChildContract> getChildContractsApproved() {
-//        return childContractsApproved;
-//    }
-//
-//    public void setChildContractsApproved(List<ChildContract> childContractsApproved) {
-//        this.childContractsApproved = childContractsApproved;
-//    }
 
     public CostCenter getDefaultCostCenter() {
         return defaultCostCenter;

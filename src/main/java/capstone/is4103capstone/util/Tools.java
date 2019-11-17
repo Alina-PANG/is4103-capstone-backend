@@ -83,13 +83,4 @@ public class Tools {
         return c.getTime();
     }
 
-
-//    public static void main(String []args){
-//        try{
-//            System.out.println(dateFormatter.format(getFirstDayOfYear(2019)));
-//        }catch (Exception ex){
-//
-//        }
-//    }
-
 }

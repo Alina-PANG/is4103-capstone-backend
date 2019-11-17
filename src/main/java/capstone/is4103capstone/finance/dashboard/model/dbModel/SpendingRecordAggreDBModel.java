@@ -19,9 +19,3 @@ public interface SpendingRecordAggreDBModel {
     @Value("#{target.country_hp}")
     String getCountryHP();
 }
-/*
-select sp.code as sp_code, sp.last_modified_date_time,sp.currency_code,
-sp.service_name,  s.code as service_code, SUM(sp.spending_amt) as total_spending_per_serv,
-c.object_name as country_name, c.code as country_code, c.hierachy_path as country_hp
-
- */
