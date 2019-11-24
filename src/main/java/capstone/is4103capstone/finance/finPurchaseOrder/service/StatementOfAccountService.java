@@ -101,7 +101,7 @@ public class StatementOfAccountService {
             ex.printStackTrace();
             return ResponseEntity
                     .badRequest()
-                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+                    .body(new GeneralRes(ex.getMessage(), true));
         }
     }
 
@@ -135,7 +135,7 @@ public class StatementOfAccountService {
             ex.printStackTrace();
             return ResponseEntity
                     .badRequest()
-                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+                    .body(new GeneralRes(ex.getMessage(), true));
         }
     }
 
@@ -167,7 +167,7 @@ public class StatementOfAccountService {
             ex.printStackTrace();
             return ResponseEntity
                     .badRequest()
-                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+                    .body(new GeneralRes(ex.getMessage(), true));
         }
     }
 
@@ -193,7 +193,7 @@ public class StatementOfAccountService {
             ex.printStackTrace();
             return ResponseEntity
                     .badRequest()
-                    .body(new GeneralRes("An unexpected error has occured: "+ ex.toString(), true));
+                    .body(new GeneralRes(ex.getMessage(), true));
         }
     }
 }

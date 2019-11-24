@@ -47,14 +47,6 @@ public class AdminInitialization {
     CostCenterRepository costCenterRepository;
     @Autowired
     SeatAdminMatchRepository seatAdminMatchRepository;
-    @Autowired
-    EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
-    @Autowired
-    ScheduleRepository scheduleRepository;
-
-    @Autowired
-    SeatInitializationService seatInitializationService;
-
     public void init() {
         if (currencyRepository.findAll().isEmpty()) {
             createCurrency();
@@ -78,10 +70,7 @@ public class AdminInitialization {
         if (teamRepository.findAll().isEmpty()){
             createTeamAndCC();
         }
-        if (seatAdminMatchRepository.findAll().isEmpty()){
-            seatManagementInitialisation();
-            seatInitializationService.initialiseSeatManagement();
-        }
+
     }
 
     private void createEmployeeTemplate(String fName, String lName, String username, String password, String email, String codeCPnt, String adminRight) {
@@ -111,8 +100,6 @@ public class AdminInitialization {
         }
 
 
-
-
         employeeRepository.save(newEmployee);
 
     }
@@ -135,6 +122,18 @@ public class AdminInitialization {
         }
     }
 
+    //TODO:
+    @Transactional
+    public void configureEmployeeTeamAndDefaultCC(){
+        String[] usernameList = {"admin", "poteam", "yingshi2502", "xuhong", "user01", "user02", "user03",
+                "outsourcing1", "panghangzhi", "caiyuqian", "joshuachew", "ryan", "viet"};
+        String[] matchTeam = {"T-SG-ADMIN-ADMIN","T-SG-ADMIN-ADMIN","T-SG-ADMIN-ADMIN","T-SG-RCR-INT","T-SG-InfraTech-DBAdmin","T-SG-FixIncTech-ProdSupp","T-SG-FixIncTech-ProdSupp",
+        "T-SG-ADMIN-ADMIN","T-SG-InfraTech-Networks","T-SG-InfraTech-Networks","T-SG-InfraTech-Networks","T-SG-FixIncTech-Dev","T-SG-FixIncTech-Dev"
+        };
+
+    }
+
+
     @Transactional
     public void configureEmployeeHier() {
         Employee admin = employeeRepository.findEmployeeByUserName("admin");
@@ -148,7 +147,11 @@ public class AdminInitialization {
                 e.setManager(admin);
                 admin.getSubordinates().add(e);
             }
+            employeeRepository.saveAndFlush(e);
         }
+        employeeRepository.saveAndFlush(admin);
+        employeeRepository.saveAndFlush(yingshi);
+
     }
     private void createCurrency() {
         String[] defaultCurrencyCode = {"SGD", "GBP", "USD", "HKD", "JPY", "EURO", "CNY"};
@@ -234,6 +237,16 @@ public class AdminInitialization {
             office.getBusinessUnitsCodeInOffice().add(buHRCodes[i]);
 
         }
+
+        CompanyFunction adminFunc = functionRepository.getByCode("F-SG-ADMIN");
+        String[] buAdminNames = {"Administration"};
+        String[] buAdminCodes = {"BU-SG-ADMIN"};
+        for (int i=0;i<buAdminNames.length;i++){
+            BusinessUnit bu = new BusinessUnit(buAdminNames[i],buAdminCodes[i],adminFunc.getHierachyPath()+":"+buAdminCodes[i],"admin",adminFunc);
+            bu = businessUnitRepository.saveAndFlush(bu);
+            office.getBusinessUnitsCodeInOffice().add(buAdminCodes[i]);
+
+        }
         officeRepository.saveAndFlush(office);
     }
 
@@ -285,6 +298,16 @@ public class AdminInitialization {
         officeRepository.saveAndFlush(orq);
 
 
+        //------------ADMIN Team Creation-------
+        BusinessUnit adminBU = businessUnitRepository.findByCode("BU-SG-ADMIN");
+        Team adminTeam = new Team("Admin", "T-SG-ADMIN-ADMIN", adminBU.getHierachyPath()+":"+"T-SG-ADMIN-ADMIN","admin",adminBU,orq);
+        adminTeam.setTeamLeader(yingshi);
+        adminTeam = teamRepository.saveAndFlush(adminTeam);
+        hrReruBu.getTeams().add(adminTeam);
+        createCCofTeam(adminTeam,admin);
+        orq.getTeams().add(adminTeam);
+        officeRepository.saveAndFlush(orq);
+
     }
 
     private CostCenter createCCofTeam(Team t, Employee funcApprover){
@@ -299,133 +322,5 @@ public class AdminInitialization {
         return costCenter;
     }
 
-    private void seatManagementInitialisation() {
-        Employee hangzhi = employeeRepository.findEmployeeByUserName("panghangzhi");
-        Employee yuqian = employeeRepository.findEmployeeByUserName("caiyuqian");
-        Employee admin = employeeRepository.findEmployeeByUserName("admin");
-        Employee joshua = employeeRepository.findEmployeeByUserName("joshuachew");
 
-        // Create Employee Office Working Schedule
-        Office office = officeRepository.getOfficeByCode("ORQ");
-        if (office!=null) {
-
-            EmployeeOfficeWorkingSchedule yuqianWorkingSchedule = new EmployeeOfficeWorkingSchedule();
-            Schedule yuqianSchedule1 = new Schedule();
-            yuqianSchedule1.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 10, 1, 9, 0));
-            yuqianSchedule1.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 1, 1, 18, 0));
-            yuqianSchedule1 = scheduleRepository.save(yuqianSchedule1);
-            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule1);
-            Schedule yuqianSchedule2 = new Schedule();
-            yuqianSchedule2.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 3, 1, 9, 0));
-            yuqianSchedule2.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 3, 30, 18, 0));
-            yuqianSchedule2 = scheduleRepository.save(yuqianSchedule2);
-            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule2);
-            yuqianWorkingSchedule.setEmployee(yuqian);
-            yuqianWorkingSchedule.setOffice(office);
-
-            EmployeeOfficeWorkingSchedule hangzhiWorkingSchedule = new EmployeeOfficeWorkingSchedule();
-            Schedule hangzhiSchedule = new Schedule();
-            hangzhiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
-            hangzhiSchedule = scheduleRepository.save(hangzhiSchedule);
-            hangzhiWorkingSchedule.getSchedules().add(hangzhiSchedule);
-            hangzhiWorkingSchedule.setEmployee(hangzhi);
-            hangzhiWorkingSchedule.setOffice(office);
-
-            EmployeeOfficeWorkingSchedule joshuaWorkingSchedule = new EmployeeOfficeWorkingSchedule();
-            Schedule joshuaSchedule = new Schedule();
-            joshuaSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
-            joshuaSchedule = scheduleRepository.save(joshuaSchedule);
-            joshuaWorkingSchedule.getSchedules().add(joshuaSchedule);
-            joshuaWorkingSchedule.setEmployee(joshua);
-            joshuaWorkingSchedule.setOffice(office);
-
-            employeeOfficeWorkingScheduleRepository.save(yuqianWorkingSchedule);
-            employeeOfficeWorkingScheduleRepository.save(hangzhiWorkingSchedule);
-            employeeOfficeWorkingScheduleRepository.save(joshuaWorkingSchedule);
-        }
-
-        // Create management hierarchy levels
-
-        // Fixed Income Development
-        Team devTeam = teamRepository.findTeamByCode("T-SG-FixIncTech-Dev");
-
-        hangzhi.setTeam(devTeam);
-        devTeam.setTeamLeader(hangzhi);
-        yuqian.setTeam(devTeam);
-        devTeam.getMembers().add(hangzhi);
-        devTeam.getMembers().add(yuqian);
-        hangzhi.setHierachyPath(devTeam.getHierachyPath()+":"+hangzhi.getCode());
-        yuqian.setHierachyPath(devTeam.getHierachyPath()+":"+yuqian.getCode());
-
-        yuqian.setManager(hangzhi);
-        hangzhi.getSubordinates().add(yuqian);
-
-        hangzhi.setManager(joshua);
-        joshua.getSubordinates().add(hangzhi);
-
-        Team prodSuppTeam = teamRepository.findTeamByCode("T-SG-FixIncTech-ProdSupp");
-        Team dbAdminTeam = teamRepository.findTeamByCode("T-SG-InfraTech-DBAdmin");
-        Team networksTeam = teamRepository.findTeamByCode("T-SG-InfraTech-Networks");
-
-        // Seat admin setup for different hierarchies
-        // SG-Tech-FixIncTech-Dev
-        SeatAdminMatch seatAdminMatch1 = new SeatAdminMatch();
-        seatAdminMatch1.setHierarchyId(devTeam.getId());
-        seatAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatAdminMatch1.setSeatAdmin(hangzhi);
-
-        // SG-Tech-FixIncTech
-        SeatAdminMatch seatAdminMatch2 = new SeatAdminMatch();
-        seatAdminMatch2.setHierarchyId(devTeam.getBusinessUnit().getId());
-        seatAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatAdminMatch2.setSeatAdmin(joshua);
-
-        // SG-Tech-FixIncTech
-        SeatAdminMatch seatAdminMatch3 = new SeatAdminMatch();
-        seatAdminMatch3.setHierarchyId(devTeam.getBusinessUnit().getFunction().getId());
-        seatAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
-        seatAdminMatch3.setSeatAdmin(admin);
-
-        // SG-Tech-FixIncTech-ProdSupp
-        SeatAdminMatch seatAdminMatch4 = new SeatAdminMatch();
-        seatAdminMatch4.setHierarchyId(prodSuppTeam.getId());
-        seatAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatAdminMatch4.setSeatAdmin(admin);
-
-        // SG-Tech-InfraTech-DBAdmin
-        SeatAdminMatch seatAdminMatch5 = new SeatAdminMatch();
-        seatAdminMatch5.setHierarchyId(dbAdminTeam.getId());
-        seatAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatAdminMatch5.setSeatAdmin(admin);
-
-        // SG-Tech-InfraTech-Networks
-        SeatAdminMatch seatAdminMatch6 = new SeatAdminMatch();
-        seatAdminMatch6.setHierarchyId(networksTeam.getId());
-        seatAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
-        seatAdminMatch6.setSeatAdmin(admin);
-
-        // SG-Tech-InfraTech
-        SeatAdminMatch seatAdminMatch7 = new SeatAdminMatch();
-        seatAdminMatch7.setHierarchyId(networksTeam.getBusinessUnit().getId());
-        seatAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
-        seatAdminMatch7.setSeatAdmin(admin);
-
-        SeatAdminMatch seatAdminMatch8 = new SeatAdminMatch();
-        seatAdminMatch8.setHierarchyId(devTeam.getOffice().getId());
-        seatAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
-        seatAdminMatch8.setSeatAdmin(admin);
-
-        teamRepository.saveAndFlush(devTeam);
-        employeeRepository.saveAndFlush(hangzhi);
-        employeeRepository.saveAndFlush(yuqian);
-        employeeRepository.saveAndFlush(joshua);
-        seatAdminMatchRepository.save(seatAdminMatch1);
-        seatAdminMatchRepository.save(seatAdminMatch2);
-        seatAdminMatchRepository.save(seatAdminMatch3);
-        seatAdminMatchRepository.save(seatAdminMatch4);
-        seatAdminMatchRepository.save(seatAdminMatch5);
-        seatAdminMatchRepository.save(seatAdminMatch6);
-        seatAdminMatchRepository.save(seatAdminMatch7);
-        seatAdminMatchRepository.save(seatAdminMatch8);
-    }
 }

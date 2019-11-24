@@ -59,7 +59,7 @@ public class MailSenderService {
             return new GeneralRes("Email successfully sent!", false);
         }catch (Exception ex){
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+            return new GeneralRes(ex.getMessage(), true);
         }
     }
 

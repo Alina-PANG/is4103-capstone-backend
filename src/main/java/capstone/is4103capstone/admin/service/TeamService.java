@@ -2,6 +2,7 @@ package capstone.is4103capstone.admin.service;
 
 import capstone.is4103capstone.admin.dto.TeamDto;
 import capstone.is4103capstone.admin.repository.TeamRepository;
+import capstone.is4103capstone.entities.Employee;
 import capstone.is4103capstone.entities.Team;
 import capstone.is4103capstone.general.model.GeneralEntityModel;
 import capstone.is4103capstone.util.exception.TeamNotFoundException;
@@ -9,7 +10,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +22,8 @@ public class TeamService {
 
     @Autowired
     private TeamRepository teamRepository;
+    @Autowired
+    private EmployeeService employeeService;
 
     public Team retrieveTeamById(String teamId) throws TeamNotFoundException {
         if (teamId == null || teamId.trim().length() == 0) {
@@ -77,6 +82,13 @@ public class TeamService {
         return teamDtos;
     }
 
+    //TODO: check whether already in team, remove original team, etc.
+    @Transactional
+    public void addUserToTeam(String username, String teamCodeOrId) throws Exception{
+        Team t = validateTeam(teamCodeOrId);
+        Employee e = employeeService.validateUser(username);
+
+    }
     public Team getTeamEntityByUuid(String teamUuid) throws Exception {
         Optional<Team> team = teamRepository.findById(teamUuid);
         if (team.isPresent()) {
@@ -133,6 +145,18 @@ public class TeamService {
             teams.add(dtoToEntity(teamDto));
         }
         return teams;
+    }
+
+    public Team validateTeam(String idOrCode) throws EntityNotFoundException {
+        Optional<Team> teamOp = teamRepository.findById(idOrCode);
+        if (teamOp.isPresent())
+            return teamOp.get();
+        Team t = teamRepository.findTeamByCode(idOrCode);
+        if ( t == null )
+            throw new EntityNotFoundException("Team not found");
+        if (t.getDeleted())
+            throw new EntityNotFoundException("Team is already removed");
+        return t;
     }
 
 

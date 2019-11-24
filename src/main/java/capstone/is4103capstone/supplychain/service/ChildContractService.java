@@ -81,7 +81,7 @@ public class ChildContractService {
         }
         catch(Exception ex){
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+            return new GeneralRes(ex.getMessage(), true);
         }
     }
 
@@ -107,7 +107,7 @@ public class ChildContractService {
             return new GetChildContractsRes("Successfully retrieved child contracts by master contract ID", false, returnList);
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetChildContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetChildContractsRes(ex.getMessage(), true, null);
         }
     }
 
@@ -132,7 +132,7 @@ public class ChildContractService {
             return new GeneralRes("Successfully updated the child contract!", false);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
+            return new GeneralRes( ex.getMessage(), true);
         }
     }
 
@@ -153,7 +153,7 @@ public class ChildContractService {
             }
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetChildContractRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetChildContractRes(ex.getMessage(), true, null);
         }
     }
 

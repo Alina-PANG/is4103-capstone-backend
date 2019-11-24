@@ -6,11 +6,12 @@ import capstone.is4103capstone.entities.helper.StringListConverter;
 
 import javax.persistence.Convert;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CreateVendorReq implements Serializable {
     private String vendorName;
-    private List<String> businessUnitIds;
+    private List<String> businessUnitIds = new ArrayList<>();
     private String serviceDescription;
     private String relationshipManagerName;
     private String relationshipManagerEmail;
@@ -21,6 +22,19 @@ public class CreateVendorReq implements Serializable {
     private String username;
 
     public CreateVendorReq() {
+    }
+
+    public CreateVendorReq(String vendorName, String singleBUId) {
+        this.vendorName = vendorName;
+        this.businessUnitIds.add(singleBUId);
+        this.serviceDescription = "";
+        this.relationshipManagerName = "";
+        this.relationshipManagerEmail = "";
+        this.billingContactName = "";
+        this.billingContactEmail = "";
+        this.escalationContactName = "";
+        this.escalationContactEmail = "";
+        this.username = "admin";
     }
 
     public String getUsername() {

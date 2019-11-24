@@ -3,14 +3,8 @@ package capstone.is4103capstone.seat.service;
 import capstone.is4103capstone.admin.repository.*;
 import capstone.is4103capstone.entities.*;
 import capstone.is4103capstone.entities.helper.DateHelper;
-import capstone.is4103capstone.entities.seat.Seat;
-import capstone.is4103capstone.entities.seat.SeatAdminMatch;
-import capstone.is4103capstone.entities.seat.SeatMap;
-import capstone.is4103capstone.entities.seat.SeatUtilisationLog;
-import capstone.is4103capstone.seat.repository.SeatAdminMatchRepository;
-import capstone.is4103capstone.seat.repository.SeatMapRepository;
-import capstone.is4103capstone.seat.repository.SeatRepository;
-import capstone.is4103capstone.seat.repository.SeatUtilisationLogRepository;
+import capstone.is4103capstone.entities.seat.*;
+import capstone.is4103capstone.seat.repository.*;
 import capstone.is4103capstone.util.enums.HierarchyTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,12 +36,154 @@ public class SeatInitializationService {
     private FunctionRepository functionRepository;
     @Autowired
     private EmployeeRepository employeeRepository;
+    @Autowired
+    ScheduleRepository scheduleRepository;
+    @Autowired
+    EmployeeOfficeWorkingScheduleRepository employeeOfficeWorkingScheduleRepository;
 
 
-    public void initialiseSeatManagement() {
-        createSeatmaps();
-        initialiseSeatUtilisationLog();
+    public void init(){
+        if (seatAdminMatchRepository.findAll().isEmpty()){
+            seatManagementInitialisation();
+        }
+        if (seatMapRepository.findAll().isEmpty()){
+            createSeatmaps();
+        }
+        if (seatUtilisationLogRepository.findAll().isEmpty()){
+            initialiseSeatUtilisationLog();
+        }
     }
+
+    private void seatManagementInitialisation() {
+        Employee hangzhi = employeeRepository.findEmployeeByUserName("panghangzhi");
+        Employee yuqian = employeeRepository.findEmployeeByUserName("caiyuqian");
+        Employee admin = employeeRepository.findEmployeeByUserName("admin");
+        Employee joshua = employeeRepository.findEmployeeByUserName("joshuachew");
+
+        // Create Employee Office Working Schedule
+        Office office = officeRepository.getOfficeByCode("ORQ");
+        if (office!=null) {
+
+            EmployeeOfficeWorkingSchedule yuqianWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule yuqianSchedule1 = new Schedule();
+            yuqianSchedule1.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 10, 1, 9, 0));
+            yuqianSchedule1.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 1, 1, 18, 0));
+            yuqianSchedule1 = scheduleRepository.save(yuqianSchedule1);
+            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule1);
+            Schedule yuqianSchedule2 = new Schedule();
+            yuqianSchedule2.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2019, 3, 1, 9, 0));
+            yuqianSchedule2.setEndDateTime(DateHelper.getDateByYearMonthDateHourMinute(2020, 3, 30, 18, 0));
+            yuqianSchedule2 = scheduleRepository.save(yuqianSchedule2);
+            yuqianWorkingSchedule.getSchedules().add(yuqianSchedule2);
+            yuqianWorkingSchedule.setEmployee(yuqian);
+            yuqianWorkingSchedule.setOffice(office);
+
+            EmployeeOfficeWorkingSchedule hangzhiWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule hangzhiSchedule = new Schedule();
+            hangzhiSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
+            hangzhiSchedule = scheduleRepository.save(hangzhiSchedule);
+            hangzhiWorkingSchedule.getSchedules().add(hangzhiSchedule);
+            hangzhiWorkingSchedule.setEmployee(hangzhi);
+            hangzhiWorkingSchedule.setOffice(office);
+
+            EmployeeOfficeWorkingSchedule joshuaWorkingSchedule = new EmployeeOfficeWorkingSchedule();
+            Schedule joshuaSchedule = new Schedule();
+            joshuaSchedule.setStartDateTime(DateHelper.getDateByYearMonthDateHourMinute(2018, 0, 1, 9, 0));
+            joshuaSchedule = scheduleRepository.save(joshuaSchedule);
+            joshuaWorkingSchedule.getSchedules().add(joshuaSchedule);
+            joshuaWorkingSchedule.setEmployee(joshua);
+            joshuaWorkingSchedule.setOffice(office);
+
+            employeeOfficeWorkingScheduleRepository.save(yuqianWorkingSchedule);
+            employeeOfficeWorkingScheduleRepository.save(hangzhiWorkingSchedule);
+            employeeOfficeWorkingScheduleRepository.save(joshuaWorkingSchedule);
+        }
+
+        // Create management hierarchy levels
+
+        // Fixed Income Development
+        Team devTeam = teamRepository.findTeamByCode("T-SG-FixIncTech-Dev");
+
+        hangzhi.setTeam(devTeam);
+        devTeam.setTeamLeader(hangzhi);
+        yuqian.setTeam(devTeam);
+        devTeam.getMembers().add(hangzhi);
+        devTeam.getMembers().add(yuqian);
+        hangzhi.setHierachyPath(devTeam.getHierachyPath()+":"+hangzhi.getCode());
+        yuqian.setHierachyPath(devTeam.getHierachyPath()+":"+yuqian.getCode());
+
+        yuqian.setManager(hangzhi);
+        hangzhi.getSubordinates().add(yuqian);
+
+        hangzhi.setManager(joshua);
+        joshua.getSubordinates().add(hangzhi);
+
+        Team prodSuppTeam = teamRepository.findTeamByCode("T-SG-FixIncTech-ProdSupp");
+        Team dbAdminTeam = teamRepository.findTeamByCode("T-SG-InfraTech-DBAdmin");
+        Team networksTeam = teamRepository.findTeamByCode("T-SG-InfraTech-Networks");
+
+        // Seat admin setup for different hierarchies
+        // SG-Tech-FixIncTech-Dev
+        SeatAdminMatch seatAdminMatch1 = new SeatAdminMatch();
+        seatAdminMatch1.setHierarchyId(devTeam.getId());
+        seatAdminMatch1.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch1.setSeatAdmin(hangzhi);
+
+        // SG-Tech-FixIncTech
+        SeatAdminMatch seatAdminMatch2 = new SeatAdminMatch();
+        seatAdminMatch2.setHierarchyId(devTeam.getBusinessUnit().getId());
+        seatAdminMatch2.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch2.setSeatAdmin(joshua);
+
+        // SG-Tech-FixIncTech
+        SeatAdminMatch seatAdminMatch3 = new SeatAdminMatch();
+        seatAdminMatch3.setHierarchyId(devTeam.getBusinessUnit().getFunction().getId());
+        seatAdminMatch3.setHierarchyType(HierarchyTypeEnum.COMPANY_FUNCTION);
+        seatAdminMatch3.setSeatAdmin(admin);
+
+        // SG-Tech-FixIncTech-ProdSupp
+        SeatAdminMatch seatAdminMatch4 = new SeatAdminMatch();
+        seatAdminMatch4.setHierarchyId(prodSuppTeam.getId());
+        seatAdminMatch4.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch4.setSeatAdmin(admin);
+
+        // SG-Tech-InfraTech-DBAdmin
+        SeatAdminMatch seatAdminMatch5 = new SeatAdminMatch();
+        seatAdminMatch5.setHierarchyId(dbAdminTeam.getId());
+        seatAdminMatch5.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch5.setSeatAdmin(admin);
+
+        // SG-Tech-InfraTech-Networks
+        SeatAdminMatch seatAdminMatch6 = new SeatAdminMatch();
+        seatAdminMatch6.setHierarchyId(networksTeam.getId());
+        seatAdminMatch6.setHierarchyType(HierarchyTypeEnum.TEAM);
+        seatAdminMatch6.setSeatAdmin(admin);
+
+        // SG-Tech-InfraTech
+        SeatAdminMatch seatAdminMatch7 = new SeatAdminMatch();
+        seatAdminMatch7.setHierarchyId(networksTeam.getBusinessUnit().getId());
+        seatAdminMatch7.setHierarchyType(HierarchyTypeEnum.BUSINESS_UNIT);
+        seatAdminMatch7.setSeatAdmin(admin);
+
+        SeatAdminMatch seatAdminMatch8 = new SeatAdminMatch();
+        seatAdminMatch8.setHierarchyId(devTeam.getOffice().getId());
+        seatAdminMatch8.setHierarchyType(HierarchyTypeEnum.OFFICE);
+        seatAdminMatch8.setSeatAdmin(admin);
+
+        teamRepository.saveAndFlush(devTeam);
+        employeeRepository.saveAndFlush(hangzhi);
+        employeeRepository.saveAndFlush(yuqian);
+        employeeRepository.saveAndFlush(joshua);
+        seatAdminMatchRepository.save(seatAdminMatch1);
+        seatAdminMatchRepository.save(seatAdminMatch2);
+        seatAdminMatchRepository.save(seatAdminMatch3);
+        seatAdminMatchRepository.save(seatAdminMatch4);
+        seatAdminMatchRepository.save(seatAdminMatch5);
+        seatAdminMatchRepository.save(seatAdminMatch6);
+        seatAdminMatchRepository.save(seatAdminMatch7);
+        seatAdminMatchRepository.save(seatAdminMatch8);
+    }
+
 
     private void createSeatmaps() {
         List<SeatMap> seatMaps = seatMapRepository.findAllUndeleted();

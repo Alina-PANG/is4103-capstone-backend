@@ -83,7 +83,7 @@ public class VendorService {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new GetVendorRes("An unexpected error happens: " + ex.getMessage(), true, null);
+            return new GetVendorRes( ex.getMessage(), true, null);
         }
     }
 
@@ -109,7 +109,7 @@ public class VendorService {
             return new GetVendorsRes("Successfully retrieved all vendors", false, returnList);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new GetVendorsRes("An unexpected error happens: " + ex.getMessage(), true, null);
+            return new GetVendorsRes( ex.getMessage(), true, null);
         }
     }
 
@@ -151,7 +151,7 @@ public class VendorService {
             return new GeneralRes("Successfully updated the vendor!", false);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
+            return new GeneralRes( ex.getMessage(), true);
         }
     }
 

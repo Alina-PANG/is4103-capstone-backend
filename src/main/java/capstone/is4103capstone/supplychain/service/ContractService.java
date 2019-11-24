@@ -105,7 +105,7 @@ public class ContractService {
         }
         catch(Exception ex){
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: "+ex.getMessage(), true);
+            return new GeneralRes(ex.getMessage(), true);
         }
     }
 
@@ -205,7 +205,7 @@ public class ContractService {
             }
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetContractRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetContractRes(ex.getMessage(), true, null);
         }
     }
 
@@ -231,7 +231,7 @@ public class ContractService {
             return new GetContractsRes("Successfully retrieved all contracts", false, returnList);
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetContractsRes(ex.getMessage(), true, null);
         }
     }
 
@@ -321,7 +321,7 @@ public class ContractService {
             return new GeneralRes("Successfully updated the contract!", false);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new GeneralRes("An unexpected error happens: " + ex.getMessage(), true);
+            return new GeneralRes( ex.getMessage(), true);
         }
     }
 
@@ -416,7 +416,7 @@ public class ContractService {
             return new GetContractsRes("Successfully retrieved contracts by vendor ID", false, returnList);
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetContractsRes(ex.getMessage(), true, null);
         }
     }
 
@@ -442,7 +442,7 @@ public class ContractService {
             return new GetContractsRes("Successfully retrieved contracts by vendor ID", false, returnList);
         }catch(Exception ex){
             ex.printStackTrace();
-            return new GetContractsRes("An unexpected error happens: "+ex.getMessage(), true, null);
+            return new GetContractsRes(ex.getMessage(), true, null);
         }
     }
 }
