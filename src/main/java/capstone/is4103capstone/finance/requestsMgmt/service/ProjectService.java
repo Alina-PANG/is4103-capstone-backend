@@ -237,6 +237,7 @@ public class ProjectService {
         return projectModels;
     }
 
+    //TODO: BJF Project also retreveing from this API ,which is incorrect
     public List<ProjectModel> retrieveProjectsByOwner(String ownerId) throws Exception{
         Employee owner = employeeService.validateUser(ownerId);
         List<Project> projects = projectRepository.getProjectsByProjectOwnerId(owner.getId());

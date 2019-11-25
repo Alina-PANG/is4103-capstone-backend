@@ -62,7 +62,7 @@ public class SupplyChainDashboardService {
         BigDecimal rejected = outsourcingAssessmentRepository.findNumberOfAssessmentByStatus("5");
 
         OutsourcingAssessmentDistributionModel model = new OutsourcingAssessmentDistributionModel(
-            pendingBM,pendingOutsourcing,approved,rejected, template, outsourcingCreated);
+            pendingBM,pendingOutsourcing,approved,rejected,/* template, */outsourcingCreated);
 
         return new GetAssessmentDistributionRes("", false, model);
     }

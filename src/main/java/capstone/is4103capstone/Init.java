@@ -25,6 +25,6 @@ public class Init {
         adminInit.init();
         finInit.financeInit();
         scmInit.init();
-//        seatInit.init();
+        seatInit.init();
     }
 }

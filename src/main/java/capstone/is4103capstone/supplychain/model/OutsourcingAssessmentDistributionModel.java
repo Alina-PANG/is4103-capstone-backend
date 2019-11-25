@@ -14,6 +14,14 @@ public class OutsourcingAssessmentDistributionModel implements Serializable {
     public OutsourcingAssessmentDistributionModel() {
     }
 
+    public OutsourcingAssessmentDistributionModel(BigDecimal pending_BM_approval, BigDecimal pending_outsourcing_approval, BigDecimal approved, BigDecimal rejected, BigDecimal outsourcing_record_created) {
+        this.pending_BM_approval = pending_BM_approval;
+        this.pending_outsourcing_approval = pending_outsourcing_approval;
+        this.approved = approved;
+        this.rejected = rejected;
+        this.outsourcing_record_created = outsourcing_record_created;
+    }
+
     public OutsourcingAssessmentDistributionModel(BigDecimal pending_BM_approval, BigDecimal pending_outsourcing_approval, BigDecimal approved, BigDecimal rejected, BigDecimal template, BigDecimal outsourcing_record_created) {
         this.pending_BM_approval = pending_BM_approval;
         this.pending_outsourcing_approval = pending_outsourcing_approval;

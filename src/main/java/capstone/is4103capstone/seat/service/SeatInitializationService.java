@@ -43,12 +43,12 @@ public class SeatInitializationService {
 
 
     public void init(){
-        if (seatAdminMatchRepository.findAll().isEmpty()){
-            seatManagementInitialisation();
-        }
-        if (seatMapRepository.findAll().isEmpty()){
-            createSeatmaps();
-        }
+//        if (seatAdminMatchRepository.findAll().isEmpty()){
+//            seatManagementInitialisation();
+//        }
+//        if (seatMapRepository.findAll().isEmpty()){
+//            createSeatmaps();
+//        }
         if (seatUtilisationLogRepository.findAll().isEmpty()){
             initialiseSeatUtilisationLog();
         }
